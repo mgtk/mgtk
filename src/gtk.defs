@@ -1074,83 +1074,94 @@
   int
   ())
 
-;; Replaced a lot of Gdk drawing functions
-;; with the Gtk equivalents (from Sugar).
-;; Henning
+(define-func gdk_gc_set_foreground
+  none
+  ((GdkGC gc)
+   (GdkColor color)))
+
+(define-func gdk_gc_set_background
+  none
+  ((GdkGC gc)
+   (GdkColor color)))
+
+(define-func gdk_gc_set_font
+  none
+  ((GdkGC gc)
+   (GdkFont font)))
 
 (define-func gdk_window_clear_area 
    none
-   ((GdkWindow window); Henning, this should be a drawable
+   ((GdkDrawable drawable)
     (int x1) (int y1)
     (int x2) (int y2)))
 
-;(define-func gdk_draw_point
-;  none
-;  ((GdkDrawable drawable)
-;   (GdkGC gc)
+(define-func gdk_draw_point
+  none
+  ((GdkDrawable drawable)
+   (GdkGC gc)
+   (int x) (int y)))
+(define-func gdk_draw_line
+  none
+  ((GdkDrawable drawable)
+   (GdkGC gc)
+   (int x1) (int y1)
+   (int x2) (int y2)))
+(define-func gdk_draw_rectangle
+  none
+  ((GdkDrawable drawable)
+   (GdkGC gc)
+   (bool filled)
+   (int x)     (int y)
+   (int width) (int height)))
+(define-func gdk_draw_arc
+  none
+  ((GdkDrawable drawable)
+   (GdkGC gc)
+   (bool filled)
+   (int x)      (int y)
+   (int width)  (int height)
+   (int angle1) (int angle2)))
+; gdk_draw_polygon
+(define-func gdk_draw_string
+  none
+  ((GdkDrawable drawable)
+   (GdkFont font)
+   (GdkGC gc)
+   (int x) (int y)
+   (string str)))
+(define-func gdk_draw_text;  Henning, inserted, 06/03/2000
+  none
+  ((GdkDrawable drawable)
+   (GdkFont font)
+   (GdkGC gc)
+   (int x) (int y)
+   (string text)
+   (int text_length)))
+(define-func gdk_draw_pixmap
+  none
+  ((GdkDrawable drawable)
+   (GdkGC gc)
+   (GdkDrawable src)
+   (int xsrc)  (int ysrc)
+   (int xdest) (int ydest)
+   (int width) (int height)))
+;gdk_draw_points
+;gdk_draw_segments
+;gdk_draw_lines
+
+; Henning
+;(define-func gdk_cursor_new
+;  GdkCursor
+;  ((GdkCursorType cursor_type)))
+
+; Henning
+;(define-func gdk_cursor_new_from_pixmap
+;  GdkCursor
+;  ((GdkPixmap source)
+;   (GdkBitmap mask)
+;   (GdkColor fg)
+;   (GdkColor bg)
 ;   (int x) (int y)))
-;(define-func gdk_draw_line
-;  none
-;  ((GdkDrawable drawable)
-;   (GdkGC gc)
-;   (int x1) (int y1)
-;   (int x2) (int y2)))
-;(define-func gdk_draw_rectangle
-;  none
-;  ((GdkDrawable drawable)
-;   (GdkGC gc)
-;   (int filled)
-;   (int x)     (int y)
-;   (int width) (int height)))
-;(define-func gdk_draw_arc
-;  none
-;  ((GdkDrawable drawable)
-;   (GdkGC gc)
-;   (int filled)
-;   (int x)      (int y)
-;   (int width)  (int height)
-;   (int angle1) (int angle2)))
-;; gdk_draw_polygon
-;(define-func gdk_draw_string
-;  none
-;  ((GdkDrawable drawable)
-;   (GdkFont font)
-;   (GdkGC gc)
-;   (int x) (int y)
-;   (string str)))
-;(define-func gdk_draw_text;  Henning, inserted, 06/03/2000
-;  none
-;  ((GdkDrawable drawable)
-;   (GdkFont font)
-;   (GdkGC gc)
-;   (int x) (int y)
-;   (string text)
-;   (int text_length)))
-;(define-func gdk_draw_pixmap
-;  none
-;  ((GdkDrawable drawable)
-;   (GdkGC gc)
-;   (GdkDrawable src)
-;   (int xsrc)  (int ysrc)
-;   (int xdest) (int ydest)
-;   (int width) (int height)))
-;;gdk_draw_points
-;;gdk_draw_segments
-;;gdk_draw_lines
-
-;; Henning
-;;(define-func gdk_cursor_new
-;;  GdkCursor
-;;  ((GdkCursorType cursor_type)))
-
-;; Henning
-;;(define-func gdk_cursor_new_from_pixmap
-;;  GdkCursor
-;;  ((GdkPixmap source)
-;;   (GdkBitmap mask)
-;;   (GdkColor fg)
-;;   (GdkColor bg)
-;;   (int x) (int y)))
 
 ;; Gtk equivalents, Henning
 (define-func gtk_draw_arrow
@@ -1418,14 +1429,30 @@
 
 
 ;; Added a few functions accessing internal widget data, Henning
-(define-func gtk_get_window
+(define-func gtk_widget_get_window
   GdkWindow
   ((GtkWidget widget)))
 
-(define-func gtk_get_state 
+(define-func gtk_widget_get_drawable
+  GdkDrawable
+  ((GtkWidget widget)))
+
+(define-func gtk_widget_get_state 
   GtkStateType 
   ((GtkWidget widget)))
 
+(define-func gtk_widget_get_allocation
+  none
+  ((GtkWidget widget)
+   (int width (output))
+   (int height (output))
+   (int x (output))
+   (int y (output))))
+
+(define-func gtk_widget_get_style_fg_gc
+  GdkGC
+  ((GtkWidget widget)
+   (GtkStateType state)))
 
 ; from gtktypeutils.h
 ; Removed, Henning

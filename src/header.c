@@ -197,10 +197,26 @@ value mgtk_glist_append_string(value ls, value s) { /* ML */
 
 /* *** Access functions to internal widget data *** */
 
-GdkWindow *gtk_get_window (GtkWidget *widget) {
+GdkWindow *gtk_widget_get_window (GtkWidget *widget) {
   return widget->window;
 }
 
-GtkStateType gtk_get_state (GtkWidget *widget) {
+GdkDrawable *gtk_widget_get_drawable (GtkWidget *widget) {
+  return widget->window;
+}
+
+GtkStateType gtk_widget_get_state (GtkWidget *widget) {
   return widget->state;
+}
+
+void gtk_widget_get_allocation (GtkWidget *widget, int *width, int *height,
+				int *x, int *y) {
+  *width = widget->allocation.width;
+  *height = widget->allocation.height;
+  *x = widget->allocation.x;
+  *y = widget->allocation.y;
+}
+
+GdkGC *gtk_widget_get_style_fg_gc (GtkWidget *widget, GtkStateType state) {
+  return widget->style->fg_gc[state];
 }

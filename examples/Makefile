@@ -4,7 +4,7 @@ MOSMLINCLUDE=-I $(LIBDIR)
 
 OBJS= FunInput.uo valuta.uo helloworld2.uo helloworld.uo entrylabel.uo\
       fileview.uo fileedit.uo fileedit2.uo counter.uo comboexample.uo\
-      treeexample.uo
+      treeexample.uo drawing.uo
 
 all: tests
 
