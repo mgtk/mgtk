@@ -1,0 +1,47 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+  (fields
+    '("guint8" "state")
+    '("guint8" "saved_state")
+    '("gchar*" "name")
+    '("GtkStyle*" "style")
+    '("GdkRectangle" "allocation")
+    '("GdkWindow*" "window")
+    '("GtkWidget*" "parent")
+  )
+)
+
+(define-object ItemFactory
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkItemFactory")
+  (gtype-id "GTK_TYPE_ITEM_FACTORY")
+)
+
+(define-method get_item
+  (of-object "GtkItemFactory")
+  (c-name "gtk_item_factory_get_item")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-gchar*" "path")
+  )
+)
+
+(define-method get_widget
+  (of-object "GtkItemFactory")
+  (c-name "gtk_item_factory_get_widget")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-gchar*" "path")
+  )
+)

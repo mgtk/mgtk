@@ -3,34 +3,35 @@ structure Gtk = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-
+ 
     type textiter = GObject.cptr
     signature TextBuffer = sig
         type base
         type 'a textbuffer_t
         type 'a t = 'a textbuffer_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
-        val insert : 'a t -> textiter -> string -> int -> unit
+        val insert : 'a t -> textiter -> string -> int option -> unit
+        val insert' : 'a t -> textiter -> string -> unit
     end
     structure TextBuffer :> TextBuffer = struct
         open Dynlib
         type cptr = GObject.cptr
         val repr = GObject.repr
         val symb = GtkBasis.symb
-
+ 
         type base = unit
         type 'a textbuffer_t = unit
         type 'a t = 'a textbuffer_t GObject.t
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
         val insert_ : cptr -> cptr -> string -> int -> unit
             = app4 (symb"mgtk_gtk_textbuffer_insert")
-        val insert : 'a t -> textiter -> string -> int -> unit
-            = fn self => fn iter => fn text => fn len => insert_ (repr self) iter text len
+        val insert : 'a t -> textiter -> string -> int option -> unit
+            = fn self => fn iter => fn text => fn len => insert_ (repr self) iter text (getOpt (len,~1))
+        val insert' : 'a t -> textiter -> string -> unit
+            = fn self => fn iter => fn text => insert_ (repr self) iter text ~1
     end
 end
 

@@ -5,8 +5,6 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
     end
     structure Object :> Object = struct
         type cptr = GObject.cptr
@@ -16,16 +14,15 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
     end
     signature Adjustment = sig
         type base
         type 'a adjustment_t
         type 'a t = 'a adjustment_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
-        val new : real -> real -> real -> real -> real -> real -> base t
+        val new : real option -> real option -> real option -> real option -> real option -> real option -> base t
+        val new' : unit -> base t
     end
     structure Adjustment :> Adjustment = struct
         type cptr = GObject.cptr
@@ -35,11 +32,37 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
         val new_ : real * real * real * real * real * real -> cptr
             = _import "gtk_adjustment_new" : real * real * real * real * real * real -> cptr;
-        val new : real -> real -> real -> real -> real -> real -> base t
-            = fn value => fn lower => fn upper => fn step_increment => fn page_increment => fn page_size => make (new_ (value,lower,upper,step_increment,page_increment,page_size))
+        val new : real option -> real option -> real option -> real option -> real option -> real option -> base t
+            = fn value => fn lower => fn upper => fn step_incr => fn page_incr => fn page_size => make (new_ (getOpt (value,0.0),getOpt (lower,0.0),getOpt (upper,0.0),getOpt (step_incr,0.0),getOpt (page_incr,0.0),getOpt (page_size,0.0)))
+        val new' : unit -> base t
+            = fn dummy => make (new_ (0.0,0.0,0.0,0.0,0.0,0.0))
+    end
+    signature Widget = sig
+        type base
+        type 'a widget_t
+        type 'a t = 'a widget_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+        val set_scroll_adjustments : 'a t -> 'b Adjustment.t option -> 'c Adjustment.t option -> bool
+        val set_scroll_adjustments' : 'a t -> bool
+    end
+    structure Widget :> Widget = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a widget_t = unit
+        type 'a t = 'a widget_t Object.t
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Object.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
+ 
+        val set_scroll_adjustments_ : cptr * cptr * cptr -> bool
+            = _import "gtk_widget_set_scroll_adjustments" : cptr * cptr * cptr -> bool;
+        val set_scroll_adjustments : 'a t -> 'b Adjustment.t option -> 'c Adjustment.t option -> bool
+            = fn self => fn hadjustment => fn vadjustment => GObject.withPtr (self,fn self => set_scroll_adjustments_ (self,getOpt (hadjustment,GObject.null),getOpt (vadjustment,GObject.null)))
+        val set_scroll_adjustments' : 'a t -> bool
+            = fn self => GObject.withPtr (self,fn self => GObject.withPtr (GObject.null,fn GObject.null => GObject.withPtr (GObject.null,fn GObject.null => set_scroll_adjustments_ (self,GObject.null,GObject.null))))
     end
 end
 
@@ -51,3 +74,6 @@ end
 
 
 /* *** Adjustment *** */
+
+
+/* *** Widget *** */

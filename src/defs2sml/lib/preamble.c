@@ -89,6 +89,13 @@ static inline char* copy_sml_string(value s) {
   return result;
 }
 
+/* A char * -> value version of the same
+   FIXME: Is this correct?
+ */
+static inline value copy_sml_string_to_value(const char *s) {
+  return (value) copy_sml_string((value)s);
+}
+
 
 /* Construct an SML string list from a C char* array
  * TODO: Generalise so that the type becomes:
@@ -149,6 +156,10 @@ EXTERNML value mgtk_main_quit(value dummy) { /* ML */
   return Val_unit;
 }
 
+/* ML type: unit -> unit */
+EXTERNML value mgtk_get_null(value dummy) { /* ML */
+  return (value) NULL;
+}
 
 
 /* *** GValue stuff *** */
@@ -198,7 +209,7 @@ MGTK_MakeGetter(mgtk_get_pos_bool, g_value_get_boolean, Val_bool)
 MGTK_MakeGetter(mgtk_get_pos_int, g_value_get_int, Val_long)
 MGTK_MakeGetter(mgtk_get_pos_char, g_value_get_char, Val_char)
 MGTK_MakeGetter(mgtk_get_pos_double, g_value_get_double, copy_double)
-MGTK_MakeGetter(mgtk_get_pos_string, g_value_get_string, copy_sml_string)
+MGTK_MakeGetter(mgtk_get_pos_string, g_value_get_string, copy_sml_string_to_value)
 /*
 MGTK_MakeGetter(mgtk_get_pos_uint, GTK_VALUE_UINT, Val_long)
 MGTK_MakeGetter(mgtk_get_pos_long, GTK_VALUE_LONG, Val_long)

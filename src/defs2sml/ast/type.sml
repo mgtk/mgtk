@@ -3,29 +3,33 @@
 
 structure Type :> Type = struct
 
-    datatype 'n ty =
+    datatype ('n, 'v) ty =
 	Void
       | Base of 'n
       | Tname of 'n
-      | Ptr of 'n ty
-      | Const of 'n ty
-      | Arr of int option * 'n ty
-      | Func of (string * 'n ty) list * 'n ty
+      | Ptr of ('n,'v) ty
+      | Const of ('n,'v) ty
+      | Arr of int option * ('n,'v) ty
+      | Func of (string * ('n,'v) ty) list * ('n,'v) ty
+      | WithDefault of ('n,'v) ty * 'v
 
-    fun mapi (f: ('n1 ty * 'n1) -> 'n2) (ty: 'n1 ty) : 'n2 ty =
+    fun mapiv f g ty =
 	case ty of
 	    Void => Void
-	  | Ptr ty => Ptr(mapi f ty)
-	  | Const ty => Const(mapi f ty)
-	  | Arr(i,ty) => Arr(i,mapi f ty)
-	  | Func(pars,ret) => Func(List.map (fn (p,t) => (p,mapi f t)) pars,
-				   mapi f ret)
+	  | Ptr ty => Ptr(mapiv f g ty)
+	  | Const ty => Const(mapiv f g ty)
+	  | Arr(i,ty) => Arr(i,mapiv f g ty)
+	  | Func(pars,ret) => Func(List.map (fn (p,t) => (p,mapiv f g t)) pars,
+				   mapiv f g ret)
 	  | Base n => Base (f(ty,n))
 	  | Tname n => Tname (f(ty, n))
+ 	  | WithDefault(ty, d) => WithDefault(mapiv f g ty, g d)
+
+    fun mapi f ty = mapiv f (fn d => d) ty
     fun map f ty = mapi (fn (_,n) => f n) ty
 
     val toUpper = String.map Char.toUpper
-    fun show show_tname ty =
+    fun show show_tname show_default ty =
 	let fun shw ty =
 		case ty of
 		    Void => "VOID"
@@ -42,6 +46,7 @@ structure Type :> Type = struct
 				     (fn (p,t) => p^":"^shw t)
 				     pars
 	                ^ "-> " ^ shw ty
+		  | WithDefault(ty,d) => shw ty ^ " [" ^ show_default d ^ "]"
 	in  shw ty
 	end
 

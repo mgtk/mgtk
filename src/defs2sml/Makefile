@@ -53,6 +53,9 @@ regdiffmlton-%: reggenmlton-%
 reg-%: regdiff-% regdiffmlton-%
 	@echo -n
 
+regmosml: $(MAIN) $(patsubst %.defs,regdiff-%,$(REGFILES))
+regmlton: $(MAIN) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
+
 regression: $(MAIN) $(patsubst %.defs,regdiff-%,$(REGFILES)) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
 
 regcompgen-%: $(MAIN)
@@ -65,12 +68,12 @@ regcomp-%: regcompgen-%
 	@echo "[MOSMLC]       $*.sml"
 	@mosmlc -toplevel -liberal -c $(REGOUT)/$*.sml
 
-reg-compile: $(MAIN) $(patsubst %.defs,regcomp-%,$(REGFILES))
+regcompile: $(MAIN) $(patsubst %.defs,regcomp-%,$(REGFILES))
 
 
 # Generate binding
 mgtk.c mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c
-	./$(MAIN) -co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gtk.defs
+	./$(MAIN) -co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gtk.defs > defs.log 2>&1
 
 mgtk-mlton.c mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
 	./$(MAIN) --mlton -co mgtk-mlton.c -so mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml api/pygtk/gtk.defs 
@@ -91,5 +94,6 @@ mltoncompile: $(MAIN) mgtk-mlton.sml mgtk-mlton.o
 	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" mgtk.cm mgtk-mlton.o
 
 realclean:
-	rm -f mgtk.c mgtk.sml
+	rm -f mgtk.c mgtk.sml mgtk.o
+	rm -f mgtk-mlton.c mgtk-mlton.sml mgtk-mlton.o mgtk
 	rm -f typetable.txt

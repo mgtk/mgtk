@@ -403,6 +403,14 @@ gtk_widget_modify_font
 gtk_widget_create_pango_context
 gtk_widget_get_pango_context
 gtk_widget_create_pango_layout
+#DEFAULTARGUMENTNOTSUPPORTED
+gtk_table_attach
+gtk_drag_get_data
+gtk_item_factory_popup
+gtk_item_factory_popup_with_data
+gtk_old_editable_claim_selection
+gtk_selection_owner_set
+gtk_selection_convert
 #SIGNALSWITHUNSUPPORTEDTYPES
 extend-selection
 scroll-vertical

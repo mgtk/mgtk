@@ -43,6 +43,8 @@ sig
     type 'a t
     type constructor = unit -> cptr
 
+    val null : cptr
+
     val repr     : 'a t -> cptr
     val inherit  : 'a -> constructor -> 'a t
     val toObject : 'a t -> base t
@@ -59,6 +61,7 @@ struct
     datatype 'a t = OBJ of cptr
     type constructor = unit -> cptr
 
+    val null = Dynlib.app1(GtkBasis.symb("mgtk_get_null")) ()
 
     fun repr (OBJ ptr) = ptr
     fun inherit _ con = OBJ(con())

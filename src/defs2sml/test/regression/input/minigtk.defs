@@ -142,10 +142,10 @@
 
 (define-function gtk_window_new
   (c-name "gtk_window_new")
-  (is-constructor-of "GtkWindow")
+  (is-constructor-of GtkWindow)
   (return-type "GtkWidget*")
   (parameters
-    '("GtkWindowType" "wtype")
+    '("GtkWindowType" "type" (default "GTK_WINDOW_TOPLEVEL"))
   )
 )
 

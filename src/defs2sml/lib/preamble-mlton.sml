@@ -67,6 +67,8 @@ sig
     type 'a t
     type constructor = unit -> cptr
 
+    val null : cptr
+
     val withPtr  : 'a t * (cptr -> 'b) -> 'b
     val inherit  : 'a -> constructor -> 'a t
     val toObject : 'a t -> base t
@@ -86,6 +88,7 @@ struct
     datatype 'a t = OBJ of cptr F.t
     type constructor = unit -> cptr
 
+    val null = MLton.Pointer.null
 
     fun withPtr (OBJ ptr, f) = F.withValue(ptr, f)
 

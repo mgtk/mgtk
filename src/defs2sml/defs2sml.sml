@@ -135,7 +135,7 @@ fun main () =
 	val api = order api
 
 	val debug = fn module => 
-        let fun pptype ty = Type.show (Name.toString') ty
+        let fun pptype ty = Type.show (Name.toString') (Name.toString') ty
 	    fun ppmodi (SOME(ty, parent, impl)) = 
 		": " ^ Name.toString' ty ^
 		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)

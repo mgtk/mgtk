@@ -18,6 +18,10 @@ structure TinySML = struct
 
     datatype fixity = Right | Left
 
+    fun show_fixity (NONE) = "infix"
+      | show_fixity (SOME Right) = "infixr"
+      | show_fixity (SOME Left)  = "infixl"
+
     datatype exp =
 	Unit 
       | Const of string
@@ -64,12 +68,15 @@ structure TinySML = struct
     fun mlify str = H.find trans_table str
 		    handle NotFound => str
 
-(*
-    fun ppExpr exp =
-	let fun ppexp level e =
+    local open Pretty in
+    fun ppDec dec =
+	let fun parens safe level tree = 
+		if level > safe then "(" ^+ tree +^ ")"
+		else tree
+	    fun ppexp level e =
 		case e of
                     (* special case some idioms *)
-		    App(Var "symb",[Str s]) => "(symb\""^s^"\")"
+		    App(Var "symb",[Str s]) => ppString("(symb\""^s^"\")")
 
                     (* then the general stuff *)
 		  | Unit => ppString "()"
@@ -80,27 +87,27 @@ structure TinySML = struct
 		  | Import(cglobal,ty) =>
                       ppString "_import" ++
 			   break(1,0)(ppString ("\""^cglobal^"\""),
-				      ": " ^+ SMLType.pp ty +^ ";")
-
-HERE
-		  | Fn(x,e) => parens 1 level ("fn " ^ mlify x ^ " => " ^ show_exp 1 e)
-		  | App(e,es) => parens 2 level 
-				    (show_exp 3 e ^ 
-				     Util.stringSep " " "" " " (show_exp 3) es)
-HERE
-
+				      ": " ^+ (ppString(SMLType.show ty)) +^ ";")
+		  | Fn(x,e) =>
+		      parens 1 level 
+			 ( break(1,3)("fn" ^+ ppString(mlify x) +^ "=>",
+				      ppexp 1 e) )
+		  | App(e,es) =>
+		      parens 2 level
+                         ( ppexp 3 e ++ makelist (true, " ") (map (ppexp 4) es) )
 		  | Tup [] => ppString "()"
-		  | Tup [e] => ppe level e
+		  | Tup [e] => ppexp level e
 		  | Tup es => ppelist "(" ")" "," es
 		  | SeqExp es => ppelist "" "" ";" es
 		  | Let(d,e) => pplet (Let(d,e))
 	    and ppelist start finish sep es =
-		compose(front ^+ clist ("#"^sep^" ") (ppe 1) es,1,2,0,ppString finish)
+		compose(start ^+ clist ("#"^sep^" ") (ppexp 1) es,
+			1,2,0,ppString finish)
 	    and pplet e =
 		let fun loop (Let(d,e)) acc = loop e (ppdec d::acc)
 		      | loop _ [] = raise Fail"pplet: shouldn't happen"
 		      | loop e acc = 
-			let val body = ppe 1 e
+			let val body = ppexp 1 e
 			in  case rev acc of
 				[] => body
 			      | d::ds =>
@@ -108,9 +115,44 @@ HERE
 					    compose(ppString "in" ++ body,1,2,0,ppString "end"))
 			end
 		in  loop e [] end
-
-		    
-*)
+	    and pplocal d =
+		let fun loop _ [] = raise Fail"pplocal: shouldn't happen"
+		      | loop (Local(d,d')) acc =
+			let val body = ppdec' d
+			in  case [ppdec' d'] of
+				[] => body
+			      | d::ds =>
+				break(1,0) (ppString "local" ++ makelist(true,"") (d :: map forcemulti ds),
+					    compose (ppString "in" ++ body,1,2,0,ppString "end"))
+			end
+		      | loop d acc = ppdec d
+		in  loop d [] end
+	    and ppdec d = 
+		case d of
+		    ValDecl(pat,ty,exp) => ppString "val"
+		  | FunDecl(name,args,ty,exp) => ppString "fun"
+		  | TypeDecl((args,name),ty) => ppString "type"
+		  | SeqDecl [] => empty
+		  | SeqDecl [d] => ppdec' d
+		  | SeqDecl (d::ds) => 
+		      makelist(true,"") (ppdec' d :: map (forcemulti o ppdec') ds)
+		  | EmptyDecl => empty
+		  | Comment NONE => empty
+		  | Comment (SOME s) => bracket "(*#*)" (ppString s)
+		  | Open strs => ppString "open" ++ clist "# " ppString strs
+		  | Infix (fixity, ids) => 
+		      ppString (show_fixity fixity) ++ clist "# " ppString ids
+		  | Local(d,d') => pplocal (Local(d,d'))
+	    and ppdec' d =
+		case d of
+		    None => empty
+		  | Some d => ppdec d
+		  | StrOnly d => ppdec d
+		  | SigOnly d => ppdec d
+	in  ppdec dec
+	end
+    end
+ 
     fun toString (isStrMode,isSigMode) mode indent info =
 	let fun parens safe level s = if level > safe then "(" ^ s ^ ")"
 				      else s
@@ -189,9 +231,14 @@ HERE
 		     ^ SMLType.toString(SMLType.TyApp(map SMLType.TyVar tvs,tname))
 		     ^ show_type_incl " = " ty
 		  | SeqDecl decs =>
-		       stringSep "" "" "\n" show' decs
+		       let fun isempty "\n" = true
+			     | isempty "" = true
+			     | isempty _ = false
+			   val decs' = List.filter (not o isempty)
+						   (List.map show' decs)
+		       in  stringSep "" "" "\n" (fn s=>s) decs' end
 		  | EmptyDecl => ""
-		  | Comment NONE => ""
+		  | Comment NONE => " "
 		  | Comment(SOME c) => "(*" ^ c ^ "*)"
 		  | Open strs => indent ^ Util.stringSep "open " "" " " (fn s=>s) strs
 		  | Infix(fixity, strs) => 

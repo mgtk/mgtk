@@ -30,7 +30,7 @@ end (* structure MosmlPrimTypes *)
 functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     
     type name = Name.name
-    type ty = name Type.ty
+    type ty = (name,name) Type.ty
 
     (* build a table mapping type names to
      *    SML types and SML primitive types
@@ -39,8 +39,8 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
      *)
 
     type info = {stype: (unit -> string) -> SMLType.ty, ptype: SMLType.ty,
-		 toc: TinyC.expr -> TinyC.expr,
-		 fromc: TinyC.expr -> TinyC.expr,
+		 toc: string (* which function to call *),
+		 fromc: string (* which function to call *),
 		 super: name option,
 		 fromprim: TinySML.exp -> TinySML.exp,
 		 wrapped: bool
@@ -56,30 +56,29 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun ccall name = fn e => TinyC.Call(name,NONE,[e])
     val basic =
 	[("int",       (fn _ => SMLType.IntTy,SMLType.IntTy,
-		        ccall"Int_val", ccall"Val_int", NONE))
+		        "Int_val", "Val_int", NONE))
         ,("uint",      (fn _ => SMLType.IntTy,SMLType.IntTy,
-		        ccall"Int_val", ccall"Val_int", NONE))
-        ,("guint",     (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
-		        ccall"Int_val", ccall"Val_int", NONE))
+		        "Int_val", "Val_int", NONE))
+        ,("guint",     (fn _ => SMLType.IntTy,SMLType.IntTy,    (* FIXME *)
+		        "Int_val", "Val_int", NONE))
         ,("char",      (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        ccall"Char_val", ccall"Val_char", NONE))
+		        "Char_val", "Val_char", NONE))
         ,("gunichar",  (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        ccall"Long_val", ccall"Val_long", NONE)) (* FIXME *)
+		        "Long_val", "Val_long", NONE)) (* FIXME *)
         ,("float",     (fn _ => SMLType.RealTy,SMLType.RealTy,
-		        ccall"Double_val", ccall"copy_double", NONE))
+		        "Double_val", "copy_double", NONE))
         ,("double",    (fn _ => SMLType.RealTy,SMLType.RealTy,
-		        ccall"Double_val", ccall"copy_double", NONE))
+		        "Double_val", "copy_double", NONE))
         ,("gdouble",   (fn _ => SMLType.RealTy,SMLType.RealTy,
-		        ccall"Double_val", ccall"copy_double", NONE))
+		        "Double_val", "copy_double", NONE))
         ,("ptr",       (fn _ => SMLType.TyApp([],["cptr"]),SMLType.TyApp([],["cptr"]),         (* FIXME *)
-		        fn e => TinyC.Cast(TinyC.TTyName "gpointer",e), 
-			fn e => TinyC.Cast(TinyC.TValue,e), NONE))
+		        "(gpointer)", "(value)", NONE))
         ,("bool",      (fn _ => SMLType.BoolTy,SMLType.BoolTy,
-		        ccall"Bool_val", ccall"Val_bool", NONE))
+		        "Bool_val", "Val_bool", NONE))
         ,("GType",     (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
-		        ccall"Int_val", ccall"Val_int", NONE))
+		        "Int_val", "Val_int", NONE))
         ,("GtkType",   (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
-		        ccall"Int_val", ccall"Val_int", NONE))
+		        "Int_val", "Val_int", NONE))
         ]
     fun init () = 
 	let fun a ((n,i),t)=
@@ -100,7 +99,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 					       nb)
 *)
 		    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
-		    val info = {toc=ccall"GtkObj_val",fromc=ccall"Val_GtkObj",
+		    val info = {toc="GtkObj_val",fromc="Val_GtkObj",
 				ptype=SMLType.TyApp([],["cptr"]),
 				fromprim = make, wrapped = true,
 				stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
@@ -114,7 +113,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		    AST.Enum _ => 
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
-			    {toc=ccall"Int_val", fromc=ccall"Val_int",
+			    {toc="Int_val", fromc="Val_int",
 			     fromprim=id, wrapped = false,
 			     ptype=SMLType.IntTy, super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asEnum name])})
@@ -122,8 +121,8 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		  | AST.Boxed _ =>
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
-			    {toc=ccall(Name.asCBoxed name^"_val"), 
-			     fromc=ccall("Val_"^Name.asCBoxed name),
+			    {toc=(Name.asCBoxed name^"_val"), 
+			     fromc=("Val_"^Name.asCBoxed name),
 			     fromprim=id, wrapped = false,
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
@@ -175,6 +174,8 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 
             (* then the general stuff *)
 	  | Type.Void => SMLType.UnitTy
+	  | Type.WithDefault(ty, default) => 
+               SMLType.TyApp([toSMLType tinfo fresh ty], ["option"])
 	  | Type.Base n => 
 	       (let val info: info = lookup tinfo n
 		in  #stype info fresh
@@ -214,6 +215,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       if Name.asType n = "char" then Prim.stringTy negative
 	       else SMLType.TyApp([],["cptr"])
 	  | Type.Void => SMLType.UnitTy
+	  | Type.WithDefault(ty,default) => toPrimType negative tinfo ty
 	  | Type.Base n => 
 	       (let val info: info = lookup tinfo n
 		in  #ptype info
@@ -233,8 +235,6 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 			      toPrimType (not negative) tinfo ret)
 	  | Type.Arr(len,ty) => SMLType.TyApp([],["..."]) (* FIXME *)
     val toPrimType = toPrimType false
-
-    fun call func arg = TinyC.Call(func, NONE, [arg])
 
     local open TinySML in
     fun prependPath n exp = (* FIXME *)
@@ -263,6 +263,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		end
 		    handle NotFound => raise Unbound n
 	       )
+	  | Type.WithDefault(ty,default) => fromPrimValue tinfo ty
 	  | Type.Ptr ty => fromPrimValue tinfo ty (* FIXME: ? *)
 	  | Type.Const ty => fromPrimValue tinfo ty
 	  | _ => id
@@ -280,6 +281,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		end
 		    handle NotFound => raise Unbound n
 	       )
+	  | Type.WithDefault(ty,default) => isWrapped tinfo ty
 	  | Type.Ptr ty => isWrapped tinfo ty
 	  | _ => false
 
@@ -288,14 +290,16 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    Type.Ptr(ty as Type.Base n) =>
                Name.asType n = "char"
 	  | Type.Const ty => isString tinfo ty
+	  | Type.WithDefault(ty,default) => isString tinfo ty
 	  | _ => false
 
-    fun toCValue tinfo ty =
+    fun tocvalue tinfo ty =
 	case ty of
 	    Type.Ptr(ty as Type.Base n) =>
-               if Name.asType n = "char" then call "String_val"
-	       else toCValue tinfo ty
-	  | Type.Const ty => toCValue tinfo ty
+               if Name.asType n = "char" then "String_val"
+	       else tocvalue tinfo ty
+	  | Type.Const ty => tocvalue tinfo ty
+	  | Type.WithDefault(ty,default) => tocvalue tinfo ty
 	  | Type.Base n => 
                (let val info:info = lookup tinfo n
 		in  #toc info end
@@ -306,29 +310,30 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		in  #toc info end
 		    handle NotFound => raise Unbound n
                )
-	  | Type.Ptr ty => toCValue tinfo ty (* FIXME: ? *)
+	  | Type.Ptr ty => tocvalue tinfo ty (* FIXME: ? *)
 	  | Type.Void => raise Fail "toCValue: shouldn't happen (Void)"
 	  | Type.Arr _ => raise Fail "toCValue: not implemented (Arr)"
 	  | Type.Func _ => raise Fail "toCValue: shouldn't happen (Func)"
-
+    fun toCValue tinfo ty exp = ccall (tocvalue tinfo ty) exp
     fun fromCValue tinfo ty =
 	case ty of 
 	    Type.Ptr(ty as Type.Base n) => 
-	       if Name.asType n = "char" then call "my_copy_string"
+	       if Name.asType n = "char" then ccall "my_copy_string"
 	       else fromCValue tinfo ty
+	  | Type.WithDefault(ty,default) => fromCValue tinfo ty
 	  | Type.Base n => 
                (let val info:info = lookup tinfo n
-		in  #fromc info end
+		in  ccall(#fromc info) end
 		    handle NotFound => 
 			   (TextIO.output(TextIO.stdErr, "Unbound type name ("^Name.toString n^")\n");
-			    call "Val_int")
+			    ccall "Val_int")
                )
 	  | Type.Tname n => 
                (let val info:info = lookup tinfo n
-		in  #fromc info end
+		in  ccall(#fromc info) end
 		    handle NotFound => 
 			   (TextIO.output(TextIO.stdErr, "Unbound type name ("^Name.toString n^")\n");
-			    call "Val_GtkObj")
+			    ccall "Val_GtkObj")
                )
           | Type.Const ty => fromCValue tinfo ty
 	  | Type.Ptr ty => fromCValue tinfo ty

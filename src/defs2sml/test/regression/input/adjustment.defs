@@ -12,16 +12,33 @@
   (gtype-id "GTK_TYPE_ADJUSTMENT")
 )
 
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+)
+
 (define-function gtk_adjustment_new
   (c-name "gtk_adjustment_new")
-  (is-constructor-of "GtkAdjustment")
+  (is-constructor-of GtkAdjustment)
   (return-type "GtkObject*")
   (parameters
-    '("gdouble" "value")
-    '("gdouble" "lower")
-    '("gdouble" "upper")
-    '("gdouble" "step_increment")
-    '("gdouble" "page_increment")
-    '("gdouble" "page_size")
+    '("gdouble" "value" (default "0.0"))
+    '("gdouble" "lower" (default "0.0"))
+    '("gdouble" "upper" (default "0.0"))
+    '("gdouble" "step_incr" (default "0.0"))
+    '("gdouble" "page_incr" (default "0.0"))
+    '("gdouble" "page_size" (default "0.0"))
+  )
+)
+
+(define-method set_scroll_adjustments
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_set_scroll_adjustments")
+  (return-type "gboolean")
+  (parameters
+    '("GtkAdjustment*" "hadjustment" (null-ok))
+    '("GtkAdjustment*" "vadjustment" (null-ok))
   )
 )

@@ -29,7 +29,7 @@ struct
 
     open AST
 
-    type 'a ty = 'a Type.ty
+    type 'a ty = ('a,'a) Type.ty
     type name = Name.name
 
     type 'a module_info = ('a * 'a option * 'a list) option
@@ -91,12 +91,13 @@ struct
 	      | resMemInfo current (Signal ty) = Signal(resType current ty)
 	      | resMemInfo current (Boxed funcs) = Boxed funcs
 	    and resType current ty =
-		let fun demod (Type.Tname _, tyname) = 
+		let fun demod_ty (Type.Tname _, tyname) = 
 			let val (f,p,b) = toName lookup Name.separateWords current tyname
 			in  Name.fromPaths(f,p,b) end
-		      | demod (Type.Base _, tyname) = Name.fromPaths([],[],[tyname])
-		      | demod (_,_) = raise Fail("resType: shouldn't happen")
-		in  Type.mapi demod ty end
+		      | demod_ty (Type.Base _, tyname) = Name.fromPaths([],[],[tyname])
+		      | demod_ty (_,_) = raise Fail("resType: shouldn't happen")
+		    fun demod_def d = Name.fromPaths(toName id Name.separateUnderscores current d)
+		in  Type.mapiv demod_ty demod_def ty end
 	    and resType' cur ty =
 		let fun demod n =
 		    let val (f,p,b) = toName lookup Name.separateWords cur n
@@ -128,7 +129,7 @@ struct
     val resolve = fn module => 
         let val module' = resolve module
 
-	    fun pptype ty = Type.show Name.toString' ty
+	    fun pptype ty = Type.show Name.toString' Name.toString' ty
 	    fun ppmodi (SOME(ty, parent,impl)) = 
 		": " ^ Name.toString' ty ^
 		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)

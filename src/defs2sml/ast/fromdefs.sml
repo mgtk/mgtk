@@ -112,7 +112,19 @@ structure FromDefs :> FromDefs = struct
 	      | nonempty ps = ps
 	    val return = A.ApiTy(case rettype of NONE => getReturnType def
 					       | SOME rt => rt)
-	    val params = map (fn(n,t)=>(n,A.ApiTy t)) 
+	    fun applyFlags fs ty =
+		let fun loop [] (null,default) = 
+			(case default of SOME d => SOME d
+				       | NONE => null)
+		      | loop (f::fs) (null,default) =
+			(case f of NullOk => loop fs (SOME "NULL",default)
+				 | Default v => loop fs (null, SOME v))
+		in  case loop fs (NONE,NONE) of
+			SOME d => A.Defaulted(ty,d)
+		      | NONE => ty
+		end
+
+	    val params = map (fn(n,t,f)=>(n,applyFlags f (A.ApiTy t)))
 			     (getParameters def handle AttribNotFound _ => [])
 	in  A.ArrowTy(nonempty(addself params), return) end
 
@@ -130,6 +142,7 @@ structure FromDefs :> FromDefs = struct
     (* For debugging: *)
     val fromDefs = fn top => fn defs => 
         let fun pptype (AST.ApiTy s) = s
+	      | pptype (AST.Defaulted(ty,v)) = pptype ty ^ "[def: "^v^"]"
 	      | pptype (AST.ArrowTy (pars,ret)) =
 		Util.stringSep "[" ("] -> "^pptype ret) ", " (fn (s,ty)=>s^":"^pptype ty) pars
 	    fun ppmodi (SOME(ty, parent, impl)) = 

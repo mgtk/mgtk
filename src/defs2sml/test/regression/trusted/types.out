@@ -3,7 +3,7 @@ structure Gtk = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-
+ 
     type icon_set = GObject.cptr
     type icon_size = int
     val get_icon_size_ : unit -> int * int * int * int * int * int * int
@@ -18,52 +18,46 @@ structure Gtk = struct
         type 'a settings_t
         type 'a t = 'a settings_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
     end
     structure Settings :> Settings = struct
         open Dynlib
         type cptr = GObject.cptr
         val repr = GObject.repr
         val symb = GtkBasis.symb
-
+ 
         type base = unit
         type 'a settings_t = unit
         type 'a t = 'a settings_t GObject.t
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
     end
     signature Style = sig
         type base
         type 'a style_t
         type 'a t = 'a style_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
     end
     structure Style :> Style = struct
         open Dynlib
         type cptr = GObject.cptr
         val repr = GObject.repr
         val symb = GtkBasis.symb
-
+ 
         type base = unit
         type 'a style_t = unit
         type 'a t = 'a style_t GObject.t
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
     end
     signature RcStyle = sig
         type base
         type 'a rcstyle_t
         type 'a t = 'a rcstyle_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
         val rc_get_style_by_paths : 'a Settings.t -> string -> string -> int -> base Style.t
     end
     structure RcStyle :> RcStyle = struct
@@ -71,14 +65,14 @@ structure Gtk = struct
         type cptr = GObject.cptr
         val repr = GObject.repr
         val symb = GtkBasis.symb
-
+ 
         type base = unit
         type 'a rcstyle_t = unit
         type 'a t = 'a rcstyle_t GObject.t
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
         val rc_get_style_by_paths_ : cptr -> string -> string -> int -> cptr
             = app4 (symb"mgtk_gtk_rc_get_style_by_paths")
         val rc_get_style_by_paths : 'a Settings.t -> string -> string -> int -> base Style.t
@@ -89,30 +83,26 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
     end
     structure Object :> Object = struct
         open Dynlib
         type cptr = GObject.cptr
         val repr = GObject.repr
         val symb = GtkBasis.symb
-
+ 
         type base = unit
         type 'a object_t = unit
         type 'a t = 'a object_t GObject.t
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
     end
     signature Widget = sig
         type base
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
-
-
         val modify_style : 'a t -> 'b RcStyle.t -> unit
     end
     structure Widget :> Widget = struct
@@ -120,14 +110,14 @@ structure Gtk = struct
         type cptr = GObject.cptr
         val repr = GObject.repr
         val symb = GtkBasis.symb
-
+ 
         type base = unit
         type 'a widget_t = unit
         type 'a t = 'a widget_t Object.t
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
-
+ 
         val modify_style_ : cptr -> cptr -> unit
             = app2 (symb"mgtk_gtk_widget_modify_style")
         val modify_style : 'a t -> 'b RcStyle.t -> unit

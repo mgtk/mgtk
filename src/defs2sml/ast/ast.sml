@@ -109,5 +109,6 @@ struct
     and api_type =
         ApiTy of string
       | ArrowTy of (string * api_type) list * api_type
-       
+      | Defaulted of api_type * string
+
 end (* structure AST *)

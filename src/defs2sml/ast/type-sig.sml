@@ -3,20 +3,23 @@
 
 signature Type = sig
 
-    datatype 'a ty =
+    datatype ('n, 'v) ty =
 	Void
-      | Base of 'a
-      | Tname of 'a
-      | Ptr of 'a ty
-      | Const of 'a ty
-      | Arr of int option * 'a ty
-      | Func of (string * 'a ty) list * 'a ty
+      | Base of 'n
+      | Tname of 'n
+      | Ptr of ('n,'v) ty
+      | Const of ('n,'v) ty
+      | Arr of int option * ('n,'v) ty
+      | Func of (string * ('n,'v) ty) list * ('n,'v) ty
+      | WithDefault of ('n,'v) ty * 'v
 
-    val show: ('n -> string) -> 'n ty -> string
-    val map: ('n1 -> 'n2) -> 'n1 ty -> 'n2 ty
-    val mapi: (('n1 ty * 'n1) -> 'n2) -> 'n1 ty -> 'n2 ty
+    val show: ('n -> string) -> ('v -> string) -> ('n,'v) ty -> string
+    val map: ('n1 -> 'n2) -> ('n1,'v) ty -> ('n2,'v) ty
+    val mapi: ((('n1,'v) ty * 'n1) -> 'n2) -> ('n1,'v) ty -> ('n2,'v) ty
+    val mapiv: ((('n1,'v1) ty * 'n1) -> 'n2) -> ('v1 -> 'v2)
+             -> ('n1,'v1) ty -> ('n2,'v2) ty
 
-    val getParams: 'a ty -> (string * 'a ty) list
-    val getRetType: 'a ty -> 'a ty
+    val getParams: ('n,'v) ty -> (string * ('n,'v) ty) list
+    val getRetType: ('n,'v) ty -> ('n,'v) ty
 
 end (* signature Type *)

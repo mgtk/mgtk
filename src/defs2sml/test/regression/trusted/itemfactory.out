@@ -1,0 +1,99 @@
+structure Gtk = struct
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+ 
+    signature Object = sig
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+    end
+    structure Object :> Object = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+ 
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in GObject.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
+ 
+    end
+    signature Widget = sig
+        type base
+        type 'a widget_t
+        type 'a t = 'a widget_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+    end
+    structure Widget :> Widget = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+ 
+        type base = unit
+        type 'a widget_t = unit
+        type 'a t = 'a widget_t Object.t
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Object.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
+ 
+    end
+    signature ItemFactory = sig
+        type base
+        type 'a itemfactory_t
+        type 'a t = 'a itemfactory_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+        val get_item : 'a t -> string -> base Widget.t
+        val get_widget : 'a t -> string -> base Widget.t
+    end
+    structure ItemFactory :> ItemFactory = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+ 
+        type base = unit
+        type 'a itemfactory_t = unit
+        type 'a t = 'a itemfactory_t Object.t
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Object.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
+ 
+        val get_item_ : cptr -> string -> cptr
+            = app2 (symb"mgtk_gtk_item_factory_get_item")
+        val get_item : 'a t -> string -> base Widget.t
+            = fn self => fn path => Widget.inherit () (fn () => get_item_ (repr self) path)
+        val get_widget_ : cptr -> string -> cptr
+            = app2 (symb"mgtk_gtk_item_factory_get_widget")
+        val get_widget : 'a t -> string -> base Widget.t
+            = fn self => fn path => Widget.inherit () (fn () => get_widget_ (repr self) path)
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** ItemFactory *** */
+/* ML type: cptr -> string -> cptr */
+EXTERNML value mgtk_gtk_item_factory_get_item(value self, value path) { /* ML */
+    return Val_GtkObj(gtk_item_factory_get_item(GtkObj_val(self), String_val(path)));
+}
+
+/* ML type: cptr -> string -> cptr */
+EXTERNML value mgtk_gtk_item_factory_get_widget(value self, value path) { /* ML */
+    return Val_GtkObj(gtk_item_factory_get_widget(GtkObj_val(self), String_val(path)));
+}
+

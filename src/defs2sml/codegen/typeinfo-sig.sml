@@ -4,7 +4,7 @@
 signature TypeInfo = sig
 
     type name = Name.name
-    type ty = name Type.ty
+    type ty = (name, name) Type.ty
 
     type info 
 (*

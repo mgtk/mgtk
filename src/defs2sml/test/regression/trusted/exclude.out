@@ -3,7 +3,7 @@ structure Gtk = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-
+ 
 end
 
 

@@ -49,13 +49,14 @@ structure ResolveTypes :> ResolveTypes = struct
 
     end (* structure Parse *)
 
-    type 'a ty = 'a Type.ty
+    type 'a ty = ('a,'a) Type.ty
     type module_info = (string * string option * string list) option
     type 'a member_info = (string,'a) AST.api_info
 
     fun resTy ty = 
 	case ty of
 	    AST.ApiTy str => Parse.toType str
+	  | AST.Defaulted(ty, v) => WithDefault(resTy ty, v)
           | AST.ArrowTy(pars, ret) =>
 		Func(List.map (fn (n,t) => (n,resTy t)) pars,  resTy ret)
     fun resTy' ty = 
@@ -80,7 +81,7 @@ structure ResolveTypes :> ResolveTypes = struct
 
     (* For debugging: *)
     val resolve = fn module => 
-        let fun pptype ty = Type.show (fn s => s) ty
+        let fun pptype ty = Type.show (fn s => s) (fn s => s) ty
 	    fun ppmodi (SOME(ty, parent, impl)) = 
 		": " ^ ty ^
 		   (case parent of NONE => "" | SOME ty => " extends " ^ ty)

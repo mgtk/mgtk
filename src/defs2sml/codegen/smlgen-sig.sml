@@ -3,7 +3,7 @@
 
 signature GEN_SML = sig
     type name = Name.name
-    type typeexp = name Type.ty
+    type ty = (name,name) Type.ty
 
     type sml_info
     type 'a incl
@@ -11,7 +11,7 @@ signature GEN_SML = sig
 
     type typeinfo
 
-    val generate: typeinfo -> (name,(name*name option*name list)option,(name,typeexp) AST.api_info) AST.module -> 
+    val generate: typeinfo -> (name,(name*name option*name list)option,(name,ty) AST.api_info) AST.module -> 
 		      (name,module_info,sml_info incl) AST.module
     val print: string option -> bool -> TextIO.outstream -> (name,module_info,sml_info incl) AST.module 
                    -> unit

@@ -1,6 +1,6 @@
 signature ResolveNames = sig
 
-    type 'a ty = 'a Type.ty
+    type 'a ty = ('a,'a) Type.ty
     type name = Name.name
 
     type 'a module_info = ('a * 'a option * 'a list) option

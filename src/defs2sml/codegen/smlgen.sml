@@ -7,10 +7,10 @@ signature PRIMITIVES = sig
     val ccall : string -> int -> SMLType.ty -> TinySML.exp
     val getEnumsTy : int -> SMLType.ty
     val getEnums : string -> Name.name list -> TinySML.exp
-    val unWrap: TinySML.exp -> TinySML.exp
+    val unWrap: (Name.name, Name.name) Type.ty * TinySML.exp -> TinySML.exp
     val toPrimString : TinySML.exp -> TinySML.exp
-    val callStub : TypeInfo.typeinfo -> string  -> Name.name Type.ty
-		-> (TinySML.exp * Name.name Type.ty) list -> TinySML.exp
+    val callStub : TypeInfo.typeinfo -> string  -> (Name.name, Name.name) Type.ty
+		-> (TinySML.exp * (Name.name, Name.name) Type.ty) list -> TinySML.exp
     val strHeader : TinySML.decl list
 end (* signature PRIMTIVES *)
 
@@ -29,7 +29,8 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
     fun getEnums enum consts =
 	App(Var("get_" ^ enum ^ "_"), [Unit])
 
-    fun unWrap e = TinySML.App(TinySML.Var("repr"), [e])
+    fun unWrap (Type.WithDefault(ty,v),e) = App(Var"Option.map",[Var "repr", e])
+      | unWrap (t,e) = App(Var "repr", [e])
     val toPrimString = fn e => e
 
     fun callStub tinfo name ret pars = 
@@ -67,7 +68,7 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
                        ]
 		)
 	end
-    val unWrap = fn e => e
+    val unWrap = fn (t,e) => e
     local open TinySML in  
         fun toPrimString e = App(Var("CString.fromString"), [e])
     end
@@ -77,9 +78,12 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 		if TypeInfo.isWrapped tinfo t
 		then App(Var"GObject.withPtr", [Tup[Var v, Fn(v, c)]])
 		else c
-	      | f ((e,t), c) =
+	      | f ((Const v,t), c) = c
+	      | f ((e,t), c) = c
+		(* FIXME:
 		if TypeInfo.isWrapped tinfo t then raise Fail("oops")
 		else c
+                *)
 	    val stub = App(Var(name^"_"), [Tup(List.map #1 pars)])
 	    val call = if TypeInfo.isString tinfo ret
 		       then Let(ValDecl(VarPat"t",None,stub),
@@ -166,7 +170,20 @@ struct
 
     (* code generation *)
     type name = Name.name
-    type typeexp = name Type.ty
+    type ty = (name,name) Type.ty
+
+    fun transCValue tinfo (ty, value) =
+	let val v = Name.toString value (* FIXME: trim the string here *)
+	in  if String.size v = 0 then raise Fail("Unrecognized C value: "^Name.toString' value)
+	    else if Prims.TypeInfo.isString tinfo ty andalso v = "NULL" 
+	         then Prims.toPrimString(Const "\"\"")
+	    else if v = "NULL" then Var("GObject.null")
+	    else if v = "TRUE" then Const("true")
+	    else if v = "FALSE" then Const("false")
+	    else if String.sub(v,0) = #"-" 
+	    then Const("~"^String.extract(v,1,NONE))
+	    else Const v
+	end
 
     exception Skip of string
     fun trans tinfo (name,member) =
@@ -191,14 +208,18 @@ struct
 			(case Name.getFullPath n of "Gtk"::_ => true | _ => false)
 		      | isWidgetType (Type.Ptr t) = isWidgetType t
 		      | isWidgetType _ = false
+		    fun var (par,ty) = (Var par, ty)
+		    fun default (par,Type.WithDefault(ty, v)) = 
+			(App(Var"getOpt", [Tup[par, transCValue tinfo (ty,v)]]), ty)
+		      | default (par,ty) = (par, ty)
 		    fun wrap (par,ty) =
 			(if TypeInfo.isWrapped tinfo ty
-			 then (Prims.unWrap (Var par),ty)
+			 then (Prims.unWrap (ty,par),ty)
 			 else if TypeInfo.isString tinfo ty
-			 then (Prims.toPrimString (Var par),ty)
-			 else (Var par, ty))
+			 then (Prims.toPrimString (par),ty)
+			 else (par, ty))
 			handle TypeInfo.Unbound n => ubnd n
-		    val pars' = List.map wrap parsty
+		    val pars' = List.map (default o wrap o var) parsty
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 
 			fromtype' ty handle TypeInfo.Unbound n => ubnd n
@@ -210,17 +231,45 @@ struct
 		    val params' = List.map (fromtype o #2) params
 		    val ret'    = TypeInfo.toSMLType tinfo (fn _ => "base") ret
 				  handle TypeInfo.Unbound n => ubnd n
+		    fun isDefault (p, Type.WithDefault _) = true
+		      | isDefault _ = false
+		    val with_defaults = List.exists isDefault parsty
 		    fun fromprim ty e =
 			TypeInfo.fromPrimValue tinfo ty e
 			handle TypeInfo.Unbound n => ubnd n
 		    val primty = primtypeFromType ty
 		    val stubcall = Prims.callStub tinfo name ret pars'
+		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
+		    fun fromtype ty = 
+			fromtype' ty handle TypeInfo.Unbound n => ubnd n
+
+		    fun default (_, Type.WithDefault(ty,v)) = 
+			(transCValue tinfo (ty,v), ty)
+		      | default (p, ty) = wrap (Var p, ty)
+		    val defpars = List.map default parsty
+		    val defparams = 
+			List.map (fromtype o #2) 
+				 (List.filter (not o isDefault) params)
+		    val defparams = if List.length defparams = 0 then
+					[SMLType.UnitTy]
+				    else defparams
+		    val defpars' = List.map #1 (List.filter (not o isDefault) params)
+		    val defpars' = if List.length defpars' = 0 then
+				        ["dummy"]
+				   else defpars'
+		    val stubcall' = Prims.callStub tinfo name ret defpars
 		in  StrOnly(
                        ValDecl(VarPat(name^"_"), Some primty,
 			       Prims.ccall cname (List.length pars) primty))
                  ++ Some(
                        ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),
 			       List.foldr Fn (fromprim ret stubcall) pars))
+                 ++ (if with_defaults then 
+		      Some(
+			ValDecl(VarPat(name^"'"), 
+				Some(SMLType.ArrowTy(defparams, ret')),
+				List.foldr Fn (fromprim ret stubcall') defpars'))
+		     else None)
 		end
 
             (* ENUMS 

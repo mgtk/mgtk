@@ -78,9 +78,8 @@ structure Defs = struct
 	end
     fun getParameters  (def: definition) = 
 	let val atts = #3 def
-	in  lookup "params"
-		   (fn (Params ps) => SOME (List.map(fn(t,n,f)=>(n,t))ps)
-		     | _ => NONE) atts
+	in  lookup "params" (fn (Params ps) => SOME (List.map(fn(t,n,f)=>(n,t,f))ps)
+			      | _ => NONE) atts
 	end
     fun getValues  (def: definition) = 
 	let val atts = #3 def

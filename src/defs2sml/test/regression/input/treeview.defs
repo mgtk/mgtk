@@ -1,0 +1,48 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+)
+
+(define-object Container
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkContainer")
+  (gtype-id "GTK_TYPE_CONTAINER")
+)
+
+(define-interface TreeModel
+  (in-module "Gtk")
+  (c-name "GtkTreeModel")
+  (gtype-id "GTK_TYPE_TREE_MODEL")
+)
+
+(define-object TreeView
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkTreeView")
+  (gtype-id "GTK_TYPE_TREE_VIEW")
+)
+
+(define-method get_model
+  (of-object "GtkTreeView")
+  (c-name "gtk_tree_view_get_model")
+  (return-type "GtkTreeModel*")
+)
+
+(define-method set_model
+  (of-object "GtkTreeView")
+  (c-name "gtk_tree_view_set_model")
+  (return-type "none")
+  (parameters
+    '("GtkTreeModel*" "model" (null-ok) (default "NULL"))
+  )
+)

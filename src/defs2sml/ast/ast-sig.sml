@@ -34,6 +34,7 @@ sig
     and api_type =
         ApiTy of string
       | ArrowTy of (string * api_type) list * api_type
+      | Defaulted of api_type * string
 
     val pp: ('n * 'modi -> string) * ('n * 'memi -> string)
             -> (string -> unit) -> ('n, 'modi, 'memi) module -> unit
