@@ -92,7 +92,7 @@ EXTERNML value mgtk_main_quit(value dummy) { /* ML */
 
 /* *** GValue stuff *** */
 
-/* We wrap both pointers to a single GValue and arrays GValues in
+/* We wrap both pointers to a single GValue and arrays to GValues in
    abtract values.
 */
 
