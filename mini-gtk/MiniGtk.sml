@@ -1,40 +1,18 @@
 (*
 app load ["Dynlib", "Polyhash", "Callback"];
 *)
+
 signature GtkBasis =
 sig
-    type cptr
-    type base
-    type 'a Object
-    type constructor = unit -> cptr
-
-    val repr     : 'a Object -> cptr
-    val inherit  : 'a -> constructor -> 'a Object
-    val toObject : 'a Object -> base Object
-
     val init : string list -> string list
     val main : unit -> unit
     val main_quit : unit -> unit
 
     val symb : string -> Dynlib.symHandle
-
 end
-
 
 structure GtkBasis :> GtkBasis =
 struct
-    prim_type cptr
-    type base = unit
-
-    (* A litle type cleverness *)
-    datatype 'a Object = OBJ of cptr
-    type constructor = unit -> cptr
-
-
-    fun repr (OBJ ptr) = ptr
-    fun inherit _ con = OBJ(con())
-    fun toObject (OBJ ptr) = OBJ ptr
-
     open Dynlib
     local 
 	val path = case Process.getEnv "MGTKHOME" of
@@ -61,10 +39,41 @@ struct
     val main_quit : unit -> unit = app1(symb "mgtk_main_quit")
 end
 
+
+signature GObject =
+sig
+    type cptr
+    type base
+    type 'a t
+    type constructor = unit -> cptr
+
+    val repr     : 'a t -> cptr
+    val inherit  : 'a -> constructor -> 'a t
+    val toObject : 'a t -> base t
+
+end
+
+
+structure GObject :> GObject =
+struct
+    prim_type cptr
+    type base = unit
+
+    (* A litle type cleverness *)
+    datatype 'a t = OBJ of cptr
+    type constructor = unit -> cptr
+
+
+    fun repr (OBJ ptr) = ptr
+    fun inherit _ con = OBJ(con())
+    fun toObject (OBJ ptr) = OBJ ptr
+
+end
+
 signature Signal =
 sig
     type state
-    type 'a Object = 'a GtkBasis.Object
+    type 'a t = 'a GObject.t
 
 
     type ('a, 'b) trans   = 'a * state -> 'b * state
@@ -88,16 +97,16 @@ sig
     type 'a signal
     type signal_id
     val signal  : string -> bool -> ('b -> 'c) return -> ('b -> 'c) ->
-                                                  'a Object signal
-    val connect : 'a Object -> 'a Object signal -> signal_id
+                                                  'a t signal
+    val connect : 'a t -> 'a t signal -> signal_id
 end
 
 
 structure Signal :> Signal =
 struct
-    type 'a Object = 'a GtkBasis.Object
+    type 'a t = 'a GObject.t
     local
-        structure GB = GtkBasis
+        structure GO = GObject
         prim_type GValues
         prim_type GValue
 
@@ -119,7 +128,7 @@ struct
 	end
 
 	open Dynlib
-	val symb = GB.symb
+	val symb = GtkBasis.symb
 
 	fun dispatch id data =
 	    case peek id of
@@ -133,7 +142,7 @@ struct
 		    )
 
 	fun register f = localId(fn id => (add (id, f); id))
-	val signal_connect : GB.cptr -> string -> int -> bool -> int
+	val signal_connect : GO.cptr -> string -> int -> bool -> int
 	                   = app4(symb"mgtk_signal_connect")
 
         (* UNSAFE: no error checking in the set and get functions! *)
@@ -201,11 +210,43 @@ struct
 
     fun connect wid (Sig(sign, after, wrap)) =
         let val id = register wrap
-        in  signal_connect (GB.repr wid) sign id after
+        in  signal_connect (GO.repr wid) sign id after
         end
 
     end	
 end
+
+(*signature IOChannel =
+sig
+    type input
+    type output
+    type 'a stream
+    type instream = input stream
+    type outstrem = output stream
+end
+
+
+signature Spawn =
+sig
+    type flag
+    type error
+    datatype result = ERROR of error
+                    | OK    of { input  : IOChannel.outstream option
+                               , output : IOChannel.instream option
+                               , error  : IOChannel.instream option
+                               }
+
+    val spawn : { working_directory : string
+                , command : string
+                , arguments : string list
+                , env : (string * string) list
+                , flags : flag list
+                , create_pipes : bool 
+                } -> result
+
+end
+*)
+
 
 
 
@@ -213,7 +254,7 @@ signature Widget =
 sig
     type base
     type 'a widget_t
-    type 'a t = 'a widget_t GtkBasis.Object
+    type 'a t = 'a widget_t GObject.t
 
     val destroy : 'a t -> unit
     val show    : 'a t -> unit
@@ -222,7 +263,7 @@ sig
     val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
     val destroy_sig      : (unit -> unit) -> 'a t Signal.signal
 
-    val inherit : 'a -> GtkBasis.constructor -> 'a t
+    val inherit : 'a -> GObject.constructor -> 'a t
     val toWidget: 'a t -> base t
 
 end
@@ -231,30 +272,30 @@ structure Widget :> Widget =
 struct
     type base = unit
     type 'a widget_t = unit
-    type 'a t = 'a widget_t GtkBasis.Object
+    type 'a t = 'a widget_t GObject.t
 
     open Dynlib
-    type cptr = GtkBasis.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    type cptr = GObject.cptr
+    val repr  = GObject.repr
 
-    fun inherit w con = GtkBasis.inherit () con
-    fun toWidget obj = GtkBasis.inherit () (fn () => repr obj)
+    fun inherit w con = GObject.inherit () con
+    fun toWidget obj = GObject.inherit () (fn () => repr obj)
 
     val destroy_: cptr -> unit
         = app1(symb"mgtk_gtk_widget_destroy")
     val destroy: 'a t -> unit
-        = fn widget => destroy_ (GtkBasis.repr widget)
+        = fn widget => destroy_ (GObject.repr widget)
 
     val show_: cptr -> unit
         = app1(symb"mgtk_gtk_widget_show")
     val show: 'a t -> unit
-        = fn widget => show_ (GtkBasis.repr widget)
+        = fn widget => show_ (GObject.repr widget)
 
     val show_all_: cptr -> unit
         = app1(symb"mgtk_gtk_widget_show_all")
     val show_all: 'a t -> unit
-        = fn widget => show_all_ (GtkBasis.repr widget)
+        = fn widget => show_all_ (GObject.repr widget)
 
     local open Signal infix --> in
     fun delete_event_sig f = 
@@ -274,7 +315,7 @@ sig
     val add   : 'a t -> 'b Widget.t -> unit
     val remove: 'a t -> 'b Widget.t -> unit
 
-    val inherit : 'a -> GtkBasis.constructor -> 'a t
+    val inherit : 'a -> GObject.constructor -> 'a t
 end
 
 structure Container :> Container =
@@ -283,9 +324,9 @@ struct
     type 'a t = 'a container_t Widget.t
 
     open Dynlib
-    type cptr = GtkBasis.cptr
+    type cptr = GObject.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    val repr  = GObject.repr
 
     fun inherit w con = Widget.inherit () con
 
@@ -317,7 +358,7 @@ sig
 
     val clicked_sig : (unit -> unit) -> 'a t Signal.signal
 
-    val inherit : 'a -> GtkBasis.constructor -> 'a t
+    val inherit : 'a -> GObject.constructor -> 'a t
 end
 
 structure Button :> Button =
@@ -327,9 +368,9 @@ struct
     type base = unit
 
     open Dynlib
-    type cptr = GtkBasis.cptr
+    type cptr = GObject.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    val repr  = GObject.repr
 
     fun inherit w con = Container.inherit () con
     fun makeBut ptr = Container.inherit () (fn() => ptr)
@@ -369,9 +410,9 @@ struct
     type base = unit
 
     open Dynlib
-    type cptr = GtkBasis.cptr
+    type cptr = GObject.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    val repr  = GObject.repr
 
     fun inherit w con = Container.inherit () con
     fun makeWin ptr = Container.inherit () (fn() => ptr)
@@ -388,7 +429,7 @@ sig
     type 'a editable_t
     type 'a t = 'a editable_t Widget.t
 
-    val inherit : 'a -> GtkBasis.constructor -> 'a t
+    val inherit : 'a -> GObject.constructor -> 'a t
 end
 
 structure Editable :> Editable =
@@ -397,9 +438,9 @@ struct
     type 'a t = 'a editable_t Widget.t
 
     open Dynlib
-    type cptr = GtkBasis.cptr
+    type cptr = GObject.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    val repr  = GObject.repr
 
     fun inherit w con = Widget.inherit () con
 end
@@ -424,9 +465,9 @@ struct
     type base = unit
 
     open Dynlib
-    type cptr = GtkBasis.cptr
+    type cptr = GObject.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    val repr  = GObject.repr
 
     fun inherit w con = Editable.inherit () con
     fun makeEnt ptr = Editable.inherit () (fn() => ptr)
@@ -452,7 +493,7 @@ sig
     type 'a box_t
     type 'a t = 'a box_t Container.t
 
-    val inherit : 'a -> GtkBasis.constructor -> 'a t
+    val inherit : 'a -> GObject.constructor -> 'a t
     val pack_start: 'a t -> 'b Widget.t -> unit
 end
 
@@ -462,9 +503,9 @@ struct
     type 'a t = 'a box_t Container.t
 
     open Dynlib
-    type cptr = GtkBasis.cptr
+    type cptr = GObject.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    val repr  = GObject.repr
 
     fun inherit w con = Container.inherit () con
     val pack_start_: cptr -> cptr -> unit
@@ -491,9 +532,9 @@ struct
     type base = unit
 
     open Dynlib
-    type cptr = GtkBasis.cptr
+    type cptr = GObject.cptr
     val symb  = GtkBasis.symb
-    val repr  = GtkBasis.repr
+    val repr  = GObject.repr
 
     fun inherit w con = Box.inherit () con
     fun make ptr = Box.inherit () (fn() => ptr)
