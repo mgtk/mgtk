@@ -14,7 +14,7 @@ fun setUpGui() =
                 end
 
         val vbox = let val vbox = VBox.new' ()
-                   in  Box.set_border_width vbox 6
+                   in  Container.set_border_width vbox 6
                      ; Container.add w vbox
                      ; vbox
                    end
@@ -30,14 +30,14 @@ fun setUpGui() =
                    in  TreeViewColumn.set_title col "Column 1"
                      ; TreeViewColumn.pack_start col colr true
                      ; TreeViewColumn.add_attribute col colr "text" 0
-                     ; TreeView.add_column tv col
+                     ; TreeView.append_column tv col
                      ; col
                    end
                                    
         (*** DEFECTS CITY STARTS HERE ***)
                        
-        val store = let val store = TreeStore.new [GType.string]
-                    in  TreeView.set_model tv (SOME store)
+        val store = let val store = TreeStore.newv 1 [GType.string]
+                    in  TreeView.set_model tv (SOME (TreeStore.asTreeModel store))
                       ; store
                     end
 
@@ -48,11 +48,11 @@ fun setUpGui() =
                             fun inner j = 
                                 if j >= 0 then 
                                     let val child = TreeStore.append store (SOME parent)
-                                    in  TreeStore.set_value store child 0 ("Visited "^Int.toString j)
+                                    in  TreeStore.set_value store child 0 (GValue.string("Visited "^Int.toString j))
                                       ; inner (j-1)
                                     end
                                 else ()   
-                        in  TreeStore.set_value store parent 0 ("Point "^Int.toString i)
+                        in  TreeStore.set_value store parent 0 (GValue.string("Point "^Int.toString i))
                           ; inner (i-1)
                           ; loop (i+1)
                         end

@@ -14,7 +14,7 @@ fun setUpGui() =
                 end
 
         val vbox = let val vbox = VBox.new' ()
-                   in  Box.set_border_width vbox 6
+                   in  Container.set_border_width vbox 6
                      ; Container.add w vbox
                      ; vbox
                    end
@@ -30,7 +30,7 @@ fun setUpGui() =
                    in  TreeViewColumn.set_title col "Column 1"
                      ; TreeViewColumn.pack_start col colr true
                      ; TreeViewColumn.add_attribute col colr "text" 0
-                     ; TreeView.add_column tv col
+                     ; TreeView.append_column tv col
                      ; col
                    end
                        
@@ -39,14 +39,14 @@ fun setUpGui() =
                    in  TreeViewColumn.set_title col "Column 2"
                      ; TreeViewColumn.pack_start col colr true
                      ; TreeViewColumn.add_attribute col colr "text" 1
-                     ; TreeView.add_column tv col
+                     ; TreeView.append_column tv col
                      ; col
                    end
             
         (*** DEFECTS CITY STARTS HERE ***)
                        
-        val store = let val store = ListStore.new [GType.string, GType.string]
-                    in  TreeView.set_model tv (SOME store)
+        val store = let val store = ListStore.newv 2 [GType.string, GType.string]
+                    in  TreeView.set_model tv (SOME (ListStore.asTreeModel store))
                       ; store
                     end
 
@@ -54,8 +54,8 @@ fun setUpGui() =
             let fun loop i = 
                     if i < n then 
                         let val iter = ListStore.append store 
-                        in  ListStore.set_value store iter 0 ("Point "^Int.toString i)
-                          ; ListStore.set_value store iter 1 ("Distance "^Int.toString(4-i))
+                        in  ListStore.set_value store iter 0 (GValue.string("Point "^Int.toString i))
+                          ; ListStore.set_value store iter 1 (GValue.string("Distance "^Int.toString(4-i)))
                           ; loop (i+1)
                         end
                     else ()

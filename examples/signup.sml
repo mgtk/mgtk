@@ -1,11 +1,6 @@
 (* An example adopted from "Mono: A Developers Notebook" (04-gtk/03-signup) *)
 
-local open Gtk
-      infixr --> 
-      val op--> = Signal.--> 
-      val Entry_changed_sig = 
-          Signal.signal "changed" true (Signal.void --> Signal.return_void)
-in
+open Gtk
 
 fun leftAlign lab = 
     Misc.set_alignment lab 0.0 0.5 (* Left align X and center Y *)
@@ -51,7 +46,7 @@ fun setUpGui() =
                                  else Char.toLower c
             in  Entry.set_text email_entry (String.map emailize e)
             end
-        val nameChanged_cb = Entry_changed_sig nameChanged
+        val nameChanged_cb = Editable.changed_sig nameChanged
 
         val outerv = VBox.new' ()
         val _ = ( Container.set_border_width outerv 12
@@ -71,8 +66,8 @@ fun setUpGui() =
                                   , ("_Last name:",     lastname_entry)
                                   , ("_Email address:", email_entry)])
 
-      ; Signal.connect firstname_entry nameChanged_cb
-      ; Signal.connect lastname_entry nameChanged_cb
+      ; Signal.connect (Entry.asEditable firstname_entry) nameChanged_cb
+      ; Signal.connect (Entry.asEditable lastname_entry)  nameChanged_cb
       ; Signal.connect w (Widget.delete_event_sig delete_event) 
 
       ; Window.set_title w "Sign up"
@@ -85,5 +80,3 @@ fun main () = ( GtkBasis.init(CommandLine.name()::CommandLine.arguments())
               )
 
 val _ = main()
-
-end (* local *)

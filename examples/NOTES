@@ -8,7 +8,6 @@ Defects:
   - The program does not compile.
   - We need to handle GtkTreeIter, in particullar as the return
     (actually out-param) for append. 
-  - The same as those for listview.sml
 
 
 listview.sml
@@ -21,11 +20,6 @@ Defects:
   - The program does not compile.
   - We need to handle GtkTreeIter, in particullar as the return
     (actually out-param) for append. 
-  - To use a ListStore we need two varargs functions:
-       - new (or the language binding-friendly version newv)
-         For this we also need to wrap GType somehow
-       - set (or set_valist)
-    Workaround for varargs: use other functions newv and set_value        
 
 
 menus.sml
@@ -44,13 +38,36 @@ An example adopted from "Mono: A Developers Notebook"
 (04-gtk/03-signup).  Shows how to use mnemonic labels and XML markup.
 
 Defects:
-  - Glib interfaces don't work.  Thus, Gtk.Entry does not have a
-    "changed" signal because we cannot use the one from Gtk.Editable.
-    A workaround was using Gtk.Signal directly was possible.
-
   - Glib properties does not work.  Thus, it is not possible to set
     the "xalign" property of a label.  Workaround: use
     Misc.set_alignment.
   
   - Using functions with default arguments is cumbersome.
 
+
+
+OLD DEFECTS:
+
+listview.sml  (2004/09/28)
+--------------------------
+
+  - To use a ListStore we need two varargs functions:
+       - new (or the language binding-friendly version newv)
+         For this we also need to wrap GType somehow
+       - set (or set_valist)
+    Workaround for varargs: use other functions newv and set_value        
+  - The same as those for listview.sml
+
+  => GType and GValue now wrapped (at least superficially)
+  => Array support added to handle newv
+
+
+signup.sml  (2004/09/27)
+------------------------
+
+  - Glib interfaces don't work.  Thus, Gtk.Entry does not have a
+    "changed" signal because we cannot use the one from Gtk.Editable.
+    A workaround was using Gtk.Signal directly was possible.
+
+  => Now Entry (similaryly for all other implementations of
+     interfaces) includes an asEditable function.
