@@ -1,15 +1,14 @@
-fun hello _ = print "Hello World\n"
 
-fun itemsignal n () = print ("itemsignal on item: "^n^"\n")
-fun newItem name = 
+
+fun newItem say name = 
     let val item = Gtk.menu_item_new_with_label name
-    in  Gtk.connect_select item (itemsignal name)
+    in  Gtk.connect_menu_item_activate item (fn() => say (name^"\n"))
       ; item
     end
 
-fun makeMenu names =
+fun makeMenu say names =
     let val menu = Gtk.menu_new()
-	val addItem = (Gtk.menu_append menu) o newItem
+	val addItem = (Gtk.menu_append menu) o (newItem say)
     in  app addItem names
       ; menu
     end
@@ -24,13 +23,15 @@ fun main () =
     let val _       = Gtk.init(CommandLine.name() :: CommandLine.arguments())
 	val window  = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 	val menubar = Gtk.menu_bar_new()
-	val topmenu = makeMenu ["Foo", "Bar", "Zap"]
-	val helpmenu= makeMenu ["About"]
-	val top     = newItem "Top"
-	val help    = newItem "Help"
+        val text    = Gtk.text_new'()
+	fun say s   = Gtk.text_insert' text s ~1
+	val topmenu = makeMenu say ["Foo", "Bar", "Zap"]
+	val helpmenu= makeMenu say ["About"]
+	val top     = newItem say "Top"
+	val help    = newItem say "Help"
 	val box1    = Gtk.vbox_new false 0
 	fun pack w  = Gtk.box_pack_start box1 w true true 0
-        val button  = Gtk.button_new_with_label "Button"
+
     in  Gtk.connect_delete_event window delete_event 
       ; Gtk.connect_destroy window destroy
       ; Gtk.container_add window box1
@@ -39,8 +40,9 @@ fun main () =
       ; Gtk.menu_bar_append menubar top
       ; Gtk.menu_bar_append menubar help
       ; Gtk.menu_item_right_justify help
+      ; Gtk.text_set_editable text false
       ; pack menubar
-      ; pack button
+      ; pack text
       ; Gtk.widget_show_all window
       ; Gtk.main() 
     end
