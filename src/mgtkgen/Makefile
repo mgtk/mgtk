@@ -7,12 +7,22 @@ OBJS=Parsercomb.uo WSeq.uo Util.uo NameUtil.uo ArgParse.uo \
      TypeExp.uo TypeInfo.uo Parse.uo ParseUtils.uo Parser.uo \
      AST.uo Translate.uo Messages.uo State.uo Main.uo
 
+SRCS=Parsercomb.sig Parsercomb.sml WSeq.sig WSeq.sml Util.sml \
+     NameUtil.sig NameUtil.sml ArgParse.sig ArgParse.sml \
+     TypeExp.sig TypeExp.sml TypeInfo.sig TypeInfo.sml Parse.sml \
+     ParseUtils.sig ParseUtils.sml Parser.sml \
+     AST.sig AST.sml Translate.sig Translate.sml \
+     Messages.sig Messages.sml State.sml Main.sml
+
 SUBDIRS=regression tools
 
 all: $(GENPROG)
 
-$(GENPROG): $(OBJS)
-	$(MOSMLC) -o $(GENPROG) Main.uo
+#$(GENPROG): $(OBJS)
+#	$(MOSMLC) -o $(GENPROG) Main.uo
+
+$(GENPROG): $(SRCS)
+	$(MOSMLPM) $(GENPROG).pm
 
 test: $(GENPROG)
 	cd regression && $(MAKE) fresh
@@ -40,24 +50,3 @@ depend:
 
 ### EVERYTHING THAT GOES BEYOND THIS COMMENT WILL BE ERASED WITHOUT WARNING
 ### DO NOT DELETE THIS LINE
-ParseUtils.ui: AST.ui TypeExp.ui NameUtil.ui 
-ParseUtils.uo: ParseUtils.ui AST.ui TypeExp.ui NameUtil.ui Util.uo 
-TypeInfo.ui: TypeExp.ui NameUtil.ui WSeq.ui 
-Parsercomb.uo: Parsercomb.ui 
-TypeExp.uo: TypeExp.ui Util.uo 
-TypeExp.ui: NameUtil.ui 
-WSeq.uo: WSeq.ui 
-TypeInfo.uo: TypeInfo.ui WSeq.ui Util.uo 
-Translate.uo: Translate.ui State.uo WSeq.ui 
-Translate.ui: AST.ui State.uo 
-Parser.uo: Parsercomb.ui 
-Parse.uo: Parsercomb.ui 
-NameUtil.uo: NameUtil.ui WSeq.ui Util.uo 
-NameUtil.ui: WSeq.ui 
-Messages.uo: Messages.ui State.uo WSeq.ui 
-Messages.ui: State.uo 
-Main.uo: Parser.uo Translate.ui State.uo Messages.ui ArgParse.ui Util.uo \
-    Parse.uo 
-AST.uo: AST.ui Util.uo 
-AST.ui: TypeExp.ui NameUtil.ui 
-ArgParse.uo: ArgParse.ui 
