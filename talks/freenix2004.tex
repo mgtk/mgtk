@@ -124,9 +124,7 @@ Module language:
 
 \end{slide}
 
-\begin{slide}{\mgtk example}
-
-\begin{Verbatim}
+\begin{SaveVerbatim}{Hello}
 fun hello _ = print "Hello World\n"
 
 fun main cmdline =
@@ -144,9 +142,22 @@ fun main cmdline =
   end
 
 val _ = main(CommandLine.name()::CommandLine.arguments())
-\end{Verbatim}
+\end{SaveVerbatim}
 
-\end{slide}
+\overlays{7}{%
+\begin{slide}{\mgtk example}
+
+\UseVerbatim{Hello}
+\onlySlide*{2}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,6.5)(11.5,7)}
+\onlySlide*{3}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,5.8)(11.5,6.3)}
+\onlySlide*{4}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,4.6)(11.5,5.1)}
+\onlySlide*{5}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,3.9)(11.5,4.7)}
+\onlySlide*{6}{%
+\psframe[fillstyle=none,linestyle=dotted,linecolor=ITUred](-.3,3.9)(11.5,4.7)%
+\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](7,3.9)(10.5,4.4)%
+}
+\onlySlide*{7}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,2.7)(11.5,3.2)}
+\end{slide}}
 
 \begin{slide}{Polymorphism and parametrized types}
 
