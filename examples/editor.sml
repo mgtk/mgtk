@@ -1,4 +1,7 @@
-local open Gtk in
+local 
+    structure BasisList = List
+    open Gtk 
+in
 
 fun uncurry f (x,y) = f x y
 
@@ -124,6 +127,8 @@ fun setUpGui() =
                        ; Widget.show_all scrolled
                        ; Widget.show lab
                        ; Notebook.prepend_page notebook scrolled lab
+                       ; Notebook.set_current_page notebook 0
+                       ; buffers := buffer :: !buffers
                        ; say (file ^ " has " ^ 
                               Int.toString (TextBuffer.get_line_count buffer) ^
                               " lines")
@@ -132,30 +137,37 @@ fun setUpGui() =
 
         fun closeAction () =
             let val n = Notebook.get_current_page notebook
-            in  if n >= 0 then Notebook.remove_page notebook n
+            in  if n >= 0 then
+                    let val first = BasisList.take(!buffers, n)
+                        val last  = BasisList.drop(!buffers, n+1)
+                    in  Notebook.remove_page notebook n
+                      ; buffers := first @ last
+                      ; say ("Closing tab number "^Int.toString n)
+                    end
                 else ()
             end
 
 
         fun saveAsAction () =
-            let val filename = getFile SAVE
-            in  case filename of
-                    NONE => say "The buffer was not saved"
-                  | SOME path =>
-                    let (* FIXME: check permissions and stuff *)
-                         val {dir, file} = OS.Path.splitDirFile path
-                         val _ = OS.FileSys.chDir dir
-                         val dev = TextIO.openOut file
-                         val i = Notebook.get_current_page notebook
-                         
-                         val buffer = TextBuffer.new NONE
-                         val (startIter, endIter) = TextBuffer.get_bounds buffer
-                         val content = TextBuffer.get_text buffer startIter endIter (SOME false)
-                     in  TextIO.output(dev, content)
-                       ; TextIO.closeOut dev 
-                       ; say ("Buffer saved to file "^file)
-                     end
-            end
+            case getFile SAVE of
+                NONE => say "The buffer was not saved"
+              | SOME path =>
+                let val n = Notebook.get_current_page notebook
+                in  if n < 0 then say "Nothing to save"
+                    else let (* FIXME: check permissions and stuff *)
+                            val {dir, file} = OS.Path.splitDirFile path
+                            val _ = OS.FileSys.chDir dir
+                            val dev = TextIO.openOut file
+                                      
+                            val buffer = BasisList.nth(!buffers, n)
+                            val (startIter, endIter) = TextBuffer.get_bounds buffer
+                            val content = TextBuffer.get_text buffer startIter endIter (SOME false)
+                        in  TextIO.output(dev, content)
+                          ; TextIO.closeOut dev 
+                          ; say ("Buffer saved to file "^file)
+                        end
+                end
+            
 
         val vbox = VBox.new' ()
     in  Box.pack_start vbox menubar (SOME false) (SOME false) (SOME 0)
