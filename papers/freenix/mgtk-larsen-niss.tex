@@ -10,17 +10,14 @@
 %  \begin{lrbox}{\kfl@discard}}{\end{lrbox}}
 %\makeatother{}
 
-% In addition, the option "endnotes" permits the use of the
-% otherwise-disabled, Usenix-deprecated footnote{} command in
-% documents.  In this case, be sure to include a
-% \makeendnotes command at the end of your document or
-% the endnotes will not actually appear.
-%
 \usepackage{preamble}
 
 
-% Hack
+% Hacks
 \setcounter{secnumdepth}{1}
+\newcommand*{\andshare}{\end{tabular}\\\begin{tabular}[t]{c}}
+
+
 
 \begin{document}
 
@@ -30,17 +27,15 @@
 
 \author{
 \authname{Ken Friis Larsen}
-\authaddr{(Work done while at ITU)}
-%\authaddr{Your Institution}
-%\authaddr{ Your City, State, ZIP}
 \authurl{\url{ken@friislarsen.net}}
-%\authurl{\url{http://host.dom/yoururl}}
 \and
 \authname{Henning Niss}
+\authurl{\url{hniss@it.edu}}
+%
+\andshare{}
 \authaddr{Department of Innovation}
 \authaddr{IT University of Copenhagen}
 \authaddr{Denmark}
-\authurl{\url{hniss@it.edu}}
 %
 } % end author
 
