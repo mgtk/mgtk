@@ -26,6 +26,8 @@
    (3) Should the functions that may fail return an option or should they
        raise an exception.
 
+* Help us setting up at mgtk-users mailing list
+
 * Use mGTK to build a real application.
 
 * Make a systematic testing, maybe by porting the testgkt suite.
