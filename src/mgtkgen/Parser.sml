@@ -67,13 +67,15 @@ struct
     fun mkSignalDecl (pos, ((name,signal),cbType)) = 
 	AST.SIGNAL_DECL (pos, name, signal, cbType)
 
-    fun mkFunType (retType, pars) = AST.ARROW(pars, retType)
+    fun mkFunType (retType, pars) = AST.LONG ([], AST.ARROW(pars, retType))
 
-    fun ensureNonEmpty [] = [(AST.TYPENAME "none", "dummy")]
+    fun ensureNonEmpty [] = [(AST.LONG ([], AST.TYPENAME "none"), "dummy")]
       | ensureNonEmpty pars = pars
 
+    fun singleton texp = ([], texp)
+
     (* functions *)
-    val typeExp = word >> AST.TYPENAME
+    val typeExp = word >> (AST.LONG o singleton o AST.TYPENAME)
     val parenName = parenthesized word
     val par = parenthesized (typeExp -- word)
     val constr = parenthesized (word -- word)
@@ -88,8 +90,8 @@ struct
             | _ => raise SyntaxError("unknown flag", toks)
 	end
 
-    fun toType ((x1,x2),SOME NULL_TYPE) = (AST.OPTION x1,x2)
-      | toType ((x1,x2),SOME OUTPUT_TYPE) = (AST.OUTPUT x1, x2)
+    fun toType ((x1,x2),SOME NULL_TYPE) = (AST.LONG ([],AST.OPTION x1),x2)
+      | toType ((x1,x2),SOME OUTPUT_TYPE) = (AST.LONG ([],AST.OUTPUT x1), x2)
       | toType ((x1,x2), NONE) = (x1, x2)
 
     val default = parenthesized (equals $-- string)

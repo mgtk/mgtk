@@ -4,7 +4,7 @@
 structure Translate :> Translate =
 struct
 
-    open WSeq NameUtil
+    open WSeq
     infix &&
 
     fun id x = x
@@ -14,11 +14,11 @@ struct
 
     (* mappings between defs strings representing (type) names,
        and the corresponding ML (type) names *)
-    fun mlWidgetName typExp = removePrefix typExp
-    fun mlFunName name = remove_prefix name
+    fun mlWidgetName typExp = NameUtil.removePrefix typExp
+    fun mlFunName name = NameUtil.remove_prefix name
     fun mlSignalName signal = String.map (fn #"-" => #"_" | ch => ch) signal
-    fun mlFlagName name = remove_PREFIX name
-    fun mlEnumName name = remove_PREFIX name
+    fun mlFlagName name = NameUtil.remove_PREFIX name
+    fun mlEnumName name = NameUtil.remove_PREFIX name
 
 
     (* insert declaration in type info table *)
@@ -32,24 +32,52 @@ struct
 
 
 
-    fun toCValue (AST.TYPENAME "<ctype>", name) = name
-      | toCValue (AST.TYPENAME typExp, name) = (#toCValue (TypeInfo.lookupTypeName typExp)) name
-      | toCValue (typExp, name) = Util.notImplemented ("toCValue: not a type name: " ^ AST.typeClass typExp)
+    val get_texp = TypeInfo.get_texp
+    val dummyPair = (AST.LONG([], AST.TYPENAME "none"), "dummy")
 
-    fun toCValue' (typExp as (AST.OPTION typExp'), name) =
-	if TypeInfo.isNullType typExp
-	then if TypeInfo.isPrimVal typExp' then $"GtkObjOption_nullok(" && name && $")"
-	     else if TypeInfo.isString typExp' then $"StringOption_nullok(" && name && $")"
-             else raise Fail("Translate.toCValue': can only handle primitive values and strings: " ^ AST.typeClass typExp')
-        else toCValue (typExp, name)
-      | toCValue' (typExp, name) = toCValue (typExp, name)
+    (* translate to/from c types:
 
-    fun fromCValue (AST.TYPENAME typExp, name) = (#fromCValue (TypeInfo.lookupTypeName typExp)) name
-      | fromCValue (AST.OUTPUT (typExp as (AST.TYPENAME _)), name) = 
-	  if TypeInfo.isPrimVal typExp 
-	  then fromCValue (typExp, $"&" && name)
-	  else fromCValue (typExp, name)
-      | fromCValue (typExp, name) = Util.notImplemented ("fromCValue: not a type name: " ^ WSeq.flatten name ^ " of " ^ AST.typeClass typExp)
+       toCValue
+
+       toCValue'
+
+       fromCValue
+    *)
+    local 
+	(* ugly hack: remove <ctype> *)
+	fun toc long (AST.TYPENAME "<ctype>", name) = name
+	  | toc long (AST.TYPENAME typExp, name) = 
+	    (#toCValue (TypeInfo.lookupTypeName typExp)) name
+	  | toc long (typExp, name) = 
+	    Util.notImplemented ("toCValue: not a type name: " ^ AST.toString long)
+
+	(* ugly hack: options *)
+	fun toc' long (AST.OPTION typExp', name) =
+	    if TypeInfo.isPrimVal typExp' 
+	    then $"GtkObjOption_nullok(" && name && $")"
+	    else if TypeInfo.isString typExp' 
+		 then $"StringOption_nullok(" && name && $")"
+		 else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ AST.toString long ^ ")")
+	  | toc' long (typExp, name) = toc long (typExp, name)
+
+	fun fromc long (AST.TYPENAME typExp, name) = 
+	    (#fromCValue (TypeInfo.lookupTypeName typExp)) name
+	  | fromc long' (AST.OUTPUT long, name) = 
+	    if TypeInfo.isTypeName long
+	    then if TypeInfo.isPrimVal long
+		 then fromCValue (long, $"&" && name)
+		 else fromCValue (long, name)
+	    else Util.notImplemented ("fromCValue: not a type name (" ^ AST.toString long' ^ ")")
+	  | fromc long (typExp, name) = 
+	    Util.notImplemented ("fromCValue: neither type name or output type (" ^ AST.toString long ^ ")")
+	    
+	and fromCValue (long, name) = fromc long (get_texp long, name)
+
+    in  fun toCValue (long, name) = toc long (get_texp long, name)
+	fun toCValue' (long, name) = toc' long (get_texp long, name)
+	val fromCValue = fromCValue
+    end (* local *)
+
 
 
     (* Types *)
@@ -61,9 +89,10 @@ struct
     val mlPrimType = fn (_:wseq) => fn tName => mlPrimType tName
 
 
-    fun mkCType (AST.TYPENAME name) = cType name
-      | mkCType (AST.OUTPUT t) = mkCType t
-      | mkCType _ = Util.notImplemented "mkCType: not a type name"
+    fun mkc (AST.TYPENAME name) = cType name
+      | mkc (AST.OUTPUT t) = mkCType t
+      | mkc _ = Util.notImplemented "mkCType: not a type name"
+    and mkCType long = mkc (get_texp long)
 
     local
 	fun parens true wseq = $"(" && wseq && $")"
@@ -72,15 +101,17 @@ struct
 	fun mkType nest mkTName tArg (AST.TYPENAME tName) = 
 	    mkTName (tArg ()) tName
 	  | mkType nest mkTName tArg (AST.TUPLE tArgs) = 
-	    prsep ($" * ") (mkType true mkTName tArg) tArgs
+	    prsep ($" * ") (mkLongType true mkTName tArg) tArgs
 	  | mkType nest mkTName tArg (AST.ARROW(tArgs, tRet)) =
-	    parens nest (prsep ($" -> ") (mkType true mkTName tArg) tArgs
-			&& $" -> " && mkType true mkTName (fn _ => $"base") tRet
+	    parens nest (prsep ($" -> ") (mkLongType true mkTName tArg) tArgs
+			&& $" -> " && mkLongType true mkTName (fn _ => $"base") tRet
                         )
 	  | mkType nest mkTName tArg (AST.OPTION t) =
-	    (mkType nest mkTName tArg t) && $" option"
+	    (mkLongType nest mkTName tArg t) && $" option"
 	  | mkType nest mkTName tArg (AST.OUTPUT t) =
-	    mkType nest mkTName tArg t
+	    mkLongType nest mkTName tArg t
+	and mkLongType nest mkTName tArg long = 
+	    mkType nest mkTName tArg (get_texp long)
 
 	val index = ref 0
 	fun reset () = index := 0
@@ -91,20 +122,22 @@ struct
 
 	(* would we like versions with explicit type arguments? *)
 	fun mkMLFreshType typExp = 
-	    (reset (); mkType false mlType fresh typExp)
+	    (reset (); mkLongType false mlType fresh typExp)
 	fun mkMLType typExp = mkMLFreshType typExp
 
 	fun mkMLPrimFreshType typExp = 
-	    (reset (); mkType false mlPrimType fresh typExp)
-	fun mkMLPrimType (AST.ARROW(tArgs, tRet)) =
+	    (reset (); mkLongType false mlPrimType fresh typExp)
+	fun mkMLPrimType (AST.LONG(path, AST.ARROW(tArgs, tRet))) =
 	    if fitsDynApp tArgs (* check if it fits appX *)
-	    then mkMLPrimFreshType (AST.ARROW(tArgs, tRet))
-	    else mkMLPrimFreshType (AST.ARROW([AST.TUPLE tArgs], tRet))
+	    then mkMLPrimFreshType (AST.LONG(path, AST.ARROW(tArgs, tRet)))
+	    else mkMLPrimFreshType 
+		      (AST.LONG(path, 
+				AST.ARROW([AST.LONG([],AST.TUPLE tArgs)],tRet)))
           | mkMLPrimType t = mkMLPrimFreshType t
 
     end (* local *)
 	
-    type parlist = (AST.type_expression * string) list
+    type parlist = (AST.long_texp * string) list
 
     fun splitList p l =
 	let fun f (elem, (acc1,acc2)) =
@@ -121,10 +154,12 @@ struct
 		in  case tOut of
 		       nil => raise Fail ("mkTuple: has to return *something*")
 		     | [t] => t
-                     | ts => AST.TUPLE ts
+                     | ts => AST.LONG([], AST.TUPLE ts)
 		end
+(*old
 	    fun removeOutput (AST.OUTPUT t, n) = (t, n)
               | removeOutput (t,n) = (t,n)
+old*)
 	    val (outPars, pars) = splitList (TypeInfo.isOutputType o #1) params
 	in  (outPars, pars, mkTuple (map #1 outPars, retType))
 	end
@@ -133,7 +168,7 @@ struct
 	raise Fail ("mlFunType: no parameters")
       | mlFunType (retType, params: parlist) =
 	let val (outPars, pars, retType) = separateParams (retType, params)
-	in  AST.ARROW(map #1 pars, retType) 
+	in  AST.LONG([], AST.ARROW(map #1 pars, retType) )
 	end
 
 
@@ -229,7 +264,7 @@ struct
 
     fun mkCall (name, args: parlist) =
 	let val args' = List.filter (not o TypeInfo.isVoidType') args
-	    fun coerce (AST.OUTPUT t, n) = $"&" && mkOutName n
+	    fun coerce (AST.LONG(_, AST.OUTPUT t), n) = $"&" && mkOutName n
 	      | coerce (t, n) = toCValue' (t, $n)
 	in  $name && $"(" && prsep ($", ") coerce args' && $")"
 	end
@@ -255,23 +290,23 @@ struct
       | declareOutParams (retType, outPars) =
 	let fun decl (tName, name) = 
 	        $"  " && mkCType tName && $" " && mkOutName name && $";"
-	in     (if size(retType) > 1 then $"  value res;" && Nl else Empty)
+	in     (if size(get_texp retType) > 1 then $"  value res;" && Nl else Empty)
             && prsep Nl decl outPars && Nl
 	end
 
     (* for this function remember that the return type has already
        been combined with the output parameters. *)
-    fun mkReturn cExp (retType as (AST.TYPENAME "none"), outPars) =
+    fun mkReturn' cExp (retType as (AST.TYPENAME "none"), outPars) =
 	   $"  " && cExp && $";" && Nl
-	&& $"  return " && fromCValue (retType, $"dummy") && $";" && Nl
-      | mkReturn cExp (retType as (AST.TYPENAME _), []) =
-	   $"  return " && fromCValue (retType, cExp) && $";" && Nl
-      | mkReturn cExp (retType as (AST.TYPENAME _), [(tOut,nOut)]) =
+	&& $"  return " && fromCValue (AST.LONG([], retType), $"dummy") && $";" && Nl
+      | mkReturn' cExp (retType as (AST.TYPENAME _), []) =
+	   $"  return " && fromCValue (AST.LONG([], retType), cExp) && $";" && Nl
+      | mkReturn' cExp (retType as (AST.TYPENAME _), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && fromCValue (tOut, mkOutName nOut) && $";" && Nl
-      | mkReturn cExp (AST.TYPENAME _, _) = 
+      | mkReturn' cExp (AST.TYPENAME _, _) = 
 	  Util.shouldntHappen("mkReturn: multiple output parameters and return type is a type name")
-      | mkReturn cExp (retType as (AST.TUPLE (tOuts as (t::_)), outPars)) =
+      | mkReturn' cExp (retType as (AST.TUPLE (tOuts as (t::_)), outPars)) =
 	if List.length tOuts = List.length outPars (* original return type was none *)
 	then    $"  " && cExp && $";" && Nl
 	     && allocTuple "res" (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) outPars)
@@ -279,15 +314,15 @@ struct
 	else    $"  value rescall = " && cExp && $";" && Nl
              && allocTuple "res" (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) ((t,"call")::outPars))
              && $"  return res;" && Nl
-      | mkReturn cExp (AST.TUPLE _, _) = 
+      | mkReturn' cExp (AST.TUPLE _, _) = 
 	  Util.shouldntHappen("mkReturn: return tuple with only one output type")
-      | mkReturn cExp (AST.OUTPUT typExp, outPars) = mkReturn cExp (typExp, outPars)
-      | mkReturn cExp (typExp, _) = 
-	  Util.shouldntHappen("mkReturn: wrong return type class " ^ AST.typeClass typExp)
+      | mkReturn' cExp (AST.OUTPUT typExp, outPars) = mkReturn cExp (typExp, outPars)
+      | mkReturn' cExp (typExp, _) = 
+	  Util.shouldntHappen("mkReturn: wrong return type")
+    and mkReturn cExp (AST.LONG(path, typExp), outPars) = mkReturn' cExp (typExp, outPars)
 
     fun mkFunDecl (name, retTyp, params, cExp) = 
-	let val params = if null params then [(AST.TYPENAME "none", "dummy")]
-			 else params
+	let val params = if null params then [dummyPair] else params
 	    val (outPars, pars, retType) = separateParams (retTyp, params)
 	    val typ = mlFunType (retTyp, params)
 	in  $"/* ML type: " && mkMLPrimType typ && $" */" && Nl
@@ -327,10 +362,11 @@ struct
 	if TypeInfo.isNullType typExp then $$["fn ", name, " => "]
 	else if TypeInfo.isWidget typExp then $$["fn OBJ ", name, " => "]
         else $$["fn ", name, " => "]
-    fun unwrapArg (AST.OPTION typExp, name) =
-	if TypeInfo.isWidget typExp then $$["(unwrapObjOpt ", name, ")"]
+    fun unwrapArg (AST.LONG(_, AST.OPTION typExp), name) =
+	if TypeInfo.isWidget typExp
+	then $$["(unwrapObjOpt ", name, ")"]
 	else $name
-      | unwrapArg (typExp, name) = $name
+      | unwrapArg (_, name) = $name
     fun wrapResult typExp res =
 	if TypeInfo.isWidget typExp then $"OBJ(" && res && $")"
         else res
@@ -340,7 +376,7 @@ struct
 
 	    val args = List.length pars'
 	    val no_args = if fitsDynApp pars' then args else 1
-	    val name' = remove_prefix name
+	    val name' = mlFunName name
 	    val (c_name,ml_name) = 
 		    if short then (name ^ "_short", name' ^ "'")
 		    else (name, name')
@@ -386,24 +422,24 @@ struct
     *)
 
     fun getFieldName (name, field) =
-	"gtk_" ^ separateWords #"_" (NameUtil.removePrefix name) ^ "_get_" ^ field
+	"gtk_" ^ NameUtil.separateWords #"_" (mlWidgetName name) ^ "_get_" ^ field
 
     fun mkGetField name (typExp, field) = 
-	let val params = [(AST.TYPENAME name, "wid")]
-	    val name' = separateWords #"_" (NameUtil.removePrefix name)
-	    val macro = $$["GTK_", toUpper name',"("]
-                        && toCValue (AST.TYPENAME name, $"wid") && $")"
+	let val params = [(AST.LONG([], AST.TYPENAME name), "wid")]
+	    val name' = NameUtil.separateWords #"_" (mlWidgetName name)
+	    val macro = $$["GTK_", NameUtil.toUpper name',"("]
+                        && toCValue (AST.LONG([], AST.TYPENAME name), $"wid") && $")"
 	    val cExp = $"(" && macro && $")" && $" -> " && $field
 	in  mkFunDecl (getFieldName (name, field), typExp, params, cExp)
 	end
 
     fun mkMLGetFieldDecl name (typExp, field) =
-	let val params = [(AST.TYPENAME name, "wid")]
+	let val params = [(AST.LONG([],AST.TYPENAME name), "wid")]
 	in  mkMLFunDecl ($"base") (getFieldName(name,field), mlFunType (typExp,params))
 	end
 
     fun mkMLGetFieldVal name (typExp, field) =
-	let val params = [(AST.TYPENAME name, "wid")]
+	let val params = [(AST.LONG([],AST.TYPENAME name), "wid")]
 	in  mkMLFunVal false (getFieldName(name,field), typExp, params)
 	end
 
@@ -429,14 +465,14 @@ struct
     *)
 
     fun mkWidgetDecl (name, fields) =
-	   $$["/* *** ", removePrefix name, " stuff *** */"] && Nl && Nl
+	   $$["/* *** ", mlWidgetName name, " stuff *** */"] && Nl && Nl
         && (prsep Nl (mkGetField name) (case fields of SOME fields => fields | NONE => []))
         && Nl
 
     fun mkMLWidgetDecl base (name, inherits) =
 	let val name' = mlWidgetName name
-	    val witness = $$["'a ", toLower name', "_t"]
-	in  mkComment ($$["*** ", removePrefix name, " ***"]) && Nl
+	    val witness = $$["'a ", NameUtil.toLower name', "_t"]
+	in  mkComment ($$["*** ", mlWidgetName name, " ***"]) && Nl
 
 	 && mkTypeDecl' (witness, base)
          && mkTypeDecl' ($"'a " && $name, SOME(witness && $" " && $inherits))
@@ -547,8 +583,10 @@ struct
 
     *)
 
-    fun mlPrimEnumType (name, constr) =	AST.TUPLE(map (fn _=> AST.TYPENAME "int") constr)
-    fun mlEnumType (name, constr) = AST.TYPENAME(TypeInfo.mlEnumTypeName name)
+    fun mlPrimEnumType (name, constr) =	
+	AST.LONG([], AST.TUPLE(map (fn _=> AST.LONG([], AST.TYPENAME "int")) constr))
+    fun mlEnumType (name, constr) = 
+	AST.LONG([], AST.TYPENAME(TypeInfo.mlEnumTypeName name))
 
     fun mkEnumDecl (name, constr) =
 	let val type_name = TypeInfo.mlEnumTypeName name
@@ -567,7 +605,7 @@ struct
 
     fun mkMLEnumDecl (name, constr) =
 	let val type_name = TypeInfo.mlEnumTypeName name
-	    val ml_type = mkMLType (AST.TYPENAME name)
+	    val ml_type = mkMLType (AST.LONG([], AST.TYPENAME name))
 	    fun prCnstr (n,const) = mkValDecl (mlFlagName const, ml_type, NONE)
 	in  mkTypeDecl (type_name, NONE)
          && prsep Empty prCnstr constr
@@ -577,7 +615,7 @@ struct
     fun mkMLEnumVal (name, constr) =
 	let val type_name = TypeInfo.mlEnumTypeName name
 	    val typ = mlPrimEnumType (name, constr)
-	    fun cName (name, const) = $(remove_PREFIX const)
+	    fun cName (name, const) = $(mlEnumName const)
 	in  $$[indent,"type ", type_name, " = int"] && Nl
          && $$[indent,"val get_", type_name, "_: "]
 	       && $"unit -> " && mkMLPrimType typ && Nl
@@ -603,16 +641,20 @@ struct
                 = fn wid => fn cb => unit_connect wid "clicked" cb
     *)
 
+    fun longTName tName = AST.LONG([], AST.TYPENAME tName)
+
     fun mlConnectType (name, NONE) = 
-	AST.ARROW([AST.TYPENAME name, AST.ARROW([AST.TYPENAME "none"], AST.TYPENAME "none")], AST.TYPENAME "none")
+	AST.LONG([], AST.ARROW([longTName name,
+				AST.LONG([], AST.ARROW([longTName "none"], 
+						       longTName "none"))],
+			       longTName "none"))
       | mlConnectType (name, SOME cb) = 
-	AST.ARROW([AST.TYPENAME name, cb], AST.TYPENAME "none")
+	AST.LONG([], AST.ARROW([longTName name, cb], longTName "none"))
 
     fun mlConnectFunction NONE = "unit_connect"
-      | mlConnectFunction (SOME(AST.ARROW([AST.TYPENAME "none"], AST.TYPENAME "bool"))) =
+      | mlConnectFunction (SOME(AST.LONG(_,AST.ARROW([AST.LONG(_, AST.TYPENAME "none")], AST.LONG(_, AST.TYPENAME "bool"))))) =
         "bool_connect"
       | mlConnectFunction (SOME _) = raise Fail("only know callbacks of type unit -> bool")
-
 
     (* Generation of C code
        ------------------------------------------------------------
@@ -621,7 +663,7 @@ struct
     fun mkCFunction (name, retTyp, params) =
 	   mkFunDecl (name, retTyp, params, mkCall (name, params))
         && let val params' = List.filter (not o TypeInfo.isNullType') params
-	       val params'' = map (fn (AST.OPTION t,n) => (AST.TYPENAME "<ctype>","NULL")
+	       val params'' = map (fn (AST.LONG(path, AST.OPTION t),n) => (AST.LONG(path,AST.TYPENAME "<ctype>"),"NULL")
                                     | (t,n) => (t,n))
                                   params
 	   in  if List.length params' = List.length params
@@ -632,8 +674,7 @@ struct
     fun mkCdecl (AST.OBJECT_DECL(pos, name, _, fields)) =
           mkWidgetDecl (name, fields)
       | mkCdecl (AST.FUNCTION_DECL(pos, name, retTyp, params)) =
-	let val params' = if null params then [(AST.TYPENAME "none","dummy")]
-			  else params
+	let val params' = if null params then [dummyPair] else params
 	in  mkCFunction (name, retTyp, params)
 	end
       | mkCdecl (AST.FLAGS_DECL(pos, name, constr)) =
@@ -652,8 +693,7 @@ struct
         && Nl
       | mkMLSigdecl (AST.FUNCTION_DECL(pos, name, retTyp, params)) = 
 	let val params' = List.filter (not o TypeInfo.isNullType') params
-	    val params'' = if null params' then [(AST.TYPENAME "none","dummy")]
-			   else params'
+	    val params'' = if null params' then [dummyPair] else params'
 	in  mkMLFunDecl NONE (name, mlFunType(retTyp, params))
          && (if List.length params' = List.length params
 	     then Empty
@@ -676,8 +716,7 @@ struct
         && Nl
       | mkMLStrdecl (AST.FUNCTION_DECL(pos, name, retTyp, params)) = 
 	let val params' = List.filter (not o TypeInfo.isNullType') params
-	    val params'' = if null params' then [(AST.TYPENAME "none","dummy")]
-			   else params'
+	    val params'' = if null params' then [dummyPair] else params'
 	in  mkMLFunVal false (name, retTyp, params)
         &&  (if List.length params' = List.length params
 	     then Empty

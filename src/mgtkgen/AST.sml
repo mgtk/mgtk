@@ -13,28 +13,41 @@ struct
 
     datatype target = SIG | SML | C
 
-    datatype type_expression = 
+    datatype texp = 
 	TYPENAME of string
-      | TUPLE of type_expression list
-      | ARROW of type_expression list * type_expression
-      | OPTION of type_expression
-      | OUTPUT of type_expression
+      | TUPLE of long_texp list
+      | ARROW of long_texp list * long_texp
+      | OPTION of long_texp
+      | OUTPUT of long_texp
+    and long_texp = LONG of string list * texp
 
-    fun typeClass (TYPENAME _) = "type name"
-      | typeClass (TUPLE _) = "tuple"
-      | typeClass (ARROW _) = "arrow"
-      | typeClass (OPTION _) = "option"
-      | typeClass (OUTPUT _) = "output"
-	
+    fun typeClass' (TYPENAME _) = "type name"
+      | typeClass' (TUPLE _) = "tuple"
+      | typeClass' (ARROW _) = "arrow"
+      | typeClass' (OPTION _) = "option"
+      | typeClass' (OUTPUT _) = "output"
+    fun typeClass (LONG (path, texp)) = typeClass' texp
+
+    fun texpToString (TYPENAME s) = s
+      | texpToString (TUPLE longs) = 
+	Util.stringSep "(" ")" " * " toString longs
+      | texpToString (ARROW (args, res)) = 
+	(Util.stringSep "[" "]" " * " toString args) ^ " -> " ^ toString res
+      | texpToString (OPTION long) = toString long ^ " option"
+      | texpToString (OUTPUT long) = toString long ^ " output"
+    and toString (LONG ([], texp)) = texpToString texp
+      | toString (LONG (path, texp)) = 
+	(Util.stringSep "" "." "." (fn s=>s) path) ^ texpToString texp
+
     type constructor = string (* nick *) * string (* constructor *)
-    type parameter = type_expression * string
+    type parameter = long_texp * string
 
     datatype declaration =
 	OBJECT_DECL of pos * string * string * (parameter list option)
-      | FUNCTION_DECL of pos * string * type_expression * (parameter list)
+      | FUNCTION_DECL of pos * string * long_texp * (parameter list)
       | FLAGS_DECL of pos * string * constructor list
       | BOXED_DECL of pos * string * (string list) * string option
-      | SIGNAL_DECL of pos * string * string * type_expression option
+      | SIGNAL_DECL of pos * string * string * long_texp option
 
     fun isWidget (OBJECT_DECL _) = true
       | isWidget _ = false
@@ -77,32 +90,36 @@ struct
 
 	fun equal_texp (TYPENAME name1, TYPENAME name2) = name1 = name2
 	  | equal_texp (TUPLE texps1, TUPLE texps2) = 
-	    equal_texp_list (texps1, texps2)
+	    equal_long_texp_list (texps1, texps2)
 	  | equal_texp (ARROW(args1,ret1),ARROW(args2,ret2)) =
-	    equal_texp_list (args1, args2) andalso equal_texp (ret1, ret2)
-	  | equal_texp (OPTION texp1, OPTION texp2) = equal_texp (texp1, texp2)
-	  | equal_texp (OUTPUT texp1, OUTPUT texp2) = equal_texp (texp1, texp2)
+	    equal_long_texp_list (args1, args2) andalso equal_long_texp (ret1, ret2)
+	  | equal_texp (OPTION texp1, OPTION texp2) = equal_long_texp (texp1, texp2)
+	  | equal_texp (OUTPUT texp1, OUTPUT texp2) = equal_long_texp (texp1, texp2)
 	  | equal_texp _ = false
+	and equal_long_texp (LONG (path1, texp1), LONG (path2, texp2)) = 
+	    equal_list (op =) (path1, path2) andalso equal_texp (texp1, texp2)
 	and equal_texp_list (texps1, texps2) = 
 	    equal_list equal_texp (texps1,texps2)
+	and equal_long_texp_list (texps1, texps2) = 
+	    equal_list equal_long_texp (texps1,texps2)
 	fun equal_par ((typExp1, name1), (typExp2, name2)) = 
-	    typExp1 = typExp2 andalso name1 = name2
+	    equal_long_texp (typExp1, typExp2) andalso name1 = name2
 	fun equal_pars (pars1, pars2) = equal_list equal_par (pars1, pars2)
 	fun equal_pars_opt (pars1, pars2) = 
 	    equal_opt (equal_list equal_par) (pars1, pars2)
-
+	fun equal_cons ((_,cons1), (_,cons2)) = cons1 = cons2
     in (* local *)
 
 	fun equal (OBJECT_DECL(_,obj1,inh1,fields1), OBJECT_DECL(_,obj2,inh2,fields2)) =
 	    obj1 = obj2 andalso inh1 = inh2 andalso equal_pars_opt (fields1, fields2)
 	  | equal (FUNCTION_DECL(_,func1,typExp1,pars1), FUNCTION_DECL(_,func2,typExp2,pars2)) =
 	    func1 = func2 andalso typExp1 = typExp2 andalso equal_pars (pars1, pars2)
-	  | equal (FLAGS_DECL(_,flag1,pars1), FLAGS_DECL(_,flag2,pars2)) =
-	    flag1 = flag1 andalso equal_pars (pars1, pars2)
+	  | equal (FLAGS_DECL(_,flag1,cons1), FLAGS_DECL(_,flag2,cons2)) =
+	    flag1 = flag1 andalso equal_list equal_cons (cons1,cons2)
 	  | equal (BOXED_DECL(_,typ1,funcs1,_), BOXED_DECL(_,typ2,funcs2,_)) =
 	    typ1 = typ2 andalso equal_list (op =) (funcs1, funcs2)
 	  | equal (SIGNAL_DECL(_,signal1,wid1,cbType1), SIGNAL_DECL(_,signal2,wid2,cbType2)) =
-	    signal1 = signal2 andalso wid1 = wid2 andalso equal_opt equal_texp (cbType1, cbType2)
+	    signal1 = signal2 andalso wid1 = wid2 andalso equal_opt equal_long_texp (cbType1, cbType2)
 	  | equal _ = false
 	    
     end (* local *)

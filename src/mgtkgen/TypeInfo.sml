@@ -81,27 +81,57 @@ struct
 	((Polyhash.find table tName)
          handle Find => Util.notFound("unbound type name: " ^ tName))
 
+    fun get_texp (AST.LONG (_, typExp)) = typExp
+
     (* predicates *)
-    fun isWidget (AST.TYPENAME tName) = #widget (lookupTypeName tName)
-      | isWidget _ = false
+    local 
+	fun iswidget (AST.TYPENAME tName) = #widget (lookupTypeName tName)
+	  | iswidget _ = false
+    in  fun isWidget  long = iswidget (get_texp long)
+	fun isWidget' (long, name) = isWidget long
+    end
 
-    fun isPrimVal (AST.TYPENAME tName) = #primitive (lookupTypeName tName)
-      | isPrimVal _ = false
+    local
+	fun istname (AST.TYPENAME tName) = true
+	  | istname _ = false
+    in  fun isTypeName long = istname (get_texp long)
+        fun isTypeName' (long, name) = isTypeName long
+    end
 
-    fun isString (AST.TYPENAME "string") = true
-      | isString (AST.TYPENAME "static_string") = true
-      | isString _ = false
+    local
+	fun isprim (AST.TYPENAME tName) = #primitive (lookupTypeName tName)
+	  | isprim _ = false
+    in  fun isPrimVal long = isprim (get_texp long)
+        fun isPrimVal' (long, name) = isPrimVal long
+    end
 
-    fun isNullType (AST.OPTION _) = true
-      | isNullType _ = false
-    fun isNullType' (typExp, name) = isNullType typExp
+    local 
+	fun isstring (AST.TYPENAME "string") = true
+	  | isstring (AST.TYPENAME "static_string") = true
+	  | isstring _ = false
+    in  fun isString long = isstring (get_texp long)
+	fun isString' (long, name) = isString long
+    end
 
-    fun isOutputType (AST.OUTPUT _) = true
-      | isOutputType _ = false
-    fun isOutputType' (typExp, name) = isOutputType typExp
+    local 
+	fun isnull (AST.OPTION _) = true
+	  | isnull _ = false
+    in  fun isNullType long = isnull (get_texp long)
+	fun isNullType' (long, name) = isNullType long
+    end
 
-    fun isVoidType (AST.TYPENAME "none") = true
-      | isVoidType _ = false
-    fun isVoidType' (typExp, name) = isVoidType typExp      
+    local 
+	fun isoutput (AST.OUTPUT _) = true
+	  | isoutput _ = false
+    in  fun isOutputType long = isoutput (get_texp long)
+	fun isOutputType' (long, name) = isOutputType long
+    end
+
+    local
+	fun isvoid (AST.TYPENAME "none") = true
+          | isvoid _ = false
+    in  fun isVoidType long = isvoid (get_texp long)
+	fun isVoidType' (long, name) = isVoidType long
+    end
  
 end (* structure TypeInfo *)
