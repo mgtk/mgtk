@@ -38,6 +38,7 @@ struct
 
     val equals = $ "="
     val fields = $ "fields"
+    val defMdl = $ "define-module" || $ "module"
     val defObj = $ "define-object"
     val defFnc = $ "define-func"
     val defFlags = $ "define-flags"
@@ -57,27 +58,56 @@ struct
     fun parens pf  = skipCommentWS (openParen #-- pf --# closeParen)
     fun parens' pf = skipCommentWS (withPos (openParen #-- pf --# closeParen))
 
+    (* modules *)
+    local
+	val current: string list ref = ref []
+    in  
+	fun declareModule path = (current := path;
+				  !current)
+	fun mkModulePath name = 
+	    let val name' = NameUtil.separate_words #" " name
+		val namePath = String.tokens Char.isSpace name'
+		val path' = let fun loop 0 _ acc = rev acc
+				  | loop d ([],[]) acc = rev acc
+                                  | loop d (e::p,e'::p') acc = if e=e' then loop (d-1) (p,p') (e::acc) 
+							     else rev acc
+		                  | loop d ([], _) acc = rev acc
+                                  | loop d (_, []) acc = rev acc
+			    in  loop 1 (!current, namePath) []
+			    end
+		val pathStr = Util.stringSep "" "" "" (fn s=>s) path'
+		val base = NameUtil.remove pathStr name
+(*
+		val _ = print ("path= " ^ pathStr ^ ", base=" ^ base ^ "\n")
+*)
+	    in  path' @ [base]
+	    end
+    end
+
+
     (* name resolution *)
     local
-	type type_info = TE.texp
+	type type_info = TE.long_texp
 	exception Find
 	val (table: (string, type_info) Polyhash.hash_table) = 
 	    Polyhash.mkPolyTable (*(hash, compare)*) (99, Find)
 	(* insert some primitive types in the symbol table *)
-	val _ = app (fn n => Polyhash.insert table (n,TE.PRIMTYPE n))
+	val _ = app (fn n => Polyhash.insert table (n,TE.LONG([],TE.PRIMTYPE n)))
 	            ["none","int","uint","float","bool","string",
 		     "static_string","GtkType"
                     ]
 	val _ = app (Polyhash.insert table)
-	            [("GtkObject",TE.WIDGET("GtkObject",NONE)),
-		     ("GtkWidget",TE.WIDGET("GtkWidget",SOME "GtkObject"))
+	            [("GtkObject",TE.LONG([],TE.WIDGET("GtkObject",NONE))),
+		     ("GtkWidget",TE.LONG([],TE.WIDGET("GtkWidget",SOME "GtkObject")))
 		    ]
-    in  fun insert tName func = Polyhash.insert table (tName, func)
-	fun insertTypeName tName = insert tName (TE.PRIMTYPE tName)
-	fun insertFlag tName = insert tName (TE.FLAG(tName,false))
-	fun insertEnum tName = insert tName (TE.FLAG(tName,true))
-	fun insertWidget wid inh = insert wid (TE.WIDGET(wid,SOME inh))
-	fun insertPointer box inh = insert box (TE.POINTER(box,inh))
+    in  fun mkLong constr tExp = TE.LONG([], constr tExp)
+
+	fun insert tName func = Polyhash.insert table (tName, func)
+	fun insertTypeName tName = insert tName (mkLong TE.PRIMTYPE tName)
+	fun insertFlag tName = insert tName (mkLong TE.FLAG (tName,false))
+	fun insertEnum tName = insert tName (mkLong TE.FLAG (tName,true))
+	fun insertWidget wid inh = insert wid (mkLong TE.WIDGET (wid,SOME inh))
+	fun insertPointer box inh = insert box (mkLong TE.POINTER (box,inh))
 	fun lookup tName =
 	    ((Polyhash.find table tName)
 	     handle Find => Util.notFound("unbound type name: " ^ tName))
@@ -112,10 +142,23 @@ struct
 	in  TE.LONG([], TE.ARROW(pars, outPars, params, retType))
 	end
 
+    fun mkModuleDecl (pos, (name, NONE)) =
+	let val path = declareModule [name]
+	in  AST.MODULE_DECL (pos, true, path)
+        end
+      | mkModuleDecl (pos, (name, SOME sub)) =
+	let val path = declareModule [sub,name]
+	in  AST.MODULE_DECL (pos, true, path)
+	end
+
     fun mkObjectDecl (pos, (((name, inherits), fields))) = 
-	( insertWidget name inherits
-        ; AST.OBJECT_DECL (pos, TE.LONG([],TE.WIDGET(name,SOME inherits)),fields)
-        )
+	let val path = declareModule (mkModulePath name)
+	in  insertWidget name inherits
+	  ; [AST.MODULE_DECL (pos, false, path),
+             AST.OBJECT_DECL (pos, TE.LONG([],TE.WIDGET(name,SOME inherits)),fields)
+            ]
+	end
+
     fun mkFunctionDecl (pos, ((name, typeExp), params)) =
 	let val dummyPair = (TE.LONG([], TE.PRIMTYPE "none"), "dummy")
 	    val params' = List.filter (not o TI.isNullType') params
@@ -138,7 +181,7 @@ struct
 	; AST.BOXED_DECL (pos, TE.LONG([], TE.POINTER(name,inherits)), names)
 	)
     fun mkSignalDecl (pos, ((name,signal),cbType)) = 
-	(AST.SIGNAL_DECL (pos, TE.LONG([],mkTypeExp name), signal, cbType))
+	(AST.SIGNAL_DECL (pos, mkTypeExp name, signal, cbType))
 
     fun mkBoxedInherits NONE = NONE
       | mkBoxedInherits (SOME(NONE)) = SOME(TE.INH_ROOT)
@@ -150,17 +193,14 @@ struct
     fun ensureNonEmpty [] = [(TE.LONG ([], TE.PRIMTYPE "none"), "dummy")]
       | ensureNonEmpty pars = pars
 
-    fun singleton texp = ([], texp)
-    val mkLong = TE.LONG o singleton
-
     datatype type_flag = NULL_TYPE | OUTPUT_TYPE
     fun toType ((x1,x2),SOME NULL_TYPE) = (TE.LONG ([],TE.OPTION x1),x2)
       | toType ((x1,x2),SOME OUTPUT_TYPE) = (TE.LONG ([],TE.OUTPUT x1), x2)
       | toType ((x1,x2), NONE) = (x1, x2)
 
     (* various *)
-    val typeExp =  (word >> (mkLong o mkTypeExp))
-                || (parens (word --# listQual) >> (mkLong o TE.LIST o mkLong o mkTypeExp))
+    val typeExp =  (word >> mkTypeExp)
+                || (parens (word --# listQual) >> ((mkLong TE.LIST) o mkTypeExp))
 
     (* parameters *)
     val default = parens (equals #-- string)
@@ -175,6 +215,13 @@ struct
 	)   >> toType
     val parList = parens (repeat0 par)
     val parDefaultList = parens (repeat0 parWithOptDefault) >> ensureNonEmpty 
+
+    (* modules *)
+    val mdlDecl = parens'
+        (   defMdl
+        #-- word
+         -- optional (parens ($"submodule-of" #-- word))
+        )
 
     (* objects *)
     val inherits = parens word
@@ -223,12 +270,14 @@ struct
 	)
 
     (* the various forms of declarations *)
-    val decl' = (fncDecl >> mkFunctionDecl)
+    val mkSng = fn e => [e]
+    val decl' = (mdlDecl >> (mkSng o mkModuleDecl))
              || (objDecl >> mkObjectDecl) 
-             || (enumDecl >> mkFlagsDecl true)
-             || (flagsDecl >> mkFlagsDecl false)
-             || (boxedDecl >> mkBoxedDecl)
-             || (signalDecl >> mkSignalDecl)
+             || (fncDecl >> (mkSng o mkFunctionDecl))
+             || (enumDecl >> (mkSng o mkFlagsDecl true))
+             || (flagsDecl >> (mkSng o mkFlagsDecl false))
+             || (boxedDecl >> (mkSng o mkBoxedDecl))
+             || (signalDecl >> (mkSng o mkSignalDecl))
 
 (*
     fun definePred (Lexer.WORD (pos, str)) = String.isPrefix "define" str
@@ -238,7 +287,7 @@ struct
 *)
     val decl = decl'
 
-    val decls =   (repeat1 decl >> op::)
+    val decls =   (repeat1 decl >> (List.concat o op::))
 	      --# (getChars0 Char.isSpace) (* remove remaining whitespace *)
 
 end (* structure Parser *)

@@ -4,11 +4,14 @@
 signature NameUtil =
 sig
 
+    val remove: string -> string -> string
+
     val removePrefix: string -> string
     val remove_prefix: string -> string
     val remove_PREFIX: string -> string
 
     val separateWords: char -> string -> string
+    val separate_words: char -> string -> string
 
     val toLower: string -> string
     val toUpper: string -> string

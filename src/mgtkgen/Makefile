@@ -47,7 +47,7 @@ TypeExp.uo: TypeExp.ui Util.uo
 WSeq.uo: WSeq.ui 
 ArgParse.uo: ArgParse.ui 
 Parsercomb.uo: Parsercomb.ui 
-Parser.uo: AST.ui Util.uo Parsercomb.ui 
+Parser.uo: AST.ui NameUtil.ui Util.uo Parsercomb.ui 
 NameUtil.uo: NameUtil.ui 
 Messages.uo: Messages.ui AST.ui WSeq.ui 
 Parse.uo: Parsercomb.ui 

@@ -22,6 +22,8 @@
 ;   original pyGtk file have double `;''s
 ; * stuff that Henning wants to reconsider have triple `;''s
 
+(module Gtk)
+
 (define-func gtk_check_version
   string
   ((uint required_major)

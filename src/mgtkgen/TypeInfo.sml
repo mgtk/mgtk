@@ -22,6 +22,7 @@ struct
     fun mlBoxedTypeName name = NU.separateWords #"_" name
 
     fun get_texp (TE.LONG (_, typExp)) = typExp
+    fun get_path (TE.LONG (path, _)) = path
 
     (* predicates *)
     local 
@@ -53,8 +54,12 @@ struct
 	fun isVoidType' (long, name) = isVoidType long
     end
 
+    fun compoundType (TE.ARROW _) = true
+      | compoundType (TE.TUPLE _) = true
+      | compoundType _ = false
 
     (* Generate appropriate C and ML versions of the types specified *)
+    val mkcpath = prmap $
     fun mkc (TE.PRIMTYPE tName) = 
 	(case tName of
              "none" => $"void"
@@ -72,13 +77,15 @@ struct
       | mkc (TE.POINTER (boxed,_)) = $boxed
       | mkc (TE.FLAG (fName,_)) = $fName
       | mkc _ = U.notImplemented "mkCType: not a type name"
-    and mkCType long = mkc (get_texp long)
+    and mkCType long = mkcpath (get_path long) && mkc (get_texp long)
 
     local
 	datatype toType = ML_TYPE | ML_PRIM_TYPE
 
 	fun parens true wseq = $"(" && wseq && $")"
           | parens false wseq = wseq
+
+	val mkPath = prsep Empty $
 
 	fun mkType nest _ tArg (TE.PRIMTYPE tName) = 
 	    (case tName of
@@ -123,7 +130,9 @@ struct
           | mkType nest ML_PRIM_TYPE tArg (TE.POINTER (boxed,SOME _)) = 
 	    (fn argTyp => argTyp && $" " && $(mlBoxedTypeName boxed)) (tArg())
 	and mkLongType nest toType tArg long = 
-	    mkType nest toType tArg (get_texp long)
+	       (if compoundType (get_texp long) then Empty
+	        else mkPath (get_path long))
+	    && mkType nest toType tArg (get_texp long)
 
 	val index = ref 0
 	fun reset () = index := 0

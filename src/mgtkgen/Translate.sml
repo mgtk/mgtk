@@ -41,10 +41,7 @@ struct
     (* check if an expression, determined from the type of the expression,
        allocates in the MosML sense *)
     fun allocExpression (long as TE.LONG(_, TE.PRIMTYPE tName)) =
-	let fun extractString (WSeq.$ s) = s
-              | extractString (WSeq.Empty) = ""
-              | extractString _ = U.shouldntHappen "allocExpression.extractString"
-	    val primType = extractString(TI.mkMLPrimType long)
+	let val primType = WSeq.flatten (TI.mkMLPrimType long)
 	in  (* choose the safe way out: only base types are few
 	       base types are considered non-allocating:
             *)
@@ -604,7 +601,8 @@ struct
          && mkFunDecl (name ^ "_short", shortFunType, mkCall (name,map mkNULL (getParams funType)))
 	end
 
-    fun mkCdecl (A.OBJECT_DECL(pos, name, fields)) =
+    fun mkCdecl (A.MODULE_DECL(pos,exp,path)) = Empty
+      | mkCdecl (A.OBJECT_DECL(pos, name, fields)) =
           mkWidgetDecl (name, fields)
       | mkCdecl (A.FUNCTION_DECL(pos, name, funType)) =
 	  mkCFunction (name, funType)
@@ -618,8 +616,15 @@ struct
     (* Generation of SML signature
        ------------------------------------------------------------
     *)
-    fun mkMLSigdecl (A.OBJECT_DECL(pos, name, fields)) =
-	Nl && mkMLWidgetDecl NONE name
+    fun mkMLSigdecl (A.MODULE_DECL(pos,exp,path)) = 
+	Nl
+(*
+	Nl && mkComment ($(U.stringSep "++++ " (if exp then " (explicit) ++++"
+						else " (implicit) ++++")
+			               "." (fn s=>s) path))
+*)
+      | mkMLSigdecl (A.OBJECT_DECL(pos, name, fields)) =
+	   mkMLWidgetDecl NONE name
         && (prsep Empty (mkMLGetFieldDecl name) (case fields of SOME fields => fields | NONE => []))
         && Nl
       | mkMLSigdecl (A.FUNCTION_DECL(pos, name, A.FUNTYPE(longType, NONE))) = 
@@ -637,7 +642,8 @@ struct
     (* Generation of SML structure
        ------------------------------------------------------------
     *)
-    fun mkMLStrdecl (A.OBJECT_DECL(pos, name, fields)) =
+    fun mkMLStrdecl (A.MODULE_DECL(pos,exp,path)) = Empty
+      | mkMLStrdecl (A.OBJECT_DECL(pos, name, fields)) =
 	   mkMLWidgetDecl (SOME ($"base")) name
         && (prsep Empty (mkMLGetFieldVal name) (case fields of SOME fields => fields | NONE => []))
         && Nl
