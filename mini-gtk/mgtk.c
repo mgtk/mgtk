@@ -92,7 +92,7 @@ static inline value string_array_to_list(int n, char** arr) {
   value result;
   Push_roots(tmp, 2);
   tmp[0] = Nil_list;
-  for( ; n > 0; n--) {
+  for( ; n != 0; n--) {
     value ml_str     = copy_string(arr[n-1]);
     tmp[1]           = make_cons(ml_str, tmp[0]);
     tmp[0]           = tmp[1];     
@@ -128,6 +128,50 @@ EXTERNML value mgtk_init(value args) { /* ML */
   stat_free((char *) argv);
 
   return result;
+}
+
+
+static inline GList* GList_val (value list, gpointer (*conv_val)(value)) {
+  if (!IsCons(list)) {
+    return NULL;
+  } else {
+    GList* res = NULL, * last;
+    Push_roots(tmp, 1)// We need this in case conv_val allocates in the ML heap
+      tmp[0] = list;
+      res = last = g_list_append(res, conv_val(Head(tmp[0])));
+      tmp[0] = Tail(tmp[0]);
+      for (; IsCons(tmp[0]); tmp[0] = Tail(tmp[0])) {
+        GList* elem = g_list_alloc();
+        elem->prev = last;
+        elem->next = NULL;
+        elem->data = conv_val(Head(tmp[0]));
+        last->next = elem;
+        last = elem;
+      }
+    Pop_roots();
+    return res;
+  }
+}
+
+static inline value val_GList(GList* glist, value (*val_conv)(gpointer)) {
+  if (glist == NULL) {
+    return Nil_list;
+  } else {
+    value result, elem;
+    Push_roots(tmp, 3);
+      elem   = val_conv(glist->data);              /* The first element */
+      tmp[2] = tmp[0] = make_cons(elem, Nil_list); /* tmp[2] is the result */
+      glist  = g_list_next(glist);
+      for(; glist != NULL; glist = g_list_next(glist)) {
+        elem   = val_conv(glist->data);
+        tmp[1] = make_cons(elem, Nil_list);
+        modify(&Tail(tmp[0]), tmp[1]); /* tmp[0] is older than tmp[1] */
+        tmp[0] = tmp[1];     
+      }
+      result = tmp[2];  
+    Pop_roots();
+    return result;
+  }
 }
 
 
