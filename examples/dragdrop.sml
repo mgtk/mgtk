@@ -25,7 +25,7 @@ val source_table = let val source_list = [ TargetEntry.new "application/x-monkey
                    end
 
 fun dataReceived drag_context x y data info time =
-    let val data = Gtk.SelectionData.get_data data  
+    let val data = Gtk.SelectionData.toString data  
         val succes = 
             case info of
                 0 => (* uri-list *) 
