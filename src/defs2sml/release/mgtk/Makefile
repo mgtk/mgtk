@@ -12,9 +12,9 @@ MLTONBIN=/usr/bin/
 
 all: mosml mlton
 
-mosml: helloworld-new buttons-galore mgtk.so
+mosml: helloworld-new buttons-galore signup mgtk.so
 
-mlton: helloworld-mlton buttons-galore-mlton
+mlton: helloworld-mlton buttons-galore-mlton signup-mlton
 
 
 # mosml stuff
