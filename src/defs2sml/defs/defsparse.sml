@@ -1,6 +1,6 @@
 structure DefsParse = struct
 
-    val pathList = ref ["api"]
+    val pathList = ref []
 
     open Parsercomb Defs
     infix 7 |>
@@ -35,11 +35,29 @@ structure DefsParse = struct
 	in  loop strm0 []
 	end
 
+    (* BASIC THINGS *)
+    fun wc #"(" = false
+      | wc #")" = false
+      | wc #"\"" = false
+      | wc #";" = false
+      | wc #"'" = false
+      | wc c = not(Char.isSpace c)
+    fun qc #"\"" = true
+      | qc _ = false
+    val word       = getChars1 wc
+    val quotedWord = "\"" $-- getChars1 (not o qc) --$ "\""
+
     (* PRE-LEXING *)
-    fun qc c = c = #"\""
-    val string = "\"" $-- getChars0 (fn c=>not(qc c)) --$ "\""
+
+(*  pyGtk
     val incl = 
 	("(" $-- skipWS ("include" $-- skipWS (string --# skipWS ($")"))))
+*)
+
+(*  GtkMM
+*)
+    val incl = 
+	("(" $-- skipWS ("include" $-- skipWS (word --# skipWS ($")"))))
     
     fun includer (orig_src: char stream) : char stream =
 	let fun get (stk, src, NONE) = 
@@ -59,46 +77,25 @@ structure DefsParse = struct
 	end
 
     fun show p src =
-	let val g = getItem src
-	    val _ = case g of
-			SOME(item,_) => p item
-		      | NONE => ()
-	in  g
-	end
+	let val i = getItem src
+	in  Option.app (p o #1) i
+          ; i
+        end
 
     (* LEXING *)
-    datatype token = WORD_T of string | STRING_T of string | LPAR_T | RPAR_T
-                   | EOF_T
-
-    fun showToken (WORD_T w) = "!" ^ w ^ "!"
-      | showToken (STRING_T s) = "\"" ^ s ^ "\""
-      | showToken LPAR_T = "<"
-      | showToken RPAR_T = ">"
-      | showToken EOF_T = "<eof>"
+    datatype token = WORD_T of string | LPAR_T | RPAR_T | EOF_T
 
     fun wordOf (WORD_T n) = n
       | wordOf _ = raise Fail("wordOf: not a word")
-    fun stringOf (STRING_T s) = s
-      | stringOf _ = raise Fail("stringOf: not a string")
     fun isWord (WORD_T _) = true
       | isWord _ = false
-    fun isString (STRING_T _) = true
-      | isString _ = false
 
-    fun wc #"-" = true
-      | wc #"_" = true
-      | wc #"#" = true (* FIXME: Do we really want this? Yup, truth values *)
-      | wc c = Char.isAlphaNum c
-    fun qc c = c = #"\""
-    val word       = getChars1 wc
-    val quotedWord = "\"" $-- getChars1 (fn c=>not(qc c) andalso wc c) --$ "\""
-    val string     = "\"" $-- getChars0 (not o qc) --$ "\""
     val white = getChar Char.isSpace
     fun token is = 
         (   $"("        |> LPAR_T
         ||  $")"        |> RPAR_T
 	||  word        >> WORD_T
-        ||  string      >> STRING_T
+	||  quotedWord  >> WORD_T
         ||  $"'("       |> LPAR_T (* FIXME: Is this what we want? *)
         ||  white #-- token
         ||  comment
@@ -108,93 +105,108 @@ structure DefsParse = struct
 	(";" $-- getChars0 (fn c=>not(c= #"\n")) --$ "\n" #-- token) is
     and lexer is = stream token is
 
-(*
-    val lexer = stream (show (TextIO.print o showToken)) o lexer
-*)
-
     (* PARSING *)
+    (* % t and derivatives --- get token t *)
+    infix 6 %-- --%
+    fun (t %-- pf) = getLit t -- pf >> #2
+    fun (pf --% t) = pf -- getLit t >> #1
+
+    (* & s and derivatives --- get word token with lexeme s *)
     infix 6 &-- --&
     fun & s = getElem (fn (WORD_T n) => s = n | _ => false) >> wordOf
     fun (n &-- pf) = & n -- pf >> #2
     fun (pf --& n) = pf -- & n >> #1
 
-    infix 6 %-- --%
-    fun (t %-- pf) = getLit t -- pf >> #2
-    fun (pf --% t) = pf -- getLit t >> #1
-
     fun parens pf = LPAR_T %-- pf --% RPAR_T
-    val name = getElem isWord >> wordOf
-    val defName = name >> (fn n => (TextIO.print(n^"\n"); n))
-    val string = getElem isString >> stringOf
+    val word = getElem isWord >> wordOf
+    val defWord = word >> (fn n => (TextIO.print(n^"\n"); n))
 
     (* Type expressions and lists of types and names *)
-    val typeID = string
-    val typeExp = string
+    val typeID = word
+    val typeExp = word
 
     val nullOk = parens (&"null-ok") |> NullOk
-    val default = parens ("default" &-- string) >> Default
+    val default = parens ("default" &-- word) >> Default
     val typeName = (* too liberal since we use it also for fields *)
-	parens (typeExp -- string -- optional nullOk -- optional default)
+	parens (typeExp -- word -- optional nullOk -- optional default)
         >> (fn (((te,na),nu),d)=>(te,na,List.mapPartial id (nu::d::[])))
-    val typeNameList = repeat1 typeName >> (op ::)
+    val typeNameList = repeat0 typeName
     
     (* Objects and boxed types *)
     val objAttrib =
-        (   parens ("in-module" &-- string)         >> (SOME o Module)
-        ||  parens ("parent" &-- string)            >> (SOME o Parent)
-        ||  parens ("c-name" &-- string)            >> (SOME o CName)
+        (   parens ("in-module" &-- word)           >> (SOME o Module)
+        ||  parens ("parent" &-- word)              >> (SOME o Parent)
+        ||  parens ("c-name" &-- word)              >> (SOME o CName)
         ||  parens ("gtype-id" &-- typeID)          >> (SOME o TypeID)
         ||  parens ("fields" &-- typeNameList)      >> (SOME o Fields)
-	||  parens ("implements" &-- string)        |> NONE
+	||  parens ("implements" &-- word)          |> NONE
         )
     val objAttribs = repeat1 objAttrib >> (List.mapPartial id o (op::))
     val object = parens ( (&"define-object" || &"define-interface") 
-                          #-- defName -- objAttribs) >> tagFn Object
+                          #-- defWord -- objAttribs) >> tagFn Object
 
     val boxAttrib =
-        (   parens ("in-module" &-- string)         >> Module
-        ||  parens ("c-name" &-- string)            >> CName
+        (   parens ("in-module" &-- word)           >> Module
+        ||  parens ("c-name" &-- word)              >> CName
         ||  parens ("gtype-id" &-- typeID)          >> TypeID
-        ||  parens ("copy-func" &-- string)         >> CopyFunc
-        ||  parens ("release-func" &-- string)      >> ReleaseFunc
+        ||  parens ("copy-func" &-- word)           >> CopyFunc
+        ||  parens ("release-func" &-- word)        >> ReleaseFunc
         ||  parens ("fields" &-- typeNameList)      >> Fields
         )
     val boxAttribs = repeat1 boxAttrib >> (op::)
     val boxed = parens ( (&"define-boxed" || &"define-pointer")
-                         #-- defName -- boxAttribs) >> tagFn Boxed
+                         #-- defWord -- boxAttribs) >> tagFn Boxed
 
     (* Enums and flags *)
-    val value = parens (string -- string)
+    val value = parens (word -- word)
     val valueList = repeat1 value >> (op::)
     val enuAttrib =
-	(   parens ("in-module" &-- string)         >> Module
-        ||  parens ("c-name" &-- string)            >> CName
+	(   parens ("in-module" &-- word)           >> Module
+        ||  parens ("c-name" &-- word)              >> CName
         ||  parens ("gtype-id" &-- typeID)          >> TypeID
         ||  parens ("values" &-- valueList)         >> Values
         )
     val enuAttribs = repeat1 enuAttrib >> (op::)
     val enum = parens ( (&"define-enum" || &"define-flags")
-                        #-- defName -- enuAttribs) >> tagFn Enum
+                        #-- defWord -- enuAttribs) >> tagFn Enum
 
     (* Function like things *)
     val truth = &"#t" |> true || &"#f" |> false
     val funAttrib = (* too liberal since it is used for all func things *)
-        (   parens ("c-name" &-- string)            >> CName
-        ||  parens ("is-constructor-of" &-- name)   >> Constructor
-        ||  parens ("of-object" &-- string)         >> OfObject
+        (   parens ("c-name" &-- word)              >> CName
+        ||  parens ("is-constructor-of" &-- word)   >> Constructor
+        ||  parens ("of-object" &-- word)           >> OfObject
         ||  parens ("return-type" &-- typeExp)      >> ReturnType
         ||  parens ("parameters" &-- typeNameList)  >> Params
-	||  parens ("deprecated" &-- string)        |> Deprecated
+	||  parens ("deprecated" &-- word)          |> Deprecated
 	||  parens ("varargs" &-- truth)            >> Varargs
 	||  parens ("caller-owns-return" &-- truth) >> CallerOwnsReturn
         )
     val funAttribs = repeat1 funAttrib >> (op::)
-    val function = parens ("define-function" &-- defName -- funAttribs) >> tagFn Function
-    val method   = parens ("define-method"   &-- defName -- funAttribs) >> tagFn Method
+    val function = parens ("define-function" &-- defWord -- funAttribs) >> tagFn Function
+    val method   = parens ("define-method"   &-- defWord -- funAttribs) >> tagFn Method
 
-    val definitions = repeat1 (function || method || object || boxed || enum )
+    (* Signals *)
+    val when = (&"unknown" |> Unknown || &"last" |> Last || &"first" |> First)
+    val sigAttrib =
+        (   parens ("of-object" &-- word)           >> OfObject
+        ||  parens ("return-type" &-- word)         >> ReturnType
+        ||  parens ("when" &-- when)                >> When
+        ||  parens ("parameters" &-- typeNameList)  >> Params
+        )
+    val sigAttribs = repeat1 sigAttrib >> (op::)
+    val signal = parens ("define-signal" &-- defWord -- sigAttribs) >> tagFn Signal
+
+    (* Misc *)
+    val property = parens ("define-property" &-- word 
+                           -- repeat0 (parens (word -- word)))
+
+    val definitions = repeat1 (  function >> SOME || method >> SOME 
+                              || object >> SOME || boxed >> SOME
+                              || enum >> SOME || signal >> SOME
+                              || property |> NONE)
                           --% EOF_T
-                      >> (op::)
+                      >> (List.mapPartial id o (op::))
 
     fun parse file =
 	let val stream = toStream file

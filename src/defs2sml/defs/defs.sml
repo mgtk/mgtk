@@ -6,6 +6,7 @@ structure Defs = struct
 
     type value_list = (string * string) list
 
+    datatype when = Unknown | First | Last
     datatype attrib =
 	Module of string
       | Parent of string
@@ -22,6 +23,7 @@ structure Defs = struct
       | Deprecated
       | Varargs of bool
       | CallerOwnsReturn of bool
+      | When of when
 
     datatype def_tag =
 	Object
@@ -29,6 +31,7 @@ structure Defs = struct
       | Enum
       | Function
       | Method
+      | Signal
 
     type definition = string * def_tag * attrib list
 
