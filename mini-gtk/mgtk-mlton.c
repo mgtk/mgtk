@@ -6,7 +6,7 @@
 #include <gtk/gtk.h>
 
 /* MLton */
-#include "helloworld-mlton.h"
+#include "mgtk-mlton.h"
 
 #ifdef WIN32
 #define EXTERNML __declspec(dllexport)
@@ -26,6 +26,11 @@
    . Perhaps rename Val_GtkObj to make_GtkObj or something similar.
 
 */
+
+
+EXTERNML char mgtk_stringsub(char *s, int i) {
+  return s[i];
+}
 
 
 EXTERNML void mgtk_init(char** argv, int argc) { /* ML */

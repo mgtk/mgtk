@@ -5,14 +5,34 @@ signature CString =
 sig
     type cstring
     val fromString : string -> cstring
-    val toString : cstring -> string
+
+    type t
+    val toString : t -> string
+
+    val free : t -> unit
 end
 
 structure CString :> CString =
 struct
-    type cstring = string
+    type cstring = string 
     fun fromString s = s ^ "\000"
-    fun toString s = raise Fail"CString.toString not implemented"
+
+    type t = MLton.pointer
+    val sub = _ffi "mgtk_stringsub" : t * int -> char;
+
+
+    fun toList t =
+        let fun loop i = 
+                let val c = sub(t, i) 
+                in  if c = #"\000" then []
+                    else c :: loop(i+1)
+                end
+        in  loop 0
+        end 
+
+    fun toString t = String.implode(toList t)
+
+    val free = _ffi "free" : t -> unit;
 end
 
 
@@ -505,9 +525,13 @@ struct
     val new: unit -> base t
         = fn dummy => makeEnt(new_ ()) 
 
-    val get_text_ = _ffi "gtk_entry_get_text" : cptr -> CString.cstring;
+    val get_text_ = _ffi "gtk_entry_get_text" : cptr -> CString.t;
     val get_text: 'a t -> string
-        = fn entry => raise Fail"not implemented"
+        = fn entry => 
+          GO.withPtr(entry, fn entry =>
+                     let val t = get_text_ entry (* Must not be free'ed *)
+                     in  CString.toString t 
+                     end)
 
     local open Signal infix --> in
     fun activate_sig f = 
@@ -533,7 +557,7 @@ struct
     type cptr = GO.cptr
 
     fun inherit w con = Container.inherit () con
-    val pack_start_= _ffi "gtk_box_pack_start" : cptr * cptr -> unit;
+    val pack_start_= _ffi "gtk_box_pack_start_defaults" : cptr * cptr -> unit;
     val pack_start: 'a t -> 'b Widget.t -> unit
         = fn box => fn widget => 
                     GO.withPtr(box, fn box =>
@@ -543,7 +567,6 @@ end
 
 signature VBox =
 sig
-
     type 'a vbox_t
     type 'a t = 'a vbox_t Box.t
     type base
@@ -564,7 +587,7 @@ struct
     fun inherit w con = Box.inherit () con
     fun make ptr = Box.inherit () (fn() => ptr)
 
-    val new_ = _ffi "gtk_entry_new": bool -> int -> cptr;
+    val new_ = _ffi "gtk_vbox_new": int * int -> cptr;
     val new: unit -> base t
-        = fn dummy => make(new_ false 10) 
+        = fn dummy => make(new_(1, 10)) 
 end
