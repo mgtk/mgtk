@@ -4,7 +4,6 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    type icon_set = GObject.cptr
     type icon_size = int
     val get_icon_size_ : unit -> int * int * int * int * int * int * int
 	= app1 (symb"mgtk_get_gtk_icon_size")
@@ -22,6 +21,16 @@ structure Gtk  = struct
     val accel_groups_activate : 'a GObject.t -> int -> int -> bool
 	= fn object => fn accel_key => fn accel_mods =>
 	     accel_groups_activate_ (repr object) accel_key accel_mods
+    structure IconSet :>
+      sig
+	type t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+    end
     structure Settings :>
       sig
 	type base
@@ -67,7 +76,7 @@ structure Gtk  = struct
 	type 'a t = 'a rcstyle_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toRcStyle : 'a t -> base t
-	val rc_get_style_by_paths
+	val get_style_by_paths
 	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
       end = struct
 	open Dynlib
@@ -80,16 +89,15 @@ structure Gtk  = struct
 	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toRcStyle obj = inherit () (fn () => repr obj)
-	val rc_get_style_by_paths_
-	  : cptr -> string -> string -> GType.t -> cptr
+	val get_style_by_paths_ : cptr -> string -> string -> GType.t -> cptr
 	    = app4 (symb"mgtk_gtk_rc_get_style_by_paths")
-	val rc_get_style_by_paths
+	val get_style_by_paths
 	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
 	    = fn settings => fn widget_path => fn class_path => fn typ =>
-		 Style.inherit
-		   ()
-		   (fn () => rc_get_style_by_paths_
-			       (repr settings) widget_path class_path typ)
+		 Style.inherit ()
+			       (fn () => get_style_by_paths_
+					   (repr settings) widget_path
+					   class_path typ)
     end
     structure Object :>
       sig
@@ -117,7 +125,7 @@ structure Gtk  = struct
 	type 'a t = 'a widget_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWidget : 'a t -> base t
-	val modify_style : 'a t -> 'b RcStyle.t -> unit
+	val modify_style : 'a t -> 'b Rc.Style.t -> unit
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -131,7 +139,7 @@ structure Gtk  = struct
 	fun toWidget obj = inherit () (fn () => repr obj)
 	val modify_style_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_widget_modify_style")
-	val modify_style : 'a t -> 'b RcStyle.t -> unit
+	val modify_style : 'a t -> 'b Rc.Style.t -> unit
 	    = fn self => fn style => modify_style_ (repr self) (repr style)
     end
     structure Calendar :>
@@ -207,20 +215,6 @@ end
 
 
 /* *** Gtk *** */
-#define GtkIconSet_val(x) (((void*) Field(x, 1)))
-
-#define GtkIconSet_val_nocast(x) (Field(x, 1))
-
-static void ml_finalize_GtkIconSet(value val) { /* Empty */
-}
-
-value Val_GtkIconSet(void* obj) {
-  value res;
-  res = alloc_final(2, ml_finalize_GtkIconSet, 0, 1);
-  GtkIconSet_val_nocast(res) = (value) obj;
-  return res;
-}
-
 /* ML type: unit -> int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
   value res = alloc_tuple(7);
@@ -242,6 +236,23 @@ EXTERNML value mgtk_gtk_icon_size_register(value name, value width, value height
 /* ML type: cptr -> int -> int -> bool */
 EXTERNML value mgtk_gtk_accel_groups_activate(value object, value accel_key, value accel_mods) { /* ML */
   return Val_bool(gtk_accel_groups_activate(GtkObj_val(object), Int_val(accel_key), Int_val(accel_mods)));
+}
+
+
+
+/* *** IconSet *** */
+#define GtkIconSet_val(x) (((void*) Field(x, 1)))
+
+#define GtkIconSet_val_nocast(x) (Field(x, 1))
+
+static void ml_finalize_GtkIconSet(value val) { /* Empty */
+}
+
+value Val_GtkIconSet(void* obj) {
+    value res;
+    res = alloc_final(2, ml_finalize_GtkIconSet, 0, 1);
+    GtkIconSet_val_nocast(res) = (value) obj;
+    return res;
 }
 
 

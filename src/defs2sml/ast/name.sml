@@ -12,6 +12,7 @@ structure Name :> NAME = struct
 	let fun loop [] = []
 	      (* Special-case some Gtk name patterns *)
 	      | loop ("get"::"type"::xs) = "get"::"type" :: loop xs
+	      | loop ("mime"::"type"::xs) = "mime"::"type" :: loop xs
 	      | loop ("get"::"buffer"::xs) = "get"::"buffer" :: loop xs
 	      | loop ("Window"::"Type"::xs) = "Window"::"Type" :: loop xs
 	      | loop (x::"Type"::xs) = (x^"Type") :: loop xs
@@ -40,7 +41,6 @@ structure Name :> NAME = struct
 	      | loop ("tree"::"selection"::xs) = ("treeselection") :: loop xs
 	      | loop ("Progress"::"Bar"::xs) = ("ProgressBar") :: loop xs
 	      | loop ("progress"::"bar"::xs) = ("progressbar") :: loop xs
-	      | loop ("Rc"::"Style"::xs) = "RcStyle" :: loop xs
 	      | loop (x::xs) = x :: loop xs
 	in  loop words end
 
@@ -214,6 +214,7 @@ structure Name :> NAME = struct
 	  | ify ("setbuffer"::rest) acc = ify rest ("buffer"::"set"::acc)
 	  | ify ("storagetype"::rest) acc = ify rest ("type"::"storage"::acc)
 	  | ify ("curvetype"::rest) acc = ify rest ("type"::"curve"::acc)
+	  | ify ("mimetype"::rest) acc = ify rest ("type"::"mime"::acc)
 	  | ify ("toiter"::rest) acc = ify rest ("iter"::"to"::acc)
 	  | ify ("selectioniter"::rest) acc = ify rest ("iter"::"selection"::acc)
 	  | ify ("childiter"::rest) acc = ify rest ("iter"::"child"::acc)

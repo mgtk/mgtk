@@ -28,6 +28,7 @@ sig
     datatype ('n,'t) api_info =
 	Method of 't
       | Field of 't
+      | Object of 'n (* type name *) * 'n option (* parent *) * 'n list (* implements *)
       | Boxed of {copy: string, release: string} option
       | Enum of bool (* flag? *) * 'n list
       | Signal of 't
@@ -40,10 +41,7 @@ sig
       | Array of api_type
 
     type ('n,'t) ast_module = 
-	 ('n, 
-	  ('n*'n option*'n list) option,
-	  ('n, 't) api_info
-         ) module
+	 ('n, 'n option, ('n, 't) api_info) module
 
     val pp: ('n * 'modi) Pretty.pp * ('n * 'memi) Pretty.pp
             -> ('n, 'modi, 'memi) module Pretty.pp

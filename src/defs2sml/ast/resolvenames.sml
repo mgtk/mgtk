@@ -57,7 +57,7 @@ struct
 	          | Field _ => (fn s => [s])
 		  | i => Name.separateWords
 
-	    fun resMod current m =
+	    fun resMod (parent,current) m =
 	        case m of
 		    Module{name,members,info} =>
 			let val (full,path,base) = toName id Name.separateWords current name
@@ -65,31 +65,32 @@ struct
 			    val name' = Name.fromPaths(full,path,base)
 			    val _ = MsgUtil.debug("  module: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ Name.toString' name' ^"\n")
 			in  Module{name=name',
-				   members=List.map (resMem current') members,
-				   info=resType' current info}
+				   members=List.map (resMem (current,current')) members,
+				   info=SOME name'}
 			before
 			    add name'
 			end
-	    and resMem current m =
+	    and resMem (parent,current) m =
 		case m of
-		    Sub m => Sub(resMod current m)
+		    Sub m => Sub(resMod (current,current) m)
 	          | Member{name,info} => 
 			let val (full,path,base) = toName id (splitfcn info) current name
 			    val name' = Name.fromPaths(full,path,base)
 			    val _ = MsgUtil.debug("  member: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ Name.toString' name')
 			in  Member{name=name',
-				   info= resMemInfo current info}
+				   info= resMemInfo (parent,current) info}
 			end
-	    and resMemInfo current (Enum(flags, enums)) =
+	    and resMemInfo (parent,current) (Enum(flags, enums)) =
 		let fun res e = 
 			let val (f,p,b) = toName id (Name.separateUnderscores) current e
 			in  Name.fromPaths(f,p,b) end
 		in  Enum(flags,List.map res enums) end
-	      | resMemInfo current (Method ty) = Method(resType current ty)
-	      | resMemInfo current (Field ty) = Field(resType current ty)
-	      | resMemInfo current (Signal ty) = Signal(resType current ty)
-	      | resMemInfo current (Boxed funcs) = Boxed funcs
-	    and resType current ty =
+	      | resMemInfo path (Method ty) = Method(resType path ty)
+	      | resMemInfo path (Field ty) = Field(resType path ty)
+	      | resMemInfo path (Signal ty) = Signal(resType path ty)
+	      | resMemInfo path (Boxed funcs) = Boxed funcs
+	      | resMemInfo path (Object obj) = Object(resObject path obj)
+	    and resType (parent,current) ty =
 		let fun demod_ty (Type.Tname _, tyname) = 
 			let val (f,p,b) = toName lookup Name.separateWords current tyname
 			in  Name.fromPaths(f,p,b) end
@@ -97,16 +98,13 @@ struct
 		      | demod_ty (_,_) = raise Fail("resType: shouldn't happen")
 		    fun demod_def (ty,d) = Name.fromPaths(toName id Name.separateUnderscores current d)
 		in  Type.mapiv demod_ty demod_def ty end
-	    and resType' cur ty =
+	    and resObject (parent,current) (ty,typarent,impl) =
 		let fun demod n =
-		    let val (f,p,b) = toName lookup Name.separateWords cur n
+		    let val (f,p,b) = toName lookup Name.separateWords parent n
 		    in  Name.fromPaths(f,p,b) end
-		in  case ty of
-			NONE => NONE
-		      | SOME(ty,parent,impl) =>
-			SOME(demod ty, Option.map demod parent, List.map demod impl)
+		in  (demod ty, Option.map demod typarent, List.map demod impl)
 		end
-	in  resMod [] module
+	in  resMod ([],[]) module
 	end
 
     fun modularize module =

@@ -1,1 +1,83 @@
 (include "lib/overrides.defs")
+
+
+;; The following functions aren't present in Gtk#'s gtk-api.raw,
+;; and hence tool/metadata2defs.pl wont be able to handled them.
+(override-parameters gtk_alignment_get_padding
+  (of-object "GtkAlignment")
+  (parameters
+    '("guint*" "padding_top" (output))
+    '("guint*" "padding_bottom" (output))
+    '("guint*" "padding_left" (output))
+    '("guint*" "padding_right" (output))
+  )
+)
+
+(override-parameters gtk_button_get_alignment
+  (of-object "GtkButton")
+  (parameters
+    '("gfloat*" "xalign" (output))
+    '("gfloat*" "yalign" (output))
+  )
+)
+
+(override-parameters gtk_scale_get_layout_offsets
+  (of-object "GtkScale")
+  (parameters
+    '("gint*" "x" (output))
+    '("gint*" "y" (output))
+  )
+)
+
+(override-parameters gtk_action_new
+  (of-object "GtkAction")
+  (parameters
+   '("const-ghar*" "name")
+   '("const-ghar*" "label")
+   '("const-ghar*" "tooltip")
+   '("const-ghar*" "stock_id")
+  )
+)
+
+(override-parameters gtk_toggle_action_new
+  (of-object "GtkToggleAction")
+  (parameters
+   '("const-ghar*" "name")
+   '("const-ghar*" "label")
+   '("const-ghar*" "tooltip")
+   '("const-ghar*" "stock_id")
+  )
+)
+
+(override-parameters gtk_radio_action_new
+  (of-object "GtkRadioAction")
+  (parameters
+   '("const-ghar*" "name")
+   '("const-ghar*" "label")
+   '("const-ghar*" "tooltip")
+   '("const-ghar*" "stock_id")
+   '("gint" "value")
+  )
+)
+
+(override-parameters gtk_action_group_new
+  (of-object "GtkActionGroup")
+  (parameters
+   '("const-gchar*" "name")
+  )
+)
+
+(override-parameters gtk_expander_new
+  (of-object "GtkExpander")
+  (parameters
+   '("const-gchar*" "label")
+  )
+)
+
+(override-parameters gtk_icon_theme_set_search_path
+  (of-object "GtkIconTheme")
+  (parameters
+    '("const-gchar*" "path" (array "n_elements"))
+    '("gint" "n_elements")
+  )
+)

@@ -167,21 +167,13 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	end
 
     fun build module =
-	let fun bmod (AST.Module{name,members,info=SOME(n,parent,impl)},table) = 
-		let val table' = List.foldl bmem table members
-(*
-		    val nb = Name.getBase name
-		    val name' = Name.fromPaths(Name.getFullPath name@nb,
-					       Name.getPath name,
-					       nb)
-*)
-		in  addObject(table',name) end
-	      | bmod (AST.Module{name,members,info=NONE},table) = 
+	let fun bmod (AST.Module{name,members,info=_},table) = 
 		List.foldl bmem table members
 	    and bmem (AST.Sub module,table) = bmod(module,table)
 	      | bmem (AST.Member{name,info},table) =
 		case info of
-		    AST.Enum(false (* not a flag *), _) => 
+		    AST.Object(typ,parent,impl) => addObject(table,typ)
+		  | AST.Enum(false (* not a flag *), _) => 
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
 			    {kind = Enum, toc="Int_val", fromc="Val_int",
@@ -212,7 +204,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 					   [Const "()"]),
 			     fromprim=id, toprim=NONE, wrapped = false,
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
-			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
+			     stype=fn _ => SMLType.TyApp([],["t"])})
                     )
 		  | _ => table
 	in  bmod (module,init())

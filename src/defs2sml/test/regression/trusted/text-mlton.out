@@ -1,7 +1,15 @@
 structure Gtk  = struct
     
     type cptr = GObject.cptr
-    type textiter = GObject.cptr
+    structure TextIter :>
+      sig
+	type t
+	val alloc_GtkTextIter : unit -> t
+      end = struct
+	type cptr = GObject.cptr
+	type t = GObject.cptr
+	val alloc_GtkTextIter = _import "alloc_GtkTextIter" : unit -> t;
+    end
     structure TextBuffer :>
       sig
 	type base
@@ -9,8 +17,8 @@ structure Gtk  = struct
 	type 'a t = 'a textbuffer_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTextBuffer : 'a t -> base t
-	val insert : 'a t -> textiter -> string -> int option -> unit
-	val insert' : 'a t -> textiter -> string -> unit
+	val insert : 'a t -> TextIter.t -> string -> int option -> unit
+	val insert' : 'a t -> TextIter.t -> string -> unit
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -23,13 +31,13 @@ structure Gtk  = struct
 	val insert_ : cptr * cptr * CString.cstring * int -> unit
 	    = _import "gtk_text_buffer_insert"
 		      : cptr * cptr * CString.cstring * int -> unit;
-	val insert : 'a t -> textiter -> string -> int option -> unit
+	val insert : 'a t -> TextIter.t -> string -> int option -> unit
 	    = fn self => fn iter => fn text => fn len =>
 		 GObject.withPtr
 		   (self, 
 		    fn self => insert_ (self, iter, CString.fromString text, 
 					getOpt (len, ~1)))
-	val insert' : 'a t -> textiter -> string -> unit
+	val insert' : 'a t -> TextIter.t -> string -> unit
 	    = fn self => fn iter => fn text =>
 		 GObject.withPtr
 		   (self, 
@@ -40,6 +48,14 @@ end
 
 
 /* *** Gtk *** */
+
+
+/* *** TextIter *** */
+EXTERNML GtkTextIter* alloc_GtkTextIter() {
+    GtkTextIter res;
+    return gtk_text_iter_copy(&res);
+}
+
 
 
 /* *** TextBuffer *** */

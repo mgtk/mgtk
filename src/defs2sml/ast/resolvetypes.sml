@@ -35,16 +35,13 @@ structure ResolveTypes :> ResolveTypes = struct
 	val tname = getChars1 name_char >> (fn n => Tname n: string ty)
 
 	val simple = void || base || tname
-
-(*
-	val array = simple -- "[" $-- num --$ "]" 
-			>> (fn (ty,len) => Arr(SOME len, ty))
-*)
 	val pointer = simple --$ "*" >> Ptr
 	val pointer = (simple -- (repeat1 ($ "*"))) 
 		      >> (fn (ty,(_,l)) => List.foldl (Ptr o #2) (Ptr ty) l)
 	    
-	val unqualtyp = pointer || simple
+	val array = pointer --$ "[]" >> Array
+
+	val unqualtyp = array || pointer || simple
 
 	val const = "const-" $-- unqualtyp >> Const
 
@@ -82,6 +79,7 @@ structure ResolveTypes :> ResolveTypes = struct
           | AST.Enum(flag, mems) => AST.Enum(flag,mems)
           | AST.Signal ty => AST.Signal(resTy ty)
 	  | AST.Boxed funcs => AST.Boxed funcs
+	  | AST.Object obj => AST.Object obj
 
     fun resolve (AST.Module{name=n,members=m,info=i}) =
 	AST.Module{name=n,members=List.map resolve' m,info=i}

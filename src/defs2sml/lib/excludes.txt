@@ -117,6 +117,9 @@ TEMPORARY
 gtk_tree_selection_get_selected
 gtk_tree_view_get_cursor
 GtkIconSource
+GSLIST(GtkRadioButton)
+gtk_radio_tool_button_new
+gtk_radio_tool_button_new_from_stock
 UNKNOWNTYPES
 gtk_widget_size_request
 ARRAYS
@@ -125,6 +128,8 @@ gtk_rc_get_default_files
 gtk_rc_set_default_files
 gtk_curve_set_vector
 gtk_tree_model_rows_reordered
+gtk_tree_store_set_column_types
+gtk_im_context_simple_add_table
 DEPRECATED
 GtkTreeViewMode
 gtk_timeout_add
@@ -178,9 +183,6 @@ gtk_vbutton_box_get_layout_default
 gtk_vbutton_box_set_layout_default
 gtk_button_box_get_layout
 gtk_button_box_set_layout
-#ARRAYS
-gtk_tree_store_set_column_types
-gtk_im_context_simple_add_table
 #DEPENDSONOTHERSTUFF
 GtkAccessible
 STUFF
@@ -202,6 +204,9 @@ gtk_rc_property_parse_enum
 gtk_rc_property_parse_flags
 gtk_rc_property_parse_requisition
 gtk_rc_property_parse_border
+#gtk_rc_get_style_by_paths
+#gtk_rc_reparse_all_for_settings
+#gtk_rc_reset_styles
 gtk_widget_class_install_style_property
 gtk_widget_class_install_style_property_parser
 gtk_container_foreach_full

@@ -52,6 +52,28 @@ structure Gtk  = struct
 	    = fn self => fn width => fn height =>
 		 set_fixed_size_ (repr self) width height
     end
+    structure CellRendererText :>
+      sig
+	type base
+	type 'a cellrenderertext_t
+	type 'a t = 'a cellrenderertext_t CellRenderer.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toCellRendererText : 'a t -> base t
+	val new : unit -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a cellrenderertext_t = unit
+	type 'a t = 'a cellrenderertext_t CellRenderer.t
+	fun inherit w con = CellRenderer.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toCellRendererText obj = inherit () (fn () => repr obj)
+	val new_ : unit -> cptr = app1 (symb"mgtk_gtk_cell_renderer_text_new")
+	val new : unit -> base t = fn dummy => make (new_ dummy)
+    end
 end
 
 
@@ -71,5 +93,13 @@ EXTERNML value mgtk_gtk_cell_renderer_get_type(value dummy) { /* ML */
 EXTERNML value mgtk_gtk_cell_renderer_set_fixed_size(value self, value width, value height) { /* ML */
     gtk_cell_renderer_set_fixed_size(GtkObj_val(self), Int_val(width), Int_val(height));
     return Val_unit;
+}
+
+
+
+/* *** CellRendererText *** */
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_cell_renderer_text_new(value dummy) { /* ML */
+    return Val_GtkObj(gtk_cell_renderer_text_new());
 }
 

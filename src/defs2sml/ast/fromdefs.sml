@@ -1,5 +1,5 @@
 (* mgtk --- an SML binding for GTK.                                          *)
-(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
 structure FromDefs :> FromDefs = struct
 
@@ -8,24 +8,40 @@ structure FromDefs :> FromDefs = struct
     structure Map = Splaymap
     structure A = AST
 
-    type module_info = (string (*name*) * string option (* parent *) * string list (* implements *)) option
+    type module_info = string option (* name *)
     type member_info = (string,AST.api_type) AST.api_info
 
     datatype module = 
-	Module of {name: string, members: member list ref, info: module_info}
+	Module of {done: bool ref, name: string, members: member list ref, info: module_info}
     and member =
         Sub of module
       | Member of {name: string, info: member_info}
     type map = (string, member list) Map.dict
+    fun show (Sub(Module{name,...})) = "module " ^ name
+      | show (Member{name,...}) = "member " ^ name
 
     fun pairmap f (x,y) = (f x, f y)
-    val empty : (string, member list ref) Map.dict
+    val empty : (string, module) Map.dict
       = Map.mkDict (String.compare o pairmap Name.toLower) (* FIXME *)
-    fun new map name r = Map.insert(map, name, r)
     fun insert map name mem = 
 	case Map.peek (map, name) of
-	    SOME r => (r := mem :: !r; map)
-	  | NONE => new map name (ref [])
+	    SOME(Module{done,name,members,info}) => 
+	      (members := mem :: !members; map)
+	  | NONE => ( print("Unbound module "^name^" for "^show mem^"\n")
+		    ; map) (* FIXME *)
+    fun new map name parent info = 
+	let val md = Module{done=ref false,name=name,info=info,members=ref[]}
+	    val map = case parent of NONE => map
+				   | SOME p => insert map p (Sub md)
+	in  Map.insert(map, name, md) end
+
+    val dependencies = ref (Map.mkDict(String.compare))
+    fun addDependencies name dep = 
+	dependencies := Map.insert(!dependencies, name, dep)
+    fun getDependencies name =
+	case Map.peek(!dependencies,name) of
+	    NONE => []
+	  | SOME d => d
 
     fun trans top metadata (def, map) =
 	let val name = getName def handle AttribNotFound _ => #1 def
@@ -56,13 +72,19 @@ structure FromDefs :> FromDefs = struct
 	in  case getTag def of
 		Object => 
 		   let val md = getModule def
-		       val r = ref []
 		       val parent = SOME(getParent def)
 			            handle AttribNotFound _ => NONE
 		       val implements = getImplements def
-		       val mem = Sub(Module{name=name,members=r,
-					    info=SOME(name,parent,implements)})
-		   in  new (insert map md mem) name r end
+		       val _ = addDependencies name
+			         ((case parent of SOME p => [p]
+						| NONE => [])
+                                  @ implements)
+		       val info = (name,parent,implements)
+		       val mem = Member{name=name,info=A.Object info}
+		   in  insert (new map name (SOME md) (* parent *) NONE)
+		              name mem
+
+		   end
 	      | Function =>
 		   (
 		   let val md = 
@@ -115,7 +137,9 @@ structure FromDefs :> FromDefs = struct
 			   SOME({copy=getCopyFunc def,release=getReleaseFunc def})
 			   handle AttribNotFound _ => NONE
 		       val mem = Member{name=name,info=A.Boxed copyrel}
-		   in  insert map md mem end
+		   in  insert (new map name (SOME md) (* parent *) NONE)
+			      name mem
+		   end
 	end
     and functype metadata self rettype def =
 	let fun addself ps = case self of NONE => ps
@@ -191,15 +215,30 @@ structure FromDefs :> FromDefs = struct
     fun fromDefs top defs metadefs
 	: (string,module_info,member_info) AST.module =
 	let val md = interpretMetadata metadefs
-	    val map = List.foldl (trans top md) (new empty top (ref[])) defs
-	    fun convert () =
-		let val ast = Map.find (map, top)
-		    fun loop (Module{name,members,info}) = 
-			A.Module{name=name,members=List.map loop' (rev (!members)),info=info}
-		    and loop' (Sub module) = A.Sub(loop module)
-		      | loop' (Member{name,info}) = A.Member{name=name,info=info}
-		in  loop (Module{name=top,members=ast,info=NONE}) end
-	in  convert () end
+	    val map = List.foldl (trans top md) (new empty top NONE NONE) defs
+	    fun cmap f = List.concat o List.map f
+	    fun convert (Module{done,name,members=mbs,info}) =
+		if !done then []
+		else let val _ = done := true
+			 val deps = getDependencies name
+		     in  (cmap (process name) deps) @
+		         [A.Module{name=name,info=info,
+				   members=cmap loop (rev(!mbs))}
+			 ]
+		     end
+	    and loop (Sub module) = List.map A.Sub (convert module)
+	      | loop (Member{name,info}) = 
+		[A.Member{name=name,info=info}]
+	    and process name dep = 
+		if dep="GObject" then [] (* YUCK: HACK *)
+		else convert(Map.find(map,dep))
+		     handle Map.NotFound => 
+			( print("Unbound dependency "^dep^" for "^name^"\n")
+			; [] )
+	in  case process "toplevel" top of
+		[m] => m
+	      | _ => Util.abort 12345
+	end
 
     (* For debugging: *)
     local open Pretty in

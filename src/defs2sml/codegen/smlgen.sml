@@ -18,7 +18,7 @@ signature PRIMITIVES = sig
     val mkOutputStub: bool -> TypeInfo.typeinfo -> ('a ty -> exp -> exp)
 		      -> (string * 'a ty) list -> 'a ty -> exp 
 		      -> (exp * (string * 'a ty) list * 'a ty list)
-    val boxedAlloc : Name.name -> TinySML.dec option
+    val boxedAlloc : Name.name -> {stru:TinySML.dec,sign:TinySML.spec} option
     val strHeader : TinySML.dec list
 end (* signature PRIMTIVES *)
 
@@ -217,8 +217,11 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 
     fun boxedAlloc name = 
 	let val n = "alloc_"^Name.asCBoxed name
-	    val ty = ArrowTy([UnitTy],TyApp([],[Name.asBoxed name]))
-	in  SOME(ValDec(VarPat n, NONE, Import(n, ty)))
+            (* this will end up inside the boxed structure, hence just use
+	       t for the return type *)
+	    val ty = ArrowTy([UnitTy],TyApp([],["t"]))
+	in  SOME({stru=ValDec(VarPat n, NONE, Import(n, ty)),
+		  sign=ValSpec(VarPat n, ty)})
 	end
 
     val strHeader = 
@@ -244,6 +247,12 @@ struct
 
     infix **
     fun s1 ** s2 = SeqSpec[s1,s2]
+
+    infix ::: :::?
+    fun {stru=stru1,sign=sign1} ::: {stru=stru2,sign=sign2} =
+	{stru=SeqDec[stru1,stru2], sign=SeqSpec[sign1,sign2]}
+    fun code1 :::? (SOME code2) = code1 ::: code2
+      | code1 :::? NONE = code1
 
     open SMLType
     infix --> ==>
@@ -446,13 +455,91 @@ struct
                     }
 		end
 
+	  | AST.Object(typ,parent,impl) => 
+	        let
+		    val base_t = "base"
+		    val witness_t = Name.asType typ^"_t"
+		    val parent = case parent of SOME p => p
+					      | NONE => Name.fromString "GObject"
+		    val parent_t = Name.asModule parent ^ ".t"
+
+		    val type_t = "t"
+		    fun pRef id = (* FIXME: Using names instead *)
+			Name.asModule parent ^ "." ^ id 
+		        
+
+		    fun fromtypeclosed ty =
+			TypeInfo.toSMLType tinfo (fn _ => "base") ty
+
+		    (* interfaces using complete path list
+		    fun f (i,a) = TyApp([a], [Name.asModule i ^ ".t"])
+		    val path = List.foldl f (TyApp([TyVar "'a"], [witness_t])) impl
+		     *)
+		    (* only implement parent *)
+		    val path = TyApp([TyVar "'a"], [witness_t])
+		in  {stru= 
+		     TypeDec(([],[base_t]),SOME UnitTy)
+		     ++ TypeDec((["'a"],[witness_t]),SOME UnitTy)
+		     ++ TypeDec((["'a"],[type_t]), SOME(TyApp([path],[parent_t])))
+(*
+   fun inherit w con = 
+       let val con = let val ptr = con () in fn () => ptr end
+           val editableWitness = Editable.inherit () con
+           val cellEditableWitness = CellEditable.inherit editableWitness con
+       in  Widget.inherit cellEditableWitness con
+       end
+*)
+		     ++ FunDec("inherit",[VarPat "w",VarPat "con"],
+		               (* 'a -> GObject.constructor -> 'a t *)
+			       NONE,
+(*
+		    Let(SeqDec (
+			   ValDec(VarPat "con", NONE, Let(ValDec(VarPat "ptr",NONE,App(Var "con",[Unit])),Fn("()",Var"ptr")))
+                        :: ValDec(VarPat "witness", NONE, Unit)
+			:: List.map (fn i => ValDec(VarPat "witness", NONE, App(Var(Name.asModule i ^ ".inherit"), [Var "witness", Var "con"]))) 
+				    impl			            []
+                        ),
+*)
+			       App(Var(pRef "inherit"),[Unit (* was "witness" *),Var "con"]))
+		     ++ FunDec("make"(*^Name.asModule name*),[VarPat"ptr"],NONE,
+			       App(Var("inherit"),[Unit,Fn("()",Var"ptr")]))
+		     ++ FunDec("to"^Name.asModule typ, [VarPat "obj"],
+			       SOME(TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"])),
+			       P.mkToFunc NONE)
+		     ++ let fun f i = 
+				let val ty = Type.Tname i
+				in  FunDec("as"^Name.asModule i, [VarPat "obj"], NONE,
+					   P.mkToFunc (SOME i))
+				end
+			in  SeqDec(List.map f impl)
+			end 
+		     ++ CommentDec NONE,
+		     sign=
+		     TypeSpec(([],[base_t]),NONE)
+	             ** TypeSpec((["'a"],[witness_t]),NONE)
+                     ** TypeSpec((["'a"],[type_t]), SOME(TyApp([path],[parent_t])))
+                     ** FunSpec("inherit", 
+				[TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"]))
+                     ** FunSpec("to"^Name.asModule typ, TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"]))
+                     ** let fun f i = 
+				let val ty = Type.Tname i
+				    val ml_ty = fromtypeclosed ty
+				in  FunSpec("as"^Name.asModule i, 
+					    TyApp([TyVar "'a"],["t"]) --> 
+						 TyApp([TyVar "base"],[Name.asModule i,"t"]))
+				end
+			in  SeqSpec(List.map f impl)
+			end
+	             }
+		end
+
 	  | AST.Boxed funcs =>
 	        let val alloc = P.boxedAlloc name
-		    val name = Name.asBoxed name
-		in  {stru=TypeDec(([],[name]), SOME(TyApp([],["GObject.cptr"])))
-		          +? alloc,
+		    val name = "t"
+		in  {stru=TypeDec(([],[name]), SOME(TyApp([],["GObject.cptr"]))),
 		     sign=TypeSpec(([],[name]),NONE)
                     }
+                :::? alloc
 		end
           | AST.Field ty => 
 		let val name = Name.asField name
@@ -460,7 +547,6 @@ struct
 				 P.ccall ("mgtk_get_"^name) 1 IntTy),
 		     sign=EmptySpec}
 		end
-
 (*
    Generate in the structure:
 
@@ -503,91 +589,6 @@ struct
 		     sign=ValSpec(VarPat(name'), ty)}
 		end
 
-    fun header tinfo (name, info) =
-	let val (typ,parent,impl) = 
-		case info of
-		    SOME (n,parent,impl) => 
-		       (Name.asType n,
-			case parent of SOME(p) => p
-				     (* assume that objects without a parent
-				        derives from GObject *)
-		                     | _ => Name.fromString "GObject",
-			impl
-                       )
-		  | _ => raise Skip("No type information")
-
-	    val base_t = "base"
-	    val witness_t = typ^"_t"
-	    val parent_t = Name.asModule parent ^ ".t"
-
-	    val type_t = "t"
-	    fun pRef id = Name.asModule parent ^ "." ^ id (* FIXME: Using names instead *)
-
-	    val fromtypeclosed = 
-		fn ty => TypeInfo.toSMLType tinfo (fn _ => "base") ty
-
-            (* interfaces using complete path list
-	    fun f (i,a) = TyApp([a], [Name.asModule i ^ ".t"])
-	    val path = List.foldl f (TyApp([TyVar "'a"], [witness_t])) impl
-            *)
-            (* only implement parent *)
-            val path = TyApp([TyVar "'a"], [witness_t])
-	in  {stru=SeqDec(P.strHeader)
-		  ++ TypeDec(([],[base_t]),SOME UnitTy)
-		  ++ TypeDec((["'a"],[witness_t]),SOME UnitTy)
-		  ++ TypeDec((["'a"],[type_t]), SOME(TyApp([path],[parent_t])))
-(*
-   fun inherit w con = 
-       let val con = let val ptr = con () in fn () => ptr end
-           val editableWitness = Editable.inherit () con
-           val cellEditableWitness = CellEditable.inherit editableWitness con
-       in  Widget.inherit cellEditableWitness con
-       end
-*)
-         ++ FunDec("inherit",[VarPat "w",VarPat "con"],
-		    (* 'a -> GObject.constructor -> 'a t *)
-		    NONE,
-(*
-		    Let(SeqDec (
-			   ValDec(VarPat "con", NONE, Let(ValDec(VarPat "ptr",NONE,App(Var "con",[Unit])),Fn("()",Var"ptr")))
-                        :: ValDec(VarPat "witness", NONE, Unit)
-			:: List.map (fn i => ValDec(VarPat "witness", NONE, App(Var(Name.asModule i ^ ".inherit"), [Var "witness", Var "con"]))) 
-				    impl			            []
-                        ),
-*)
-			App(Var(pRef "inherit"),[Unit (* was "witness" *),Var "con"]))
-	 ++ FunDec("make"(*^Name.asModule name*),[VarPat"ptr"],NONE,
-		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")]))
-	 ++ FunDec("to"^Name.asModule name, [VarPat "obj"],
-	         SOME(TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"])),
-		 P.mkToFunc NONE)
-         ++ let fun f i = 
-		    let val ty = Type.Tname i
-		    in  FunDec("as"^Name.asModule i, [VarPat "obj"], NONE,
-			       P.mkToFunc (SOME i))
-		    end
-	    in  SeqDec(List.map f impl)
-	    end 
-         ++ CommentDec NONE,
-	     sign=  TypeSpec(([],[base_t]),NONE)
-                 ** TypeSpec((["'a"],[witness_t]),NONE)
-                 ** TypeSpec((["'a"],[type_t]), SOME(TyApp([path],[parent_t])))
-                 ** FunSpec("inherit", 
-		      [TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"]))
-                 ** FunSpec("to"^Name.asModule name, TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"]))
-                 ** let fun f i = 
-			    let val ty = Type.Tname i
-				val ml_ty = fromtypeclosed ty
-			    in  FunSpec("as"^Name.asModule i, 
-					TyApp([TyVar "'a"],["t"]) --> 
-					     TyApp([TyVar "base"],[Name.asModule i,"t"]))
-			    end
-		    in  SeqSpec(List.map f impl)
-		    end
-             }
-	end
-	    handle Skip msg => {stru=EmptyDec,sign=EmptySpec}
-
     local 
 	open AST TinySML
 	val trans = fn tinfo => fn (name,member) => trans tinfo (name,member)
@@ -602,12 +603,12 @@ struct
 	    in  loop ls ([],[]) end
 
 	fun transMod named_sigs tinfo (Module{name,members,info}) =
-	    let val {stru=headstr,sign=headsig} = header tinfo (name,info)
+	    let 
 		val name = Name.asModule name
 		val contents = List.map (transMem named_sigs tinfo) members
 		val {stru=contstr,sign=contsig} = decUnzip contents
-		val sigexp = SigBasic(SeqSpec[headsig,contsig])
-		val decs = CoreDec(headstr) :: contstr
+		val sigexp = SigBasic(contsig)
+		val decs = CoreDec(SeqDec P.strHeader) :: contstr
 	    in  
 		if named_sigs then
 		    { stru = SigDec(name, sigexp) ::

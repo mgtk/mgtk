@@ -206,6 +206,12 @@ structure DefsParse :> DEFSPARSE = struct
                         >>= (fn t => (defWord -- enuAttribs) >> tagFn t) )
 
     (* Function like things *)
+    val argname = parens ("argname" &-- word)
+    val opt     = parens (&"optional")
+    val prop = parens (word -- optional argname --# optional opt) 
+	       >> (fn (p,a) => ("none", case a of SOME p => p | NONE => p, []))
+    val properties = repeat1 prop >> op::
+
     val truth = &"#t" |> true || &"#f" |> false
     val funAttrib = (* too liberal since it is used for all func things *)
         (   parens ("c-name" &-- word)              >> CName
@@ -216,6 +222,7 @@ structure DefsParse :> DEFSPARSE = struct
 	||  parens ("deprecated" &-- word)          |> Deprecated
 	||  parens ("varargs" &-- truth)            >> Varargs
 	||  parens ("caller-owns-return" &-- truth) >> CallerOwnsReturn
+        ||  parens ("properties" &-- properties)    >> Params (* HACK *)
         )
     val funAttribs = repeat1 funAttrib >> (op::)
     val function = parens ("define-function" &-- defWord -- funAttribs) >> tagFn Function

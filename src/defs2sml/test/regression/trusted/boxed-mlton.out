@@ -1,8 +1,24 @@
-structure Gtk  = struct 
-			type cptr = GObject.cptr
-			type icon_source = GObject.cptr
-			type textiter = GObject.cptr
+structure Gtk  = struct
+    
+    type cptr = GObject.cptr
+    structure TextIter :>
+      sig
+	type t
+	val alloc_GtkTextIter : unit -> t
+      end = struct
+	type cptr = GObject.cptr
+	type t = GObject.cptr
+	val alloc_GtkTextIter = _import "alloc_GtkTextIter" : unit -> t;
+    end
 end
 
 
 /* *** Gtk *** */
+
+
+/* *** TextIter *** */
+EXTERNML GtkTextIter* alloc_GtkTextIter() {
+    GtkTextIter res;
+    return gtk_text_iter_copy(&res);
+}
+

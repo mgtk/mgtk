@@ -3,39 +3,35 @@ structure Gtk  = struct
 			type cptr = GObject.cptr
 			val repr = GObject.repr
 			val symb = GtkBasis.symb
-			type icon_source = GObject.cptr
-			type textiter = GObject.cptr
+			structure TextIter :>
+			  sig
+			    type t
+			  end = struct
+			    open Dynlib
+			    type cptr = GObject.cptr
+			    val repr = GObject.repr
+			    val symb = GtkBasis.symb
+			    type t = GObject.cptr
+			end
 end
 
 
 /* *** Gtk *** */
-#define GtkIconSource_val(x) (((void*) Field(x, 1)))
 
-#define GtkIconSource_val_nocast(x) (Field(x, 1))
 
-static void ml_finalize_GtkIconSource(value val) {
-  gtk_icon_source_free(GtkIconSource_val(val));
-}
-
-value Val_GtkIconSource(void* obj) {
-  value res;
-  res = alloc_final(2, ml_finalize_GtkIconSource, 0, 1);
-  GtkIconSource_val_nocast(res) = (value) gtk_icon_source_copy(obj);
-  return res;
-}
-
+/* *** TextIter *** */
 #define GtkTextIter_val(x) (((void*) Field(x, 1)))
 
 #define GtkTextIter_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_GtkTextIter(value val) {
-  gtk_text_iter_free(GtkTextIter_val(val));
+    gtk_text_iter_free(GtkTextIter_val(val));
 }
 
 value Val_GtkTextIter(void* obj) {
-  value res;
-  res = alloc_final(2, ml_finalize_GtkTextIter, 0, 1);
-  GtkTextIter_val_nocast(res) = (value) gtk_text_iter_copy(obj);
-  return res;
+    value res;
+    res = alloc_final(2, ml_finalize_GtkTextIter, 0, 1);
+    GtkTextIter_val_nocast(res) = (value) gtk_text_iter_copy(obj);
+    return res;
 }
 

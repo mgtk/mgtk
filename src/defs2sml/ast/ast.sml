@@ -73,6 +73,7 @@ struct
     datatype ('n,'t) api_info =
 	Method of 't
       | Field of 't
+      | Object of 'n (* type name *) * 'n option (* parent *) * 'n list (* implements *)
       | Boxed of {copy:string, release:string} option
       | Enum of bool (* flag? *) * 'n list
       | Signal of 't
@@ -85,10 +86,7 @@ struct
       | Array of api_type
 
     type ('n,'t) ast_module = 
-	 ('n, 
-	  ('n*'n option*'n list) option,
-	  ('n, 't) api_info
-         ) module
+	 ('n, 'n option, ('n, 't) api_info) module
 
     local 
 	open Pretty
@@ -116,17 +114,16 @@ struct
 	  ppAstType ty +^ " array"
 
     fun ppAst ppn ppt =
-	let fun ppmodi NONE = empty
-	      | ppmodi (SOME(ty, parent, impl)) =
-		let val ty = ": " ^+ ppn ty
-		    val parent = case parent of 
-				     NONE => empty
-				   | SOME ty => "extends " ^+ ppn ty
-		    val impl = "implements " ^+ clist ",# " ppn impl
-		in  ty ++ parent ++ impl end
+	let fun ppmodi _ = empty
 	    fun ppmemi (Method ty) = ": method " ^+ ppt ty
 	      | ppmemi (Field ty)  = ": field "  ^+ ppt ty
 	      | ppmemi (Signal ty) = ": signal " ^+ ppt ty
+	      | ppmemi (Object(ty,parent,impl)) = 
+		  ppString ": object" 
+                  ++ (ppn ty)
+	          ++ (case parent of NONE => empty
+				   | SOME ty => "extends " ^+ ppn ty)
+                  ++ ("implements " ^+ clist ",# " ppn impl)
 	      | ppmemi (Boxed func) = ppString ": boxed"
 	      | ppmemi (Enum(flag, ss)) =
 		  (if flag then ": flag " else ": enum ")

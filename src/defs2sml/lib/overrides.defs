@@ -1,3 +1,46 @@
+(override-parameters gtk_accel_label_new
+  (of-object GtkAccelLabel)
+  (parameters
+    ("const-gchar*" "string" )
+  )
+)
+(override-parameters gtk_adjustment_new
+  (of-object GtkAdjustment)
+  (parameters
+    ("gdouble" "value" )
+    ("gdouble" "lower" )
+    ("gdouble" "upper" )
+    ("gdouble" "step_incr" )
+    ("gdouble" "page_incr" )
+    ("gdouble" "page_size" )
+  )
+)
+(override-parameters gtk_alignment_new
+  (of-object GtkAlignment)
+  (parameters
+    ("gfloat" "xalign" )
+    ("gfloat" "yalign" )
+    ("gfloat" "xscale" )
+    ("gfloat" "yscale" )
+  )
+)
+(override-parameters gtk_arrow_new
+  (of-object GtkArrow)
+  (parameters
+    ("GtkArrowType" "arrow_type" )
+    ("GtkShadowType" "shadow_type" )
+  )
+)
+(override-parameters gtk_aspect_frame_new
+  (of-object GtkAspectFrame)
+  (parameters
+    ("gfloat" "xalign" )
+    ("gfloat" "yalign" )
+    ("gfloat" "ratio" )
+    ("const-gchar*" "label" )
+    ("gboolean" "obey_child" )
+  )
+)
 (override-parameters gtk_clipboard_set_with_data
   (of-object GtkClipboard)
   (parameters
@@ -8,6 +51,24 @@
   (of-object GtkClipboard)
   (parameters
     ("const-GtkTargetEntry*" "targets" (array foo))
+  )
+)
+(override-parameters gtk_color_selection_dialog_new
+  (of-object GtkColorSelectionDialog)
+  (parameters
+    ("const-gchar*" "title" )
+  )
+)
+(override-parameters gtk_dialog_set_default_response
+  (of-object GtkDialog)
+  (parameters
+    ("gint" "response_id" )
+  )
+)
+(override-parameters gtk_dialog_set_response_sensitive
+  (of-object GtkDialog)
+  (parameters
+    ("gint" "response_id" )
   )
 )
 (override-parameters gtk_drag_dest_set
@@ -28,11 +89,67 @@
     ("gint*" "position" (inout))
   )
 )
+(override-parameters gtk_file_selection_new
+  (of-object GtkFileSelection)
+  (parameters
+    ("const-gchar*" "title" )
+  )
+)
+(override-parameters gtk_font_selection_dialog_new
+  (of-object GtkFontSelectionDialog)
+  (parameters
+    ("const-gchar*" "title" )
+  )
+)
+(override-parameters gtk_frame_new
+  (of-object GtkFrame)
+  (parameters
+    ("const-gchar*" "label" )
+  )
+)
+(override-parameters gtk_hbox_new
+  (of-object GtkHBox)
+  (parameters
+    ("gboolean" "homogeneous" )
+    ("gint" "spacing" )
+  )
+)
+(override-parameters gtk_hscale_new
+  (of-object GtkHScale)
+  (parameters
+    ("GtkAdjustment*" "adjustment" )
+  )
+)
+(override-parameters gtk_hscrollbar_new
+  (of-object GtkHScrollbar)
+  (parameters
+    ("GtkAdjustment*" "adjustment" )
+  )
+)
 (override-parameters gtk_icon_size_lookup
   (of-object Gtk)
   (parameters
     ("gint*" "width" (output))
     ("gint*" "height" (output))
+  )
+)
+(override-parameters gtk_label_new
+  (of-object GtkLabel)
+  (parameters
+    ("const-char*" "str" )
+  )
+)
+(override-parameters gtk_label_new_with_mnemonic
+  (of-object GtkLabel)
+  (parameters
+    ("const-char*" "str" )
+  )
+)
+(override-parameters gtk_layout_new
+  (of-object GtkLayout)
+  (parameters
+    ("GtkAdjustment*" "hadjustment" )
+    ("GtkAdjustment*" "vadjustment" )
   )
 )
 (override-parameters gtk_list_store_append
@@ -59,12 +176,6 @@
     ("GtkTreeIter*" "iter" (output))
   )
 )
-(override-parameters gtk_list_store_newv
-  (of-object GtkListStore)
-  (parameters
-    ("GType*" "types" (array foo))
-  )
-)
 (override-parameters gtk_list_store_prepend
   (of-object GtkListStore)
   (parameters
@@ -77,10 +188,22 @@
     ("GtkTreeIter*" "iter" (inout))
   )
 )
+(override-parameters gtk_list_store_reorder
+  (of-object GtkListStore)
+  (parameters
+    ("gint*" "new_order" (array foo))
+  )
+)
 (override-parameters gtk_list_store_set_column_types
   (of-object GtkListStore)
   (parameters
     ("GType*" "types" (array foo))
+  )
+)
+(override-parameters gtk_paint_polygon
+  (of-object GtkGlobal)
+  (parameters
+    ("GdkPoint*" "points" (array foo))
   )
 )
 (override-parameters gtk_scrolled_window_get_policy
@@ -90,10 +213,46 @@
     ("GtkPolicyType*" "vscrollbar_policy" (output))
   )
 )
+(override-parameters gtk_scrolled_window_new
+  (of-object GtkScrolledWindow)
+  (parameters
+    ("GtkAdjustment*" "hadjustment" )
+    ("GtkAdjustment*" "vadjustment" )
+  )
+)
 (override-parameters gtk_selection_data_set
   (of-object GtkSelectionData)
   (parameters
+    ("const-guchar*" "data" )
     ("const-guchar*" "data" (array foo))
+  )
+)
+(override-parameters gtk_size_group_new
+  (of-object GtkSizeGroup)
+  (parameters
+    ("GtkSizeGroupMode" "mode" )
+  )
+)
+(override-parameters gtk_spin_button_new
+  (of-object GtkSpinButton)
+  (parameters
+    ("GtkAdjustment*" "adjustment" )
+    ("gdouble" "climb_rate" )
+    ("guint" "digits" )
+  )
+)
+(override-parameters gtk_stock_lookup
+  (of-object GtkStock_)
+  (parameters
+    ("GtkStockItem*" "item" (inout))
+  )
+)
+(override-parameters gtk_table_new
+  (of-object GtkTable)
+  (parameters
+    ("guint" "rows" )
+    ("guint" "columns" )
+    ("gboolean" "homogeneous" )
   )
 )
 (override-parameters gtk_text_buffer_get_bounds
@@ -158,6 +317,12 @@
     ("GtkTextIter*" "iter" (output))
   )
 )
+(override-parameters gtk_text_buffer_new
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextTagTable*" "table" )
+  )
+)
 (override-parameters gtk_text_iter_backward_search
   (of-object GtkTextIter)
   (parameters
@@ -170,6 +335,12 @@
   (parameters
     ("GtkTextIter*" "match_start" (output))
     ("GtkTextIter*" "match_end" (output))
+  )
+)
+(override-parameters gtk_text_tag_new
+  (of-object GtkTextTag)
+  (parameters
+    ("const-gchar*" "name" )
   )
 )
 (override-parameters gtk_text_view_get_iter_at_location
@@ -188,6 +359,12 @@
   (of-object GtkTextView)
   (parameters
     ("GtkTextIter*" "target_iter" (output))
+  )
+)
+(override-parameters gtk_text_view_new_with_buffer
+  (of-object GtkTextView)
+  (parameters
+    ("GtkTextBuffer*" "buffer" )
   )
 )
 (override-parameters gtk_tree_model_get_iter
@@ -212,6 +389,7 @@
   (of-object GtkTreeModel)
   (parameters
     ("GValue*" "value" (inout))
+    ("GValue*" "value" (output))
   )
 )
 (override-parameters gtk_tree_model_iter_children
@@ -250,6 +428,12 @@
     ("GtkTreeIter*" "child_iter" (output))
   )
 )
+(override-parameters gtk_tree_model_sort_new_with_model
+  (of-object GtkTreeModelSort)
+  (parameters
+    ("GtkTreeModel*" "child_model" )
+  )
+)
 (override-parameters gtk_tree_selection_get_selected
   (of-object GtkTreeSelection)
   (parameters
@@ -261,7 +445,6 @@
   (of-object GtkTreeStore)
   (parameters
     ("GtkTreeIter*" "iter" (output))
-    ("GtkTreeIter*" "parent" (null-ok))
   )
 )
 (override-parameters gtk_tree_store_insert
@@ -282,12 +465,6 @@
     ("GtkTreeIter*" "iter" (output))
   )
 )
-(override-parameters gtk_tree_store_newv
-  (of-object GtkTreeStore)
-  (parameters
-    ("GType*" "types" (array foo))
-  )
-)
 (override-parameters gtk_tree_store_prepend
   (of-object GtkTreeStore)
   (parameters
@@ -300,10 +477,23 @@
     ("GtkTreeIter*" "iter" (inout))
   )
 )
+(override-parameters gtk_tree_store_reorder
+  (of-object GtkTreeStore)
+  (parameters
+    ("gint*" "new_order" (array foo))
+  )
+)
 (override-parameters gtk_tree_store_set_column_types
   (of-object GtkTreeStore)
   (parameters
     ("GType*" "types" (array foo))
+  )
+)
+(override-parameters gtk_tree_view_column_cell_get_position
+  (of-object GtkTreeViewColumn)
+  (parameters
+    ("gint*" "start_pos" (output))
+    ("gint*" "width" (output))
   )
 )
 (override-parameters gtk_tree_view_enable_model_drag_dest
@@ -351,9 +541,43 @@
     ("GtkTreeViewDropPosition*" "pos" (output))
   )
 )
+(override-parameters gtk_tree_view_new_with_model
+  (of-object GtkTreeView)
+  (parameters
+    ("GtkTreeModel*" "model" )
+  )
+)
+(override-parameters gtk_vbox_new
+  (of-object GtkVBox)
+  (parameters
+    ("gboolean" "homogeneous" )
+    ("gint" "spacing" )
+  )
+)
+(override-parameters gtk_viewport_new
+  (of-object GtkViewport)
+  (parameters
+    ("GtkAdjustment*" "hadjustment" )
+    ("GtkAdjustment*" "vadjustment" )
+  )
+)
+(override-parameters gtk_vscale_new
+  (of-object GtkVScale)
+  (parameters
+    ("GtkAdjustment*" "adjustment" )
+  )
+)
+(override-parameters gtk_vscrollbar_new
+  (of-object GtkVScrollbar)
+  (parameters
+    ("GtkAdjustment*" "adjustment" )
+  )
+)
 (override-parameters gtk_widget_class_path
   (of-object GtkWidget)
   (parameters
+    ("gchar**" "path" (output))
+    ("gchar**" "path_reversed" (output))
     ("gchar**" "path" (output))
     ("gchar**" "path_reversed" (output))
     ("guint*" "path_length" (output))
@@ -384,7 +608,15 @@
   (parameters
     ("gchar**" "path" (output))
     ("gchar**" "path_reversed" (output))
+    ("gchar**" "path" (output))
+    ("gchar**" "path_reversed" (output))
     ("guint*" "path_length" (output))
+  )
+)
+(override-parameters gtk_widget_set_events
+  (of-object GtkWidget)
+  (parameters
+    ("gint" "events" )
   )
 )
 (override-parameters gtk_widget_size_request
@@ -421,9 +653,15 @@
     ("gint*" "height" (output))
   )
 )
-(override-parameters size_request
-  (of-object GtkWidget)
+(override-parameters gtk_window_new
+  (of-object GtkWindow)
   (parameters
-    ("GtkRequisition*" "requisition" (inout))
+    ("GtkWindowType" "type" )
+  )
+)
+(override-parameters response
+  (of-object GtkDialog)
+  (parameters
+    ("gint" "response_id" )
   )
 )

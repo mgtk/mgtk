@@ -81,8 +81,8 @@ regressionclean:
 
 # Generate meta data .defs files
 
-GTKAPIXML=api/other/gtk-sharp-1.0/gtk/gtk-api.raw
-GTKMETADATA=api/other/gtk-sharp-1.0/gtk/Gtk.metadata
+GTKAPIXML=api/gtk-api.raw
+GTKMETADATA=api/gtk.metadata
 lib/overrides.defs: $(GTKAPIXML) $(GTKMETADATA) tools/metadata2defs.pl
 	tools/metadata2defs.pl $(GTKAPIXML) $(GTKMETADATA) > $@
 
@@ -91,17 +91,15 @@ lib/metadata.defs: lib/overrides.defs
 # Generate binding
 RELDIR=release/mgtk
 
-DEFSOPTS=$(OPTIONS) --metadata-file lib/metadata.defs --separate-struct -as api/pygtk/gtk.defs > defs.log 2>&1
+#DEFSOPTS=$(OPTIONS) --metadata-file lib/metadata.defs --separate-struct -as api/gtk.defs > defs.log 2>&1
+DEFSOPTS=$(OPTIONS) --metadata-file lib/metadata.defs --separate-struct -as api/gtk.defs > defs.log 2>&1
 DEFSOPTSMOSML=-co $(RELDIR)/mgtk.c -so $(RELDIR)/mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml
 DEFSOPTSMLTON=--mlton -co $(RELDIR)/mgtk-mlton.c -so $(RELDIR)/mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml
 
-$(RELDIR)/mgtk.c $(RELDIR)/mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c lib/metadata.defs
+$(RELDIR)/mgtk.c $(RELDIR)/mgtk.sml: $(MAIN) api/gtk.defs api/gtk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c lib/overrides.defs
 	./$(MAIN) $(DEFSOPTSMOSML) $(DEFSOPTS)
 
-mgdk.c mgdk.sml: $(MAIN) api/pygtk/gdk.defs api/pygtk/gdk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c
-	./$(MAIN) -co mgdk.c -so mgdk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gdk.defs
-
-$(RELDIR)/mgtk-mlton.c $(RELDIR)/mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble-mlton.sml lib/preamble-mlton.c
+$(RELDIR)/mgtk-mlton.c $(RELDIR)/mgtk-mlton.sml: $(MAIN) api/gtk.defs api/gtk-types.defs lib/excludes.txt lib/preamble-mlton.sml lib/preamble-mlton.c
 	./$(MAIN) $(DEFSOPTSMLTON) $(DEFSOPTS)
 
 mosml: $(RELDIR)/mgtk.so $(RELDIR)/mgtk.uo

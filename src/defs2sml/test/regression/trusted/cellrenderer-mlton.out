@@ -47,6 +47,27 @@ structure Gtk  = struct
 		 GObject.withPtr
 		   (self, fn self => set_fixed_size_ (self, width, height))
     end
+    structure CellRendererText :>
+      sig
+	type base
+	type 'a cellrenderertext_t
+	type 'a t = 'a cellrenderertext_t CellRenderer.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toCellRendererText : 'a t -> base t
+	val new : unit -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a cellrenderertext_t = unit
+	type 'a t = 'a cellrenderertext_t CellRenderer.t
+	fun inherit w con = CellRenderer.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toCellRendererText obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val new_ : unit -> cptr
+	    = _import "gtk_cell_renderer_text_new" : unit -> cptr;
+	val new : unit -> base t = fn dummy => make (new_ dummy)
+    end
 end
 
 
@@ -57,3 +78,6 @@ end
 
 
 /* *** CellRenderer *** */
+
+
+/* *** CellRendererText *** */

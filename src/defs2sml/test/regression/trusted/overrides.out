@@ -42,6 +42,44 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj = inherit () (fn () => repr obj)
     end
+    structure Container :>
+      sig
+	type base
+	type 'a container_t
+	type 'a t = 'a container_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toContainer : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a container_t = unit
+	type 'a t = 'a container_t Widget.t
+	fun inherit w con = Widget.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toContainer obj = inherit () (fn () => repr obj)
+    end
+    structure Bin :>
+      sig
+	type base
+	type 'a bin_t
+	type 'a t = 'a bin_t Container.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toBin : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a bin_t = unit
+	type 'a t = 'a bin_t Container.t
+	fun inherit w con = Container.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toBin obj = inherit () (fn () => repr obj)
+    end
     structure Window :>
       sig
 	type base
@@ -83,6 +121,12 @@ end
 
 
 /* *** Widget *** */
+
+
+/* *** Container *** */
+
+
+/* *** Bin *** */
 
 
 /* *** Window *** */

@@ -14,6 +14,31 @@
   (gtype-id "GTK_TYPE_WIDGET")
 )
 
+(define-object Container
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkContainer")
+  (gtype-id "GTK_TYPE_CONTAINER")
+  (fields
+    '("GtkWidget*" "focus_child")
+    '("guint" "border_width")
+    '("guint" "need_resize")
+    '("guint" "resize_mode")
+    '("guint" "reallocate_redraws")
+    '("guint" "has_focus_chain")    
+  )
+)
+
+(define-object Bin
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkBin")
+  (gtype-id "GTK_TYPE_BIN")
+  (fields
+    '("GtkWidget*" "child")
+  )
+)
+
 (define-object Window
   (in-module "Gtk")
   (parent "GtkBin")

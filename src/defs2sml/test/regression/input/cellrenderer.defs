@@ -12,6 +12,13 @@
   (gtype-id "GTK_TYPE_CELL_RENDERER")
 )
 
+(define-object CellRendererText
+  (in-module "Gtk")
+  (parent "GtkCellRenderer")
+  (c-name "GtkCellRendererText")
+  (gtype-id "GTK_TYPE_CELL_RENDERER_TEXT")
+)
+
 (define-function gtk_cell_renderer_get_type
   (c-name "gtk_cell_renderer_get_type")
   (return-type "GType")
