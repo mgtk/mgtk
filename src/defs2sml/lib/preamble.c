@@ -226,7 +226,8 @@ static void ml_finalize_gvalue (value val) {
 static inline value create_GValue (GType type) { 
   value res; 
   res = alloc_final (3 + 1, ml_finalize_gvalue, 0, 1);
-  *GValue_val(res) = {0, };
+  GValue const dummy = {0, };
+  *GValue_val(res) = dummy;
   g_value_init(GValue_val(res), type);
   return res; 
 }
