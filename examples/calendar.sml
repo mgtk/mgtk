@@ -23,6 +23,11 @@ fun main () =
     let val _      = Gtk.init(CommandLine.name()::CommandLine.arguments())
 	val window = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 	val cal    = Gtk.calendar_new ()
+	val _      = Gtk.calendar_display_options cal 
+	                  [Gtk.CALENDAR_NO_MONTH_CHANGE,
+			   Gtk.CALENDAR_WEEK_START_MONDAY,
+			   Gtk.CALENDAR_SHOW_HEADING,
+			   Gtk.CALENDAR_SHOW_DAY_NAMES]
     in  Gtk.connect_delete_event window delete_event 
       ; Gtk.connect_destroy window destroy
       ; Gtk.container_set_border_width window 10
