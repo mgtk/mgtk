@@ -199,7 +199,7 @@ structure Gtk  = struct
 	type 'a t = 'a button_t Bin.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toButton : 'a t -> base t
-	val get_type : unit -> int
+	val get_type : unit -> GType.t
 	val new : unit -> base t
 	val new_with_label : string -> base t
 	val set_label : 'a t -> string -> unit
@@ -217,9 +217,9 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toButton obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
-	val get_type_ : unit -> int
-	    = _import "gtk_button_get_type" : unit -> int;
-	val get_type : unit -> int = fn dummy => get_type_ dummy
+	val get_type_ : unit -> GType.t
+	    = _import "gtk_button_get_type" : unit -> GType.t;
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : unit -> cptr = _import "gtk_button_new" : unit -> cptr;
 	val new : unit -> base t = fn dummy => make (new_ dummy)
 	val new_with_label_ : CString.cstring -> cptr

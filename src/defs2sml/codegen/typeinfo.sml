@@ -90,9 +90,9 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
         ,("guint",     (fn _ => SMLType.IntTy,SMLType.IntTy,    (* FIXME *)
 		        "Int_val", "Val_int", TinyC.TInt, NONE, Const "0"))
         ,("char",      (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        "Char_val", "Val_char", TinyC.TChar, NONE, Const "#\"\000\""))
+		        "Char_val", "Val_char", TinyC.TChar, NONE, Const "#\" \""))
         ,("gunichar",  (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        "Long_val", "Val_long", TinyC.TChar, NONE, Const "#\"\000\"")) (* FIXME *)
+		        "Long_val", "Val_long", TinyC.TChar, NONE, Const "#\" \"")) (* FIXME *)
         ,("float",     (fn _ => SMLType.RealTy,SMLType.RealTy,
 		        "Double_val", "copy_double", TinyC.TFloat, NONE, Const "0.0"))
         ,("double",    (fn _ => SMLType.RealTy,SMLType.RealTy,
@@ -103,9 +103,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		        "(gpointer)", "(value)", TinyC.TStar TinyC.TVoid, NONE, Var"GObject.null"))
         ,("bool",      (fn _ => SMLType.BoolTy,SMLType.BoolTy,
 		        "Bool_val", "Val_bool", TinyC.TInt, NONE, Const "true"))
-        ,("GType",     (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
+        ,("GType",     (fn _ => SMLType.TyApp([],["GType","t"]),
+			SMLType.TyApp([],["GType","t"]),
 		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
-        ,("GtkType",   (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
+        ,("GtkType",   (fn _ => SMLType.TyApp([],["GType","t"]),
+			SMLType.TyApp([],["GType","t"]),
 		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
         ]
 

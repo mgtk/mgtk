@@ -79,7 +79,7 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toRcStyle : 'a t -> base t
 	val rc_get_style_by_paths
-	  : 'a Settings.t -> string -> string -> int -> base Style.t
+	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -93,11 +93,12 @@ structure Gtk  = struct
 	fun toRcStyle obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
 	val rc_get_style_by_paths_
-	  : cptr * CString.cstring * CString.cstring * int -> cptr
+	  : cptr * CString.cstring * CString.cstring * GType.t -> cptr
 	    = _import "gtk_rc_get_style_by_paths"
-		      : cptr * CString.cstring * CString.cstring * int -> cptr;
+		      : cptr * CString.cstring * CString.cstring * GType.t
+			-> cptr;
 	val rc_get_style_by_paths
-	  : 'a Settings.t -> string -> string -> int -> base Style.t
+	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
 	    = fn settings => fn widget_path => fn class_path => fn typ =>
 		 Style.inherit
 		   ()

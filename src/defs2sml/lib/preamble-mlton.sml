@@ -319,3 +319,29 @@ structure Flags :>
 
     fun areTheseSet flags flag = ((W(set flags)) andb (W flag)) <> 0w0
 end
+
+structure GType :>
+  sig
+    type t
+    val int    : t
+    val real   : t
+    val string : t
+
+    val toInt : t -> int
+    val toString : t -> string
+  end = struct
+
+    type t = int
+
+    val int    = _import "mgtk_g_type_int"    : unit -> int;
+    val int    = int ()
+    val real   = _import "mgtk_g_type_real"   : unit -> int;
+    val real   = real ()
+    val string = _import "mgtk_g_type_string" : unit -> int;
+    val string = string ()
+
+    val toInt = fn t => t
+    val toString : t -> CString.t = _import "mgtk_g_type_name" : int -> CString.t;
+    val toString = CString.toString o toString
+
+end

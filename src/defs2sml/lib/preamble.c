@@ -344,3 +344,25 @@ EXTERNML value mgtk_signal_connect (value object, value name, value clb, value a
   return Val_long(res);
 }
 
+
+/* GType's */
+
+/* ML type: cptr -> int -> string */
+EXTERNML value mgtk_g_type_name (value typ) { /* ML */
+  return my_copy_string(g_type_name(Int_val(typ)));
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_g_type_int (value dummy) { /* ML */
+  return Val_int (G_TYPE_INT);
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_g_type_real (value dummy) { /* ML */
+  return Val_int (G_TYPE_DOUBLE);
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_g_type_string (value dummy) { /* ML */
+  return Val_int (G_TYPE_STRING);
+}

@@ -28,7 +28,7 @@ structure Gtk  = struct
 	type 'a t = 'a cellrenderer_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toCellRenderer : 'a t -> base t
-	val get_type : unit -> int
+	val get_type : unit -> GType.t
 	val set_fixed_size : 'a t -> int -> int -> unit
       end = struct
 	type cptr = GObject.cptr
@@ -42,9 +42,9 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toCellRenderer obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
-	val get_type_ : unit -> int
-	    = _import "gtk_cell_renderer_get_type" : unit -> int;
-	val get_type : unit -> int = fn dummy => get_type_ dummy
+	val get_type_ : unit -> GType.t
+	    = _import "gtk_cell_renderer_get_type" : unit -> GType.t;
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val set_fixed_size_ : cptr * int * int -> unit
 	    = _import "gtk_cell_renderer_set_fixed_size"
 		      : cptr * int * int -> unit;

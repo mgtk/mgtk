@@ -187,7 +187,7 @@ structure Gtk  = struct
 	type 'a t = 'a button_t Bin.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toButton : 'a t -> base t
-	val get_type : unit -> int
+	val get_type : unit -> GType.t
 	val new : unit -> base t
 	val new_with_label : string -> base t
 	val set_label : 'a t -> string -> unit
@@ -207,8 +207,8 @@ structure Gtk  = struct
 			    in Bin.inherit witness con end
 	fun make ptr = inherit () (fn () => ptr)
 	fun toButton obj = inherit () (fn () => repr obj)
-	val get_type_ : unit -> int = app1 (symb"mgtk_gtk_button_get_type")
-	val get_type : unit -> int = fn dummy => get_type_ dummy
+	val get_type_ : unit -> GType.t = app1 (symb"mgtk_gtk_button_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : unit -> cptr = app1 (symb"mgtk_gtk_button_new")
 	val new : unit -> base t = fn dummy => make (new_ dummy)
 	val new_with_label_ : string -> cptr
@@ -455,7 +455,7 @@ EXTERNML value mgtk_gtk_window_get_size(value self, value width, value height) {
 
 
 /* *** Button *** */
-/* ML type: unit -> int */
+/* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_button_get_type(value dummy) { /* ML */
     return Val_int(gtk_button_get_type());
 }

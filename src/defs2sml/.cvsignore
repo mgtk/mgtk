@@ -1,6 +1,8 @@
 mosmake.dep
 *.ui
 *.uo
+defs.log
+semantic.cache
 defs2sml
 mgtk-mlton.c mgtk-mlton.sml
 mgtk.c mgtk.sml

@@ -277,3 +277,27 @@ structure Flags :>
 
     fun areTheseSet flags flag = ((W(set flags)) andb (W flag))<>0w0
 end
+
+structure GType :>
+  sig
+    type t
+    val int    : t
+    val real   : t
+    val string : t
+
+    val toInt : t -> int
+    val toString : t -> string
+  end = struct
+
+    open Dynlib
+    val symb = GtkBasis.symb
+   
+    type t = int
+
+    val int    = app1(symb "mgtk_g_type_int") ()
+    val real   = app1(symb "mgtk_g_type_real") ()
+    val string = app1(symb "mgtk_g_type_string") ()
+
+    val toInt = fn t => t
+    val toString : t -> string = app1(symb "mgtk_g_type_name")
+end

@@ -33,7 +33,7 @@ structure Gtk  = struct
 	type 'a t = 'a cellrenderer_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toCellRenderer : 'a t -> base t
-	val get_type : unit -> int
+	val get_type : unit -> GType.t
 	val set_fixed_size : 'a t -> int -> int -> unit
       end = struct
 	open Dynlib
@@ -49,9 +49,9 @@ structure Gtk  = struct
 			    in Object.inherit witness con end
 	fun make ptr = inherit () (fn () => ptr)
 	fun toCellRenderer obj = inherit () (fn () => repr obj)
-	val get_type_ : unit -> int
+	val get_type_ : unit -> GType.t
 	    = app1 (symb"mgtk_gtk_cellrenderer_get_type")
-	val get_type : unit -> int = fn dummy => get_type_ dummy
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val set_fixed_size_ : cptr -> int -> int -> unit
 	    = app3 (symb"mgtk_gtk_cellrenderer_set_fixed_size")
 	val set_fixed_size : 'a t -> int -> int -> unit
@@ -68,7 +68,7 @@ end
 
 
 /* *** CellRenderer *** */
-/* ML type: unit -> int */
+/* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_cellrenderer_get_type(value dummy) { /* ML */
     return Val_int(gtk_cell_renderer_get_type());
 }

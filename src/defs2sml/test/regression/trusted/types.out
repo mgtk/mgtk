@@ -74,7 +74,7 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toRcStyle : 'a t -> base t
 	val rc_get_style_by_paths
-	  : 'a Settings.t -> string -> string -> int -> base Style.t
+	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -89,10 +89,11 @@ structure Gtk  = struct
 			    in GObject.inherit witness con end
 	fun make ptr = inherit () (fn () => ptr)
 	fun toRcStyle obj = inherit () (fn () => repr obj)
-	val rc_get_style_by_paths_ : cptr -> string -> string -> int -> cptr
+	val rc_get_style_by_paths_
+	  : cptr -> string -> string -> GType.t -> cptr
 	    = app4 (symb"mgtk_gtk_rc_get_style_by_paths")
 	val rc_get_style_by_paths
-	  : 'a Settings.t -> string -> string -> int -> base Style.t
+	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
 	    = fn settings => fn widget_path => fn class_path => fn typ =>
 		 Style.inherit
 		   ()
@@ -243,7 +244,7 @@ EXTERNML value mgtk_gtk_accel_groups_activate(value object, value accel_key, val
 
 
 /* *** RcStyle *** */
-/* ML type: cptr -> string -> string -> int -> cptr */
+/* ML type: cptr -> string -> string -> GType.t -> cptr */
 EXTERNML value mgtk_gtk_rc_get_style_by_paths(value settings, value widget_path, value class_path, value type) { /* ML */
     return Val_GtkObj(gtk_rc_get_style_by_paths(GtkObj_val(settings), String_val(widget_path), String_val(class_path), Int_val(type)));
 }
