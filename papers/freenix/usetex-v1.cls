@@ -165,7 +165,7 @@
 
 % Times-Roman font is nice if you can get it (requires NFSS,
 % which is in latex2e).
-\usepackage{times}
+%\usepackage{times}
 
 % endnote support, as described at
 %   http://www.lyx.org/help/footnotes.php
