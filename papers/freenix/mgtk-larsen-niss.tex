@@ -123,30 +123,20 @@ optimizing whole-program compilers targeting native code.
 \subsection{\gtk}
 \label{sec:gtk}
 
-\gtk (GIMP Toolkit) is a library for creating graphical user
-interfaces. It is licensed using the LGPL. It is the graphical toolkit
-used in the \gnome platform.  \gtk is implemented in C, but from the
-beginning the \gtk developers have paid attention to making it feasible
-and practical to develop bindings for other programming languages than C.
-
-\begin{ednote}{Bart}
-  "...is a library...It is licensed...LGPL..." -> "is an
-  LGPL-licensed [cite LGPL] library for creating..."  i.e, fold
-  second sentence in to first, and add LGPL cite.
-\end{ednote}
+\gtk (the GIMP Toolkit) \cite{Gtk-webpage:2004} is an LGPL-licensed
+\cite{LGPL:1999} library for creating graphical user interfaces. It is
+the graphical toolkit used in the \gnome platform.  \gtk is
+implemented in C, but from the beginning the \gtk developers have paid
+attention to making it feasible and practical to develop ``bindings''
+or ``wrappers'' for other programming languages than C. Such bindings
+allows \gtk to be used in programs written in those languages. See
+\cite{Gtk-bindings-webpage:2004} for a current list of bindings.
 
 \begin{ednote}{Bart}
      "It is the graphical toolkit used in the GNOME platform."  Add more
    sentences to this to make a paragraph with a brief history of
    GIMP/GNOME/Gtk/Gtk+.
 \end{ednote}
-
-\begin{ednote}{Bart}
-     "...than C."  Should section 4 material move here to
-   describe the gtk.defs file?
-
-\end{ednote}
-
 
 %\subsection{Overview of this paper}
 %\label{sec:overview-this-paper}
@@ -720,10 +710,6 @@ by the Moscow ML compiler
 
 \begin{ednote}{Henning}
   Fra mini muck-up til fuld toolkit
-\end{ednote}
-
-\begin{ednote}{Henning}
-  What is a binding?
 \end{ednote}
 
 In constructing the \mgtk binding we leverage the foresightedness of
