@@ -1,0 +1,34 @@
+listview.sml
+------------
+An example adopted from "Mono, A Developers Notebook"
+(04-gtk/07-listview).  Shows how to use TreeView as a grid-like
+widget.
+
+
+
+menus.sml
+---------
+An example adopted from "Mono, A Developers Notebook"
+(04-gtk/06-menus).  Shows how to build menus and uses stock icons.
+
+Defects:
+  - Custom accelerators are not possible because Gdk support is
+    missing.
+
+
+signup.sml
+----------
+An example adopted from "Mono: A Developers Notebook"
+(04-gtk/03-signup).  Shows how to use mnemonic labels and XML markup.
+
+Defects:
+  - Glib interfaces don't work.  Thus, Gtk.Entry does not have a
+    "changed" signal because we cannot use the one from Gtk.Editable.
+    A workaround was using Gtk.Signal directly was possible.
+
+  - Glib properties does not work.  Thus, it is not possible to set
+    the "xalign" property of a label.  Workaround: use
+    Misc.set_alignment.
+  
+  - Using functions with default arguments is cumbersome.
+
