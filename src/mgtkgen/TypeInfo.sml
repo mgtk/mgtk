@@ -244,25 +244,30 @@ new *)
       | toCValue (TE.WIDGET _, name) = $"GtkObj_val(" && name && $")"
       | toCValue (tExp as TE.POINTER _, name) = 
 	MLBoxedName tExp && $"_val(" && name && $")"
-      | toCValue (typExp, name) = 
-	U.notImplemented ("toCValue: not a type name: " ^ TE.toString typExp)
+(*old
 
-    (* ugly hack: options *)
-    fun toCValue' (TE.OPTION (TE.WIDGET _), name) =
+    fun toCValue'
+old*)
+      (* ugly hack: options *)
+      | toCValue (TE.OPTION (TE.WIDGET _), name) =
 	$"GtkObjOption_nullok(" && name && $")"
-      | toCValue' (TE.OPTION (TE.POINTER _), name) =
+      | toCValue (TE.OPTION (TE.POINTER _), name) =
 	$"GtkObjOption_nullok(" && name && $")"
-      | toCValue' (TE.OPTION typExp', name) =
+      | toCValue (TE.OPTION typExp', name) =
 	if isString typExp' 
 	then $"StringOption_nullok(" && name && $")"
 	else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ TE.toString (TE.OPTION typExp') ^ ")")
-      | toCValue' (TE.LIST (TE.WIDGET _), name) = 
+      | toCValue (TE.LIST (TE.WIDGET _), name) = 
 	$"mgtk_smllist_to_glist_object(" && name && $")"
-      | toCValue' (TE.LIST typExp, name) = 
+      | toCValue (TE.LIST typExp, name) = 
 	if isString typExp 
 	then $"mgtk_smllist_to_glist_string(" && name && $")"
 	else U.notImplemented "toCValue: can only handle lists of widgets or strings"
+      | toCValue (typExp, name) = 
+	U.notImplemented ("toCValue: not a type name: " ^ TE.toString typExp)
+(*old
       | toCValue' (typExp, name) = toCValue (typExp, name)
+old*)
 
     fun fromCValue (TE.PRIMTYPE tName, name) = 
 	(case tName of

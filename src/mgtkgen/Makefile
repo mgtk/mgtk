@@ -40,24 +40,24 @@ depend:
 
 ### EVERYTHING THAT GOES BEYOND THIS COMMENT WILL BE ERASED WITHOUT WARNING
 ### DO NOT DELETE THIS LINE
-Translate.ui: AST.ui State.uo 
-TypeInfo.ui: TypeExp.ui NameUtil.ui WSeq.ui 
-TypeInfo.uo: TypeInfo.ui WSeq.ui Util.uo 
-TypeExp.uo: TypeExp.ui Util.uo 
-WSeq.uo: WSeq.ui 
-ArgParse.uo: ArgParse.ui 
-ParseUtils.uo: ParseUtils.ui AST.ui TypeExp.ui NameUtil.ui Util.uo 
 ParseUtils.ui: AST.ui TypeExp.ui NameUtil.ui 
+ParseUtils.uo: ParseUtils.ui AST.ui TypeExp.ui NameUtil.ui Util.uo 
+TypeInfo.ui: TypeExp.ui NameUtil.ui WSeq.ui 
 Parsercomb.uo: Parsercomb.ui 
-Parser.uo: Parsercomb.ui 
-NameUtil.uo: NameUtil.ui WSeq.ui Util.uo 
+TypeExp.uo: TypeExp.ui Util.uo 
 TypeExp.ui: NameUtil.ui 
+WSeq.uo: WSeq.ui 
+TypeInfo.uo: TypeInfo.ui WSeq.ui Util.uo 
+Translate.uo: Translate.ui State.uo WSeq.ui 
+Translate.ui: AST.ui State.uo 
+Parser.uo: Parsercomb.ui 
+Parse.uo: Parsercomb.ui 
+NameUtil.uo: NameUtil.ui WSeq.ui Util.uo 
 NameUtil.ui: WSeq.ui 
 Messages.uo: Messages.ui State.uo WSeq.ui 
-Parse.uo: Parsercomb.ui 
 Messages.ui: State.uo 
 Main.uo: Parser.uo Translate.ui State.uo Messages.ui ArgParse.ui Util.uo \
     Parse.uo 
 AST.uo: AST.ui Util.uo 
-Translate.uo: Translate.ui State.uo WSeq.ui 
 AST.ui: TypeExp.ui NameUtil.ui 
+ArgParse.uo: ArgParse.ui 

@@ -12,6 +12,9 @@ sig
 
     datatype texp = 
 	PRIMTYPE of string (* no path is necessary here *)
+      | WIDGET of tname * inherits (* parent type *)
+      | FLAG of tname * bool (* is this an enum? *)
+      | POINTER of tname * inherits option (* parent type *)
       | TUPLE of texp list
       | ARROW of (texp * string) list (* parameters *) 
                * (texp * string) list (* output parameters *) 
@@ -19,32 +22,45 @@ sig
 	       * texp (* return type *)
       | OPTION of texp
       | OUTPUT of texp
-      | FLAG of tname * bool (* is this an enum? *)
-      | WIDGET of tname * inherits (* parent type *)
-      | POINTER of tname * inherits option (* parent type *)
       | LIST of texp
 
     val toString: texp -> string
-    val typeClass: texp -> string
+    val typeKind: texp -> string
 
-    val equal_name: tname * tname -> bool
+    val equal_tname: tname * tname -> bool
     val equal_texp: texp * texp -> bool
-
-    val widgetOf: texp -> string
-    val boxedOf: texp -> string
-    val flagOf: texp -> string
 
 end
 
 (*
 
-   Type [long_texp] is the type of values returned by the parser
-   for parts of the .defs file corresponding to types.
+   Type [tname] represents type names. Type names are simply names
+   as described in NameUtil.
 
-   [toString texp] returns a string representation of the long
-   type expression texp.
+   Type [inherits] specifies an inheritance hierarchy for widgets and
+   pointer types. INH_ROOT represents the top of the hierarchy (with
+   no parents), and INH_FROM(parent) a type inheriting from parent.
 
-   [typeClass texp] returns a string describing the type expression
+   Type [texp] specifies type expressions. Most of these are
+   self-explanatory. The following describe the remaning ones 
+   - PRIMTYPE represents "built-in" types such as integers and
+     strings;
+   - ARROW represents function types (notice the three types of
+     parameter lists: the first component is the list of parameters
+     when all output parameters have been removed, the second is the
+     list of parameters, and the third is the complete list of
+     parameters).
+
+   [toString texp] returns a string representation of the type
+   expression texp.
+
+   [typeKind texp] returns a string describing the type expression
    texp --- sort of like the kind of the expression.
+
+   [equal_tname (tname1,tname2)] returns true if the two type
+   names tname1 and tname2 are equal.
+
+   [equal_texp (texp1,texp2)] returns true if the two type expressions
+   texp1 and texp2 are equal.
 
 *)

@@ -44,10 +44,10 @@ struct
 
     fun combine' sep = Util.stringSep "" "" sep (fn s=>s)
     fun nameOf (MODULE_DECL (_,_,path)) = combine' "." path
-      | nameOf (OBJECT_DECL (_, obj, _)) = TE.widgetOf obj
+      | nameOf (OBJECT_DECL (_, obj, _)) = TE.toString obj
       | nameOf (FUNCTION_DECL (_, funname, _)) = NU.combine "_" funname
-      | nameOf (FLAGS_DECL (_, flag, _)) = TE.flagOf flag
-      | nameOf (BOXED_DECL (_, pointer, _)) = TE.boxedOf pointer
+      | nameOf (FLAGS_DECL (_, flag, _)) = TE.toString flag
+      | nameOf (BOXED_DECL (_, pointer, _)) = TE.toString pointer
       | nameOf (SIGNAL_DECL (_, widget, signal, _)) = NU.combine "" signal
 
     fun typeOf (MODULE_DECL _) = "module"
@@ -88,14 +88,14 @@ struct
 	  | equal (OBJECT_DECL(_,wid1,fields1), OBJECT_DECL(_,wid2,fields2)) =
 	    TE.equal_texp (wid1,wid2) andalso equal_pars_opt (fields1,fields2)
 	  | equal (FUNCTION_DECL(_,name1,funtype1), FUNCTION_DECL(_,name2,funtype2)) =
-	    TE.equal_name (name1,name2) andalso equal_funtype (funtype1, funtype2)
+	    TE.equal_tname (name1,name2) andalso equal_funtype (funtype1, funtype2)
 	  | equal (FLAGS_DECL(_,flag1,cons1), FLAGS_DECL(_,flag2,cons2)) =
 	    TE.equal_texp (flag1,flag2) andalso equal_list (op =) (cons1,cons2)
 	  | equal (BOXED_DECL(_,typ1,funcs1), BOXED_DECL(_,typ2,funcs2)) =
 	    TE.equal_texp (typ1,typ2) andalso TE.equal_texp (typ1,typ2)
 	    andalso equal_list (op =) (funcs1, funcs2)
 	  | equal (SIGNAL_DECL(_,wid1,signal1,cbType1), SIGNAL_DECL(_,wid2,signal2,cbType2)) =
-	    TE.equal_texp (wid1,wid2) andalso TE.equal_name (signal1,signal2) andalso equal_opt TE.equal_texp (cbType1, cbType2)
+	    TE.equal_texp (wid1,wid2) andalso TE.equal_tname (signal1,signal2) andalso equal_opt TE.equal_texp (cbType1, cbType2)
 	  | equal _ = false
 	and equal_funtype (FUNTYPE (long1,short1), FUNTYPE(long2,short2)) =
 	    TE.equal_texp (long1,long2) andalso equal_opt TE.equal_texp (short1,short2)

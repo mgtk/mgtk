@@ -1,5 +1,11 @@
 2000-07-12  Henning Niss  <hniss@diku.dk>
 
+	* Many files: Added/updated documentation in signature files, and
+	in the process cleaned-up some of the code (mostly removing
+	functionality not needed elsewhere).
+
+2000-07-12  Henning Niss  <hniss@diku.dk>
+
 	* Translate.sml: Cleaned up the mess about where the TypeInfo name
 	functions are applied. 
 

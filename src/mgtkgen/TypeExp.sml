@@ -26,15 +26,15 @@ struct
       | POINTER of tname * inherits option (* parent type *)
       | LIST of texp
 
-    fun typeClass (PRIMTYPE _) = "type name"
-      | typeClass (TUPLE _) = "tuple"
-      | typeClass (ARROW _) = "arrow"
-      | typeClass (OPTION _) = "option"
-      | typeClass (OUTPUT _) = "output"
-      | typeClass (FLAG _) = "flag/enum"
-      | typeClass (POINTER _) = "pointer"
-      | typeClass (WIDGET _) = "widget"
-      | typeClass (LIST _) = "list"
+    fun typeKind (PRIMTYPE _) = "type name"
+      | typeKind (TUPLE _) = "tuple"
+      | typeKind (ARROW _) = "arrow"
+      | typeKind (OPTION _) = "option"
+      | typeKind (OUTPUT _) = "output"
+      | typeKind (FLAG _) = "flag/enum"
+      | typeKind (POINTER _) = "pointer"
+      | typeKind (WIDGET _) = "widget"
+      | typeKind (LIST _) = "list"
 
     fun toString (PRIMTYPE s) = s
       | toString (TUPLE args) = 
@@ -49,14 +49,6 @@ struct
       | toString (WIDGET (name,parent)) = NU.combine "" name ^ " widget"
       | toString (LIST texp) = toString texp ^ " list"
 
-    fun widgetOf (tExp as WIDGET _) = toString tExp
-      | widgetOf _ = Util.shouldntHappen "widgetOf: not a widget"
-    fun flagOf (tExp as FLAG _) = toString tExp
-      | flagOf _ = Util.shouldntHappen "flagOf: not a flag"
-    fun boxedOf (tExp as POINTER _) = toString tExp
-      | boxedOf _ = Util.shouldntHappen "boxedOf: not a pointer"
-
-
     fun equal_list eq ([], []) = true
       | equal_list eq (x::xs, y::ys) = 
 	eq(x,y) andalso equal_list eq (xs, ys)
@@ -70,7 +62,7 @@ struct
       | equal_inherits (INH_FROM p1, INH_FROM p2) = p1=p2
       | equal_inherits _ = false
 
-    fun equal_name ((path1,base1),(path2,base2)) =
+    fun equal_tname ((path1,base1),(path2,base2)) =
 	equal_list (op=) (path1,path2) andalso equal_list (op=) (base1,base2)
     fun equal_texp (PRIMTYPE name1, PRIMTYPE name2) = name1=name2
       | equal_texp (TUPLE texps1, TUPLE texps2) = 
@@ -81,11 +73,11 @@ struct
       | equal_texp (OPTION texp1, OPTION texp2) = equal_texp (texp1, texp2)
       | equal_texp (OUTPUT texp1, OUTPUT texp2) = equal_texp (texp1, texp2)
       | equal_texp (FLAG (name1,em1), FLAG (name2,em2)) = 
-	equal_name (name1,name2) andalso em1=em2
+	equal_tname (name1,name2) andalso em1=em2
       | equal_texp (WIDGET(name1, par1), WIDGET(name2,par2)) =
-	equal_name (name1, name2) andalso equal_inherits (par1,par2)
+	equal_tname (name1, name2) andalso equal_inherits (par1,par2)
       | equal_texp (POINTER (name1,inh1), POINTER (name2,inh2)) =
-	equal_name (name1, name2) andalso equal_opt equal_inherits (inh1,inh2)
+	equal_tname (name1, name2) andalso equal_opt equal_inherits (inh1,inh2)
       | equal_texp (LIST texp1, LIST texp2) = equal_texp (texp1,texp2)
       | equal_texp _ = false
     and equal_par ((texp1, name1), (texp2,name2)) =

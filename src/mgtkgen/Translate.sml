@@ -138,7 +138,7 @@ struct
     fun mkCall (name, args: parlist) =
 	let val args' = List.filter (not o TI.isVoidType') args
 	    fun coerce (TE.OUTPUT t, n) = $"&" && mkOutName n
-	      | coerce (t, n) = TI.toCValue' (t, $n)
+	      | coerce (t, n) = TI.toCValue (t, $n)
 	in  TI.CFunName name && $"(" && prsep ($", ") coerce args' && $")"
 	end
 
