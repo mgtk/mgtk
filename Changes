@@ -1,6 +1,8 @@
 ----------------------------------------------------------------------
 Changes since mgtk-beta-0.02
 
+* Added the game of NIM (examples/nim.sml) contributed by Hans Rischel.
+
 ----------------------------------------------------------------------
 Changes since mgtk-alpha-0.01
 
