@@ -64,6 +64,53 @@ structure TinySML = struct
     fun mlify str = H.find trans_table str
 		    handle NotFound => str
 
+(*
+    fun ppExpr exp =
+	let fun ppexp level e =
+		case e of
+                    (* special case some idioms *)
+		    App(Var "symb",[Str s]) => "(symb\""^s^"\")"
+
+                    (* then the general stuff *)
+		  | Unit => ppString "()"
+		  | Var x => ppString (mlify x)
+		  | Long n => ppString(Name.toString n)
+		  | Const c => ppString c
+		  | Str s => ppString("\"" ^ s ^ "\"")
+		  | Import(cglobal,ty) =>
+                      ppString "_import" ++
+			   break(1,0)(ppString ("\""^cglobal^"\""),
+				      ": " ^+ SMLType.pp ty +^ ";")
+
+HERE
+		  | Fn(x,e) => parens 1 level ("fn " ^ mlify x ^ " => " ^ show_exp 1 e)
+		  | App(e,es) => parens 2 level 
+				    (show_exp 3 e ^ 
+				     Util.stringSep " " "" " " (show_exp 3) es)
+HERE
+
+		  | Tup [] => ppString "()"
+		  | Tup [e] => ppe level e
+		  | Tup es => ppelist "(" ")" "," es
+		  | SeqExp es => ppelist "" "" ";" es
+		  | Let(d,e) => pplet (Let(d,e))
+	    and ppelist start finish sep es =
+		compose(front ^+ clist ("#"^sep^" ") (ppe 1) es,1,2,0,ppString finish)
+	    and pplet e =
+		let fun loop (Let(d,e)) acc = loop e (ppdec d::acc)
+		      | loop _ [] = raise Fail"pplet: shouldn't happen"
+		      | loop e acc = 
+			let val body = ppe 1 e
+			in  case rev acc of
+				[] => body
+			      | d::ds =>
+				break(1,0) (ppString "let" ++ makelist(true,"") (d :: map forcemulti ds),
+					    compose(ppString "in" ++ body,1,2,0,ppString "end"))
+			end
+		in  loop e [] end
+
+		    
+*)
     fun toString (isStrMode,isSigMode) mode indent info =
 	let fun parens safe level s = if level > safe then "(" ^ s ^ ")"
 				      else s
@@ -166,5 +213,6 @@ structure TinySML = struct
 
 	in  show' info ^ "\n"
 	end
+
 
 end (* structure TinySML *)

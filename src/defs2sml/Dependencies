@@ -4,4 +4,5 @@
 defs2sml: util/ defs/defsparse /ast/ast /ast/fromdefs /ast/resolvetypes
     /ast/resolvenames /codegen/typeinfo /codegen/smlgen
     /codegen/cgen-mosml /codegen/cgen-mlton /ast/type /ast/name
+    /util/pretty/pretty
     %PROGRAM

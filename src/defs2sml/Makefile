@@ -6,7 +6,7 @@ MAIN=defs2sml$(EXEEXT)
 MOSMLC  = mosmlc
 PERL    = perl
 MOSMLFLAGS = -liberal
-MOSMAKEDIRS = . util defs ast codegen
+MOSMAKEDIRS = . util util/pretty defs ast codegen
 MOSMAKE = mosmake
 include $(MOSMAKE)/Makefile.inc
 

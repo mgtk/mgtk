@@ -64,7 +64,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
         ,("char",      (fn _ => SMLType.CharTy,SMLType.CharTy,
 		        ccall"Char_val", ccall"Val_char", NONE))
         ,("gunichar",  (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        ccall"Long_val", ccall"Long_char", NONE)) (* FIXME *)
+		        ccall"Long_val", ccall"Val_long", NONE)) (* FIXME *)
         ,("float",     (fn _ => SMLType.RealTy,SMLType.RealTy,
 		        ccall"Double_val", ccall"copy_double", NONE))
         ,("double",    (fn _ => SMLType.RealTy,SMLType.RealTy,
@@ -241,8 +241,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	case exp of
 	    App(Var "make", [arg]) =>
 	       let val p = Name.getPath n
-	       in  App(Long(Name.fromPaths(p,p,["inherit"])), 
-		       [Unit,Fn("()", arg)]) end
+	       in  if List.length p > 0
+		   then App(Long(Name.fromPaths(p,p,["inherit"])), 
+			    [Unit,Fn("()", arg)])
+		   else exp
+	       end
 	  | exp => exp
     end (* local *)
 

@@ -82,7 +82,7 @@ structure Gtk = struct
         val rc_get_style_by_paths_ : cptr -> string -> string -> int -> cptr
             = app4 (symb"mgtk_gtk_rc_get_style_by_paths")
         val rc_get_style_by_paths : 'a Settings.t -> string -> string -> int -> base Style.t
-            = fn settings => fn widget_path => fn class_path => fn typ => make (rc_get_style_by_paths_ (repr settings) widget_path class_path typ)
+            = fn settings => fn widget_path => fn class_path => fn typ => Style.inherit () (fn () => rc_get_style_by_paths_ (repr settings) widget_path class_path typ)
     end
     signature Object = sig
         type base

@@ -66,7 +66,7 @@ structure Gtk = struct
         val rc_get_style_by_paths_ : cptr * CString.cstring * CString.cstring * int -> cptr
             = _import "gtk_rc_get_style_by_paths" : cptr * CString.cstring * CString.cstring * int -> cptr;
         val rc_get_style_by_paths : 'a Settings.t -> string -> string -> int -> base Style.t
-            = fn settings => fn widget_path => fn class_path => fn typ => make (GObject.withPtr (settings,fn settings => rc_get_style_by_paths_ (settings,CString.fromString widget_path,CString.fromString class_path,typ)))
+            = fn settings => fn widget_path => fn class_path => fn typ => Style.inherit () (fn () => GObject.withPtr (settings,fn settings => rc_get_style_by_paths_ (settings,CString.fromString widget_path,CString.fromString class_path,typ)))
     end
     signature Object = sig
         type base
