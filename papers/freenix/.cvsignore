@@ -1,4 +1,9 @@
 auto
+example-class-diagram.log
+example-class-diagram.mp
+example-class-diagram.mps
+example-class-diagram.mpx
+example-class-diagram.tex
 mgtk-larsen-niss.aux
 mgtk-larsen-niss.bbl
 mgtk-larsen-niss.blg
@@ -6,3 +11,4 @@ mgtk-larsen-niss.dvi
 mgtk-larsen-niss.log
 mgtk-larsen-niss.log
 mgtk-larsen-niss.pdf
+mgtk-larsen-niss.ps
