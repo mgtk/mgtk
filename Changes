@@ -8,6 +8,7 @@ Changes since mgtk-beta-0.03
 * Bug fixes (defs2sml)
   - output parameters declared correctly (used to have a wrong type)
     and defined after Push_roots
+* Added support for timeouts and idle tasks
 
 ----------------------------------------------------------------------
 Changes since mgtk-beta-0.02
