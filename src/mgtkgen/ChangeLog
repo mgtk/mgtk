@@ -1,3 +1,8 @@
+2000-06-13  Ken Friis Larsen  <kfl@it.edu>
+
+	* Translate.sml: Fixed a small bug: the keyword eqtype is not
+	allowed in declarations	(.sml files) only in specs (.sig files).
+
 2000-06-13  Henning Niss  <hniss@diku.dk>
 
 	* Translate.sml: Made flags ``real'' flags. Functions with a flag
