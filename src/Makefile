@@ -22,7 +22,7 @@ SUBDIRS=mgtkgen
 
 all: mgtkobjs
 
-mgtkfiles: $(MGTKFILES)
+mgtkfiles: $(MGTKFILES) $(GENPROG)
 mgtkobjs: mgtkfiles $(MGTKOBJS)
 
 

@@ -59,7 +59,8 @@ struct
          |   "bool" => $"int"
          |   "string" => $"char*"
          |   "static_string" => $"char*"
-         |   _ => Util.shouldntHappen "toCValue: uknown primitive type"
+         |   "GtkType" => $"int"
+         |   _ => Util.shouldntHappen "mkc: unknown primitive type"
 	)
       | mkc (TypeExp.OUTPUT t) = mkCType t
       | mkc (TypeExp.WIDGET (wid,_)) = $"GtkObject"
@@ -83,7 +84,8 @@ struct
              |   "bool" => $"bool"
              |   "string" => $"string"
              |   "static_string" => $"string"
-	     |   _ => Util.shouldntHappen "toCValue: uknown primitive type"
+             |   "GtkType" => $"gtk_type"
+	     |   _ => Util.shouldntHappen "mkType: unknown primitive type"
             )
 	  | mkType nest toType tArg (TypeExp.TUPLE tArgs) = 
 	    prsep ($" * ") (mkLongType true toType tArg) tArgs
@@ -158,7 +160,8 @@ struct
              |  "bool" => $"Bool_val(" && name && $")"
              |  "string" => $"String_val(" && name && $")"
              |  "static_string" => $"String_val(" && name && $")"
-	     |  _ => Util.shouldntHappen "toCValue: uknown primitive type"
+             |   "GtkType" => $"Int_val(" && name && $")"
+	     |  _ => Util.shouldntHappen "toCValue: unknown primitive type"
 	    )
 	  | toc long (TypeExp.FLAG (fName,_), name) = $"Int_val(" && name && $")"
 	  | toc long (TypeExp.WIDGET (wid,_), name) = $"GtkObj_val(" && name && $")"
@@ -192,7 +195,8 @@ struct
              |   "bool" => $"Val_bool(" && name && $")"
 	     |   "string" => $"copy_string(" && name && $")"
 	     |   "static_string" => $"copy_string(" && name && $")"
-	     |   _ => Util.shouldntHappen "toCValue: uknown primitive type"
+             |   "GtkType" => $"Val_int(" && name && $")"
+	     |   _ => Util.shouldntHappen "fromCValue: unknown primitive type"
             )
 	  | fromc long (TypeExp.OUTPUT (widType as (TypeExp.LONG(_, TypeExp.WIDGET _))), name) =
 	    fromCValue (widType, $"&" && name)

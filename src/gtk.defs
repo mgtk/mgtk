@@ -36,7 +36,7 @@
 ; grep _get_type *.h | grep "#define" | grep -v GTK_CHECK | awk '{ printf "   (%s %s)\n", tolower(substr($2, 10)), $2 }' >! ~/gtktype.defs
 ; ugly hack to avoid complications: call it GtkGtkType :-)
 
-;(define-enum GtkGtkType
+;(define-enum GtkType
 ;   (accel_label GTK_TYPE_ACCEL_LABEL)
 ;   (adjustment GTK_TYPE_ADJUSTMENT)
 ;   (alignment GTK_TYPE_ALIGNMENT)
@@ -5116,7 +5116,7 @@
 (define-object GtkMenuShell (GtkContainer))
 
 (define-func gtk_menu_shell_get_type
-  GtkGtkType
+  GtkType
   ())
 
 (define-func gtk_menu_shell_append
@@ -5159,7 +5159,7 @@
 (define-object GtkMenuBar (GtkMenuShell))
 
 (define-func gtk_menu_bar_get_type
-  GtkGtkType
+  GtkType
   ())
 
 (define-func gtk_menu_bar_new
@@ -5192,7 +5192,7 @@
 (define-object GtkMenu (GtkMenuShell))
 
 (define-func gtk_menu_get_type
-  GtkGtkType
+  GtkType
   ())
 
 (define-func gtk_menu_new
@@ -5274,7 +5274,7 @@
 (define-object GtkMenuItem (GtkItem))
 
 (define-func gtk_menu_item_get_type
-  GtkGtkType
+  GtkType
   ())
 
 (define-func gtk_menu_item_new
@@ -5328,7 +5328,7 @@
    (uint active))
 )
 (define-func gtk_check_menu_item_get_type
-  GtkGtkType
+  GtkType
   ())
 
 (define-func gtk_check_menu_item_new
@@ -5358,7 +5358,7 @@
 (define-object GtkRadioMenuItem (GtkCheckMenuItem))
 
 (define-func gtk_radio_menu_item_get_type
-  GtkGtkType
+  GtkType
   ())
 
 ;;(define-func gtk_radio_menu_item_new_interp
@@ -5375,7 +5375,7 @@
 (define-object GtkOptionMenu (GtkButton))
 
 (define-func gtk_option_menu_get_type
-  GtkGtkType
+  GtkType
   ())
 
 (define-func gtk_option_menu_new
@@ -5405,7 +5405,7 @@
 (define-object GtkTearoffMenuItem (GtkMenuItem))
 
 (define-func gtk_tearoff_menu_item_get_type
-  GtkGtkType
+  GtkType
   ())
 
 (define-func gtk_tearoff_menu_item_new

@@ -66,7 +66,7 @@ struct
 	(* insert some primitive types in the symbol table *)
 	val _ = app (fn n => Polyhash.insert table (n,TypeExp.PRIMTYPE n))
 	            ["none","int","uint","float","bool","string",
-		     "static_string","GtkGtkType"
+		     "static_string","GtkType"
                     ]
 	val _ = app (Polyhash.insert table)
 	            [("GtkObject",TypeExp.WIDGET("GtkObject",NONE)),
