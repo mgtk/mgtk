@@ -7,7 +7,7 @@ fun delete_event _ = ( print "delete event occurred\n"
 fun destroy _ = Gtk.main_quit()
 
 fun main () =
-    let val _      = Gtk.init(CommandLine.arguments())
+    let val _      = Gtk.init(CommandLine.name()::CommandLine.arguments())
 	val window = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 	val button = Gtk.button_new_with_label "Hello World"
 
@@ -20,4 +20,3 @@ fun main () =
       ; Gtk.widget_show window
       ; Gtk.main() 
     end
-    

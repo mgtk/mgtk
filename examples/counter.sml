@@ -19,7 +19,7 @@ fun report lab f inp state =
     end
 
 fun main () =
-    let val _       = Gtk.init(CommandLine.arguments())
+    let val _       = Gtk.init(CommandLine.name()::CommandLine.arguments())
 	val window  = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 	val but1    = Gtk.button_new_with_label "Up"
 	val but2    = Gtk.button_new_with_label "Down"

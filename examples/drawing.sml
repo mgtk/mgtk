@@ -1,4 +1,4 @@
-val _ = Gtk.init(CommandLine.arguments())
+val _ = Gtk.init(CommandLine.name()::CommandLine.arguments())
 
 fun mkColor color =
     let val (parsed, color) = Gtk.gdk_color_parse color

@@ -20,7 +20,7 @@ fun simpwin i =
 fun destroy _ = Gtk.main_quit()
 
 fun main () =
-    let val _      = Gtk.init(CommandLine.arguments())
+    let val _      = Gtk.init(CommandLine.name()::CommandLine.arguments())
 	val window = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 	val button = Gtk.button_new_with_label "New Window"
 	val count = ref 1

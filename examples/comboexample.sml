@@ -29,7 +29,7 @@ fun mkComplexCombo parent =
     end
 
 fun main () =
-    let val _      = Gtk.init(CommandLine.arguments())
+    let val _      = Gtk.init(CommandLine.name()::CommandLine.arguments())
 	val window = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 	val combo = mkComplexCombo window
 

@@ -26,7 +26,7 @@ fun labent s editable =
     end
 
 fun main () =
-    let val _      = Gtk.init(CommandLine.arguments())
+    let val _      = Gtk.init(CommandLine.name()::CommandLine.arguments())
 	val window = window()
 	val (getarg, _, box1) = labent "S. Francs" true
 	val (_, setres, box2) = labent "Kroner" false
