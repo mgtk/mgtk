@@ -9,13 +9,13 @@ structure GenSML :>
 
 	type sml_info
 	type 'a incl
-	type mode
+	type module_info
 
 	val max_curried : int
 
 	val generate: TypeInfo.typeinfo -> (name,(name*name option)option,typeexp AST.api_info) AST.module -> 
-		      (name,mode,sml_info incl) AST.module
-	val print: string option -> TextIO.outstream -> (name,mode,sml_info incl) AST.module 
+		      (name,module_info,sml_info incl) AST.module
+	val print: string option -> TextIO.outstream -> (name,module_info,sml_info incl) AST.module 
                    -> unit
     end =
 struct
@@ -73,9 +73,17 @@ struct
 	end
 
     (* print *)
-    datatype mode = STRUCTURE | SIGNATURE
-    fun showMode STRUCTURE = "structure"
-      | showMode SIGNATURE = "signature"
+    datatype module_info = STRUCTURE of string * string option (* sig? *)
+			 | SIGNATURE of string
+    fun isStrMode (STRUCTURE _) = true
+      | isStrMode _ = false
+    fun isSigMode (SIGNATURE _) = true
+      | isSigMode _ = false
+    fun showModInfo (STRUCTURE(name,sign)) = 
+	"structure " ^ name ^ (case sign of SOME s => " :> " ^s | NONE => "")
+      | showModInfo (SIGNATURE name) = "signature " ^ name
+    fun showModBegin (STRUCTURE _) = "struct"
+      | showModBegin (SIGNATURE _) = "sig"
 
     fun toString mode indent info =
 	let fun parens safe level s = if level > safe then "(" ^ s ^ ")"
@@ -102,9 +110,9 @@ struct
 	    fun show_type_incl sep None = "" 
 	      | show_type_incl sep (Some ty) = sep ^ SMLType.toString ty
 	      | show_type_incl sep (StrOnly ty) = 
-		if mode = STRUCTURE then sep ^ SMLType.toString ty else ""
+		if isStrMode mode then sep ^ SMLType.toString ty else ""
 	      | show_type_incl sep (SigOnly ty) = 
-		if mode = SIGNATURE then sep ^ SMLType.toString ty else ""
+		if isSigMode mode then sep ^ SMLType.toString ty else ""
 
 	    fun printing s =
 		List.exists (not o Char.isSpace) (String.explode s)
@@ -124,13 +132,13 @@ struct
 	    fun show decl =
 		case decl of
 		    ValDecl(pat,ty,exp) =>
-		       if mode = STRUCTURE then
+		       if isStrMode mode then
 			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
 			   ^ (if printing (show_type_incl " : " ty) then "\n" ^ indent ^ "    = " else " = ") ^ show_exp exp
 		       else
 			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
 		  | FunDecl(name,pars,ty,exp) =>
-		       if mode = STRUCTURE then
+		       if isStrMode mode then
 			   indent ^ "fun " ^ name ^ Util.stringSep " " "" " " show_pat pars
 			   ^ " = " ^ show_exp exp
 		       else
@@ -147,36 +155,37 @@ struct
 		  | Open strs => indent ^ Util.stringSep "open " "" " " (fn s=>s) strs
 	    and show' (None) = ""
 	      | show' (Some decl) = show decl
-	      | show' (StrOnly decl) = if mode=STRUCTURE then show decl else ""
-	      | show' (SigOnly decl) = if mode=SIGNATURE then show decl else ""
+	      | show' (StrOnly decl) = if isStrMode mode then show decl else ""
+	      | show' (SigOnly decl) = if isSigMode mode then show decl else ""
 
 	in  show' info ^ "\n"
 	end
 	    
     fun print preamble os module =
 	let fun dump s = TextIO.output(os, s)
-	    fun dump_preamble (SOME file) =
-		let val is = TextIO.openIn file
-		    val s = TextIO.inputAll is
-		in  TextIO.output(os, s) 
-                  ; TextIO.closeIn is
-		end
-	      | dump_preamble NONE = ()
 	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
+	    fun dump_preamble indent (SOME file) =
+		let val is = TextIO.openIn file
+		    val indent = spaces indent
+		    fun loop () = 
+			if TextIO.endOfStream is then ()
+			else ( dump (indent ^ TextIO.inputLine is)
+                             ; loop() )
+		in  loop () ; TextIO.closeIn is end
+	      | dump_preamble indent NONE = ()
 	    fun indent cols str = spaces cols ^ str
 	    fun print_member mode indent (AST.Member{name,info}) = 
 		dump (toString mode (spaces indent) info)
 	      | print_member mode indent (AST.Sub module) = 
 		print_module indent module
 	    and print_module indent (AST.Module{name,members,info}) =
-		( dump(spaces indent ^ showMode info ^ " " ^Name.asModule name^ (if info=STRUCTURE then " :> " ^Name.asModule name^ " = struct\n" else " = sig\n"))
-		; dump("\n")
+		( dump(spaces indent ^ showModInfo info ^ " = " ^ showModBegin info ^ "\n")
 		; List.app (print_member info (indent+4)) members
 		; dump(spaces indent ^ "end\n")
 		)
 	    fun print_toplevel (AST.Module{name,members,info}) =
-                ( dump("structure " ^Name.asModule name ^ " = struct\n")
-                ; dump_preamble preamble
+		( dump(spaces 0 ^ showModInfo info ^ " = " ^ showModBegin info ^ "\n")
+                ; dump_preamble 4 preamble
                 ; List.app (print_member info 4) members
                 ; dump("end\n")
                 )
@@ -321,11 +330,11 @@ struct
                      ; None)
 	fun generate_module tinfo (Module{name,members,info}) = 
 	    let val subs = List.concat(List.map (generate_member tinfo) members)
-	    in  [ Module{name=name, info=SIGNATURE, 
+	    in  [ Module{name=name, info=SIGNATURE (Name.asModule name),
 			 members=Member{name=Name.fromString "signatureheader",
 					info=header tinfo (name,info)}
 				 :: subs}
-		, Module{name=name, info=STRUCTURE,
+		, Module{name=name, info=STRUCTURE (Name.asModule name, SOME (Name.asModule name)),
 			 members=Member{name=Name.fromString "structureheader",
 					info=header tinfo (name,info)}
 				 :: subs}
@@ -336,8 +345,12 @@ struct
 	  | generate_member tinfo (Member{name,info}) = 
 	    [Member{name=name,info=trans tinfo (name,info)}]
     in  fun generate tinfo (Module{name,members,info}) = 
-	    Module{name=name,info=STRUCTURE,
-		   members=List.concat(List.map (generate_member tinfo) members)}
+	    Module{name=name,info=STRUCTURE(Name.asModule name, NONE),
+		   members=Member{name=Name.fromString "structureheader",
+				  info = StrOnly(Open["Dynlib"])}  
+                           :: Member{name=Name.fromString "structureheader",
+				  info = StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))}
+			   :: List.concat(List.map (generate_member tinfo) members)}
     end (* local *)
 
 end (* structure GenSML *)

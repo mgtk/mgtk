@@ -7,5 +7,6 @@ fileutils:
 util:
 msgutil:
 dyn:
+debug: argparse
 config: + dyn util
-. = argparse parsercomb util fileutils msgutil
+. = argparse parsercomb util fileutils msgutil debug

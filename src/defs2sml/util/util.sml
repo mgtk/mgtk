@@ -1,5 +1,5 @@
 (* mgtk --- an SML binding for GTK.                                          *)
-(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004  *)
 
 structure Util =
 struct
@@ -34,6 +34,13 @@ struct
 		in  if ord = EQUAL then loop xs ys else ord
 		end
 	in  loop xs ys
+	end
+
+    fun splitWhile p l =
+	let fun loop [] acc = (rev acc, [])
+	      | loop (x::xs) acc = if p x then loop xs (x::acc)
+				   else (rev acc, x::xs)
+	in  loop l []
 	end
 
 end (* structure Util *)

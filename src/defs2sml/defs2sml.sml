@@ -58,7 +58,7 @@ fun main () =
 		    ("-bo", ArgParse.String setOutFileBase),
 		    ("-cp", ArgParse.String setCPreamble),
 		    ("-sp", ArgParse.String setSMLPreamble)
-                   ]
+                   ] @ Debug.argparse ()
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
 
@@ -88,8 +88,24 @@ fun main () =
 	fun member set elem = Splayset.member(set,elem)
 	fun filter (name,info) = not(member exclude name)
         (* Since the toplevel module will be Gtk, and this is presumably
-           not filter away, valOf below should always work. *)
+           not filtered away, valOf below should always work. *)
 	val api = Option.valOf(AST.filteri (filter,filter) api)
+
+        (* Change the order of the entries in the file to move 
+           all non-module stuff up before modules. *)
+	fun order api =
+	    let fun oModule (AST.Module{name,members,info}) =
+		    let val (mods,non) = 
+			    List.partition (fn (AST.Sub _) => true
+					     | _ => false) members
+		    in  AST.Module{members=non @ (List.map oMember mods),
+				   name=name,info=info}
+		    end
+		and oMember (AST.Sub module) = AST.Sub(oModule module)
+		  | oMember (m as AST.Member _) = m
+	    in  oModule api
+	    end
+	val api = order api
 
 	val api = ResolveTypes.resolve (ResolveNames.resolve api)
 

@@ -7,6 +7,23 @@ structure Name :> NAME = struct
                                    else (rev acc, x :: xs)
         in  loop xs acc
         end
+
+    fun coalesce words =
+	let fun loop [] = []
+	      (* Special-case some Gtk name patterns *)
+	      | loop ("get"::"type"::xs) = "get"::"type" :: loop xs
+	      | loop ("Window"::"Type"::xs) = "Window"::"Type" :: loop xs
+	      | loop (x::"Type"::xs) = (x^"Type") :: loop xs
+	      | loop (x::"type"::xs) = (x^"type") :: loop xs
+	      | loop (x::"Buffer"::xs) = (x^"Buffer") :: loop xs
+	      | loop (x::"buffer"::xs) = (x^"buffer") :: loop xs
+	      | loop (x::"Renderer"::xs) = (x^"Renderer") :: loop xs
+	      | loop (x::"renderer"::xs) = (x^"renderer") :: loop xs
+	      | loop (x::"Iter"::xs) = (x^"Iter") :: loop xs
+	      | loop (x::"iter"::xs) = (x^"iter") :: loop xs
+	      | loop (x::xs) = x :: loop xs
+	in  loop words end
+
     fun separateWords word =
         let val word = explode word
             val _ = if null word then raise Fail("separate_words: empty word")
@@ -37,21 +54,13 @@ structure Name :> NAME = struct
 				 end
                      end
                 else split cs (c :: cur, rest)
-                        
-            val words = split word ([],[])
-	    fun coalesce words =
-		let fun loop [] = []
-		      (* Special-case some Gtk name patterns *)
-		      | loop (x::"Type"::xs) = (x^"Type") :: loop xs
-		      | loop (x::"Buffer"::xs) = (x^"Buffer") :: loop xs
-		      | loop (x::"Renderer"::xs) = (x^"Renderer") :: loop xs
-		      | loop (x::"Iter"::xs) = (x^"Iter") :: loop xs
-		      | loop (x::xs) = x :: loop xs
-		in  loop words end
-        in  coalesce words
+        in  split word ([],[])
         end
 
     val separateUnderscores = String.tokens (fn c=> #"_"=c)
+
+    val separateWords = coalesce o separateWords
+    val separateUnderscores = coalesce o separateUnderscores
 
     (* names *)
     type name = {path: string list, fullpath: string list, base: string list}
@@ -90,6 +99,14 @@ structure Name :> NAME = struct
     val getFullPath = #fullpath
     val getBase = #base
 
+
+    (* make sure a name gets output as a valid ML name *)
+    fun mlify name =
+	let val (f,p,b) = (getFullPath name, getPath name, getBase name)
+	    fun ify "Type" = "Ctype" (* FIXME *)
+	      | ify n = n
+	in  fromPaths(map ify f, map ify p, map ify b) end
+
     val toLower = String.map Char.toLower
     val toUpper = String.map Char.toUpper
     fun capitalize "" = ""
@@ -118,7 +135,7 @@ structure Name :> NAME = struct
 	let val (path,base) = prune (getPath name, getBase name)
 	in  combine "" (noSep path, noSep(map capitalize base))
 	end
-    val asEnum = underscored
+    val asEnum = underscored o mlify
     val asBoxed = underscored
     val asMethod = underscored
     val asField = underscored

@@ -37,8 +37,13 @@ test-compile: $(MAIN)
         done
 
 
-mgtk.c: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs excludes.txt
+test-%: $(MAIN)
+	./$(MAIN) test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
+	mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$*.sml
+	gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$*.c
+
+mgtk.c: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
 	./$(MAIN) -co mgtk.c -so mGtk.sml -cp lib/preamble.c api/pygtk/gtk.defs 
 
-ctest: $(MAIN) mgtk.c excludes.txt
+ctest: $(MAIN) mgtk.c
 	gcc $(CINCLUDE) -c -o /dev/null mgtk.c > c.out 2>&1 

@@ -28,6 +28,30 @@ structure FromDefs :> FromDefs = struct
 
     fun trans top (def, map) =
 	let val name = getName def handle AttribNotFound _ => #1 def
+	    fun probableModule nothing split name = 
+		(* look for modules "matching" name:
+		   - functions beginning with xxx_yyy_zzz_... when
+                     XxxYyyZzz is a known module matches that module
+                   - enums beginning with XxxYyyZzz... when
+                     XxxYyyZzz is a known module matches that module
+                *)
+		let val words = split name
+		    fun loop [] acc = nothing
+		      | loop (ith::rest) acc = 
+			let val ith = Name.capitalize ith
+			    val _ = print("Looking at " ^ ith ^ "\n")
+			    val probable = String.concat(rev(ith::acc))
+			in  if Map.peek(map,probable) = NONE then
+				loop rest (ith::acc)
+			    else probable
+			end
+		    val module = loop (tl words) [Name.capitalize(hd words)]
+		in  if module = nothing then
+			( MsgUtil.warning("Demoting "^name^" to top-level module " ^nothing)
+			  ; nothing)
+		    else module
+		end
+
 	in  case getTag def of
 		Object => 
 		   let val md = getModule def
@@ -41,25 +65,9 @@ structure FromDefs :> FromDefs = struct
 		   let val md = 
 		       (getConstructor def)
 		       handle AttribNotFound _ => 
-			  (* okay, so this isn't a constructor; special-case
-                             functions beginning with xxx_yyy_zzz_... when
-			     XxxYyyZzz is a known module
-                          *)
-			  let val words = Name.separateUnderscores name
-			      fun loop [] acc = top
-				| loop (ith::rest) acc = 
-				  let val ith = Name.capitalize ith
-				      val probable = String.concat(rev(ith::acc))
-				  in  if Map.peek(map,probable) = NONE then
-					  loop rest (ith::acc)
-				      else probable
-				  end
-			      val module = loop (tl words) [Name.capitalize(hd words)]
-			  in  if module = top then
-				  ( MsgUtil.warning("Demoting "^name^" to top-level module " ^top)
-				  ; top)
-			      else module
-			  end
+			  (* okay, so this isn't a constructor; look for
+                             a probable module *)
+			  probableModule top Name.separateUnderscores name
 		       val isConst = 
 			   (getConstructor def; true)
 			   handle AttribNotFound _ =>
@@ -78,7 +86,7 @@ structure FromDefs :> FromDefs = struct
 					info=A.Method(functype (SOME md) NONE def)}
 		   in  insert map md mem end
 	      | Enum =>
-		   let val md = getModule def
+		   let val md = probableModule (getModule def) Name.separateWords name
 		       val mem = Member{name=name,info=A.Enum(getValues def handle AttribNotFound _ => [])}
 		   in  insert map md mem end
 	      | Signal =>
@@ -116,7 +124,6 @@ structure FromDefs :> FromDefs = struct
 		in  loop (Module{name=top,members=ast,info=NONE}) end
 	in  convert () end
 
-(*
     (* For debugging: *)
     val fromDefs = fn top => fn defs => 
         let fun pptype (AST.ApiTy s) = s
@@ -126,17 +133,23 @@ structure FromDefs :> FromDefs = struct
 		": " ^ pptype ty ^
 		   (case parent of NONE => "" | SOME ty => " extends " ^ pptype ty)
 	      | ppmodi NONE = ""
-	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
-	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty
-	      | ppmemi (AST.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " (fn s=>s) ss
-	      | ppmemi (AST.Signal ty) = ": signal " ^ pptype ty
+	    fun ppmemi (A.Method ty) = ": method " ^ pptype ty
+	      | ppmemi (A.Field ty) = ": field " ^ pptype ty
+	      | ppmemi (A.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " (fn s=>s) ss
+	      | ppmemi (A.Boxed _) = ": boxed"
+	      | ppmemi (A.Signal ty) = ": signal " ^ pptype ty
 	    val print = TextIO.print
 
 	    val module' = fromDefs top defs
-	in  print("After building defs:\n")
-          ; AST.ppString (ppmodi, ppmemi) print module'
+	in  if Debug.included "FromDefs.debug_defs" then
+		( print("After building defs:\n")
+		; AST.ppString (ppmodi, ppmemi) print module')
+	    else ()
           ; module'
         end
-*)
 
 end (* structure FromDefs *)
+
+val _ = Debug.add {name="FromDefs.debug_defs",
+		   short_option="dfd",long_option=SOME("debug-from-defs"),
+		   included=false}

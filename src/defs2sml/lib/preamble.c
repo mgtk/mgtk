@@ -39,6 +39,7 @@ EXTERNML value my_copy_string(const char *s) {
 
 /* A nice macro to have */
 #define GtkObj_val(x) (((void*) Field(x, 1)))
+#define GtkObj_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gtkobject (value val) {
   gtk_object_unref (GtkObj_val(val)); 
@@ -48,7 +49,7 @@ static inline value Val_GtkObj (void* obj) {
   value res; 
   gtk_object_ref(obj); 
   res = alloc_final (2, ml_finalize_gtkobject, 0, 1);
-  GtkObj_val(res) = obj;  
+  GtkObj_val_nocast(res) = (value)obj;  
   return res; 
 }
 
@@ -196,6 +197,49 @@ MGTK_MakeGetter(mgtk_get_pos_float, GTK_VALUE_FLOAT, copy_double)
 MGTK_MakeGetter(mgtk_get_pos_double, GTK_VALUE_DOUBLE, copy_double)
 MGTK_MakeGetter(mgtk_get_pos_string, GTK_VALUE_STRING, copy_string)
 */
+
+static inline GList* GList_val (value list, gpointer (*conv_val)(value)) {
+  if (!IsCons(list)) {
+    return NULL;
+  } else {
+    GList* res = NULL, * last;
+    Push_roots(tmp, 1)// We need this in case conv_val allocates in the ML heap
+      tmp[0] = list;
+      res = last = g_list_append(res, conv_val(Head(tmp[0])));
+      tmp[0] = Tail(tmp[0]);
+      for (; IsCons(tmp[0]); tmp[0] = Tail(tmp[0])) {
+        GList* elem = g_list_alloc();
+        elem->prev = last;
+        elem->next = NULL;
+        elem->data = conv_val(Head(tmp[0]));
+        last->next = elem;
+        last = elem;
+      }
+    Pop_roots();
+    return res;
+  }
+}
+
+static inline value val_GList(GList* glist, value (*val_conv)(gpointer)) {
+  if (glist == NULL) {
+    return Nil_list;
+  } else {
+    value result, elem;
+    Push_roots(tmp, 3);
+      elem   = val_conv(glist->data);              /* The first element */
+      tmp[2] = tmp[0] = make_cons(elem, Nil_list); /* tmp[2] is the result */
+      glist  = g_list_next(glist);
+      for(; glist != NULL; glist = g_list_next(glist)) {
+        elem   = val_conv(glist->data);
+        tmp[1] = make_cons(elem, Nil_list);
+        modify(&Tail(tmp[0]), tmp[1]); /* tmp[0] is older than tmp[1] */
+        tmp[0] = tmp[1];
+      }
+      result = tmp[2];
+    Pop_roots();
+    return result;
+  }
+}
 
 
 /* *** Signal stuff *** */

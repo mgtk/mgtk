@@ -91,10 +91,12 @@ structure TypeInfo :> TypeInfo = struct
 	      | bmem (AST.Member{name,info},table) =
 		case info of
 		    AST.Enum _ => 
+		    (TextIO.print("Binding " ^ Name.toString' name ^ "\n");
 		        add(table,name,
 			    {toc=ccall"Int_val", fromc=ccall"Val_int",
 			     ptype=SMLType.IntTy, super=NONE,
-			     stype=fn _ => SMLType.TyApp([],[Name.toString name])})
+			     stype=fn _ => SMLType.TyApp([],[Name.asEnum name])})
+                    )
 		  | AST.Boxed _ =>
 		    (TextIO.print("Binding " ^ Name.toString' name ^ "\n");
 		        add(table,name,

@@ -43,9 +43,18 @@ struct
 		    Sub m => Sub(resMod current m)
 	          | Member{name,info} => 
 			let val (path,base) = toName (splitfcn info) current name
+(*
+			    val _ = TextIO.print("member: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ show_path path ^ ":" ^ show_path base ^ "\n")
+*)
 			in  Member{name=Name.fromPaths(current,path,base),
-				   info= info}
+				   info= resMemInfo current info}
 			end
+	    and resMemInfo current (Enum enums) =
+		let fun res e = 
+			let val (p,b) = toName (Name.separateUnderscores) current e
+			in  Util.stringSep "" "" "_" (fn s=>s) b end
+		in  Enum(List.map res enums) end
+	      | resMemInfo current info = info
 	in  resMod [] module
 	end
 
@@ -63,15 +72,21 @@ struct
 			Member{name=Name.fromPaths(fullpath,[],base),info=info}
 	in  modMod module
 	end
-(*
+
     (* For debugging: *)
     val resolve = fn module => 
         let val print = TextIO.print
 
 	    val module' = resolve module
-	in  print("After resolving names:\n")
-          ; AST.ppName (fn _ =>"", fn _=>"") print module'
+	in  if Debug.included "ResolveNames.debug_resolve_names" then
+		( print("After resolving names:\n")
+		; AST.ppName (fn _ =>"", fn _=>"") print module')
+	    else ()
           ; module'
         end
-*)
+
 end (* structure ResolveNames *)
+
+val _ = Debug.add {name="ResolveNames.debug_resolve_names",
+		   short_option="drn",long_option=SOME("debug-resolve-names"),
+		   included=false}

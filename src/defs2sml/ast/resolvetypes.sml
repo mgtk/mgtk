@@ -59,6 +59,7 @@ structure ResolveTypes :> ResolveTypes = struct
     fun deModularize name (Tname _, tyname) = (* FIXME *)
 	let val context = Name.getFullPath name @ Name.getBase name
 	    val (path,base) = ResolveNames.toName Name.separateWords context tyname
+(*
 	    val _ = 
 		( TextIO.print  ("deModularizing: " ^ tyname ^ 
 			       " (in " ^ Util.stringSep "" "" "." (fn s=>s) context ^")" ^
@@ -66,6 +67,7 @@ structure ResolveTypes :> ResolveTypes = struct
 			       Util.stringSep "" "!" "." (fn s=>s) path ^
 			       Util.stringSep "" "" "-" (fn s=>s) base ^ "\n")
                 )
+*)
 	    val base = 
 		if length base = 0 then [hd(rev context)]
 		else base
@@ -93,6 +95,7 @@ structure ResolveTypes :> ResolveTypes = struct
 (*
 	    val _ = 
 		( TextIO.print  ("deModularizing: " ^ tyname ^ 
+			       " [" ^ Util.stringSep "" "" "-" (fn s=>s) splits ^ "]" ^
 			       " (in " ^ Util.stringSep "" "" "." (fn s=>s) context ^")" ^
 			       " -> " ^
 			       Name.toString' name^"\n")
@@ -139,7 +142,6 @@ structure ResolveTypes :> ResolveTypes = struct
 	  | AST.Member{name=n,info=i} => AST.Member{name=n,info=resMember inm i}
     val resolve = fn module => resolve (Name.fromPaths ([""],[""],[])) module
 
-(*
     (* For debugging: *)
     val resolve = fn module => 
         let fun pptype ty = Type.show(Name.toString') ty
@@ -155,9 +157,15 @@ structure ResolveTypes :> ResolveTypes = struct
 	    val print = TextIO.print
 
 	    val module' = resolve module
-	in  print("After resolving types:\n")
-          ; AST.ppName (ppmodi, ppmemi) print module'
+	in  if Debug.included "ResolveTypes.debug_resolve_types" then
+		( print("After resolving types:\n")
+		; AST.ppName (ppmodi, ppmemi) print module' )
+	    else ()
           ; module'
         end
-*)
+
 end (* structure ResolveTypes *)
+
+val _ = Debug.add {name="ResolveTypes.debug_resolve_types",
+		   short_option="drt",long_option=SOME("debug-resolve-types"),
+		   included=false}
