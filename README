@@ -1,5 +1,5 @@
-mGTK - SML bindings to GTK+
-===========================
+mGTK - SML bindings for gtk+
+============================
 
 Homepage:
     http://www.it.edu/people/kfl/mgtk/index.html
@@ -10,23 +10,21 @@ Authors:
 Copyright (C) 2000 by Ken Friis Larsen and Henning Niss.
 
 
-
 CURRENT VERSION
 ---------------
 The current version is 
     green-horses-and-blue-ducks (or mgtk-alpha-0.01)
 
 
-
 ABOUT
 -----
 
-mGTK is a SML interface to the graphical toolkit gtk+ written in C. The gtk+ 
-toolkit is available from the homepage:
+mGTK is an SML interface to the C-based graphical toolkit gtk+ (the
+Gimp Toolkit).  Gtk+ is available from the homepage:
 	http://www.gtk.org
 
 We use Moscow ML's foreign function interface to call the C functions
-in gtk+.  Therefore, mGTK can only be used with Moscow ML (version
+in Gtk+.  Therefore, mGTK can only be used with Moscow ML (version
 1.44 or newer).  However, we are very interested if somebody wants to
 port mGTK to other SML systems and are willing to provide information
 and help.
@@ -39,19 +37,19 @@ Moscow ML: Version 1.44 (or newer) compiled with dynlib support.
        Moscow ML is available from:
 	      http://www.dina.kvl.dk/~sestoft/mosml.html
 
-gtk+: mGTK will only work with 1.2.x series.  Check you gtk version
-      with the command:
-		gtk-config --version
+Gtk+: mGTK will only work with the 1.2.x series.  Check your gtk+ 
+      version with the command:
+              gtk-config --version
 
 
 DOCUMENTATION
 -------------
 
 At this time there is no documentation for mGTK :-(
-But it should be possible to use the documentation for the C interface
-to gtk+ available the gtk+ homepage
+However, it should be possible to use the documentation for the C
+interface to gtk+ (available the gtk+ homepage; see above).
 
-Also, you can take a peek in the examples directory (Remember to read
+Also, you can take a peek in the examples directory (remember to read
 the README file there).
 
 
