@@ -20,8 +20,15 @@ v Flags [Fixed: Henning, June 13, 2000]
 
 Milestone 2 (release version 1.0):
 ----------------------------------
-* Release at most one week later than mosml 2.0
-* Error handling, can catch gtk+ errors and convert them to
+v Release at most one week later than mosml 2.0 [Failed!]
+v Include mgtkgen [In a sense done with the move to Sourceforge]
+v Robustify the GtkArg stuff [Fixed: Ken, March 2001. No GC bug in the
+                                     GtkArgs stuff]
+v Review signal architecture [Done: Ken, March 2001. New signal
+                                    architecture ready, but not
+                                    completely implemented]
+* Complete signal infrastructure.
+* Error handling, can we catch gtk+ errors and convert them to
   exceptions? (Henning)
 * Documentation
   + Tutorial
@@ -30,12 +37,8 @@ Milestone 2 (release version 1.0):
 * More functions from Sugar:
   + cursors
   + AccelGroups
-* Include mgtkgen
-* Split Gtk.s{ig,ml} into many files
-* Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
 * Constructed data types in .defs file (GList's, arrays, etc.)
 * ItemFactories
-* Robustify the GtkArg stuff
 * Make a better gtk_init fix (Ken)
 
 
@@ -44,7 +47,6 @@ Postpone for after version 1.0:
 * Start to look at Gnome stuff
 * More functions from Sugar:
   + Drag'n'Drop
-* Review signal architecture
 
 
 Milestone in some distant future:
