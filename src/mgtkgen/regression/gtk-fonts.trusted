@@ -81,7 +81,7 @@ end
 (*                                                                           *)
 
 
-    prim_type gdk_font
+    type gdk_font = gpointer
 
     val gdk_font_load_: string -> gdk_font
         = app1(symb"mgdk_font_load")

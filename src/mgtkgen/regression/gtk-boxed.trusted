@@ -85,8 +85,8 @@ end
 (*                                                                           *)
 
 
-    prim_type gdk_font
+    type gdk_font = gpointer
 
-    prim_type gdk_color
+    type gdk_color = gpointer
 
 end

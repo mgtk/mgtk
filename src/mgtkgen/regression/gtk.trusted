@@ -1595,89 +1595,293 @@ value mgdk_colormap_get_system_size(value dummy) { /* ML */
   return Val_int(gdk_colormap_get_system_size());
 }
 
-/* ML type: gdk_drawable -> gdk_gc -> int -> int -> unit */
-value mgdk_draw_point(value drawable, value gc, value x, value y) { /* ML */
-  gdk_draw_point(GdkDrawable_val(drawable), GdkGC_val(gc), Int_val(x), Int_val(y));
+/* ML type: gdk_window -> int -> int -> int -> int -> unit */
+value mgdk_window_clear_area(value window, value x1, value y1, value x2, value y2) { /* ML */
+  gdk_window_clear_area(GdkWindow_val(window), Int_val(x1), Int_val(y1), Int_val(x2), Int_val(y2));
   return Val_unit;
 }
 
-/* ML type: gdk_drawable * gdk_gc * int * int * int * int -> unit */
-value mgdk_draw_line(value mgtk_params) { /* ML */
-  value drawable = Field(mgtk_params, 0);
-  value gc = Field(mgtk_params, 1);
-  value x1 = Field(mgtk_params, 2);
-  value y1 = Field(mgtk_params, 3);
+/* ML type: gtk_style * gdk_window * int * int * int * bool * int * int * int * int -> unit */
+value mgtk_draw_arrow(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value arrow_type = Field(mgtk_params, 4);
+  value fill = Field(mgtk_params, 5);
+  value x = Field(mgtk_params, 6);
+  value y = Field(mgtk_params, 7);
+  value width = Field(mgtk_params, 8);
+  value height = Field(mgtk_params, 9);
+  gtk_draw_arrow(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(arrow_type), Bool_val(fill), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_box(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_box(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int * int * int * int -> unit */
+value mgtk_draw_box_gap(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  value gap_side = Field(mgtk_params, 8);
+  value gap_x = Field(mgtk_params, 9);
+  value gap_width = Field(mgtk_params, 10);
+  gtk_draw_box_gap(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height), Int_val(gap_side), Int_val(gap_x), Int_val(gap_width));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_check(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_check(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_cross(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_cross(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_diamond(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_diamond(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit */
+value mgtk_draw_extension(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  value gap_side = Field(mgtk_params, 8);
+  gtk_draw_extension(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height), Int_val(gap_side));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_flat_box(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_flat_box(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int -> unit */
+value mgtk_draw_focus(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value x = Field(mgtk_params, 2);
+  value y = Field(mgtk_params, 3);
+  value width = Field(mgtk_params, 4);
+  value height = Field(mgtk_params, 5);
+  gtk_draw_focus(GtkStyle_val(style), GdkWindow_val(window), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit */
+value mgtk_draw_handle(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  value orientation = Field(mgtk_params, 8);
+  gtk_draw_handle(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height), Int_val(orientation));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int -> unit */
+value mgtk_draw_hline(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value x1 = Field(mgtk_params, 3);
   value x2 = Field(mgtk_params, 4);
-  value y2 = Field(mgtk_params, 5);
-  gdk_draw_line(GdkDrawable_val(drawable), GdkGC_val(gc), Int_val(x1), Int_val(y1), Int_val(x2), Int_val(y2));
+  value y = Field(mgtk_params, 5);
+  gtk_draw_hline(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(x1), Int_val(x2), Int_val(y));
   return Val_unit;
 }
 
-/* ML type: gdk_drawable * gdk_gc * int * int * int * int * int -> unit */
-value mgdk_draw_rectangle(value mgtk_params) { /* ML */
-  value drawable = Field(mgtk_params, 0);
-  value gc = Field(mgtk_params, 1);
-  value filled = Field(mgtk_params, 2);
-  value x = Field(mgtk_params, 3);
-  value y = Field(mgtk_params, 4);
-  value width = Field(mgtk_params, 5);
-  value height = Field(mgtk_params, 6);
-  gdk_draw_rectangle(GdkDrawable_val(drawable), GdkGC_val(gc), Int_val(filled), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_option(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_option(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
   return Val_unit;
 }
 
-/* ML type: gdk_drawable * gdk_gc * int * int * int * int * int * int * int -> unit */
-value mgdk_draw_arc(value mgtk_params) { /* ML */
-  value drawable = Field(mgtk_params, 0);
-  value gc = Field(mgtk_params, 1);
-  value filled = Field(mgtk_params, 2);
-  value x = Field(mgtk_params, 3);
-  value y = Field(mgtk_params, 4);
-  value width = Field(mgtk_params, 5);
-  value height = Field(mgtk_params, 6);
-  value angle1 = Field(mgtk_params, 7);
-  value angle2 = Field(mgtk_params, 8);
-  gdk_draw_arc(GdkDrawable_val(drawable), GdkGC_val(gc), Int_val(filled), Int_val(x), Int_val(y), Int_val(width), Int_val(height), Int_val(angle1), Int_val(angle2));
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_oval(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_oval(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
   return Val_unit;
 }
 
-/* ML type: gdk_drawable * gdk_font * gdk_gc * int * int * string -> unit */
-value mgdk_draw_string(value mgtk_params) { /* ML */
-  value drawable = Field(mgtk_params, 0);
-  value font = Field(mgtk_params, 1);
-  value gc = Field(mgtk_params, 2);
-  value x = Field(mgtk_params, 3);
-  value y = Field(mgtk_params, 4);
-  value str = Field(mgtk_params, 5);
-  gdk_draw_string(GdkDrawable_val(drawable), GdkFont_val(font), GdkGC_val(gc), Int_val(x), Int_val(y), String_val(str));
-  return Val_unit;
-}
-
-/* ML type: gdk_drawable * gdk_font * gdk_gc * int * int * string * int -> unit */
-value mgdk_draw_text(value mgtk_params) { /* ML */
-  value drawable = Field(mgtk_params, 0);
-  value font = Field(mgtk_params, 1);
-  value gc = Field(mgtk_params, 2);
-  value x = Field(mgtk_params, 3);
-  value y = Field(mgtk_params, 4);
-  value text = Field(mgtk_params, 5);
-  value text_length = Field(mgtk_params, 6);
-  gdk_draw_text(GdkDrawable_val(drawable), GdkFont_val(font), GdkGC_val(gc), Int_val(x), Int_val(y), String_val(text), Int_val(text_length));
-  return Val_unit;
-}
-
-/* ML type: gdk_drawable * gdk_gc * gdk_drawable * int * int * int * int * int * int -> unit */
-value mgdk_draw_pixmap(value mgtk_params) { /* ML */
-  value drawable = Field(mgtk_params, 0);
-  value gc = Field(mgtk_params, 1);
-  value src = Field(mgtk_params, 2);
-  value xsrc = Field(mgtk_params, 3);
-  value ysrc = Field(mgtk_params, 4);
-  value xdest = Field(mgtk_params, 5);
-  value ydest = Field(mgtk_params, 6);
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit */
+value mgtk_draw_ramp(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value arrow_type = Field(mgtk_params, 4);
+  value x = Field(mgtk_params, 5);
+  value y = Field(mgtk_params, 6);
   value width = Field(mgtk_params, 7);
   value height = Field(mgtk_params, 8);
-  gdk_draw_pixmap(GdkDrawable_val(drawable), GdkGC_val(gc), GdkDrawable_val(src), Int_val(xsrc), Int_val(ysrc), Int_val(xdest), Int_val(ydest), Int_val(width), Int_val(height));
+  gtk_draw_ramp(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(arrow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_shadow(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_shadow(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int * int * int * int -> unit */
+value mgtk_draw_shadow_gap(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  value gap_side = Field(mgtk_params, 8);
+  value gap_x = Field(mgtk_params, 9);
+  value gap_width = Field(mgtk_params, 10);
+  gtk_draw_shadow_gap(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height), Int_val(gap_side), Int_val(gap_x), Int_val(gap_width));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit */
+value mgtk_draw_slider(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  value orientation = Field(mgtk_params, 8);
+  gtk_draw_slider(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height), Int_val(orientation));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * string -> unit */
+value mgtk_draw_string(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value x = Field(mgtk_params, 3);
+  value y = Field(mgtk_params, 4);
+  value string = Field(mgtk_params, 5);
+  gtk_draw_string(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(x), Int_val(y), String_val(string));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int * int * int -> unit */
+value mgtk_draw_tab(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value shadow_type = Field(mgtk_params, 3);
+  value x = Field(mgtk_params, 4);
+  value y = Field(mgtk_params, 5);
+  value width = Field(mgtk_params, 6);
+  value height = Field(mgtk_params, 7);
+  gtk_draw_tab(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(shadow_type), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gtk_style * gdk_window * int * int * int * int -> unit */
+value mgtk_draw_vline(value mgtk_params) { /* ML */
+  value style = Field(mgtk_params, 0);
+  value window = Field(mgtk_params, 1);
+  value state_type = Field(mgtk_params, 2);
+  value y1 = Field(mgtk_params, 3);
+  value y2 = Field(mgtk_params, 4);
+  value x = Field(mgtk_params, 5);
+  gtk_draw_vline(GtkStyle_val(style), GdkWindow_val(window), Int_val(state_type), Int_val(y1), Int_val(y2), Int_val(x));
   return Val_unit;
 }
 
@@ -1699,6 +1903,16 @@ value mgdk_screen_width_mm(value dummy) { /* ML */
 /* ML type: unit -> int */
 value mgdk_screen_height_mm(value dummy) { /* ML */
   return Val_int(gdk_screen_height_mm());
+}
+
+/* ML type: gtkobj -> gdk_window */
+value mgtk_get_window(value widget) { /* ML */
+  return Val_GdkWindow(gtk_get_window(GtkObj_val(widget)));
+}
+
+/* ML type: gtkobj -> int */
+value mgtk_get_state(value widget) { /* ML */
+  return Val_int(gtk_get_state(GtkObj_val(widget)));
 }
 
 /* *** Data stuff *** */
@@ -6867,17 +7081,33 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val gdk_colormap_free_colors: gdk_colormap -> gdk_color -> int -> unit
     val gdk_colormap_get_system: unit -> gdk_colormap
     val gdk_colormap_get_system_size: unit -> int
-    val gdk_draw_point: gdk_drawable -> gdk_gc -> int -> int -> unit
-    val gdk_draw_line: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> unit
-    val gdk_draw_rectangle: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> int -> unit
-    val gdk_draw_arc: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> int -> int -> int -> unit
-    val gdk_draw_string: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> unit
-    val gdk_draw_text: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> int -> unit
-    val gdk_draw_pixmap: gdk_drawable -> gdk_gc -> gdk_drawable -> int -> int -> int -> int -> int -> int -> unit
+    val gdk_window_clear_area: gdk_window -> int -> int -> int -> int -> unit
+    val draw_arrow: gtk_style -> gdk_window -> state_type -> shadow_type -> arrow_type -> bool -> int -> int -> int -> int -> unit
+    val draw_box: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_box_gap: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> position_type -> int -> int -> unit
+    val draw_check: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_cross: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_diamond: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_extension: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> position_type -> unit
+    val draw_flat_box: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_focus: gtk_style -> gdk_window -> int -> int -> int -> int -> unit
+    val draw_handle: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> orientation -> unit
+    val draw_hline: gtk_style -> gdk_window -> state_type -> int -> int -> int -> unit
+    val draw_option: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_oval: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_ramp: gtk_style -> gdk_window -> state_type -> shadow_type -> arrow_type -> int -> int -> int -> int -> unit
+    val draw_shadow: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_shadow_gap: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> position_type -> int -> int -> unit
+    val draw_slider: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> orientation -> unit
+    val draw_string: gtk_style -> gdk_window -> state_type -> int -> int -> string -> unit
+    val draw_tab: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+    val draw_vline: gtk_style -> gdk_window -> state_type -> int -> int -> int -> unit
     val gdk_screen_width: unit -> int
     val gdk_screen_height: unit -> int
     val gdk_screen_width_mm: unit -> int
     val gdk_screen_height_mm: unit -> int
+    val get_window: 'a GtkWidget -> gdk_window
+    val get_state: 'a GtkWidget -> state_type
 
     (* *** Data *** *)
 
@@ -8965,31 +9195,31 @@ end
     val (GDK_RGB_DITHER_NONE,GDK_RGB_DITHER_NORMAL,GDK_RGB_DITHER_MAX)
         = get_gdk_rgb_dither_ ()
 
-    prim_type gtk_accel_group
+    type gtk_accel_group = gpointer
 
-    prim_type gtk_style
+    type gtk_style = gpointer
 
-    prim_type gtk_selection_data
+    type gtk_selection_data = gpointer
 
-    prim_type gdk_drag_context
+    type gdk_drag_context = gpointer
 
-    prim_type gdk_colormap
+    type gdk_colormap = gpointer
 
-    prim_type gdk_font
+    type gdk_font = gpointer
 
-    prim_type gdk_window
+    type gdk_window = gpointer
 
-    prim_type gdk_pixmap
+    type gdk_pixmap = gpointer
 
-    prim_type gdk_bitmap
+    type gdk_bitmap = gpointer
 
-    prim_type gdk_drawable
+    type gdk_drawable = gpointer
 
-    prim_type gdk_event
+    type gdk_event = gpointer
 
-    prim_type gdk_color
+    type gdk_color = gpointer
 
-    prim_type gdk_gc
+    type gdk_gc = gpointer
 
     val gdk_font_load_: string -> gdk_font
         = app1(symb"mgdk_font_load")
@@ -9051,40 +9281,110 @@ end
     val gdk_colormap_get_system_size: unit -> int
         = fn dummy => gdk_colormap_get_system_size_ dummy
 
-    val gdk_draw_point_: gdk_drawable -> gdk_gc -> int -> int -> unit
-        = app4(symb"mgdk_draw_point")
-    val gdk_draw_point: gdk_drawable -> gdk_gc -> int -> int -> unit
-        = fn drawable => fn gc => fn x => fn y => gdk_draw_point_ drawable gc x y
+    val gdk_window_clear_area_: gdk_window -> int -> int -> int -> int -> unit
+        = app5(symb"mgdk_window_clear_area")
+    val gdk_window_clear_area: gdk_window -> int -> int -> int -> int -> unit
+        = fn window => fn x1 => fn y1 => fn x2 => fn y2 => gdk_window_clear_area_ window x1 y1 x2 y2
 
-    val gdk_draw_line_: gdk_drawable * gdk_gc * int * int * int * int -> unit
-        = app1(symb"mgdk_draw_line")
-    val gdk_draw_line: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> unit
-        = fn drawable => fn gc => fn x1 => fn y1 => fn x2 => fn y2 => gdk_draw_line_ (drawable, gc, x1, y1, x2, y2)
+    val draw_arrow_: gtk_style * gdk_window * int * int * int * bool * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_arrow")
+    val draw_arrow: gtk_style -> gdk_window -> state_type -> shadow_type -> arrow_type -> bool -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn arrow_type => fn fill => fn x => fn y => fn width => fn height => draw_arrow_ (style, window, state_type, shadow_type, arrow_type, fill, x, y, width, height)
 
-    val gdk_draw_rectangle_: gdk_drawable * gdk_gc * int * int * int * int * int -> unit
-        = app1(symb"mgdk_draw_rectangle")
-    val gdk_draw_rectangle: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> int -> unit
-        = fn drawable => fn gc => fn filled => fn x => fn y => fn width => fn height => gdk_draw_rectangle_ (drawable, gc, filled, x, y, width, height)
+    val draw_box_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_box")
+    val draw_box: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_box_ (style, window, state_type, shadow_type, x, y, width, height)
 
-    val gdk_draw_arc_: gdk_drawable * gdk_gc * int * int * int * int * int * int * int -> unit
-        = app1(symb"mgdk_draw_arc")
-    val gdk_draw_arc: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> int -> int -> int -> unit
-        = fn drawable => fn gc => fn filled => fn x => fn y => fn width => fn height => fn angle1 => fn angle2 => gdk_draw_arc_ (drawable, gc, filled, x, y, width, height, angle1, angle2)
+    val draw_box_gap_: gtk_style * gdk_window * int * int * int * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_box_gap")
+    val draw_box_gap: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> position_type -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => fn gap_side => fn gap_x => fn gap_width => draw_box_gap_ (style, window, state_type, shadow_type, x, y, width, height, gap_side, gap_x, gap_width)
 
-    val gdk_draw_string_: gdk_drawable * gdk_font * gdk_gc * int * int * string -> unit
-        = app1(symb"mgdk_draw_string")
-    val gdk_draw_string: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> unit
-        = fn drawable => fn font => fn gc => fn x => fn y => fn str => gdk_draw_string_ (drawable, font, gc, x, y, str)
+    val draw_check_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_check")
+    val draw_check: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_check_ (style, window, state_type, shadow_type, x, y, width, height)
 
-    val gdk_draw_text_: gdk_drawable * gdk_font * gdk_gc * int * int * string * int -> unit
-        = app1(symb"mgdk_draw_text")
-    val gdk_draw_text: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> int -> unit
-        = fn drawable => fn font => fn gc => fn x => fn y => fn text => fn text_length => gdk_draw_text_ (drawable, font, gc, x, y, text, text_length)
+    val draw_cross_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_cross")
+    val draw_cross: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_cross_ (style, window, state_type, shadow_type, x, y, width, height)
 
-    val gdk_draw_pixmap_: gdk_drawable * gdk_gc * gdk_drawable * int * int * int * int * int * int -> unit
-        = app1(symb"mgdk_draw_pixmap")
-    val gdk_draw_pixmap: gdk_drawable -> gdk_gc -> gdk_drawable -> int -> int -> int -> int -> int -> int -> unit
-        = fn drawable => fn gc => fn src => fn xsrc => fn ysrc => fn xdest => fn ydest => fn width => fn height => gdk_draw_pixmap_ (drawable, gc, src, xsrc, ysrc, xdest, ydest, width, height)
+    val draw_diamond_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_diamond")
+    val draw_diamond: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_diamond_ (style, window, state_type, shadow_type, x, y, width, height)
+
+    val draw_extension_: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_extension")
+    val draw_extension: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> position_type -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => fn gap_side => draw_extension_ (style, window, state_type, shadow_type, x, y, width, height, gap_side)
+
+    val draw_flat_box_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_flat_box")
+    val draw_flat_box: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_flat_box_ (style, window, state_type, shadow_type, x, y, width, height)
+
+    val draw_focus_: gtk_style * gdk_window * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_focus")
+    val draw_focus: gtk_style -> gdk_window -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn x => fn y => fn width => fn height => draw_focus_ (style, window, x, y, width, height)
+
+    val draw_handle_: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_handle")
+    val draw_handle: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> orientation -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => fn orientation => draw_handle_ (style, window, state_type, shadow_type, x, y, width, height, orientation)
+
+    val draw_hline_: gtk_style * gdk_window * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_hline")
+    val draw_hline: gtk_style -> gdk_window -> state_type -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn x1 => fn x2 => fn y => draw_hline_ (style, window, state_type, x1, x2, y)
+
+    val draw_option_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_option")
+    val draw_option: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_option_ (style, window, state_type, shadow_type, x, y, width, height)
+
+    val draw_oval_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_oval")
+    val draw_oval: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_oval_ (style, window, state_type, shadow_type, x, y, width, height)
+
+    val draw_ramp_: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_ramp")
+    val draw_ramp: gtk_style -> gdk_window -> state_type -> shadow_type -> arrow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn arrow_type => fn x => fn y => fn width => fn height => draw_ramp_ (style, window, state_type, shadow_type, arrow_type, x, y, width, height)
+
+    val draw_shadow_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_shadow")
+    val draw_shadow: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_shadow_ (style, window, state_type, shadow_type, x, y, width, height)
+
+    val draw_shadow_gap_: gtk_style * gdk_window * int * int * int * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_shadow_gap")
+    val draw_shadow_gap: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> position_type -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => fn gap_side => fn gap_x => fn gap_width => draw_shadow_gap_ (style, window, state_type, shadow_type, x, y, width, height, gap_side, gap_x, gap_width)
+
+    val draw_slider_: gtk_style * gdk_window * int * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_slider")
+    val draw_slider: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> orientation -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => fn orientation => draw_slider_ (style, window, state_type, shadow_type, x, y, width, height, orientation)
+
+    val draw_string_: gtk_style * gdk_window * int * int * int * string -> unit
+        = app1(symb"mgtk_draw_string")
+    val draw_string: gtk_style -> gdk_window -> state_type -> int -> int -> string -> unit
+        = fn style => fn window => fn state_type => fn x => fn y => fn string => draw_string_ (style, window, state_type, x, y, string)
+
+    val draw_tab_: gtk_style * gdk_window * int * int * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_tab")
+    val draw_tab: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn shadow_type => fn x => fn y => fn width => fn height => draw_tab_ (style, window, state_type, shadow_type, x, y, width, height)
+
+    val draw_vline_: gtk_style * gdk_window * int * int * int * int -> unit
+        = app1(symb"mgtk_draw_vline")
+    val draw_vline: gtk_style -> gdk_window -> state_type -> int -> int -> int -> unit
+        = fn style => fn window => fn state_type => fn y1 => fn y2 => fn x => draw_vline_ (style, window, state_type, y1, y2, x)
 
     val gdk_screen_width_: unit -> int
         = app1(symb"mgdk_screen_width")
@@ -9105,6 +9405,16 @@ end
         = app1(symb"mgdk_screen_height_mm")
     val gdk_screen_height_mm: unit -> int
         = fn dummy => gdk_screen_height_mm_ dummy
+
+    val get_window_: gtkobj -> gdk_window
+        = app1(symb"mgtk_get_window")
+    val get_window: 'a GtkWidget -> gdk_window
+        = fn OBJ widget => get_window_ widget
+
+    val get_state_: gtkobj -> int
+        = app1(symb"mgtk_get_state")
+    val get_state: 'a GtkWidget -> state_type
+        = fn OBJ widget => get_state_ widget
 
     (* *** Data *** *)
 

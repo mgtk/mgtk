@@ -124,7 +124,7 @@ end
 (*                                                                           *)
 
 
-    prim_type gdk_color
+    type gdk_color = gpointer
 
     val gdk_color_parse_: string -> bool * gdk_color
         = app1(symb"mgdk_color_parse")

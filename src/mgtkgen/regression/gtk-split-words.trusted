@@ -127,7 +127,7 @@ end
 (*                                                                           *)
 
 
-    prim_type gdk_font
+    type gdk_font = gpointer
 
     type gdk_im_style = int
     val get_gdk_im_style_: unit -> int * int * int
