@@ -19,8 +19,11 @@ structure SMLType :> SML_TYPE = struct
       | TyApp of ty list * tyname
       | RefTy of ty
 
-    fun eqTyVar (tv,tv') = tv = tv'
-    fun eqTyName (tn,tn') = List.all (op=) (ListPair.zip(tn,tn'))
+    fun eqStr (s,s') = case String.compare(s,s') of
+			   EQUAL => true
+			 | _ => false
+    fun eqTyVar (tv,tv') = eqStr(tv,tv')
+    fun eqTyName (tn,tn') = List.all eqStr (ListPair.zip(tn,tn'))
     fun equal (t,t') =
 	case (t,t') of
 	    (IntTy, IntTy) => true

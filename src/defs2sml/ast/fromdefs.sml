@@ -19,7 +19,8 @@ structure FromDefs :> FromDefs = struct
     type map = (string, member list) Map.dict
 
     fun pairmap f (x,y) = (f x, f y)
-    val empty = Map.mkDict (String.compare o pairmap Name.toLower) (* FIXME *)
+    val empty : (string, member list ref) Map.dict
+      = Map.mkDict (String.compare o pairmap Name.toLower) (* FIXME *)
     fun new map name r = Map.insert(map, name, r)
     fun insert map name mem = 
 	case Map.peek (map, name) of

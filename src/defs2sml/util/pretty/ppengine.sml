@@ -16,7 +16,7 @@
  * tort or otherwise, arising from, out of or in connection with the
  * software or the use or other dealings in the software.
  *)
-signature PPengine = PPengine
+
 structure PPengine :> PPengine = struct
   infix --
 
@@ -229,7 +229,7 @@ structure PPengine :> PPengine = struct
 				then (w1+sn+w2, 1, Line(L1--sL--L2)) :: rest
 				else             (w2,1,Line L2) :: revl
 			    | shadd w2 L2 revl = (w2,1,Line L2) :: revl
-		  	  fun add (R,revl)
+		  	  fun add (R: 'a options,revl)
 		      	      = if not cons andalso #linwidth R <= w
 				then shadd (#linwidth R) (#linear R) revl
 				else (#get R w) :: revl
@@ -324,8 +324,8 @@ infixr 5 ^+
 infix 4 +^
 infixr 4 ++
 
-signature PPbuild = PPbuild where type 'a pptree' = 'a PPengine.pptree
-structure PPbuild :> PPbuild = struct
+structure PPbuild :> PPbuild where type 'a pptree' = 'a PPengine.pptree
+= struct
   open PPengine
   type 'a pptree' = 'a pptree
 

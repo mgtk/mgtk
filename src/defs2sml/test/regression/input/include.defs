@@ -1,0 +1,23 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+)
+
+(include "file1.inc")
+
+(define-method destroy
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_destroy")
+  (return-type "none")
+)
+
+(include "file2.inc")

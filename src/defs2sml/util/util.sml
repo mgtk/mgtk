@@ -59,7 +59,7 @@ struct
 	fun charToWord c = Word.fromInt(Char.ord c)
 	fun hashChar(c,h) = Word.<<(h,0w5) + h + 0w720 + (charToWord c)
     in
-    fun hashString s = CharVector.foldl hashChar 0w0 s
+    fun hashString s = Word.toInt(CharVector.foldl hashChar 0w0 s)
     end (* local *)
 
 end (* structure Util *)

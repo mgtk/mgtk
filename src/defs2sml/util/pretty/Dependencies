@@ -1,2 +1,3 @@
+ppengine-sig:
 ppengine:
-pretty: ppengine
+pretty: ppengine ppengine-sig

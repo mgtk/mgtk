@@ -9,7 +9,7 @@ structure DefsParse :>
     end = 
 struct
 
-    val pathList = ref []
+    val pathList: string list ref = ref []
     fun addPath p = pathList := p :: !(pathList)
 
     open Parsercomb Defs

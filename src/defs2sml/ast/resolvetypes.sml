@@ -5,7 +5,9 @@ structure ResolveTypes :> ResolveTypes = struct
 
     open Type
 
-    structure Parse = struct
+    type 'a ty = ('a,'a) Type.ty
+
+    structure Parse :> sig val toType: string -> string ty end = struct
 	open Parsercomb 
 	infix 6 $-- --$ #-- --#
 	infix 5 -- unless    
@@ -15,20 +17,20 @@ structure ResolveTypes :> ResolveTypes = struct
 
 	val num = getChars1 Char.isDigit >>* Int.fromString
 
-	val void = ($"void" || $"none") >> (fn _ => Void)
+	val void = ($"void" || $"none") >> (fn _ => Void: string ty)
 
-	val bool = $"gboolean" >> (fn _ => Base "bool")
-	val ptr = $"gpointer" >> (fn _ => Base "ptr")
-	val char = ($"gchar" || $"char") >> (fn _ => Base "char")
-	val int = $"gint" >> (fn _ => Base "int")
-	val uint = $"guint" >> (fn _ => Base "uint")
-	val float = $"gfloat" >> (fn _ => Base "float")
-	val double = $"gdouble" >> (fn _ => Base "double")
+	val bool = $"gboolean" >> (fn _ => Base "bool": string ty)
+	val ptr = $"gpointer" >> (fn _ => Base "ptr": string ty)
+	val char = ($"gchar" || $"char") >> (fn _ => Base "char": string ty)
+	val int = $"gint" >> (fn _ => Base "int": string ty)
+	val uint = $"guint" >> (fn _ => Base "uint": string ty)
+	val float = $"gfloat" >> (fn _ => Base "float": string ty)
+	val double = $"gdouble" >> (fn _ => Base "double": string ty)
 	val base = bool || int || uint || ptr || char || float || double
 
 	val dash_char = fn #"-" => true | _ => false
 	fun name_char ch = Char.isAlphaNum ch orelse dash_char ch
-	val tname = getChars1 name_char >> (fn n => Tname n)
+	val tname = getChars1 name_char >> (fn n => Tname n: string ty)
 
 	val simple = void || base || tname
 
@@ -48,8 +50,6 @@ structure ResolveTypes :> ResolveTypes = struct
 	      | SOME ty => ty
 
     end (* structure Parse *)
-
-    type 'a ty = ('a,'a) Type.ty
 
     fun resTy ty = 
 	case ty of

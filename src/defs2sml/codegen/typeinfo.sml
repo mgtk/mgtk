@@ -69,8 +69,10 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 			super=NONE}
 	in  add(table,name,info)  end
 
-    val basic =
-	[("int",       (fn _ => SMLType.IntTy,SMLType.IntTy,
+    type binfo
+      = ((unit -> string) -> SMLType.ty) * SMLType.ty * string * string * Name.name option
+    val basic: (string * binfo) list
+    =   [("int",       (fn _ => SMLType.IntTy,SMLType.IntTy,
 		        "Int_val", "Val_int", NONE))
         ,("uint",      (fn _ => SMLType.IntTy,SMLType.IntTy,
 		        "Int_val", "Val_int", NONE))
@@ -97,7 +99,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
         ]
 
     fun init () = 
-	let fun a ((n,i),t)=
+	let fun a ((n,i:binfo),t)=
 		add(t,Name.fromPaths([],[],[n]),
 		    {stype= #1 i,ptype= #2 i,toc= #3 i, 
 		     wrapped = false, fromprim = id, toprim = NONE,
@@ -261,7 +263,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       Prim.mkArrowTy(List.map (toPrimType negative tinfo o #2) pars,
 			      toPrimType (not negative) tinfo ret)
 	  | Type.Arr(len,ty) => SMLType.TyApp([],["..."]) (* FIXME *)
-    val toPrimType = toPrimType false
+    val toPrimType = fn tinfo => fn ty => toPrimType false tinfo ty
 
     local open TinySML in
     fun prependPath n exp = (* FIXME *)

@@ -1,0 +1,76 @@
+structure Gtk  = struct
+    
+    type cptr = GObject.cptr
+    signature Object = sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+    end
+    structure Object :> Object = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    signature Widget = sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+	val show : 'a t -> unit
+	val show_all : 'a t -> unit
+	val show_now : 'a t -> unit
+	val destroy : 'a t -> unit
+	val hide : 'a t -> unit
+    end
+    structure Widget :> Widget = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val show_ : cptr -> unit = _import "gtk_widget_show" : cptr -> unit;
+	val show : 'a t -> unit
+	    = fn self => GObject.withPtr (self, fn self => show_ self)
+	val show_all_ : cptr -> unit
+	    = _import "gtk_widget_show_all" : cptr -> unit;
+	val show_all : 'a t -> unit
+	    = fn self => GObject.withPtr (self, fn self => show_all_ self)
+	val show_now_ : cptr -> unit
+	    = _import "gtk_widget_show_now" : cptr -> unit;
+	val show_now : 'a t -> unit
+	    = fn self => GObject.withPtr (self, fn self => show_now_ self)
+	val destroy_ : cptr -> unit
+	    = _import "gtk_widget_destroy" : cptr -> unit;
+	val destroy : 'a t -> unit
+	    = fn self => GObject.withPtr (self, fn self => destroy_ self)
+	val hide_ : cptr -> unit = _import "gtk_widget_hide" : cptr -> unit;
+	val hide : 'a t -> unit
+	    = fn self => GObject.withPtr (self, fn self => hide_ self)
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */

@@ -21,7 +21,7 @@ signature Pretty =
 sig
 
   include PPengine where type 'a pptree = 'a PPengine.pptree
-  include PPbuild
+  include PPbuild where type 'a pptree' = 'a PPengine.pptree
 
   type device
   val htmlOutput : string * string -> device

@@ -1,0 +1,105 @@
+structure Gtk  = struct
+    
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+    signature Object = sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+    end
+    structure Object :> Object = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj = inherit () (fn () => repr obj)
+    end
+    signature Widget = sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+	val show : 'a t -> unit
+	val show_all : 'a t -> unit
+	val show_now : 'a t -> unit
+	val destroy : 'a t -> unit
+	val hide : 'a t -> unit
+    end
+    structure Widget :> Widget = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj = inherit () (fn () => repr obj)
+	val show_ : cptr -> unit = app1 (symb"mgtk_gtk_widget_show")
+	val show : 'a t -> unit = fn self => show_ (repr self)
+	val show_all_ : cptr -> unit = app1 (symb"mgtk_gtk_widget_show_all")
+	val show_all : 'a t -> unit = fn self => show_all_ (repr self)
+	val show_now_ : cptr -> unit = app1 (symb"mgtk_gtk_widget_show_now")
+	val show_now : 'a t -> unit = fn self => show_now_ (repr self)
+	val destroy_ : cptr -> unit = app1 (symb"mgtk_gtk_widget_destroy")
+	val destroy : 'a t -> unit = fn self => destroy_ (repr self)
+	val hide_ : cptr -> unit = app1 (symb"mgtk_gtk_widget_hide")
+	val hide : 'a t -> unit = fn self => hide_ (repr self)
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_show(value self) { /* ML */
+    gtk_widget_show(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_show_all(value self) { /* ML */
+    gtk_widget_show_all(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_show_now(value self) { /* ML */
+    gtk_widget_show_now(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_destroy(value self) { /* ML */
+    gtk_widget_destroy(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_hide(value self) { /* ML */
+    gtk_widget_hide(GtkObj_val(self));
+    return Val_unit;
+}
+

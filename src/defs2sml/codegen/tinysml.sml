@@ -163,8 +163,10 @@ structure TinySML :> TinySML = struct
     fun x ==> e = Fn(x,e)
 
     structure H = Polyhash
+    val hash = Polyhash.hash
     exception NotFound
-    val trans_table = H.mkPolyTable (17, NotFound)
+    val trans_table: (string,string) H.hash_table  
+      = H.mkTable (hash, op=) (17, NotFound)
     val () =
 	List.app (fn (str, trans) => H.insert trans_table (str, trans))
             [ ("and",  "an")
