@@ -1,7 +1,7 @@
 mGTK - SML bindings for gtk+
 ============================
 
-Homepage:
+Webpage:
     http://mgtk.sourceforge.net/
 
 Authors:
@@ -28,12 +28,12 @@ ABOUT
 
 mGTK is an SML interface to the C-based graphical toolkit Gtk+ (the
 Gimp Toolkit).  Gtk+ is available from the homepage:
-	http://www.gtk.org
+    http://www.gtk.org
 
 mGTK can currently be used with SML systems Moscow ML and MLton.
 
 To subscribe to the mgtk-announce mailing list go to:
-        http://lists.sourceforge.net/lists/listinfo/mgtk-announce
+    http://lists.sourceforge.net/lists/listinfo/mgtk-announce
 
 
 
@@ -53,22 +53,23 @@ please send us an email with a description of the machine.
 
 The following versions of Moscow ML or MLton, and Gtk+ are required:
 
-Moscow ML: Version 2.00 (or newer) compiled with dynlib support.  
-       Moscow ML is available from:
-	      http://www.dina.kvl.dk/~sestoft/mosml.html
+*   Moscow ML: Version 2.00 (or newer) compiled with dynlib
+    support. Moscow ML is available from:
+        http://www.dina.kvl.dk/~sestoft/mosml.html
 or
-MLton: Tested with version 20040227 and 20041109 from Debian.
-       MLton is available from:
-              http://mlton.org
 
+*   MLton: Tested with version 20040227 and 20041109 from Debian. MLton
+    is available from:
+        http://mlton.org
 
 and 
-Gtk+: mGTK will only work with the 2.4.x series.  Check your Gtk+ 
-      version with the command:
-               pkg-config --modversion gtk+-2.0
-      Gtk+ is available from:
-              http://www.gtk.org/
-              http://www.gimp.org/win32 (Windows version)
+
+*   Gtk+: mGTK will only work with the 2.4.x series.  Check your Gtk+ 
+    version with the command:
+        pkg-config --modversion gtk+-2.0
+    Gtk+ is available from:
+        http://www.gtk.org/
+        http://www.gimp.org/win32 (Windows version)
 
 
 DOCUMENTATION
