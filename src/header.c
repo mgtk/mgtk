@@ -201,32 +201,22 @@ EXTERNML value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
 /* *** Glib stuff *** */
 
 /* *** glist stuff *** */
+#define mgtk_isCons(x) (Tag_val(x) != 0)
+#define MGTK_SMLLIST_TO_GLIST(sls,gls,conv)		\
+        do {gls = NULL;					\
+	 while (mgtk_isCons(sls))			\
+	 {						\
+	   value elem = Field(sls, 0);			\
+	   gls = g_list_append (gls,conv(elem));	\
+	   sls = Field(sls, 1);				\
+	 }} while(0)
 
-#define Glist_val(x) ((GList *) Field(x, 1))
-
-#define Glist_val_nocast(x) (Field(x, 1))
-
-
-static void mgtk_finalize_glist (value val) {
-  g_list_free(Glist_val(val));
+/* Shows how MGTK_SMLLIST_TO_GLIST can be used */
+GList* mgtk_smllist_to_glist_string(value smllist) {
+  GList* glist;
+  MGTK_SMLLIST_TO_GLIST(smllist,glist,String_val);
+  return glist;
 }
-
-
-/* ML type: unit -> glist */
-EXTERNML value mgtk_glist_nil (value dummy) { /* ML */
-  value res; 
-  res = alloc_final (2, mgtk_finalize_glist, 0, 1);
-  Glist_val_nocast(res) = (value) NULL;  
-  return res; 
-}
-
-/* ML type: glist -> string -> unit */
-EXTERNML value mgtk_glist_append_string(value ls, value s) { /* ML */
-  Glist_val_nocast(ls) = (value) g_list_append (Glist_val(ls), String_val (s));
-  return Val_unit;
-}
-
-
 
 /* *** Access functions to internal widget data *** */
 
