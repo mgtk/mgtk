@@ -6,6 +6,7 @@ Milestone 1 (red-hens alpha 0.02):
 * Signals
 * Error handling, can catch gtk+ errors and convert them to
   exceptions? (Henning)
+* Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
 
 
 Milestone 2 (release version 1.0):
