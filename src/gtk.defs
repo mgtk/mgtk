@@ -606,6 +606,10 @@
   int
   ())
 
+(define-func gdk_gc_new
+  GdkGC
+  ((GdkWindow window)))
+
 (define-func gdk_gc_set_background
   none
   ((GdkGC gc)
@@ -648,6 +652,11 @@
   none
   ((GdkGC gc)
    (GdkFill fill)))
+
+(define-func gdk_gc_set_function
+  none
+  ((GdkGC gc)
+   (GdkFunction function)))
 
 (define-func gdk_gc_set_font
   none
