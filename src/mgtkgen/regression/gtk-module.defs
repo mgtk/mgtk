@@ -1,0 +1,7 @@
+(module Gtk)
+
+(define-object GtkButton (GtkWidget))
+
+(define-func gtk_button_new
+   GtkButton
+   ())
