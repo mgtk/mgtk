@@ -53,6 +53,14 @@ value mgtk_init(value args) { /* ML */
 
   gtk_init(&argc, &argv);
 
+  /*
+  value result;
+  result = alloc(argc, 0);
+  for (i=0; i<argc; i++) {
+    Field(result, i) = copy_string(argv[i]);
+  }
+  */
+
   stat_free((char *) argv);
 
   return Val_unit;
