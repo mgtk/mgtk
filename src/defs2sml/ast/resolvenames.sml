@@ -47,6 +47,7 @@ struct
 		end
 	    val seenbefore = ref (Set.empty Name.compare)
 	    fun add name = seenbefore := Set.add(!seenbefore,name)
+	    val _ = add (Name.fromString "GObject")
 	    fun lookup (full,base) =
 		if Set.member(!seenbefore, Name.fromPaths(full,[],base))
 		then (full,base,[])

@@ -80,31 +80,37 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
         ,("GtkType",   (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
 		        "Int_val", "Val_int", NONE))
         ]
+
+    fun addObject (table,name) =
+	let 
+	    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
+	    val info = {toc="GtkObj_val",fromc="Val_GtkObj",
+			ptype=SMLType.TyApp([],["cptr"]),
+			fromprim = make, wrapped = true,
+			stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
+			super=NONE}
+	in  add(table,name,info)  end
+
     fun init () = 
 	let fun a ((n,i),t)=
 		add(t,Name.fromPaths([],[],[n]),
 		    {stype= #1 i,ptype= #2 i,toc= #3 i, 
 		     wrapped = false, fromprim = id,
 		     fromc= #4 i,super= #5 i})
-	in  List.foldl a (Splaymap.mkDict Name.compare) basic
+	    val table = List.foldl a (Splaymap.mkDict Name.compare) basic
+	in  addObject(table, Name.fromString "GObject")
 	end
 
     fun build module =
 	let fun bmod (AST.Module{name,members,info=SOME(n,parent,impl)},table) = 
 		let val table' = List.foldl bmem table members
-		    val nb = Name.getBase name
 (*
+		    val nb = Name.getBase name
 		    val name' = Name.fromPaths(Name.getFullPath name@nb,
 					       Name.getPath name,
 					       nb)
 *)
-		    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
-		    val info = {toc="GtkObj_val",fromc="Val_GtkObj",
-				ptype=SMLType.TyApp([],["cptr"]),
-				fromprim = make, wrapped = true,
-				stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
-				super=NONE}
-		in  add(table',name,info)  end
+		in  addObject(table',name) end
 	      | bmod (AST.Module{name,members,info=NONE},table) = 
 		List.foldl bmem table members
 	    and bmem (AST.Sub module,table) = bmod(module,table)

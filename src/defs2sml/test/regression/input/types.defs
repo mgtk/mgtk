@@ -119,3 +119,13 @@
     '("GtkRcStyle*" "style")
   )
 )
+
+(define-function accel_groups_activate
+  (c-name "gtk_accel_groups_activate")
+  (return-type "gboolean")
+  (parameters
+    '("GObject*" "object")
+    '("guint" "accel_key")
+    '("int" "accel_mods")
+  )
+)
