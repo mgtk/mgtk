@@ -9,6 +9,8 @@ Changes since mgtk-alpha-0.01
   important'', ones. Such a signal has as it's SML connect function
   the name ``connect_<widget name>_<signal name>''.
 
+* Added some new examples
+
 * Fixed some bugs. For example,
   + command line arguments are now passed on to gtk_init.
   + short version of functions with no arguments are now also in the
