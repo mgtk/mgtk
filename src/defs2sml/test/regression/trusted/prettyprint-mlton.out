@@ -22,10 +22,9 @@ structure Gtk  = struct
 		     ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, 
 		     ref 0)
 	  in get_anchortype_ (x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, 
-			      x11, x12, x13, x14, x15, x16); 
-	     (! x0, ! x1, ! x2, ! x3, ! x4, ! x5, ! x6, ! x7, ! x8, ! x9, 
-	      ! x10, ! x11, ! x12, ! x13, ! x14, ! x15, ! x16)
-	     
+			      x11, x12, x13, x14, x15, x16)
+	   ; (!x0, !x1, !x2, !x3, !x4, !x5, !x6, !x7, !x8, !x9, !x10, !x11, 
+	      !x12, !x13, !x14, !x15, !x16)
 	  end
     type movement_step = int
     val get_movement_step_ : int ref * int ref * int ref * int ref * int ref 
@@ -42,9 +41,8 @@ structure Gtk  = struct
 	= let val (x0, x1, x2, x3, x4, x5, x6, x7, x8)
 		  = (ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, 
 		     ref 0)
-	  in get_movement_step_ (x0, x1, x2, x3, x4, x5, x6, x7, x8); 
-	     (! x0, ! x1, ! x2, ! x3, ! x4, ! x5, ! x6, ! x7, ! x8)
-	     
+	  in get_movement_step_ (x0, x1, x2, x3, x4, x5, x6, x7, x8)
+	   ; (!x0, !x1, !x2, !x3, !x4, !x5, !x6, !x7, !x8)
 	  end
     type rc_tokentype = int
     val get_rc_tokentype_
@@ -87,13 +85,11 @@ structure Gtk  = struct
 	  in get_rc_tokentype_
 	       (x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, 
 		x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, 
-		x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37); 
-	     (! x0, ! x1, ! x2, ! x3, ! x4, ! x5, ! x6, ! x7, ! x8, ! x9, 
-	      ! x10, ! x11, ! x12, ! x13, ! x14, ! x15, ! x16, ! x17, ! x18, 
-	      ! x19, ! x20, ! x21, ! x22, ! x23, ! x24, ! x25, ! x26, ! x27, 
-	      ! x28, ! x29, ! x30, ! x31, ! x32, ! x33, ! x34, ! x35, ! x36, 
-	      ! x37)
-	     
+		x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37)
+	   ; (!x0, !x1, !x2, !x3, !x4, !x5, !x6, !x7, !x8, !x9, !x10, !x11, 
+	      !x12, !x13, !x14, !x15, !x16, !x17, !x18, !x19, !x20, !x21, 
+	      !x22, !x23, !x24, !x25, !x26, !x27, !x28, !x29, !x30, !x31, 
+	      !x32, !x33, !x34, !x35, !x36, !x37)
 	  end
 end
 

@@ -162,9 +162,11 @@ struct
 
     val nullOk = parens (&"null-ok") |> NullOk
     val default = parens ("default" &-- word) >> Default
+    val output = parens (&"output" |> Output OUT || &"inout" |> Output INOUT)
     val typeName = (* too liberal since we use it also for fields *)
-	parens (typeExp -- word -- optional nullOk -- optional default)
-        >> (fn (((te,na),nu),d)=>(te,na,List.mapPartial id (nu::d::[])))
+	parens (typeExp -- word 
+                -- optional nullOk -- optional default -- optional output)
+        >> (fn ((((te,na),nu),d),out)=>(te,na,List.mapPartial id (nu::d::out::[])))
     val typeNameList = repeat0 typeName
     
     (* Objects and boxed types *)

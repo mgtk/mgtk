@@ -3,6 +3,8 @@
 
 structure Type :> TYPE = struct
 
+    datatype pass = OUT | INOUT (* no need to have IN as that is the default *)
+
     datatype ('n, 'v) ty =
 	Void
       | Base of 'n
@@ -12,6 +14,7 @@ structure Type :> TYPE = struct
       | Arr of int option * ('n,'v) ty
       | Func of (string * ('n,'v) ty) list * ('n,'v) ty
       | WithDefault of ('n,'v) ty * 'v
+      | Output of pass * ('n,'v) ty
 
     fun mapiv f g ty =
 	case ty of
@@ -24,6 +27,7 @@ structure Type :> TYPE = struct
 	  | Base n => Base (f(ty,n))
 	  | Tname n => Tname (f(ty, n))
  	  | WithDefault(ty, d) => WithDefault(mapiv f g ty, g(ty,d))
+	  | Output(p, ty) => Output(p, mapiv f g ty)
 
     fun mapi f ty = mapiv f (fn (_,d) => d) ty
     fun map f ty = mapi (fn (_,n) => f n) ty
@@ -32,7 +36,9 @@ structure Type :> TYPE = struct
     in
       fun parens my safe tree = if my<=safe then bracket "(#)" tree else tree
       fun pp ppn ppv ty =
-	  let fun p safe ty =
+	  let fun pppass OUT = ppString "out" 
+		| pppass INOUT = ppString "in/out"
+	      fun p safe ty =
 		  case ty of
 		      Void => ppString "void"
 		    | Base n => ppn n
@@ -51,6 +57,8 @@ structure Type :> TYPE = struct
 			end
 		    | WithDefault(ty,d) =>
 		        ppBinary(p safe ty, "with", ppv d)
+		    | Output(pass,ty) =>
+		        p safe ty ++ ("[" ^+ pppass pass +^ "]")
 	  in  p 0 ty end
     end (* local *)
 

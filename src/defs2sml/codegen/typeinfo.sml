@@ -221,6 +221,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Func(pars,ret) => 
 	       SMLType.ArrowTy(List.map (toSMLType tinfo fresh o #2) pars,
 			       toSMLType tinfo fresh ret)
+	  | Type.Output(pass,ty) => toSMLType tinfo fresh ty
 	  | Type.Arr(len,ty) => 
 	       raise Fail("Not implemented: toSMLType(arr)")
 	       (* FIXME 
@@ -258,6 +259,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		    handle NotFound => raise Unbound n
                )
 	  | Type.Const ty => toPrimType negative tinfo ty
+	  | Type.Output(pass, ty) => SMLType.RefTy(toPrimType negative tinfo ty)
 	  | Type.Ptr ty => SMLType.TyApp([],["cptr"])
 	  | Type.Func(pars,ret) => 
 	       Prim.mkArrowTy(List.map (toPrimType negative tinfo o #2) pars,
@@ -295,6 +297,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.WithDefault(ty,default) => toprimvalue tinfo ty
 	  | Type.Ptr ty => toprimvalue tinfo ty (* FIXME: ? *)
 	  | Type.Const ty => toprimvalue tinfo ty
+	  | Type.Output(pass,ty) => toprimvalue tinfo ty
 	  | _ => NONE
     local open TinySML in
     fun toPrimValue tinfo ty =
@@ -327,6 +330,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.WithDefault(ty,default) => fromPrimValue tinfo ty
 	  | Type.Ptr ty => fromPrimValue tinfo ty (* FIXME: ? *)
 	  | Type.Const ty => fromPrimValue tinfo ty
+	  | Type.Output(pass, ty) => fromPrimValue tinfo ty
 	  | _ => id
 
     fun isWrapped tinfo ty =
@@ -345,13 +349,23 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       )
 	  | Type.WithDefault(ty,default) => isWrapped tinfo ty
 	  | Type.Ptr ty => isWrapped tinfo ty
+	  | Type.Output(pass,ty) => isWrapped tinfo ty
 	  | _ => false
 
     fun isDefault tinfo ty =
 	case ty of
 	    Type.Ptr ty => isDefault tinfo ty
 	  | Type.Const ty => isDefault tinfo ty
+	  | Type.Output(pass,ty) => isDefault tinfo ty
 	  | Type.WithDefault(ty,default) => true
+	  | _ => false
+
+    fun isOutput isPass tinfo ty =
+	case ty of
+	    Type.Ptr ty => isOutput isPass tinfo ty
+	  | Type.Const ty => isOutput isPass tinfo ty
+	  | Type.Output(p,ty) => isPass p
+	  | Type.WithDefault(ty,default) => isOutput isPass tinfo ty
 	  | _ => false
 
     fun isString tinfo ty =
@@ -359,8 +373,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    Type.Ptr(ty as Type.Base n) =>
                Name.asType n = "char"
 	  | Type.Const ty => isString tinfo ty
+	  | Type.Output(pass,ty) => isString tinfo ty
 	  | Type.WithDefault(ty,default) => isString tinfo ty
 	  | _ => false
+
+    fun toCType tinfo ty = TinyC.TInt
 
     fun tocvalue tinfo ty =
 	case ty of
@@ -369,6 +386,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       else tocvalue tinfo ty
 	  | Type.Const ty => tocvalue tinfo ty
 	  | Type.WithDefault(ty,default) => tocvalue tinfo ty
+	  | Type.Output(pass,ty) => "&" (* YUCK *)
 	  | Type.Base n => 
                (let val info:info = lookup tinfo n
 		in  #toc info end
@@ -390,6 +408,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       if Name.asType n = "char" then ccall "my_copy_string"
 	       else fromCValue tinfo ty
 	  | Type.WithDefault(ty,default) => fromCValue tinfo ty
+	  | Type.Output(pass,ty) => fromCValue tinfo ty
 	  | Type.Base n => 
                (let val info:info = lookup tinfo n
 		in  ccall(#fromc info) end
@@ -410,25 +429,6 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Arr _ => raise Fail "fromCValue: not implemented (Arr)"
 	  | Type.Func _ => raise Fail "fromCValue: shouldn't happen (Func)"
 
-(*
-		    fun show ty =
-			let open Type
-			    fun loop Void = "void"
-			      | loop (Func(args,ret)) = 
-				   Util.stringSep "" "" " --> " (loop o #2) args
-				   ^ " --> " ^ "return_" ^ loop ret
-			      | loop (Base tn) = 
-				   (case Name.asType tn of
-					"uint" => "int"
-				      | ty => ty
-                                   )
-			      | loop (Tname tn) = 
-				   (* FIXME: ? *) "unit"
-			      | loop (Ptr ty) = loop ty
-			      | loop (Const ty) = loop ty
-			      | loop (Arr(i, ty)) = raise Fail("signal (dyn): not impl for "^name)
-			in  loop ty end
-*)
     fun toSignalType tinfo ty =
 	let fun loop ty =
 		case ty of
@@ -438,6 +438,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		  | Type.Func(args,ret) =>
 		    SMLType.ArrowTy(List.map (loop o #2) args, loop ret)
 		  | Type.WithDefault(ty,_) => loop ty
+		  | Type.Output(pass,ty) => loop ty
 		  | Type.Tname tn => SMLType.UnitTy (* FIXME: true? *)
 		  | Type.Base tn =>
 		    (let val info: info = lookup tinfo tn

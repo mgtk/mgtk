@@ -124,15 +124,21 @@ structure FromDefs :> FromDefs = struct
 	    val return = A.ApiTy(case rettype of NONE => getReturnType def
 					       | SOME rt => rt)
 	    fun applyFlags fs ty =
-		let fun loop [] (null,default) = 
-			(case default of SOME d => SOME d
-				       | NONE => null)
-		      | loop (f::fs) (null,default) =
-			(case f of NullOk => loop fs (SOME "NULL",default)
-				 | Default v => loop fs (null, SOME v))
-		in  case loop fs (NONE,NONE) of
-			SOME d => A.Defaulted(ty,d)
-		      | NONE => ty
+		let fun loop [] (null,default,out) = 
+			(case default of SOME d => (SOME d,out)
+				       | NONE => (null,out))
+		      | loop (f::fs) (null,default,out) =
+			(case f of NullOk => loop fs (SOME "NULL",default,out)
+				 | Default v => loop fs (null, SOME v, out)
+				 | Output p => loop fs (null,default,SOME p)
+			)
+		    fun mkPass (OUT) = A.OUT | mkPass (INOUT) = A.INOUT
+		    val (def,out) = loop fs (NONE,NONE,NONE)
+		    val ty = case def of SOME d => A.Defaulted(ty,d) 
+				       | NONE => ty
+		    val ty = case out of SOME p => A.Output(mkPass p,ty)
+				       | NONE => ty
+		in  ty
 		end
 
 	    val params = map (fn(n,t,f)=>(n,applyFlags f (A.ApiTy t)))

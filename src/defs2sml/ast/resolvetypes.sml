@@ -55,6 +55,9 @@ structure ResolveTypes :> ResolveTypes = struct
 	case ty of
 	    AST.ApiTy str => Parse.toType str
 	  | AST.Defaulted(ty, v) => WithDefault(resTy ty, v)
+	  | AST.Output(pass,ty) => Output(case pass of AST.OUT => OUT
+						     | AST.INOUT => INOUT,
+					  resTy ty)
           | AST.ArrowTy(pars, ret) =>
 		Func(List.map (fn (n,t) => (n,resTy t)) pars,  resTy ret)
     fun resTy' ty = 

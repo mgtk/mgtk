@@ -160,6 +160,7 @@ structure Gtk  = struct
 	val POPUP : type_t
 	val new : type_t option -> base t
 	val new' : unit -> base t
+	val get_size : 'a t -> int * int
     end
     structure Window :> Window = struct
 	type cptr = GObject.cptr
@@ -177,11 +178,22 @@ structure Gtk  = struct
 	val get_type_t_ : int ref * int ref -> unit
 	    = _import "mgtk_get_gtk_window_type" : int ref * int ref -> unit;
 	val (TOPLEVEL, POPUP) = let val (x0, x1) = (ref 0, ref 0)
-				in get_type_t_ (x0, x1); (! x0, ! x1)  end
+				in get_type_t_ (x0, x1)
+				 ; (!x0, !x1)
+				end
 	val new_ : int -> cptr = _import "gtk_window_new" : int -> cptr;
 	val new : type_t option -> base t
 	    = fn typ => make (new_ (getOpt (typ, TOPLEVEL)))
 	val new' : unit -> base t = fn dummy => make (new_ TOPLEVEL)
+	val get_size_ : cptr * int ref * int ref -> unit
+	    = _import "gtk_window_get_size" : cptr * int ref * int ref -> unit;
+	val get_size : 'a t -> int * int
+	    = fn self =>
+		 let val (width, height) = (ref 0, ref 0)
+		 in GObject.withPtr
+		      (self, fn self => get_size_ (self, width, height))
+		  ; (!width, !height)
+		 end
     end
     signature Button = sig
 	type base

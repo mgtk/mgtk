@@ -19,6 +19,8 @@ signature SML_TYPE = sig
       | TyApp of ty list * tyname
       | RefTy of ty
 
+    val mkTuple : ty list -> ty
+
     val eqTyName : tyname * tyname -> bool
     val eqTyVar  :  tyvar * tyvar  -> bool
     val equal    :     ty * ty     -> bool

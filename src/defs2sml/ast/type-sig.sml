@@ -3,6 +3,8 @@
 
 signature TYPE = sig
 
+    datatype pass = OUT | INOUT (* no need to have IN as that is the default *)
+
     datatype ('n, 'v) ty =
 	Void
       | Base of 'n
@@ -12,6 +14,7 @@ signature TYPE = sig
       | Arr of int option * ('n,'v) ty
       | Func of (string * ('n,'v) ty) list * ('n,'v) ty
       | WithDefault of ('n,'v) ty * 'v
+      | Output of pass * ('n,'v) ty
 
     val pp : 'n Pretty.pp -> 'v Pretty.pp -> ('n,'v) ty Pretty.pp
 

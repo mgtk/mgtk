@@ -128,6 +128,8 @@ struct
     (* convenience *)
     open TinySML
     structure TypeInfo = Prims.TypeInfo
+    structure P = Prims
+    structure TI = TypeInfo
 
     infix ++
     fun d1 ++ d2 = Some(SeqDecl[d1,d2])
@@ -184,7 +186,7 @@ struct
     fun transCValue tinfo (ty, value) =
 	let val v = Name.toString value (* FIXME: trim the string here *)
 	in  if String.size v = 0 then raise Fail("Unrecognized C value: "^Name.toString' value)
-	    else if Prims.TypeInfo.isString tinfo ty andalso v = "NULL" 
+	    else if P.TypeInfo.isString tinfo ty andalso v = "NULL" 
 	         then Const "\"\"" (* converted to a primitive string in
                                       callStub *)
 	    else if v = "NULL" then Var("GObject.null")
@@ -208,72 +210,117 @@ struct
                        = fn label => makeBut(new_with_label_ label)
             *)
 	    AST.Method ty => 
-		let val cname = Prims.mkMethodName name
+		let val cname = P.mkMethodName name
 		    val name = Name.asMethod name
 		    val parsty = Type.getParams ty
 		    val (pars,tys) = ListPair.unzip parsty
+		    val ret     = Type.getRetType ty
 		    fun ubnd n =
 			raise Skip("Unbound type name: "^Name.toString' n)
 
+                    (* convenience *)
+		    val parFn = fn f => f tinfo o #2
+		    val isOut = TI.isOutput (fn _ => true)
+		    val isOutOut = TI.isOutput (fn Type.OUT => true
+						 | Type.INOUT => false)
+
+                    (* parameter list helpers *)
 		    fun var (par,ty) = (Var par, ty)
 		    fun prim (par,ty) = 
 			(TypeInfo.toPrimValue tinfo ty par, ty)
 			handle TypeInfo.Unbound n => ubnd n
 		    fun trans (par, ty) = 
 			(par, Type.mapiv (fn (ty,n)=>n) (transCValue tinfo) ty)
-
-		    val pars' = List.map (trans o prim o var) parsty
-
-		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
-		    fun fromtype ty = 
-			fromtype' ty handle TypeInfo.Unbound n => ubnd n
-		    fun primtypeFromType ty = 
-			TypeInfo.toPrimType tinfo ty
-			handle TypeInfo.Unbound n => ubnd n
-		    val params = Type.getParams ty
-		    val ret    = Type.getRetType ty
-		    val params' = List.map (fromtype o #2) params
-		    val ret'    = TypeInfo.toSMLType tinfo (fn _ => "base") ret
-				  handle TypeInfo.Unbound n => ubnd n
-		    fun isDefault (p, Type.WithDefault _) = true
-		      | isDefault _ = false
-		    val with_defaults = List.exists isDefault parsty
-		    fun fromprim ty e =
-			TypeInfo.fromPrimValue tinfo ty e
-			handle TypeInfo.Unbound n => ubnd n
-		    val primty = primtypeFromType ty
-		    val stubcall = Prims.callStub tinfo name ret pars'
-		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
-		    fun fromtype ty = 
-			fromtype' ty handle TypeInfo.Unbound n => ubnd n
-
 		    fun default (_, t as Type.WithDefault(ty,v)) = 
 			(transCValue tinfo (ty,v), ty)
 		                      (* the second ty above is correct here to
 				         avoid extra calls to withPtr *)
-		      | default (p, ty) = prim (Var p, ty)
-		    val defpars = List.map (trans o default) parsty
+		      | default (p, ty) = prim (p, ty)
+
+                    (* type-based helpers *)
+		    val seqfrom = TypeInfo.toSMLTypeSeq tinfo
+		    val fromtype = fn ty => seqfrom ty 
+				      handle TypeInfo.Unbound n => ubnd n
+		    val fromtypeclosed = 
+			fn ty => TypeInfo.toSMLType tinfo (fn _ => "base") ty
+			   handle TypeInfo.Unbound n => ubnd n
+		    val primfrom = fn ty => TypeInfo.toPrimType tinfo ty
+				      handle TypeInfo.Unbound n => ubnd n
+		    fun fromprim ty e =
+			TypeInfo.fromPrimValue tinfo ty e
+			handle TypeInfo.Unbound n => ubnd n
+
+                    (* generate code that handles output parameters 
+                       - returns a "wrapped" stub call and the list
+                         of parameters to be used for the exported
+                         version of the function *)
+		    fun mkOutputStub with_outputs ret call =
+			if with_outputs then
+			    let val outputs = List.filter (parFn isOut) parsty
+
+				val non = List.filter (not o parFn isOutOut) parsty
+				fun refe e = App(Long(Name.fromString "ref"), [e])
+				fun deref e = App(Var("!"), [e])
+				fun inout (v,t) =
+				    if TypeInfo.isOutput (fn Type.INOUT => true | Type.OUT => false) tinfo t
+				    then refe (Var v)
+				    else refe (Const "0")
+				val ret = (case ret of Type.Void => []
+						     | ty => [ty])
+					  @ (List.map #2 outputs)
+			    in  (Let(ValDecl(TupPat(List.map (VarPat o #1) outputs), None, 
+					     Tup(List.map inout outputs)),
+				     SeqExp[ call
+					   , Tup(List.map (deref o Var o #1) outputs)
+					   ]
+				     ),
+				 non, ret)
+			    end
+			else 
+			    (call, parsty, [ret])
+
+		    val with_defaults =	List.exists (parFn TI.isDefault) parsty
+		    val with_outputs =  List.exists (parFn isOut)        parsty
+
+		    val stub = P.callStub tinfo name ret
+			                  (map (trans o prim o var) parsty)
+
+		    val (stub, outparsty, outret) = 
+			mkOutputStub with_outputs ret stub
+
+		    val params_ml = List.map (fromtype o #2) outparsty
+		    val ret_ml    = SMLType.mkTuple(List.map fromtypeclosed outret)
+		    val ty_ml     = SMLType.ArrowTy(params_ml, ret_ml)
+
+		    val primty = primfrom ty
+
+		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
+		    fun fromtype ty = 
+			fromtype' ty handle TypeInfo.Unbound n => ubnd n
+
+		    val defpars = List.map (trans o default o var) parsty
 		    val defparams = 
 			List.map (fromtype o #2) 
-				 (List.filter (not o isDefault) params)
+				 (List.filter (not o (TypeInfo.isDefault tinfo) o #2) parsty)
 		    val defparams = if List.length defparams = 0 then
 					[SMLType.UnitTy]
 				    else defparams
-		    val defpars' = List.map #1 (List.filter (not o isDefault) params)
+		    val defpars' = List.map #1 (List.filter (not o (TypeInfo.isDefault tinfo) o #2) parsty)
 		    val defpars' = if List.length defpars' = 0 then
 				        ["dummy"]
 				   else defpars'
-		    val stubcall' = Prims.callStub tinfo name ret defpars
+		    val (stubcall',_,_) = mkOutputStub with_outputs ret (P.callStub tinfo name ret defpars)
 		in  StrOnly(
                        ValDecl(VarPat(name^"_"), Some primty,
-			       Prims.ccall cname (List.length pars) primty))
+			       P.ccall cname (List.length parsty) primty))
                  ++ Some(
-                       ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),
-			       List.foldr Fn (fromprim ret stubcall) pars))
+                       ValDecl(VarPat name, Some ty_ml,
+			       List.foldr Fn (fromprim ret stub) 
+					  (List.map #1 outparsty)))
                  ++ (if with_defaults then 
 		      Some(
 			ValDecl(VarPat(name^"'"), 
-				Some(SMLType.ArrowTy(defparams, ret')),
+				Some(SMLType.ArrowTy(defparams, ret_ml)),
 				List.foldr Fn (fromprim ret stubcall') defpars'))
 		     else None)
 		end
@@ -291,15 +338,15 @@ struct
 	  | AST.Enum(flag,consts) => 
 	        let val cname = Name.asCEnum name
 		    val name = Name.asEnum name
-		    val primty = Prims.getEnumsTy (List.length consts)
+		    val primty = P.getEnumsTy (List.length consts)
 		    val decs = List.map (fn c => SigOnly(ValDecl(VarPat(Name.asEnumConst c),Some(TyApp([],[name])),Const "1"))) consts
 		in  Some(SeqDecl(
 	            Some(TypeDecl(([],[name]), StrOnly IntTy))
                  :: decs
                 @ [ StrOnly(ValDecl(VarPat("get_" ^ name ^ "_"), Some primty,
-			    Prims.ccall ("mgtk_get_"^cname) 1 primty))
+			    P.ccall ("mgtk_get_"^cname) 1 primty))
 		  , StrOnly(ValDecl(TupPat(List.map (VarPat o Name.asEnumConst) consts), None,
-			    Prims.getEnums name consts))
+			    P.getEnums name consts))
                   ]))
 		end
 
@@ -310,7 +357,7 @@ struct
           | AST.Field ty => 
 		let val name = Name.asField name
 		in  StrOnly(ValDecl(VarPat ("get_"^name), None, 
-			    Prims.ccall ("mgtk_get_"^name) 1 IntTy))
+			    P.ccall ("mgtk_get_"^name) 1 IntTy))
 		end
 
 (*
@@ -375,7 +422,7 @@ struct
 
 	    fun f (i,a) = TyApp([a], [Name.asModule i ^ ".t"])
 	    val path = List.foldl f (TyApp([TyVar "'a"], [witness_t])) impl
-	in  Some(SeqDecl(List.map StrOnly Prims.strHeader))
+	in  Some(SeqDecl(List.map StrOnly P.strHeader))
          ++ Some(TypeDecl(([],[base_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[witness_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[type_t]), 
@@ -401,7 +448,7 @@ struct
 		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")])))
 	 ++ Some(FunDecl("to"^Name.asModule name, [VarPat "obj"],
 	         Some(TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"])),
-		 Prims.mkToFunc ()))
+		 P.mkToFunc ()))
          ++ StrOnly(Comment NONE)
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)
@@ -426,7 +473,7 @@ struct
 	    [ CoreDec (trans tinfo (name,info)) ]
     in  fun translate tinfo (Module{name,members,info}) =
 	    let val name = Name.asModule name
-		val head = CoreDec(Some(SeqDecl(List.map StrOnly Prims.strHeader)))
+		val head = CoreDec(Some(SeqDecl(List.map StrOnly P.strHeader)))
 		val contents = 
 		      (head :: List.concat(List.map (transMem tinfo) members))
 	    in  StrDec(name, NONE, contents)

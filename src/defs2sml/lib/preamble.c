@@ -27,6 +27,9 @@ EXTERNML value my_copy_string(const char *s) {
 #define Char_val(c)	((char) Long_val(c))
 #define Val_char(c)	(Val_long((long) c))
 
+#define GetRefVal(r) (Field(r, 0))
+#define SetRefVal(r, v) (modify(&Field(r,0), v))
+
 /* TODO: 
 
    . Don't use void* so extensively.  Use the cast functions provided by gtk.

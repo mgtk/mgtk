@@ -134,7 +134,9 @@ structure Gtk  = struct
 		      : int ref * int ref * int ref -> unit;
 	val (MODAL, DESTROY_WITH_PARENT, NO_SEPARATOR)
 	    = let val (x0, x1, x2) = (ref 0, ref 0, ref 0)
-	      in get_flags_ (x0, x1, x2); (! x0, ! x1, ! x2)  end
+	      in get_flags_ (x0, x1, x2)
+	       ; (!x0, !x1, !x2)
+	      end
 	val new_with_buttons_
 	  : CString.cstring * cptr * int * CString.cstring -> cptr
 	    = _import "gtk_dialog_new_with_buttons"

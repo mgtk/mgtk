@@ -4,7 +4,8 @@
 structure Defs = struct
 
     type type_exp = string
-    datatype type_flags = NullOk | Default of string
+    datatype pass = OUT | INOUT
+    datatype type_flags = NullOk | Default of string | Output of pass
     type type_name_list = (type_exp * string * type_flags list) list
 
     type value_list = (string * string) list

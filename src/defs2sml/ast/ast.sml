@@ -76,10 +76,12 @@ struct
       | Boxed of {copy:string, release:string} option
       | Enum of bool (* flag? *) * 'n list
       | Signal of 't
-    and api_type =
+    datatype pass = OUT | INOUT
+    datatype api_type =
         ApiTy of string
       | ArrowTy of (string * api_type) list * api_type
       | Defaulted of api_type * string
+      | Output of pass * api_type
 
     type ('n,'t) ast_module = 
 	 ('n, 
@@ -103,6 +105,9 @@ struct
     fun ppAstType (ApiTy s) = Pretty.ppString s
       | ppAstType (Defaulted(ty,v)) = 
 	  ppAstType ty ++ ("with "^+ ppString v)
+      | ppAstType (Output(pass,ty)) =
+	  ppAstType ty ++ ("[" ^+ ppString(case pass of INOUT => "in/out"
+						      | OUT => "out") +^ "]")
       | ppAstType (ArrowTy (pars,ret)) =
 	  let fun f (par,ty) = ppBinary(ppString par,":",ppAstType ty)
 	  in  ppBinary(ilist " #* " f pars, "->", ppAstType ret) end

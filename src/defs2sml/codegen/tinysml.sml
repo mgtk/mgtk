@@ -206,6 +206,7 @@ structure TinySML :> TinySML = struct
 		case e of
                     (* special case some idioms *)
 		    App(Var "symb",[Str s]) => ppString("(symb\""^s^"\")")
+		  | App(Var "!", [e as Var v]) => "!" ^+ ppexp level e
 
                     (* then the general stuff *)
 		  | Unit => ppString "()"
@@ -234,7 +235,7 @@ structure TinySML :> TinySML = struct
 		  | Tup [] => ppString "()"
 		  | Tup [e] => ppexp level e
 		  | Tup es => pperoundlist es
-		  | SeqExp es => ppelist "" "" ";" es
+		  | SeqExp es => clist "#; " (forcemulti o ppexp 1) es
 		  | Let(d,e) => pplet (Let(d,e))
 	    and pperoundlist es = bracket "(#)" (ilist ", #" (ppexp 1) es)
 	    and ppelist start finish sep es =

@@ -54,8 +54,9 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 		    fun ubnd n =
 			raise Skip("Unbound type name: "^Name.toString n)
 		    fun f (par,Type.Void) = NONE
-		      | f (par,ty) = SOME(TypeInfo.toCValue typeinfo ty (Var par))
-				     handle TypeInfo.Unbound n => ubnd n
+		      | f (par,ty) = 
+			(SOME(TypeInfo.toCValue typeinfo ty (Var par))
+			 handle TypeInfo.Unbound n => ubnd n)
 		    val parsty' = List.mapPartial f parsty
 		    val ret = Type.getRetType ty
 
@@ -63,15 +64,25 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 		    val extract = if List.length parsty > 5 
 				  then List.map f (ListPair.zip(parsty,List.tabulate(List.length parsty, fn i=>i)))
 				  else []
+		    val (outputs,build) = 
+			let fun f (p,t as Type.Output(_,ty)) = 
+				SOME(VDecl(p,TypeInfo.toCType typeinfo ty,SOME(TypeInfo.toCValue typeinfo ty (Call("GetRefVal",NONE, [Var (p^"_ref")])))),
+				     Exp(Call("SetRefVal",NONE,[Var(p^"_ref"),TypeInfo.fromCValue typeinfo ty (Var p)])))
+			      | f (p,t) = NONE
+			in  ListPair.unzip(List.mapPartial f parsty) end
 		    val call = TypeInfo.fromCValue typeinfo ret (Call(Name.asCFunc name, NONE, parsty'))
 			       handle TypeInfo.Unbound n => ubnd n
 		    val body = 
-			Block(NONE,extract, 
+			Block(NONE,extract@outputs,
 			  Comment "ML" ::
-                          (if isVoid ret then [Exp(call),Return(Var("Val_unit"))]
+                          (if isVoid ret then Exp(call) :: build @ [Return(Var("Val_unit"))]
 			   else [Return(call)])
                         )
-		    fun f (par,ty) = (par,TValue)
+		    fun f (par,ty) = 
+			(if TypeInfo.isOutput (fn _=>true) typeinfo ty
+			 then par^"_ref"
+			 else par,
+			 TValue)
 		in  [(Fun(Proto(SOME"EXTERNML",Name.asCStub name, map f args, TValue), 
 			  body),
 		      SOME ty)]

@@ -172,6 +172,16 @@
   )
 )
 
+(define-method get_size
+  (c-name "gtk_window_get_size")
+  (of-object "GtkWindow")
+  (return-type "none")
+  (parameters
+    '("gint" "width" (output))
+     ("gint" "height" (output))
+  )
+)
+
 (define-function gtk_button_get_type
   (c-name "gtk_button_get_type")
   (return-type "GType")

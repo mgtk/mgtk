@@ -19,6 +19,9 @@ structure SMLType :> SML_TYPE = struct
       | TyApp of ty list * tyname
       | RefTy of ty
 
+    fun mkTuple [ty] = ty
+      | mkTuple tys = TupTy tys
+
     fun eqStr (s,s') = case String.compare(s,s') of
 			   EQUAL => true
 			 | _ => false

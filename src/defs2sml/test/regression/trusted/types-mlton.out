@@ -15,9 +15,8 @@ structure Gtk  = struct
 	 ICON_SIZE_DIALOG)
 	= let val (x0, x1, x2, x3, x4, x5, x6)
 		  = (ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0)
-	  in get_icon_size_ (x0, x1, x2, x3, x4, x5, x6); 
-	     (! x0, ! x1, ! x2, ! x3, ! x4, ! x5, ! x6)
-	     
+	  in get_icon_size_ (x0, x1, x2, x3, x4, x5, x6)
+	   ; (!x0, !x1, !x2, !x3, !x4, !x5, !x6)
 	  end
     val icon_size_register_ : CString.cstring * int * int -> int
 	= _import "gtk_icon_size_register"
@@ -197,9 +196,8 @@ structure Gtk  = struct
 	     WEEK_START_MONDAY)
 	    = let val (x0, x1, x2, x3, x4)
 		      = (ref 0, ref 0, ref 0, ref 0, ref 0)
-	      in get_display_options_ (x0, x1, x2, x3, x4); 
-		 (! x0, ! x1, ! x2, ! x3, ! x4)
-		 
+	      in get_display_options_ (x0, x1, x2, x3, x4)
+	       ; (!x0, !x1, !x2, !x3, !x4)
 	      end
 	val display_options_ : cptr * int -> unit
 	    = _import "gtk_calendar_display_options" : cptr * int -> unit;

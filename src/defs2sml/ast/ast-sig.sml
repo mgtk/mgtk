@@ -31,10 +31,12 @@ sig
       | Boxed of {copy: string, release: string} option
       | Enum of bool (* flag? *) * 'n list
       | Signal of 't
-    and api_type =
+    datatype pass = OUT | INOUT
+    datatype api_type =
         ApiTy of string
       | ArrowTy of (string * api_type) list * api_type
       | Defaulted of api_type * string
+      | Output of pass * api_type
 
     type ('n,'t) ast_module = 
 	 ('n, 
