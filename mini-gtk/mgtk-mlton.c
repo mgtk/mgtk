@@ -29,11 +29,7 @@
 
 
 EXTERNML void mgtk_init(char** argv, int argc) { /* ML */
-  printf("Before init\n");
   gtk_init(&argc, &argv);
-  printf("after init\n");
-
-
 }
 
 
