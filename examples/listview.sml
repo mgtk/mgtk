@@ -42,6 +42,8 @@ fun setUpGui() =
                      ; TreeView.add_column tv col
                      ; col
                    end
+            
+        (*** DEFECTS CITY STARTS HERE ***)
                        
         val store = let val store = ListStore.new [GType.string, GType.string]
                     in  TreeView.set_model tv (SOME store)

@@ -4,6 +4,15 @@ An example adopted from "Mono, A Developers Notebook"
 (04-gtk/07-listview).  Shows how to use TreeView as a grid-like
 widget.
 
+Defects:
+  - The program does not compile.
+  - To use a ListStore we need two varargs functions:
+       - new (or the language binding-friendly version newv)
+         For this we also need to wrap GType somehow
+       - set (or set_valist)
+  - We need to handle GtkTreeIter, in particullar as the return
+    (actually out-param) for append. 
+        
 
 
 menus.sml
