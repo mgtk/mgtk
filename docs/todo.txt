@@ -1,6 +1,8 @@
 ----------------------------------------------------------------------
 + Space leak with static_strings. This is simple to fix---do it!
 
++ Add support for constructed data (lists, arrays, etc.)
+
 + Is the output satisfactory. I know some lines are very long---
   perhaps we could find some heuristic to improve this. This is
   a minor issue since people aren't expected to look at the generated
