@@ -21,6 +21,14 @@ struct
     infix 2 >>=
     infix 0 ||
 
+    (* character categories *)
+    fun quoteSymb c = c = #"\""
+    val letterSymb = Char.isAlpha
+    val digitSymb  = Char.isDigit
+    fun wordSymb #"-" = true
+      | wordSymb #"_" = true
+      | wordSymb c = letterSymb c orelse digitSymb c
+
     (* lexer like definitions *)
     val comment = skipWS (";" $-- (getChars0 (fn c=>not(c= #"\n"))) --$ "\n")
     fun skipComment pf = repeat0 comment #-- skipWS pf
@@ -38,13 +46,6 @@ struct
     val defSignal = $ "define-signal"
     val listQual = $ "list"
 
-    fun quoteSymb c = c = #"\""
-    val letterSymb = Char.isAlpha
-    val digitSymb  = Char.isDigit
-    fun wordSymb #"-" = true
-      | wordSymb #"_" = true
-      | wordSymb c = letterSymb c orelse digitSymb c
-
     (* word actually allows slightly more than we want --- words
        should not begin with a digit, underscore, or hypen. *)
     val word   = skipCommentWS (getChars1 wordSymb)
@@ -53,8 +54,8 @@ struct
     val openParen  = skipCommentWS ($# #"(")
     val closeParen = skipCommentWS ($# #")")
 
-    fun parenthesized pf = skipCommentWS (openParen #-- pf --# closeParen)
-    fun parenthesized' pf = skipCommentWS (withPos (openParen #-- pf --# closeParen))
+    fun parens pf  = skipCommentWS (openParen #-- pf --# closeParen)
+    fun parens' pf = skipCommentWS (withPos (openParen #-- pf --# closeParen))
 
     (* name resolution *)
     local
@@ -159,26 +160,26 @@ struct
 
     (* various *)
     val typeExp =  (word >> (mkLong o mkTypeExp))
-                || (parenthesized (word --# listQual) >> (mkLong o TE.LIST o mkLong o mkTypeExp))
+                || (parens (word --# listQual) >> (mkLong o TE.LIST o mkLong o mkTypeExp))
 
     (* parameters *)
-    val default = parenthesized (equals #-- string)
-    val flag =  (parenthesized ($ "null-ok") >> (fn _ => NULL_TYPE))
-             || (parenthesized ($ "output")  >> (fn _ => OUTPUT_TYPE))
-    val par = parenthesized (typeExp -- word)
-    val parWithOptDefault = parenthesized 
+    val default = parens (equals #-- string)
+    val flag =  (parens ($ "null-ok") >> (fn _ => NULL_TYPE))
+             || (parens ($ "output")  >> (fn _ => OUTPUT_TYPE))
+    val par = parens (typeExp -- word)
+    val parWithOptDefault = parens 
 	(   typeExp
 	 -- word
 	 -- (optional flag)
 	--# (optional default)
 	)   >> toType
-    val parList = parenthesized (repeat0 par)
-    val parDefaultList = parenthesized (repeat0 parWithOptDefault) >> ensureNonEmpty 
+    val parList = parens (repeat0 par)
+    val parDefaultList = parens (repeat0 parWithOptDefault) >> ensureNonEmpty 
 
     (* objects *)
-    val inherits = parenthesized word
-    val fieldList = parenthesized (fields #-- repeat1 par) >> op::
-    val objDecl = parenthesized' 
+    val inherits = parens word
+    val fieldList = parens (fields #-- repeat1 par) >> op::
+    val objDecl = parens' 
 	(   defObj
 	#-- word
 	 -- inherits
@@ -186,7 +187,7 @@ struct
 	)
 
     (* functions *)
-    val fncDecl = parenthesized' 
+    val fncDecl = parens' 
 	(   defFnc
 	#-- word
 	 -- typeExp
@@ -194,15 +195,15 @@ struct
 	)
 
     (* enums/flags *)
-    val constr = parenthesized (word #-- word)
+    val constr = parens (word #-- word)
     val constructors = repeat1 constr >> (op ::)
-    val enumDecl = parenthesized' (defEnum #-- word -- constructors)
-    val flagsDecl = parenthesized' (defFlags #-- word -- constructors)
+    val enumDecl = parens' (defEnum #-- word -- constructors)
+    val flagsDecl = parens' (defFlags #-- word -- constructors)
 
     (* boxed types *)
     val size = string 
-    val inherits = optional (parenthesized (optional word)) >> mkBoxedInherits
-    val boxedDecl = parenthesized' 
+    val inherits = optional (parens (optional word)) >> mkBoxedInherits
+    val boxedDecl = parens' 
 	(   defBoxed 
 	#-- word
 	 -- inherits
@@ -211,10 +212,10 @@ struct
 	)
 
     (* signals *)
-    val cbType = parenthesized (typeExp -- parList) >> mkCBType
+    val cbType = parens (typeExp -- parList) >> mkCBType
     val signalName = (string >> (fn n => [n]))
-                  || (parenthesized (string -- string) >> (fn (n,p) => [p,n]))
-    val signalDecl = parenthesized' 
+                  || (parens (string -- string) >> (fn (n,p) => [p,n]))
+    val signalDecl = parens' 
 	(   defSignal
 	#-- word
 	 -- signalName
