@@ -16,6 +16,8 @@ MGTKOBJS=Gtk.ui Gtk.uo mgtk.so
 CFILES=mgtk.c
 COBJS=mgtk.o
 
+GENPROG=mgtkgen/mgtkgen
+
 SUBDIRS=mgtkgen
 
 all: mgtkobjs
