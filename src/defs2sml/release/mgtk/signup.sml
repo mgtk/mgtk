@@ -25,7 +25,7 @@ fun setUpGui() =
 
         val l = let val l = Label.new (SOME("<span weight=\"bold\" size=\"larger\">" ^
 			   "Enter your name and preferred address</span>"))
-                in   Misc.set_alignment l 0.0 0.5 (* Left align X and center i Y *)
+                in   Misc.set_alignment l 0.0 0.5 (* Left align X and center Y *)
                    ; Label.set_use_markup l true
                    ; Box.pack_start outerv l (SOME false) (SOME false) (SOME 0)
                    ; l
