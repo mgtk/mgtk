@@ -17,8 +17,8 @@ struct
     type cstring = string 
     fun fromString s = s ^ "\000"
 
-    type t = MLton.pointer
-    val sub = _ffi "mgtk_stringsub" : t * int -> char;
+    type t = MLton.Pointer.t
+    val sub = _import "mgtk_stringsub" : t * int -> char;
 
     fun toVector t =
         let fun size i = if sub(t, i) = #"\000" then i
@@ -28,7 +28,7 @@ struct
 
     val toString = toVector
 
-    val free = _ffi "free" : t -> unit;
+    val free = _import "free" : t -> unit;
 end
 
 
@@ -46,7 +46,7 @@ structure GtkBasis :> GtkBasis =
 struct
     structure AS = ArraySlice
     (* Basic GTK stuff *)
-    val gtk_init_ = _ffi "mgtk_init" 
+    val gtk_init_ = _import "mgtk_init" 
                   : CString.cstring array * int -> unit;
     fun init args = 
 	let val args =
@@ -58,8 +58,8 @@ struct
         in  gtk_init_(argv, Array.length argv)
 	end
 
-    val main      = _ffi "gtk_main" : unit -> unit;
-    val main_quit = _ffi "gtk_main_quit" : unit -> unit; 
+    val main      = _import "gtk_main" : unit -> unit;
+    val main_quit = _import "gtk_main_quit" : unit -> unit; 
 end
 
 
@@ -82,7 +82,7 @@ struct
     structure F = MLton.Finalizable
 (*    structure FXP = FinalizableXP
 *)
-    type cptr = MLton.pointer
+    type cptr = MLton.Pointer.t
     type base = unit
 
     (* A litle type cleverness *)
@@ -92,8 +92,8 @@ struct
 
     fun withPtr (OBJ ptr, f) = F.withValue(ptr, f)
 
-    val object_ref = _ffi "g_object_ref" : cptr -> cptr;
-    val object_unref = _ffi "g_object_ref" : cptr -> unit;
+    val object_ref = _import "g_object_ref" : cptr -> cptr;
+    val object_unref = _import "g_object_ref" : cptr -> unit;
     
     fun inherit _ con = let val ptr = object_ref(con())
                             val obj = F.new ptr
@@ -145,8 +145,8 @@ struct
         structure GO = GObject
         structure CT = Callbacktable
 
-        type GValues = MLton.pointer
-        type GValue = MLton.pointer
+        type GValues = MLton.Pointer.t
+        type GValue = MLton.Pointer.t
 
         type callback_data = GValue * GValues * int
 	type callback = callback_data -> unit
@@ -184,7 +184,7 @@ struct
 		
 
 	fun register f = localId(fn id => (add (id, f); id))
-	val signal_connect = _ffi "mgtk_signal_connect"
+	val signal_connect = _import "mgtk_signal_connect"
                            : GO.cptr * CString.cstring * int * bool -> int;
 
 
@@ -194,16 +194,16 @@ struct
         (* UNSAFE: no error checking in the set and get functions! *)
         type 'a setter_ = GValue * 'a -> unit
         type 'a setter = GValue -> 'a -> unit
-        val setBool = _ffi "g_value_set_boolean" : bool setter_;
+        val setBool = _import "g_value_set_boolean" : bool setter_;
         val setBool = curry setBool
-        val setInt  = _ffi "g_value_set_long" : int setter_;  
+        val setInt  = _import "g_value_set_long" : int setter_;  
         val setInt  = curry setInt
 
         type 'a getter_ = GValues * int -> 'a
         type 'a getter = GValues -> int -> 'a
-        val getBool = _ffi "mgtk_get_pos_bool" : bool getter_;
+        val getBool = _import "mgtk_get_pos_bool" : bool getter_;
         val getBool = curry getBool
-        val getInt  = _ffi "mgtk_get_pos_int"  : int getter_;
+        val getInt  = _import "mgtk_get_pos_int"  : int getter_;
         val getInt  = curry getInt 
 (*
         val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
@@ -337,15 +337,15 @@ struct
     fun toWidget obj = 
         GObject.inherit () (fn () => GO.withPtr(obj, fn obj => obj))
 
-    val destroy_ = _ffi "gtk_widget_destroy" : cptr -> unit;
+    val destroy_ = _import "gtk_widget_destroy" : cptr -> unit;
     val destroy: 'a t -> unit
         = fn widget => GO.withPtr(widget, destroy_)
 
-    val show_ = _ffi "gtk_widget_show" : cptr -> unit;
+    val show_ = _import "gtk_widget_show" : cptr -> unit;
     val show: 'a t -> unit
         = fn widget => GO.withPtr(widget, show_)
 
-    val show_all_ = _ffi "gtk_widget_show_all" : cptr -> unit;
+    val show_all_ = _import "gtk_widget_show_all" : cptr -> unit;
     val show_all: 'a t -> unit
         = fn widget => GO.withPtr(widget, show_all_)
 
@@ -379,21 +379,21 @@ struct
 
     fun inherit w con = Widget.inherit () con
 
-    val set_border_width_ = _ffi "gtk_container_set_border_width" 
+    val set_border_width_ = _import "gtk_container_set_border_width" 
                           : cptr * int -> unit;
     val set_border_width: 'a t -> int -> unit
         = fn container => fn border_width => 
           GO.withPtr(container, fn container => 
                                    set_border_width_ (container, border_width))
 
-    val add_ = _ffi "gtk_container_add" : cptr * cptr -> unit;
+    val add_ = _import "gtk_container_add" : cptr * cptr -> unit;
     val add: 'a t -> 'b Widget.t -> unit
         = fn container => fn widget => 
                          GO.withPtr(container, fn container =>
                          GO.withPtr(widget, fn widget =>    
                                     add_ (container, widget)))
 
-    val remove_ = _ffi "gtk_container_remove" : cptr * cptr -> unit;
+    val remove_ = _import "gtk_container_remove" : cptr * cptr -> unit;
     val remove: 'a t -> 'b Widget.t -> unit
         = fn container => fn widget => 
                          GO.withPtr(container, fn container =>
@@ -428,11 +428,11 @@ struct
     fun inherit w con = Container.inherit () con
     fun makeBut ptr = Container.inherit () (fn() => ptr)
 
-    val new_ = _ffi "gtk_button_new" : unit -> cptr;
+    val new_ = _import "gtk_button_new" : unit -> cptr;
     val new: unit -> base t
         = fn dummy => makeBut(new_ dummy)
 
-    val new_with_label_ = _ffi "gtk_button_new_with_label" 
+    val new_with_label_ = _import "gtk_button_new_with_label" 
                         : CString.cstring -> cptr;
     val new_with_label: string -> base t
         = fn label => makeBut(new_with_label_ (CString.fromString label))
@@ -467,7 +467,7 @@ struct
     fun inherit w con = Container.inherit () con
     fun makeWin ptr = Container.inherit () (fn() => ptr)
 
-    val new_ = _ffi "gtk_window_new": int -> cptr;
+    val new_ = _import "gtk_window_new": int -> cptr;
     val new: unit -> base t
         = fn dummy => makeWin(new_ 0) (* FIXME: HACK ALERT!!!!!*)
 
@@ -517,11 +517,11 @@ struct
     fun inherit w con = Editable.inherit () con
     fun makeEnt ptr = Editable.inherit () (fn() => ptr)
 
-    val new_ = _ffi "gtk_entry_new": unit -> cptr;
+    val new_ = _import "gtk_entry_new": unit -> cptr;
     val new: unit -> base t
         = fn dummy => makeEnt(new_ ()) 
 
-    val get_text_ = _ffi "gtk_entry_get_text" : cptr -> CString.t;
+    val get_text_ = _import "gtk_entry_get_text" : cptr -> CString.t;
     val get_text: 'a t -> string
         = fn entry => 
           GO.withPtr(entry, fn entry =>
@@ -553,7 +553,7 @@ struct
     type cptr = GO.cptr
 
     fun inherit w con = Container.inherit () con
-    val pack_start_= _ffi "gtk_box_pack_start_defaults" : cptr * cptr -> unit;
+    val pack_start_= _import "gtk_box_pack_start_defaults" : cptr * cptr -> unit;
     val pack_start: 'a t -> 'b Widget.t -> unit
         = fn box => fn widget => 
                     GO.withPtr(box, fn box =>
@@ -583,7 +583,7 @@ struct
     fun inherit w con = Box.inherit () con
     fun make ptr = Box.inherit () (fn() => ptr)
 
-    val new_ = _ffi "gtk_vbox_new": int * int -> cptr;
+    val new_ = _import "gtk_vbox_new": int * int -> cptr;
     val new: unit -> base t
         = fn dummy => make(new_(1, 10)) 
 end
