@@ -124,7 +124,6 @@ char *StringOption_nullok(value opt) {
 }
 
 /* *** Signal stuff *** */
-
 void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs, 
 			     GtkArg *args) {
   value res;
@@ -154,15 +153,13 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   */
 }
 
-
-/* FIXME */
 void mgtk_callback_destroy (gpointer data) {
   valueptr mvp = get_valueptr("mgtk_callback_destroy"); 
   if(mvp == (valueptr) NULL)
     failwith("Cannot find mgtk_callback_destroy");
 
-  printf("callback id = %i\n",(int) data);
-
+  /* printf("callback id = %i\n",(int) data);
+   */
   callbackptr(mvp, (value) data);
 }
 
