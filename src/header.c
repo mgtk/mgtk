@@ -157,7 +157,13 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
 
 /* FIXME */
 void mgtk_callback_destroy (gpointer data) {
+  valueptr mvp = get_valueptr("mgtk_callback_destroy"); 
+  if(mvp == (valueptr) NULL)
+    failwith("Cannot find mgtk_callback_destroy");
 
+  printf("callback id = %i\n",(int) data);
+
+  callbackptr(mvp, (value) data);
 }
 
 

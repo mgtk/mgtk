@@ -33,8 +33,7 @@ struct
 	end
     val main : unit -> unit = app1(symb "mgtk_main")
     val main_quit : unit -> unit = app1(symb "mgtk_main_quit")
-(*    fun main_quit_with e = (main_quit(); raise e)
-*)
+
     (* A litle type cleverness *)
     datatype 'a GtkObject = OBJ of gtkobj
 
@@ -72,11 +71,12 @@ struct
 		SOME f => f data(* handle e => main_quit_with e)*)
 	      | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
 				     Int.toString id^")")
-(*
-		   main_quit_with(Fail("mgtk: Unknown callback function (id: "^
-				       Int.toString id^")"))
-*)
-	val dummy = Callback.register "mgtk_callback_dispatch" dispatch
+
+        fun destroy id = Polyhash.remove callbackTable id
+
+	val dummy = ( Callback.register "mgtk_callback_dispatch" dispatch
+                    ; Callback.register "mgtk_callback_destroy" destroy
+		    )
 
 	val set_bool_pos : GtkArgs -> int -> bool -> unit 
                          = app3(symb "mgtk_set_pos_bool")
