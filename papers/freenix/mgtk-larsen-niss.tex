@@ -22,7 +22,6 @@
 
 
 
-
 \begin{document}
 
 \title{mGTK}
@@ -47,6 +46,8 @@
 } % end author
 
 \maketitle
+
+\DefineShortVerb{\!}
 
 \begin{abstract}
   We describe \mgtk a language binding that makes the graphical
@@ -249,7 +250,9 @@ hierarchies.
 
 In type theoretical jargon, the trick is to use \emph{parametric
   polymorphism} and \emph{existential types} to encode inheriatance
-subtyping.  
+subtyping.  In particular we use \emph{phantom types} to encode the
+inheritance path.
+
 
 \begin{figure}
   \centering
@@ -265,25 +268,69 @@ are subclasses of the class \classname{Super} and
 shall go through the different parts of the encoding of a class.
 
 \begin{description}
-\item[Class type]
-\item[Subtyping/Inheritance]  
-\item[Method]
-\item[Constructor]  
+\item[Class type] A base class like \classname{Super} in
+  Figure~\ref{fig:class-hierarchy} is encoded as an abstract
+  parameterized type:
+\begin{SMLcode}
+  type 'path super
+\end{SMLcode}
+(we follow the \sml convention and spell type-names in lower-case with
+underscores if needed).  The type vatiable !'path! will be used to
+hold the inheritance path for subclasses.
+
+\item[Subtyping/Inheritance] For a subclass like \classname{SubClassA}
+  we need to declare two new \sml types: an abstract parameterized
+  type, which we shall call a \emph{witness type}; and a type
+  abbreviation specifying the inheritance:
+\begin{SMLcode}
+  type 'path sub_class_a_t
+  type 'path sub_class_a = 
+          'path sub_class_a_t super
+\end{SMLcode}
+Where !sub_class_a_t! is the witness type and !sub_class_a! is the
+type specifying the inheritance.  In the declaration of !sub_class_a!
+we see that the type variable !'path! in the declaration of the type
+!super! has been instantiated with the type expression 
+!'path sub_class_a_t!, which contains an new type variable (also named
+!'path!).
+
+In the rest of the paper we shall use the convention that witness
+types ends with !_t!.
+
+\item[Method] Because \sml is not an object-oriented language we shall
+  model methods with ordinary functions, and use the usual convention
+  that the first argument is the object on which the method is called
+  (\gtk also uses this convention).
+  
+  We can now write the type for the method !toString! in
+  \classname{SubclassB}:
+\begin{SMLcode}
+  val toString : 'path sub_class_b -> string
+\end{SMLcode}
+This type says that !toString! takes any object which is a subclass of
+\classname{SubClassB} and returns a string as result.   Similar the
+type for the methos !foo! from class \classname{SubSubClassB} has the
+type:
+\begin{SMLcode}
+  val foo : 'path sub_sub_class_b -> int -> int
+\end{SMLcode}
+That is, !foo! takes any object which is a subclass of
+\classname{SubSubClassB} and an integer and returns an integer.
+
+\item[Constructor] We have to be a bit careful with constructors.
+  Because if we return a value where polymorphic type-variable !'path!
+  that holds the inheritance path has not ``plugged'' then we can
+  accidently use a super-class constructor to construct values that
+  can be instanciated to the type of a sub-class.  Hence, we introduce
+  the abstract dummy type !base! and use that to plug the type
+  variable.  Thus, the type of the constructor for
+  \classname{SubClassA} is:
+\begin{SMLcode}
+  val new : unit -> base sub_class_a
+\end{SMLcode}
+The convention in \gtk is that constructors are named !new!.
 \end{description}
  
-\begin{ednote}{Ken}
-  * Phantom types are inheritance paths.
-
-  * We have one witness type per subtype.
-  
-  * We get upcasts for free.
-  
-  * Use base for plumbing.
-
-  * Only single-inheritance is handled.
-\end{ednote}
-
-
 Continuing our running example the two widgets
 \textit{window} and \textit{button} gets the following
 types

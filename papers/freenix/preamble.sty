@@ -3,7 +3,7 @@
 \RequirePackage{url}
 \RequirePackage{graphicx}
 \RequirePackage{xspace}
-\RequirePackage{fancyvrb}
+\usepackage{fancyvrb}
 
 
 
@@ -45,6 +45,8 @@
 
 
 \newcommand*{\classname}[1]{\textsf{#1}}
+\DefineVerbatimEnvironment{SMLcode}{Verbatim}{}
+
 
 %%% Local Variables: 
 %%% mode: latex
