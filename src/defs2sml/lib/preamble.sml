@@ -11,26 +11,27 @@ structure GtkBasis :> GtkBasis =
 struct
     open Dynlib
     local 
-	val path = case Process.getEnv "MGTKHOME" of
-	               SOME p => Path.concat (p, "mgtk.so")
-		     | NONE   => "./mgtk.so"
-	
-	val hdl  = dlopen {lib = path, flag = RTLD_LAZY, global = false}
+        val path = case Process.getEnv "MGTKHOME" of
+                       SOME p => Path.concat (p, "mgtk.so")
+                     | NONE   => "./mgtk.so"
+        
+        val hdl  = dlopen {lib = path, flag = RTLD_LAZY, global = false}
     in
-	val symb = dlsym hdl
+        val symb = dlsym hdl
     end
 
     (* Basic GTK stuff *)
     val init_ : string vector -> string list = app1(symb "mgtk_init")
     fun init args = 
-	let val args =
-	        case args of
-		    [] => (print "mGTK Warning: Gtk.init called with empty list\n";
-			   [CommandLine.name()])
-		  | _  => args
-	in
-	    init_(vector args)
-	end
+        let val args =
+                case args of
+                    [] => (print "mGTK Warning: Gtk.init \
+				  \ called with empty list\n";
+                           [CommandLine.name()])
+                  | _  => args
+        in
+            init_(vector args)
+        end
     val main : unit -> unit = app1(symb "mgtk_main")
     val main_quit : unit -> unit = app1(symb "mgtk_main_quit")
 end
@@ -116,39 +117,41 @@ struct
         prim_type GValue
 
         type callback_data = GValue * GValues * int
-	type callback = callback_data -> unit
-	type callback_id  = int
+        type callback = callback_data -> unit
+        type callback_id  = int
 
-	val callbackTable : (int, callback) Polyhash.hash_table
+        val callbackTable : (int, callback) Polyhash.hash_table
                           = Polyhash.mkPolyTable(401, Domain)
                       
-	val add     = Polyhash.insert callbackTable
-	val peek    = Polyhash.peek callbackTable
+        val add     = Polyhash.insert callbackTable
+        val peek    = Polyhash.peek callbackTable
         val destroy = Polyhash.remove callbackTable
 
-	local
-	    val intern = ref 0;
-	in
-	    val localId = fn f => f (!intern before intern := !intern + 1)
-	end
+        local
+            val intern = ref 0;
+        in
+            val localId = fn f => f (!intern before intern := !intern + 1)
+        end
 
-	open Dynlib
-	val symb = GtkBasis.symb
+        open Dynlib
+        val symb = GtkBasis.symb
 
-	fun dispatch id data =
-	    case peek id of
-		SOME f => f data    (* FIXME: we need a handle here, but what 
-                                              should it do *)
-	      | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
-				     Int.toString id^")")
+        fun dispatch id data =
+            case peek id of
+                SOME f => f data    
+                (* FIXME: we need a handle here, but what should it do *)
+              | NONE   => 
+                raise Fail("mgtk: Unknown callback function (id: "^
+                           Int.toString id^")")
 
-	val dummy = ( Callback.register "mgtk_callback_dispatch" dispatch
-                    ; Callback.register "mgtk_callback_destroy" destroy
-		    )
+        val dummy = 
+            ( Callback.register "mgtk_callback_dispatch" dispatch
+            ; Callback.register "mgtk_callback_destroy" destroy
+            )
 
-	fun register f = localId(fn id => (add (id, f); id))
-	val signal_connect : GO.cptr -> string -> int -> bool -> int
-	                   = app4(symb"mgtk_signal_connect")
+        fun register f = localId(fn id => (add (id, f); id))
+        val signal_connect : GO.cptr -> string -> int -> bool -> int
+                           = app4(symb"mgtk_signal_connect")
 
         (* UNSAFE: no error checking in the set and get functions! *)
         type 'a setter = GValue -> 'a -> unit
@@ -181,8 +184,9 @@ struct
     fun wrap conv f (ret, arg, max) = ignore(conv(state f ret arg max)) 
 
     fun getter get (f, S(ret, arg, max, next)) = 
-        if next < max  (* FIXME: it should be < but that gives problems with
-                                  return_unit.  Currently unsafe! *)
+        (* FIXME: it should be < but that gives problems with
+           return_unit.  Currently unsafe! *)        
+        if next < max  
         then (f (get arg next), S(ret, arg, max, next+1))
         else raise Subscript
 
@@ -212,7 +216,7 @@ struct
     
     (* FIXME: convince Ken that this correct *)
     fun void (f, state) = (f(), state)
-    fun return_void (f, S(ret, arg, max, next)) = (f, S(ret, arg,max+1,next))
+    fun return_void (f, S(ret,arg,max,next)) = (f, S(ret,arg,max+1,next))
 
     fun unit x        = getter (fn _ => fn _ => ()) x
     fun return_unit x =  x
@@ -232,7 +236,7 @@ struct
         in  signal_connect (GO.repr wid) sign id after
         end
 
-    end	
+    end 
 end
 
 signature Flags = sig
@@ -254,36 +258,36 @@ structure Flags = struct
     fun unset(f, res) = notb(W f) andb res
 
     fun setGeneral init pos neg =
-	let val res = List.foldl set (W init) pos
-	    val res = List.foldl unset res neg
-	in  Word.toInt res
-	end
+        let val res = List.foldl set (W init) pos
+            val res = List.foldl unset res neg
+        in  Word.toInt res
+        end
 
     (* we only need to set flags from the no flag *)
     val set = fn pos =>
-	let val res = List.foldl set 0w0 pos
-	in  Word.toInt res
-	end
+        let val res = List.foldl set 0w0 pos
+        in  Word.toInt res
+        end
 
     (* Checks which flags from possible is set in flag *)
     fun isSet possible flag =
-	let val f = W flag
-	    fun isIn pos = (f andb (W pos)) <> 0w0
-	in  List.filter isIn possible
-	end
+        let val f = W flag
+            fun isIn pos = (f andb (W pos)) <> 0w0
+        in  List.filter isIn possible
+        end
 
     fun get f =
-	let val flag = W f
-	    fun loop p acc = 
-		let val acc = if (flag andb p) <> 0w0 
-			      then Word.toInt p :: acc
-			      else acc
-		    val next = Word.<<(p, 0w1)
-		in  if next = 0w0 then acc
-		    else loop next acc
-		end
-	in  loop 0w1 []
-	end
+        let val flag = W f
+            fun loop p acc = 
+                let val acc = if (flag andb p) <> 0w0 
+                              then Word.toInt p :: acc
+                              else acc
+                    val next = Word.<<(p, 0w1)
+                in  if next = 0w0 then acc
+                    else loop next acc
+                end
+        in  loop 0w1 []
+        end
 
-    fun areTheseSet flags flag = ((W(set flags)) andb (W flag)) <> 0w0
+    fun areTheseSet flags flag = ((W(set flags)) andb (W flag))<>0w0
 end

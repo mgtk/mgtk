@@ -1,3 +1,4 @@
+gtk_window_get_size
 TESTING
 gtk_dummy_function
 THESE_SIMPLY_DO_NOT_WORK
@@ -92,7 +93,6 @@ gtk_tree_model_iter_children
 gtk_tree_model_iter_nth
 gtk_tree_model_iter_parent
 gtk_window_get_frame_dimensions
-gtk_window_get_size
 gtk_window_get_default_size
 gtk_window_get_position
 gtk_calendar_get_date

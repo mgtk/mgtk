@@ -2,12 +2,6 @@ signature TinySML = sig
 
     val max_curried: int
 
-    datatype 'a incl =
-        None
-      | StrOnly of 'a
-      | SigOnly of 'a
-      | Some of 'a
-	     
     type typeexp = SMLType.ty
     type tyvar = SMLType.tyvar
     type tyname = SMLType.tyname
@@ -28,27 +22,39 @@ signature TinySML = sig
       | App of exp * exp list
       | Tup of exp list
       | Import of string * typeexp
-      | Let of decl * exp
+      | Let of dec * exp
       | SeqExp of exp list
 
-    and decl =
-	ValDecl of pat * typeexp incl * exp
-      | FunDecl of string * pat list * typeexp incl * exp
-      | TypeDecl of (tyvar list * tyname) * typeexp incl
-      | SeqDecl of decl incl list
-      | EmptyDecl
-      | Comment of string option (* an empty comment prints as newline *)
-      | Open of string list
-      | Infix of fixity option * string list
-      | Local of decl incl * decl
+    and dec =
+	ValDec of pat * typeexp option * exp
+      | FunDec of string * pat list * typeexp option * exp
+      | TypeDec of (tyvar list * tyname) * typeexp option
+      | SeqDec of dec list
+      | EmptyDec
+      | CommentDec of string option (* an empty comment prints as newline *)
+      | OpenDec of string list
+      | InfixDec of fixity option * string list
+      | LocalDec of dec * dec
+
+    datatype spec =
+	ValSpec of pat * typeexp
+      | FunSpec of string * typeexp
+      | TypeSpec of (tyvar list * tyname) * typeexp option
+      | SeqSpec of spec list
+      | EmptySpec
+      | CommentSpec of string option
+      | StrSpec of string (* strid *) * sigexp
+    and sigexp = 
+	SigBasic of spec
+      | SigId of string (* sigid *)
 
     datatype topdec =
-	StrDec of string (* strid *) * string option (* signature constraint *)
-		  * topdec list
-      | SigDec of string (* sigid *) * topdec list (* really specs *)
-      | CoreDec of decl incl
+	StrDec of string (* strid *) * sigexp option * topdec list
+      | SigDec of string (* sigid *) * sigexp
+      | CoreDec of dec
 
-    val ppDec : bool * bool -> decl incl Pretty.pp
+    val ppDec    :    dec Pretty.pp
+    val ppSigExp : sigexp Pretty.pp
     val ppTopDec : topdec Pretty.pp
 
 end (* signature TinySML *)

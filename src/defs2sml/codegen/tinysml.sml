@@ -2,12 +2,6 @@ structure TinySML :> TinySML = struct
 
     val max_curried = 5
 
-    datatype 'a incl =
-        None
-      | StrOnly of 'a
-      | SigOnly of 'a
-      | Some of 'a
-	     
     type typeexp = SMLType.ty
     type tyvar = SMLType.tyvar
     type tyname = SMLType.tyname
@@ -32,34 +26,40 @@ structure TinySML :> TinySML = struct
       | App of exp * exp list
       | Tup of exp list
       | Import of string * typeexp
-      | Let of decl * exp
+      | Let of dec * exp
       | SeqExp of exp list
 
-    and decl =
-	ValDecl of pat * typeexp incl * exp
-      | FunDecl of string * pat list * typeexp incl * exp
-      | TypeDecl of (tyvar list * tyname) * typeexp incl
-      | SeqDecl of decl incl list
-      | EmptyDecl
-      | Comment of string option (* an empty comment prints as newline *)
-      | Open of string list
-      | Infix of fixity option * string list
-      | Local of decl incl * decl
+    and dec =
+	ValDec of pat * typeexp option * exp
+      | FunDec of string * pat list * typeexp option * exp
+      | TypeDec of (tyvar list * tyname) * typeexp option
+      | SeqDec of dec list
+      | EmptyDec
+      | CommentDec of string option (* an empty comment prints as newline *)
+      | OpenDec of string list
+      | InfixDec of fixity option * string list
+      | LocalDec of dec * dec
 
+    datatype spec =
+	ValSpec of pat * typeexp
+      | FunSpec of string * typeexp
+      | TypeSpec of (tyvar list * tyname) * typeexp option
+      | SeqSpec of spec list
+      | EmptySpec
+      | CommentSpec of string option
+      | StrSpec of string (* strid *) * sigexp
+    and sigexp = 
+	SigBasic of spec
+      | SigId of string (* sigid *)
 
     datatype topdec =
-	StrDec of string (* strid *) * string option (* signature constraint *)
-		  * topdec list
-      | SigDec of string (* sigid *) * topdec list (* really specs *)
-      | CoreDec of decl incl
+	StrDec of string (* strid *) * sigexp option * topdec list
+      | SigDec of string (* sigid *) * sigexp
+      | CoreDec of dec
 
-    fun equalincl eq (i, i') =
-	case (i, i') of
-	    (None, None) => true
-	  | (Some x, Some x') => eq (x,x')
-	  | (StrOnly x, StrOnly x') => eq (x,x')
-	  | (SigOnly x, SigOnly x') => eq (x,x')
-	  | _ => false
+    fun equalopt eq (SOME x, SOME x') = eq (x,x')
+      | equalopt eq (NONE,   NONE   ) = true
+      | equalopt eq _                 = false
 
     fun equalpat (p,p') =
 	case (p,p') of
@@ -86,75 +86,40 @@ structure TinySML :> TinySML = struct
     and equalexplists es = List.all equalexp (ListPair.zip es)
     and equal (d, d') =
 	case (d, d') of
-	    (EmptyDecl, EmptyDecl) => true
-	  | (Comment s, Comment s') => 
+	    (EmptyDec, EmptyDec) => true
+	  | (CommentDec s, CommentDec s') => 
 	      Util.optionCmp String.compare (s,s') = EQUAL
-	  | (Open strs, Open strs') =>
+	  | (OpenDec strs, OpenDec strs') =>
               List.all (op=) (ListPair.zip (strs, strs'))
-	  | (Infix(f, ids), Infix(f', ids')) =>
+	  | (InfixDec(f, ids), InfixDec(f', ids')) =>
 	      List.all (op=) (ListPair.zip (ids, ids'))
-	  | (ValDecl(p,t,e), ValDecl(p',t',e')) =>
-              equalpat(p,p') andalso equalincl SMLType.equal (t,t')
+	  | (ValDec(p,t,e), ValDec(p',t',e')) =>
+              equalpat(p,p') andalso equalopt SMLType.equal (t,t')
 	      andalso equalexp (e,e')
-	  | (FunDecl(n,ps,t,e), FunDecl(n',ps',t',e')) =>
+	  | (FunDec(n,ps,t,e), FunDec(n',ps',t',e')) =>
               n=n' andalso List.all equalpat (ListPair.zip(ps,ps'))
-              andalso equalincl SMLType.equal (t,t') andalso equalexp (e,e')
-	  | (TypeDecl((a,n),t), TypeDecl((a',n'),t')) =>
+              andalso equalopt SMLType.equal (t,t') andalso equalexp (e,e')
+	  | (TypeDec((a,n),t), TypeDec((a',n'),t')) =>
               List.all SMLType.eqTyVar (ListPair.zip(a,a')) 
 	      andalso SMLType.eqTyName(n,n')
-              andalso equalincl SMLType.equal (t,t')
-	  | (Local(d1,d2), Local(d1',d2')) =>
-	      equalincl equal (d1,d1') andalso equal(d2,d2')
-	  | (SeqDecl ds, SeqDecl ds') =>
-              List.all (equalincl equal) (ListPair.zip (ds,ds'))
+              andalso equalopt SMLType.equal (t,t')
+	  | (LocalDec(d1,d2), LocalDec(d1',d2')) =>
+	      equal (d1,d1') andalso equal(d2,d2')
+	  | (SeqDec ds, SeqDec ds') =>
+              List.all equal (ListPair.zip (ds,ds'))
 	  | _ => false
-(*
-    fun rank d =
-	case d of
-	    EmptyDecl => 0
-	  | Comment => 10
-	  | Open _ => 20
-	  | Infix _ => 30
-	  | ValDecl _ => 40
-	  | FunDecl _ => 50
-	  | TypeDecl _ => 60
-	  | LocalDecl _ => 70
-	  | SeqDecl _ => 80
-*)
 
-    datatype mode = STR | SIG
-    fun flatten mode (d: decl) : decl list =
+    fun flatten (d: dec) : dec list =
 	case d of
-	    SeqDecl ds => List.concat (List.map (flatten' mode) ds)
-	  | Local(d,d') => [Local(d,d')]
+	    SeqDec ds => List.concat (List.map flatten ds)
 	  | d => [d]
-    and flatten' mode (d: decl incl) : decl list =
-	let val d = case d of
-			Some d => d
-		      | StrOnly d => if mode = STR then d else EmptyDecl
-		      | SigOnly d => if mode = SIG then d else EmptyDecl
-		      | None => EmptyDecl
-	in  flatten mode d end
-(*
-    fun iCtns (None) = NONE
-      | iCtns (SigOnly x) = SOME x
-      | iCtns (StrOnly x) = SOME x
-      | iCtns (Some x) = SOME x
-    fun iRank (None) = 0
-      | iRank (SigOnly _) = 5
-      | iRank (StrOnly _) = 10
-      | iRank (Some _) = 20
-    fun inclcmp cmp (x,x') =
-	case Int.cmp(iRank x, iRank x') of
-	    EQUAL => Util.optionCmp cmp (iCtns x, iCtns)
-	  | order => order
-*)
+
     fun coalesce ds =
 	case ds of
-	    (d as Local(d1,d1'))::
-	    (d' as Local(d2,d2'))::rest =>
-	      if equalincl equal (d1,d2)
-	      then coalesce (Local(d1,SeqDecl[Some d1',Some d2'])::rest)
+	    (d as LocalDec(d1,d1'))::
+	    (d' as LocalDec(d2,d2'))::rest =>
+	      if equal (d1,d2)
+	      then coalesce (LocalDec(d1,SeqDec[d1',d2'])::rest)
 	      else d::coalesce(d'::rest)
 	  | d::rest => d::coalesce rest
 	  | [] => []
@@ -191,17 +156,22 @@ structure TinySML :> TinySML = struct
        However, please not that it sometimes sacrifies prettyness
        for compactness.
     *)
-    local open Pretty in
-    fun ppDec (strIncl,sigIncl) dec =
+    local open Pretty 
+        fun brkprt sep opt (t1, t2) =
+	    if isPrinting t2 then break opt (t1, sep ^+ t2) else t1
+	fun ppopt pp NONE = empty
+	  | ppopt pp (SOME x) = pp x
+	fun pppat p =
+	    case p of
+		VarPat v => ppString (mlify v)
+	      | TupPat ps => bracket "(#)" (ilist ", #" pppat ps)
+    in
+
+    fun ppDec dec = 
 	let fun parens safe level tree = 
 		if level > safe then "(" ^+ tree +^ ")"
 		else tree
-	    fun ppincl pp incl =
-		case incl of
-		    None => empty
-		  | Some x => pp x
-		  | StrOnly x => if strIncl then pp x else empty
-		  | SigOnly x => if sigIncl then pp x else empty
+
 	    fun ppexp level e =
 		case e of
                     (* special case some idioms *)
@@ -254,7 +224,7 @@ structure TinySML :> TinySML = struct
 			end
 		in  loop e [] end
 	    and pplocal d =
-		let fun loop (Local(d,d')) acc = loop d' (ppdec' d::acc)
+		let fun loop (LocalDec(d,d')) acc = loop d' (ppdec d::acc)
 		      | loop _ [] = raise Fail"pplocal: shouldn't happen"
 		      | loop d acc = 
                           let val body = ppdec d
@@ -269,36 +239,22 @@ structure TinySML :> TinySML = struct
 				    end
 			  end
 		in  loop d [] end
-	    and pppat p =
-		case p of
-		    VarPat v => ppString (mlify v)
-		  | TupPat ps => bracket "(#)" (ilist ", #" pppat ps)
-	    and brkprt sep opt (t1, t2) =
-		if isPrinting t2 then break opt (t1, sep ^+ t2) else t1
 	    and ppsimple d = 
 		case d of
-		    ValDecl(pat,ty,exp) => 
+		    ValDec(pat,ty,exp) => 
 		      let val bind = ppString "val" ++ pppat pat
-			  val ty = ppincl SMLType.pp ty
-		      in  if sigIncl then
-			      brkprt ": " (1,2) (bind, ty)
-			  else 
-			      break(1,4)
+			  val ty = ppopt SMLType.pp ty
+		      in  break(1,4)
 				( brkprt ": " (1,2)(bind, ty)
 				, "= " ^+ ppexp 1 exp )
 		      end
-		  | FunDecl(name,args,ty,exp) => 
-		      if sigIncl then
-			  break(1,2) 
-                            ( ppString "val" ++ ppString name
-                            , ": " ^+ ppincl SMLType.pp ty )
-		      else
-			  break(1,2)
+		  | FunDec(name,args,ty,exp) => 
+		      break(1,2)
 			    ( ppString "fun" ++ ppString name 
                                 ++ clist " #" pppat args
                             , "= " ^+ ppexp 1 exp )
 
-		  | TypeDecl((args,name),ty) => 
+		  | TypeDec((args,name),ty) => 
 		      let val bindty = 
 			      case args of
 				  [] => SMLType.ppTyName name
@@ -307,19 +263,19 @@ structure TinySML :> TinySML = struct
 					    (clist ",#" SMLType.ppTyVar args )
                                           ++ SMLType.ppTyName name
 			  val bind = ppString "type" ++ bindty
-			  val ty = ppincl SMLType.pp ty
+			  val ty = ppopt SMLType.pp ty
 		      in  brkprt "= " (1,2) ( bind, ty )
 		      end
-		  | EmptyDecl => empty
-		  | Comment NONE => empty
-		  | Comment (SOME s) => bracket "(*#*)" (ppString s)
-		  | Open strs => ppString "open" ++ clist "# " ppString strs
-		  | Infix (fixity, ids) => 
+		  | EmptyDec => empty
+		  | CommentDec NONE => empty
+		  | CommentDec (SOME s) => bracket "(*#*)" (ppString s)
+		  | OpenDec strs => ppString "open" ++ clist "# " ppString strs
+		  | InfixDec (fixity, ids) => 
 		      ppString (show_fixity fixity) ++ clist "# " ppString ids
-		  | Local(d,d') => pplocal (Local(d,d'))
-		  | SeqDecl _ => raise Fail "Shouldn't happen (ppsimple(seq))"
+		  | LocalDec(d,d') => pplocal (LocalDec(d,d'))
+		  | SeqDec _ => raise Fail "Shouldn't happen (ppsimple(seq))"
 	    and ppdec d =
-		case coalesce (flatten (if strIncl then STR else SIG) d) of
+		case coalesce (flatten d) of
 		    [] => empty
 		  | [d] => ppsimple d
 		  | d::ds => 
@@ -329,46 +285,85 @@ structure TinySML :> TinySML = struct
 			          List.map (forcemulti o ppsimple) ds)
 		      in  makelist (true,"") ds end
 
-	    and ppdec' d =
-		case d of
-		    None => empty
-		  | Some d => ppdec d
-		  | StrOnly d => ppdec d
-		  | SigOnly d => ppdec d
-	in  ppdec' dec
+	in  ppdec dec
 	end
+    fun ppSpec spec =
+	case spec of
+	    ValSpec(pat,ty) => 
+	      break (1,2) ( ppString "val" ++ pppat pat
+			  , ": " ^+ SMLType.pp ty )
+	  | FunSpec(name,ty) => 
+	      break (1,2) ( ppString "val" ++ ppString name
+                          , ": " ^+ SMLType.pp ty )
+	  | TypeSpec((args,name),tyopt) =>
+	      let val bindty = 
+		      case args of
+			  [] => SMLType.ppTyName name
+			| [a] => SMLType.ppTyVar a ++ SMLType.ppTyName name
+			| args => bracket "(#)"
+			             (clist ",#" SMLType.ppTyVar args )
+                                  ++ SMLType.ppTyName name
+		  val bind = ppString "type" ++ bindty
+		  val ty = ppopt SMLType.pp tyopt
+	      in  brkprt "= " (1,2) ( bind, ty )
+	      end
+	  | EmptySpec => empty
+	  | CommentSpec NONE => empty
+	  | CommentSpec (SOME s) => bracket "(*#*)" (ppString s)
+	  | StrSpec(strid,sigexp) =>
+	       ("structure " ^+ ppString strid +^ " = ") ++ ppSigExp sigexp
+	  | SeqSpec _ =>
+	       let fun loop (SeqSpec ss, acc) =  List.foldr loop acc ss
+		     | loop (spec, acc) = ppSpec spec :: acc
+		   val specs = List.filter isPrinting (loop(spec,[]))
+	       in  clist "#" forcemulti specs
+	       end
+    and ppSigExp (SigBasic spec) = 
+	close(1,"end") (always(2)(ppString"sig", ppSpec spec))
+      | ppSigExp (SigId id) = ppString id
     fun ppTopDec dec =
 	let 
 	    fun coalesce tops =
 		case tops of
 		    CoreDec(d1)::CoreDec(d2)::tops =>
-		        coalesce (CoreDec(Some(SeqDecl[d1,d2]))::tops)
+		        coalesce (CoreDec(SeqDec[d1,d2])::tops)
 		  | top::tops => top::coalesce tops
 		  | [] => []
-	    fun pptop mode dec =
+	    fun pptop dec =
 		case dec of
-		    StrDec(strid, sigopt, decs) =>
+		    StrDec(strid, SOME(se as SigBasic _), decs) =>
+		       close(1,"end")
+			    (always 4
+			       ( always 2 ( "structure " ^+ ppString strid +^ " :>"
+					  , ppSigExp se )
+                                 +^ " = struct"
+			       , pptoplist (true,false) decs )
+                             )
+		  | StrDec(strid, sigexpopt, decs) =>
                        let val sigcons = 
-			       case sigopt of 
+			       case sigexpopt of 
 				   NONE => empty
-				 | SOME sigid => ":> " ^+ ppString sigid
+				 | SOME sigexp => ppSigExp sigexp
 		       in  close(1,"end")
-			     (always 4 ( ("structure " ^+ ppString strid ++ sigcons) +^ " = struct"
+			     (always 4 ( ("structure " ^+ (ppString strid +^ " :>") ++ sigcons) +^ " = struct"
 				       , pptoplist (true,false) decs )
                              )
 		       end
-		  | SigDec(sigid, specs) =>
-		       close(1,"end")
-                             (always 4 ( ("signature " ^+ ppString sigid +^ " = sig")
-                                       , pptoplist (false,true) specs )
-                             )
-		  | CoreDec decl => ppDec mode decl
+		  | SigDec(sigid, SigBasic spec) =>
+                       close(1,"end")
+			    (always 4 ( "signature " ^+ ppString sigid +^ " = sig"
+                                      , ppSpec spec )
+                            )                                 
+		  | SigDec(sigid, SigId id) =>
+		       "signature " ^+ ppString sigid +^ (" = " ^ id)
+
+		  | CoreDec decl => ppDec decl
 	    and pptoplist mode tops =
 		let val tops = 
-			List.filter isPrinting (map (pptop mode) (coalesce tops))
+			List.filter isPrinting (map pptop (coalesce tops))
 		in  clist "#" forcemulti tops
 		end
-	in  pptop (true,false) dec end
+	in  pptop dec end
     end (* local *)
 
 end (* structure TinySML *)

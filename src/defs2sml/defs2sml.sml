@@ -69,6 +69,7 @@ fun main () =
 
 	val forMLton = ref false
 	val sep_struct = ref false
+	val named_sigs = ref true
 
 	val args = [ ("-I",  ArgParse.String DefsParse.addPath)
 		   , ("-so", ArgParse.String setSMLOutFile)
@@ -82,6 +83,8 @@ fun main () =
 		   , ("-v",  ArgParse.Unit   (inc verbosity))
 		   , ("--mlton",  ArgParse.Unit   (fn () => forMLton := true))
 		   , ("--separate-struct",  ArgParse.Unit   (fn () => sep_struct := true))
+		   , ("--anonymous-sigs",  ArgParse.Unit   (fn () => named_sigs := false))
+		   , ("-as",  ArgParse.Unit   (fn () => named_sigs := false))
                    ] @ Debug.argparse ()
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
@@ -90,7 +93,9 @@ fun main () =
 		  | 1 => MsgUtil.verbose()
 		  | 2 => MsgUtil.Verbose()
 		  | _ => MsgUtil.Debug()
-
+	val _ = if !named_sigs andalso !sep_struct then
+		    MsgUtil.warning("Warning: could lead to SML code that does not conform to the standard.")
+		else ()
         (* 1. Parse *)
 	val defs = (MsgUtil.print "Parsing (defs)..."; 
 		    DefsParse.parseFile (getFile ()) 
@@ -165,7 +170,7 @@ fun main () =
 	val _ = MsgUtil.print "Generating SML code ..."
 	val typeinfo = MLtonPrims.TypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
-	val topdec = GenSMLMLton.translate typeinfo api
+	val topdec = GenSMLMLton.translate (!named_sigs) typeinfo api
 	val _ = GenSMLMLton.print (!smlPreamble) (!sep_struct) 
 				  (getOutFile()) topdec
         val _ = closeOutFile()
@@ -187,7 +192,7 @@ fun main () =
 	val _ = MsgUtil.print "Generating SML code ..."
 	val typeinfo = MosmlPrims.TypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
-	val topdec = GenSMLMosml.translate typeinfo api
+	val topdec = GenSMLMosml.translate (!named_sigs) typeinfo api
 	val _ = GenSMLMosml.print (!smlPreamble) (!sep_struct)
 				  (getOutFile()) topdec
         val _ = closeOutFile()

@@ -11,7 +11,7 @@ signature PRIMITIVES = sig
     val mkToFunc: unit -> TinySML.exp
     val callStub : TypeInfo.typeinfo -> string  -> (Name.name, Name.name) Type.ty
 		-> (TinySML.exp * (Name.name, TinySML.exp) Type.ty) list -> TinySML.exp
-    val strHeader : TinySML.decl list
+    val strHeader : TinySML.dec list
 end (* signature PRIMTIVES *)
 
 functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES 
@@ -44,11 +44,11 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 	end
 
     val strHeader =
-        [ Open["Dynlib"]
-        , TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"])))
-        , ValDecl(VarPat"repr", None, Var("GObject.repr"))
-        , ValDecl(VarPat"symb", None, Var("GtkBasis.symb"))
-        , Comment NONE
+        [ OpenDec["Dynlib"]
+        , TypeDec(([],["cptr"]), SOME(TyApp([],["GObject.cptr"])))
+        , ValDec(VarPat"repr", NONE, Var("GObject.repr"))
+        , ValDec(VarPat"symb", NONE, Var("GtkBasis.symb"))
+        , CommentDec NONE
         ]
 end (* structure MosmlPrims *)
 
@@ -64,7 +64,7 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 	let val fresh = List.tabulate(List.length consts, fn i => "x"^Int.toString i)
 	    fun refe e = App(Long(Name.fromString "ref"), [e])
 	    fun deref e = App(Var("!"), [e])
-	in  Let(ValDecl(TupPat(List.map VarPat fresh), None, 
+	in  Let(ValDec(TupPat(List.map VarPat fresh), NONE, 
 			Tup(List.map (fn _ => refe(Const "0")) fresh)),
 		SeqExp [ App(Var("get_"^enum^"_"), [Tup(List.map Var fresh)])
 		       , Tup(List.map (deref o Var) fresh)
@@ -109,7 +109,7 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 		else e
 	    val stub = App(Var(name^"_"), [Tup(List.map g pars)])
 	    val call = if TypeInfo.isString tinfo ret
-		       then Let(ValDecl(VarPat"t",None,stub),
+		       then Let(ValDec(VarPat"t",NONE,stub),
 				App(Var"CString.toString",[Var"t"]))
 		       else stub
 	in  List.foldr f call pars
@@ -117,7 +117,7 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 
     val strHeader = 
         [
-          TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"])))
+          TypeDec(([],["cptr"]), SOME(TyApp([],["GObject.cptr"])))
 	]
 end (* structure MLtonPrims *)
 
@@ -132,7 +132,10 @@ struct
     structure TI = TypeInfo
 
     infix ++
-    fun d1 ++ d2 = Some(SeqDecl[d1,d2])
+    fun d1 ++ d2 = SeqDec[d1,d2]
+
+    infix **
+    fun s1 ** s2 = SeqSpec[s1,s2]
 
     open SMLType
     infix --> ==>
@@ -164,7 +167,7 @@ struct
 	    val body = clist "#" (forcemulti o TinySML.ppTopDec) decs
 	    val sigcons = case sigopt of 
 			      NONE => empty
-			    | SOME sigid => ppString(" :> "^sigid)
+			    | SOME sigexp => ":> " ^+ TinySML.ppSigExp sigexp
 	    val res =
 		if sep_struct then
 		    close(1,"end")
@@ -268,7 +271,7 @@ struct
 				val ret = (case ret of Type.Void => []
 						     | ty => [ty])
 					  @ (List.map #2 outputs)
-			    in  (Let(ValDecl(TupPat(List.map (VarPat o #1) outputs), None, 
+			    in  (Let(ValDec(TupPat(List.map (VarPat o #1) outputs), NONE, 
 					     Tup(List.map inout outputs)),
 				     SeqExp[ call
 					   , Tup(List.map (deref o Var o #1) outputs)
@@ -310,19 +313,22 @@ struct
 				        ["dummy"]
 				   else defpars'
 		    val (stubcall',_,_) = mkOutputStub with_outputs ret (P.callStub tinfo name ret defpars)
-		in  StrOnly(
-                       ValDecl(VarPat(name^"_"), Some primty,
-			       P.ccall cname (List.length parsty) primty))
-                 ++ Some(
-                       ValDecl(VarPat name, Some ty_ml,
+		    val ty'_ml = SMLType.ArrowTy(defparams, ret_ml)
+		in  {stru = 
+                       ValDec(VarPat(name^"_"), SOME primty,
+			       P.ccall cname (List.length parsty) primty)
+                 ++    ValDec(VarPat name, SOME ty_ml,
 			       List.foldr Fn (fromprim ret stub) 
-					  (List.map #1 outparsty)))
+					  (List.map #1 outparsty))
                  ++ (if with_defaults then 
-		      Some(
-			ValDecl(VarPat(name^"'"), 
-				Some(SMLType.ArrowTy(defparams, ret_ml)),
-				List.foldr Fn (fromprim ret stubcall') defpars'))
-		     else None)
+		      ValDec(VarPat(name^"'"), SOME ty'_ml,
+			     List.foldr Fn (fromprim ret stubcall') defpars')
+		     else EmptyDec),
+		     sign = ValSpec(VarPat name, ty_ml) 
+		         ** (if with_defaults then
+				 ValSpec(VarPat(name^"'"), ty'_ml)
+			     else EmptySpec)
+                    }
 		end
 
             (* ENUMS 
@@ -339,25 +345,30 @@ struct
 	        let val cname = Name.asCEnum name
 		    val name = Name.asEnum name
 		    val primty = P.getEnumsTy (List.length consts)
-		    val decs = List.map (fn c => SigOnly(ValDecl(VarPat(Name.asEnumConst c),Some(TyApp([],[name])),Const "1"))) consts
-		in  Some(SeqDecl(
-	            Some(TypeDecl(([],[name]), StrOnly IntTy))
-                 :: decs
-                @ [ StrOnly(ValDecl(VarPat("get_" ^ name ^ "_"), Some primty,
-			    P.ccall ("mgtk_get_"^cname) 1 primty))
-		  , StrOnly(ValDecl(TupPat(List.map (VarPat o Name.asEnumConst) consts), None,
-			    P.getEnums name consts))
-                  ]))
+		    val specs = List.map (fn c => ValSpec(VarPat(Name.asEnumConst c),TyApp([],[name]))) consts
+		in  {stru=SeqDec(
+	            TypeDec(([],[name]), SOME IntTy)
+                 :: 
+                  [ ValDec(VarPat("get_" ^ name ^ "_"), SOME primty,
+			   P.ccall ("mgtk_get_"^cname) 1 primty)
+		  , ValDec(TupPat(List.map (VarPat o Name.asEnumConst) consts), NONE,
+			   P.getEnums name consts)
+                  ]),
+		     sign=SeqSpec(TypeSpec(([],[name]), NONE) :: specs)
+                    }
 		end
 
 	  | AST.Boxed funcs =>
 	        let val name = Name.asBoxed name
-		in  Some(TypeDecl(([],[name]), StrOnly(TyApp([],["GObject.cptr"]))))
+		in  {stru=TypeDec(([],[name]), SOME(TyApp([],["GObject.cptr"]))),
+		     sign=TypeSpec(([],[name]),NONE)
+                    }
 		end
           | AST.Field ty => 
 		let val name = Name.asField name
-		in  StrOnly(ValDecl(VarPat ("get_"^name), None, 
-			    P.ccall ("mgtk_get_"^name) 1 IntTy))
+		in  {stru=ValDec(VarPat ("get_"^name), NONE, 
+				 P.ccall ("mgtk_get_"^name) 1 IntTy),
+		     sign=EmptySpec}
 		end
 
 (*
@@ -395,9 +406,11 @@ struct
 		    fun toUnderscore #"-" = #"_"
 		      | toUnderscore ch = ch
 		    val name' = (String.map toUnderscore name)^"_sig"
-		in  Some(Local(StrOnly(Open ["Signal"]) ++ StrOnly(Infix(SOME Right, ["-->"])),
-			 (ValDecl(VarPat(name'), Some(ty), 
-				  Fn("f", App(Var("signal"), args))))))
+		in  {stru=LocalDec(OpenDec ["Signal"] ++ 
+					   InfixDec(SOME Right, ["-->"]),
+				   ValDec(VarPat(name'), SOME ty, 
+					  Fn("f", App(Var("signal"), args)))),
+		     sign=ValSpec(VarPat(name'), ty)}
 		end
 
     fun header tinfo (name, info) =
@@ -422,11 +435,10 @@ struct
 
 	    fun f (i,a) = TyApp([a], [Name.asModule i ^ ".t"])
 	    val path = List.foldl f (TyApp([TyVar "'a"], [witness_t])) impl
-	in  Some(SeqDecl(List.map StrOnly P.strHeader))
-         ++ Some(TypeDecl(([],[base_t]),StrOnly UnitTy))
-         ++ Some(TypeDecl((["'a"],[witness_t]),StrOnly UnitTy))
-         ++ Some(TypeDecl((["'a"],[type_t]), 
-		    Some(TyApp([path],[parent_t]))))
+	in  {stru=SeqDec(P.strHeader)
+		  ++ TypeDec(([],[base_t]),SOME UnitTy)
+		  ++ TypeDec((["'a"],[witness_t]),SOME UnitTy)
+		  ++ TypeDec((["'a"],[type_t]), SOME(TyApp([path],[parent_t])))
 (*
    fun inherit w con = 
        let val con = let val ptr = con () in fn () => ptr end
@@ -435,48 +447,73 @@ struct
        in  Widget.inherit cellEditableWitness con
        end
 *)
-         ++ Some(FunDecl("inherit",[VarPat "w",VarPat "con"],
+         ++ FunDec("inherit",[VarPat "w",VarPat "con"],
 		    (* 'a -> GObject.constructor -> 'a t *)
-		    SigOnly([TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"])),
-		    Let(SeqDecl (
-			   Some(ValDecl(VarPat "con", None, Let(ValDecl(VarPat "ptr",None,App(Var "con",[Unit])),Fn("()",Var"ptr"))))
-                        :: Some(ValDecl(VarPat "witness", None, Unit))
-			:: List.map (fn i => Some(ValDecl(VarPat "witness", None, App(Var(Name.asModule i ^ ".inherit"), [Var "witness", Var "con"])))) impl
+		    NONE,
+		    Let(SeqDec (
+			   ValDec(VarPat "con", NONE, Let(ValDec(VarPat "ptr",NONE,App(Var "con",[Unit])),Fn("()",Var"ptr")))
+                        :: ValDec(VarPat "witness", NONE, Unit)
+			:: List.map (fn i => ValDec(VarPat "witness", NONE, App(Var(Name.asModule i ^ ".inherit"), [Var "witness", Var "con"]))) impl
                         ),
-			App(Var(pRef "inherit"),[Var "witness",Var "con"]))))
-	 ++ StrOnly(FunDecl("make"(*^Name.asModule name*),[VarPat"ptr"],None,
-		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")])))
-	 ++ Some(FunDecl("to"^Name.asModule name, [VarPat "obj"],
-	         Some(TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"])),
-		 P.mkToFunc ()))
-         ++ StrOnly(Comment NONE)
+			App(Var(pRef "inherit"),[Var "witness",Var "con"])))
+	 ++ FunDec("make"(*^Name.asModule name*),[VarPat"ptr"],NONE,
+		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")]))
+	 ++ FunDec("to"^Name.asModule name, [VarPat "obj"],
+	         SOME(TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"])),
+		 P.mkToFunc ())
+         ++ CommentDec NONE,
+	     sign=  TypeSpec(([],[base_t]),NONE)
+                 ** TypeSpec((["'a"],[witness_t]),NONE)
+                 ** TypeSpec((["'a"],[type_t]), SOME(TyApp([path],[parent_t])))
+                 ** FunSpec("inherit", 
+		      [TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"]))
+                 ** FunSpec("to"^Name.asModule name, TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"]))
+             }
 	end
-	    handle Skip msg => None (* Was EmptyDecl *)
+	    handle Skip msg => {stru=EmptyDec,sign=EmptySpec}
 
     local 
 	open AST TinySML
 	val trans = fn tinfo => fn (name,member) => trans tinfo (name,member)
 		   handle Skip msg => ( TextIO.output(TextIO.stdErr,
 		       "Error translating " ^ Name.toString name ^ ": " ^msg^"\n")
-                     ; None)
-	fun transMod tinfo (Module{name,members,info}) =
-	    let val head = CoreDec(header tinfo (name,info))
+                     ; {stru=EmptyDec,sign=EmptySpec} )
+
+	fun decUnzip ls = 
+	    let fun loop [] (a1,a2) = {stru=List.concat(rev a1), sign=SeqSpec(rev a2)}
+		  | loop ({stru,sign}::ds) (a1,a2) = 
+		    loop ds (stru::a1,sign::a2)
+	    in  loop ls ([],[]) end
+
+	fun transMod named_sigs tinfo (Module{name,members,info}) =
+	    let val {stru=headstr,sign=headsig} = header tinfo (name,info)
 		val name = Name.asModule name
-		val contents = 
-		      (head :: List.concat(List.map (transMem tinfo) members))
-	    in  [ SigDec(name, contents)
-		, StrDec(name, SOME name, contents)
-		]
+		val contents = List.map (transMem named_sigs tinfo) members
+		val {stru=contstr,sign=contsig} = decUnzip contents
+		val sigexp = SigBasic(SeqSpec[headsig,contsig])
+		val decs = CoreDec(headstr) :: contstr
+	    in  
+		if named_sigs then
+		    { stru = SigDec(name, sigexp) ::
+			     StrDec(name, SOME(SigId name), decs) ::
+			     [] ,
+		      sign = EmptySpec }
+		else
+		    { stru = [ StrDec(name, SOME(sigexp), decs) ],
+		      sign = EmptySpec }
 	    end
-	and transMem tinfo (Sub module) = transMod tinfo module
-	  | transMem tinfo (Member{name,info}) =
-	    [ CoreDec (trans tinfo (name,info)) ]
-    in  fun translate tinfo (Module{name,members,info}) =
+	and transMem named_sigs tinfo (Sub module) = 
+	    transMod named_sigs tinfo module
+	  | transMem named_sigs tinfo (Member{name,info}) =
+	    let val {stru,sign} = trans tinfo (name,info)
+	    in  { stru = [ CoreDec(stru) ], sign = sign } end
+
+    in  fun translate named_sigs tinfo (Module{name,members,info}) =
 	    let val name = Name.asModule name
-		val head = CoreDec(Some(SeqDecl(List.map StrOnly P.strHeader)))
-		val contents = 
-		      (head :: List.concat(List.map (transMem tinfo) members))
-	    in  StrDec(name, NONE, contents)
+		val head = CoreDec(SeqDec P.strHeader)
+		val contents = List.map (transMem named_sigs tinfo) members
+		val {stru=contstr,sign=contsig} = decUnzip contents
+	    in  StrDec(name, NONE, head :: contstr)
 	    end
     end
 

@@ -24,7 +24,7 @@ REGTRS=$(REGDIR)/trusted
 
 REGFILES=$(notdir $(wildcard $(REGIN)/*.defs))
 
-REGOPTS=--separate-struct -tl Gtk -q $(OPTIONS)
+REGOPTS=--separate-struct -as -tl Gtk -q $(OPTIONS)
 REGOPTSMOS=$(REGOPTS)
 REGOPTSMLTON=--mlton $(REGOPTS)
 
@@ -74,7 +74,7 @@ trusted:
 	cp $(REGOUT)/*.out $(REGTRS)
 
 # Generate binding
-DEFSOPTS=$(OPTIONS) api/pygtk/gtk.defs > defs.log 2>&1
+DEFSOPTS=$(OPTIONS) --separate-struct -as api/pygtk/gtk.defs > defs.log 2>&1
 DEFSOPTSMOSML=-co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml
 DEFSOPTSMLTON=--mlton -co mgtk-mlton.c -so mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml
 
