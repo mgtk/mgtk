@@ -4,7 +4,7 @@
 include ../src/Makefile.inc
 
 # Options for compilation of mgtk.c
-OPTS=-O3 -fPIC
+OPTS=-O3 -fPIC -Wall
 CINCLUDE=-I$(MOSMLRUNTIME) `$(GTKCONFIG) --cflags`
 CFLAGS=$(ADDRUNCFLAGS) -Dunix $(OPTS) $(CINCLUDE)
 LIBS=$(ADDRUNLIBS) `$(GTKCONFIG) --libs`

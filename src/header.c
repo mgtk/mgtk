@@ -23,10 +23,7 @@
 
 
 /* A nice macro to have */
-#define GtkObj_val(x) ((void*) Field(x, 1))
-
-#define GtkObj_val_nocast(x) (Field(x, 1))
-
+#define GtkObj_val(x) (((void*) Field(x, 1)))
 
 static void ml_finalize_gtkobject (value val) {
   gtk_object_unref (GtkObj_val(val)); 
@@ -36,7 +33,7 @@ value Val_GtkObj (void* obj) {
   value res; 
   gtk_object_ref(obj); 
   res = alloc_final (2, ml_finalize_gtkobject, 0, 1);
-  GtkObj_val_nocast(res) = (value) obj;  
+  GtkObj_val(res) = obj;  
   return res; 
 }
 
@@ -198,31 +195,49 @@ EXTERNML value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
 }
 
 
+/* *** Convertion from ML to C *** */
+#define Mgtk_isCons(x) (Tag_val(x) != 0)
+#define Mgtk_head(x) (Field(x, 0))
+#define Mgtk_tail(x) (Field(x, 1))
+
+
+/* CONDITION: conv must not allocate in the mosml heap */
+#define Mgtk_SMLARRAY_TO_CARRAY(sarr, carr, conv)               \
+{int MGTK_SMLARRAY_I, MGTK_SMLARRAY_SZ;                         \
+ sarr = Field(sarr, 0); /* get underlying vector */             \
+ MGTK_SMLARRAY_SZ = Wosize_val(sarr);                           \
+ carr = malloc(MGTK_SMLARRAY_SZ);                               \
+ /* FIXME: check result from malloc */                          \
+ for(MGTK_SMLARRAY_I = 0; MGTK_SMLARRAY_I < MGTK_SMLARRAY_SZ;   \
+     MGTK_SMLARRAY_I++)                                         \
+   carr[MGTK_SMLARRAY_I] = conv(Field(sarr, MGTK_SMLARRAY_I));  \
+}
+
+
 /* *** Glib stuff *** */
 
 /* *** glist stuff *** */
-#define mgtk_isCons(x) (Tag_val(x) != 0)
-#define MGTK_SMLLIST_TO_GLIST(sls,gls,conv)				\
-        {value MGTK_SMLLIST_TEMP = sls; 				\
-         gls = NULL;							\
-	 while (mgtk_isCons(MGTK_SMLLIST_TEMP))				\
-	 {								\
-	   value MGTK_SMLLIST_ELEM__TEMP = Field(MGTK_SMLLIST_TEMP, 0);	\
-	   gls = g_list_append (gls,conv(MGTK_SMLLIST_ELEM__TEMP));	\
-	   MGTK_SMLLIST_TEMP = Field(MGTK_SMLLIST_TEMP, 1);		\
-	 }								\
-        }								\
+
+#define Mgtk_SMLLIST_TO_GLIST(sls,gls,conv)                             \
+{value MGTK_SMLLIST_TEMP = sls;                                         \
+ gls = NULL;                                                            \
+ while (Mgtk_isCons(MGTK_SMLLIST_TEMP)){                                \
+   value MGTK_SMLLIST_ELEM__TEMP = Mgtk_head(MGTK_SMLLIST_TEMP);        \
+   gls = g_list_append (gls,conv(MGTK_SMLLIST_ELEM__TEMP));             \
+   MGTK_SMLLIST_TEMP = Mgtk_tail(MGTK_SMLLIST_TEMP);                    \
+ }                                                                      \
+}
 									
-/* Shows how MGTK_SMLLIST_TO_GLIST can be used */
+/* Shows how Mgtk_SMLLIST_TO_GLIST can be used */
 GList* mgtk_smllist_to_glist_string(value smllist) {
   GList* glist;
-  MGTK_SMLLIST_TO_GLIST(smllist,glist,String_val);
+  Mgtk_SMLLIST_TO_GLIST(smllist,glist,String_val);
   return glist;
 }
 
 GList* mgtk_smllist_to_glist_object(value smllist) {
   GList* glist;
-  MGTK_SMLLIST_TO_GLIST(smllist,glist,GtkObj_val);
+  Mgtk_SMLLIST_TO_GLIST(smllist,glist,GtkObj_val);
   return glist;
 }
 

@@ -4533,6 +4533,7 @@
   ((GtkCList clist)
    (int row)))
 
+;; gtk_clist_prepend
 ;; gtk_clist_append
 ;; gtk_clist_insert
 
