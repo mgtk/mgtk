@@ -15,8 +15,8 @@ mgtk.so: $(COBJS)
 	$(DYNLD) /Fe$@ $(COBJS) $(LIBS) /link /subsystem:console
 
 clean:
-	$(REMOVE) *.ui
-	$(REMOVE) *.uo
+	$(REMOVE) *.u?
+	$(REMOVE) *~
 	$(REMOVE) *.obj
 	$(REMOVE) *.so
 	$(REMOVE) *.def

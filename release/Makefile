@@ -15,9 +15,10 @@ mgtk.so: $(COBJS)
 	$(DYNLD) -o $@ $(COBJS) $(LIBS)
 
 clean:
-	rm -f *.u? 
-	rm -f *.o *.so
-	rm -f Makefile.bak
+	$(REMOVE) *.u? 
+	$(REMOVE) *~
+	$(REMOVE) *.o *.so
+	$(REMOVE) Makefile.bak
 
 depend : 
 	mv Makefile Makefile.bak
