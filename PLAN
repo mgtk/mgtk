@@ -13,7 +13,7 @@ v gtk_init fix (Ken) [May 1, 2000]
 * More functions from Sugar: latest comparison:
   + bitmaps / drawables
   + cursors
-v Incoporate Mike's Win32 port
+v Incoporate Mike's Win32 port [Fixed: Henning, June 5, 2000]
 
 Milestone 2 (release version 1.0):
 ----------------------------------
