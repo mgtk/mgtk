@@ -87,7 +87,7 @@ change to have some influence):
 
         val text_new': unit -> base GtkText
    
-    The plinged version corresponds the the normal version called with
+    The plinged version corresponds to the normal version called with
     all optional arguments set to NONE.
  
     Should this be the other way around?  That is, should the version
