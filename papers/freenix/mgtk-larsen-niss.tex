@@ -12,14 +12,14 @@
 
 \usepackage{preamble}
 
-
-\usepackage{hyperref}
-\hypersetup{pdftitle = {mGTK: An \sml binding of \gtk},
-            pdfauthor = {Ken Friis Larsen \& Henning Niss},
-            pdfsubject = {Describtion of a Standard ML language
-              binding for the graphical toolkit \gtk.},
-            pdfstartview = {FitH}
-            }
+%\usepackage{hyperref}
+%\hypersetup{pdftitle = {mGTK: An \sml binding of \gtk},
+%            pdfauthor = {Ken Friis Larsen \& Henning Niss},
+%            pdfsubject = {Describtion of a Standard ML language
+%              binding for the graphical toolkit \gtk.},
+%            pdfstartview = {FitH}
+%            }
+\usepackage{url}
 
 
 % Hacks
@@ -399,7 +399,6 @@ widget, and \texttt{Button} for the Button widget), and (3)~how to
 connect signals to widgets (using module \texttt{Signal}).
 
 \begin{figure*}[htp]
-\begin{centering}
 \begin{verbatim}
 structure HelloWorld = struct
   fun hello _ = print "Hello World\n"
@@ -420,7 +419,6 @@ end
 val _ = HelloWorld.main()
 \end{verbatim}
 \caption{Hello World in \mgtk.\label{fig:hello-world}}
-\end{centering}
 \end{figure*}
 
 Even this small example shows some of the main advantages of
@@ -448,9 +446,9 @@ Such syntacic conveniences improve the readability and
 quality of code.
 
 Finally, in \sml, the double-colon \texttt{::}
-denotes the cons operation on lists.  That is, to add an element $x$
-to the beginning of a list $\mathit{xs}$ we write $x \texttt{::}
-\mathit{xs}$ (in contrast to C++ where double-colon is the module operator).  
+denotes the cons operation on lists.  That is, to add an element \textit{x}
+to the beginning of a list \textit{xs} we write $\textit{x} \texttt{::}
+\textit{xs}$ (in contrast to C++ where double-colon is the module operator).  
 Built-in data types such as lists make GUI programming more convenient.
 
 %% FIXME
@@ -551,7 +549,6 @@ also called ``type safety''.  In type-theoretic jargon, the trick is to
 use parametric polymorphism and \emph{existential types} to encode
 inheritance subtyping.  In particular we use \emph{phantom types} to
 encode the inheritance path.
-
 
 \begin{figure}[thp]
   \centering
