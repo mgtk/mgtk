@@ -162,7 +162,10 @@ be sufficient to get an understanding of the examples in the rest of
 the paper.  We refer the interested reader to one of the fine textbooks
 \cite{Hansen-Rischel:1999,Paulson:1996} for more information about \sml{}.
 
-
+\begin{ednote}{HN}
+I don't like the sentence ``\ldots use the language in anger'' (what
+does this ``anger''-thing mean?).
+\end{ednote}
 
 \sml{} is a two-level language, it consists of a \emph{core language}
 for programming in the small (that is, functions, data structures and
@@ -215,7 +218,7 @@ end
 \end{figure*}
 
 Figure~\ref{fig:stack-lib} show a small stack library implemented in
-SML.  This examples shows most of the important features of SML.  The
+SML.  This example shows most of the important features of SML.  The
 library consists of two parts: an interface description, which is
 called a \emph{signature} in SML (Figure~\ref{fig:stack-sig}), and an
 module implementation, which is called a \emph{structure} in SML
@@ -227,59 +230,68 @@ declarations of the structure that is to be visible from the outside.
 The signature is named !STACK!, its extent is delimited by
 \texttt{sig} \ldots\ \texttt{end}, and it contains five
 specifications: one type specification, one exception sprcification,
-and three value specifications.  The type specification 
-!type 'a stack! states that a module that satisfy (implements) the signature
-!STACK! must declare a parameterized type named !stack! and that this
-type is parameterized.  The !'a! is a \emph{type variable} and this is
-what makes the type parameterized.  Type variables can be instansiated
-to other types.  Thus, the type of a stack of intergers is 
-!int stack!, the type of a stack of integer stacks is !int stack stack!,
-and so on. Type variables are the core of \emph{parametric
-  polymorphism} (which is also knows as generics in, for example, C++
-and Java.  See \cite{garcia03:generics} for a comparison of
-programming languages with support for parametric polymorphism).  The
-type specification does not say anything about how a stack must be
-implemented.  The exception specification just states that an
-exception named !EmptyStack! must be declared.  The first value
-specification said that a constant named !empty! must be declared and
-that this constant must have type !'a stack!.  That is, !empty! is a
-\emph{polymophic} value, it can be used in contexts where an
-\texttt{int stack} is needed or in contexts where a !string stack! is
-needed.  The next value specification states that a function named
-!push! must be implemented, and that this function takes two
-arguments: an element and a stack, and returns a stack.  Again, we see
-how type variables a used to specify that !push! must work with stacks
-where the elements can have any type.  The last value specification
-states that a function named !pop! must be implemented, and that !pop!
-takes a stack as argument and returs an element and a new stack.
+and three value specifications.
 
-Figure~\ref{fig:stack-struct} show code of the implemtation, that is a
+The type specification !type 'a stack! states that a module that
+satisfy (implements) the signature !STACK! must declare a type named
+!stack! and that this type is parameterized.  The !'a! is a \emph{type
+  variable} and this is what makes the type parameterized.  Type
+variables can be instansiated to other types.  Thus, the type of a
+stack of intergers is !int stack!, the type of a stack of integer
+stacks is !int stack stack!, and so on. Type variables are the core of
+\emph{parametric polymorphism} (also known as generics in, for
+example, C++ and Java; see \cite{garcia03:generics} for a comparison
+of programming languages with support for parametric polymorphism).
+The type specification does not say anything about how a stack must be
+implemented.
+
+The exception specification just states that an exception named
+!EmptyStack! must be declared.
+
+The first value specification says that a constant named !empty! must
+be declared and that this constant must have type !'a stack!.  That
+is, !empty! is a \emph{polymophic} value, it can be used in contexts
+where an \texttt{int stack} is needed or in contexts where a
+!int stack stack! is needed.  The next value specification states that a
+function named !push! must be implemented, and that this function
+takes two arguments: an element and a stack, and returns a stack.
+Again, we see how type variables are used to specify that !push! must
+work with stacks where the elements can have any type.  The last value
+specification states that a function named !pop! must be implemented,
+and that !pop!  takes a stack as argument and returs an element and a
+new stack.
+
+Figure~\ref{fig:stack-struct} show the code of the implementation, that is a
 structure declaration.  The declarations states
-that the structure is named !Stack!, that !Stack! satisfy the
+that the structure is named !Stack!, that !Stack! satisfies the
 signature !STACK!, and that !Stack! does not reveal any implementation
 details not revealed by !STACK! (that is what the !:>! means).  The
-extend of a structure is delimited by \texttt{struct} \ldots\ 
-\texttt{end}.  The parameterized type !stack! is implemented by an
-algebraic data type, that is, the !datatype! declaration.  This
-declaration says that an !'a stack! is either: the constant !Empty! or
-constructed by applying the constructor !Stack! to an element and a
-stack (constants declared by a !datatype! declaration, such as !Empty!
-is sometimes called unit constructors or just constructors).  The
-exception declaration !exception EmptyStack! just declares an
-exception.  The next declaration just state that !empty! is bound to
-!Empty!.  The function !push! just applies the constructor !Stack! to
-its argumets.  The function !pop! is more interesting, it takes a
-stack as argument (here we have reused the name !stack! as types and
-values uses different namespaces, thus the same name can be used for
-both a type and a value) and the uses a !case! expression to analyse
-its argument.  If the argument is the empty stack (the constant
-!Empty!) then the exception !EmptyStack! is raised (thrown);
-otherwise, if the argument has been constructed with !Stack! applied
-to the arguments !top! and !rest! then a pair consisting of !top! and
-!rest! is returned.  Now, users of this library can call functions
-from the structure !Stack! by using ``dot-notation'', fx !Stack.pop mystack!.
+extent of a structure is delimited by \texttt{struct} \ldots\ 
+\texttt{end}.
 
+The parameterized type !stack! is implemented by an algebraic data
+type, that is, the !datatype! declaration.  This declaration says that
+an !'a stack! is either: the constant !Empty! or constructed by
+applying the constructor !Stack! to an element and a stack (constants
+declared by a !datatype! declaration, such as !Empty!  is sometimes
+called unit constructors or just constructors).
 
+The exception declaration !exception EmptyStack! just declares an
+exception.
+
+The next declaration just states that !empty! is bound to !Empty!.  The
+function !push! just applies the constructor !Stack! to its argumets.
+The function !pop! is more interesting, it takes a stack as argument
+(here we have reused the name !stack! as types and values uses
+different namespaces, thus the same name can be used for both a type
+and a value) and then uses a !case! expression to analyse its argument.
+If the argument is the empty stack (the constant !Empty!) then the
+exception !EmptyStack! is raised (thrown); otherwise, if the argument
+has been constructed with !Stack! applied to the arguments !top! and
+!rest! then a pair consisting of !top! and !rest! is returned.
+
+Now, users of this library can call functions from the structure
+!Stack! by using ``dot-notation'', for example !Stack.pop mystack!.
 
 This small example illustrate one of the cornerstones in functional
 programming, namely that new values are constructed by analyzing,
