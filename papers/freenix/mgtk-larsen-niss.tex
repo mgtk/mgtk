@@ -123,13 +123,15 @@ optimizing whole-program compilers targeting native code.
 \subsection{\gtk}
 \label{sec:gtk}
 
-\gtk (the GIMP Toolkit) \cite{Gtk-webpage:2004} is an LGPL-licensed
-\cite{LGPL:1999} library for creating graphical user interfaces. It is
-the graphical toolkit used in the \gnome platform.  \gtk is
-implemented in C, but from the beginning the \gtk developers have paid
-attention to making it feasible and practical to develop ``bindings''
-or ``wrappers'' for other programming languages than C. Such bindings
-allows \gtk to be used in programs written in those languages. See
+\gtk (The GIMP Toolkit) \cite{Gtk-webpage:2004} is an LGPL-licensed
+\cite{LGPL:1999} graphical toolkit for the X Window System. It
+provides facilities for programmers to create graphical user
+interfaces.  \gtk is implemented in C with an object-oriented
+hierarchy of user interface elements (``widgets''), but from the
+beginning the \gtk developers have paid attention to making it
+feasible and practical to develop ``bindings'' or ``wrappers'' for
+other programming languages than C.  Such bindings allows \gtk to be
+used in programs written in those languages. See
 \cite{Gtk-bindings-webpage:2004} for a current list of bindings.
 
 \begin{ednote}{Bart}
@@ -708,10 +710,6 @@ by the Moscow ML compiler
 \section{Process}
 \label{sec:process}
 
-\begin{ednote}{Henning}
-  Fra mini muck-up til fuld toolkit
-\end{ednote}
-
 In constructing the \mgtk binding we leverage the foresightedness of
 the \gtk developers. Early on it was recognized that it would be
 important to have a machine-readable ``specification'' of the toolkit.
@@ -719,24 +717,18 @@ Essentially the specification would specify the widget classes, the
 inheritance hierarchy, and methods and functions in the toolkit. The
 specification became known as the \texttt{gtk.defs} file. One could
 argue that it is simple enough to extract the same information from
-the C header files. However, that incurs an initial hurdle in the
-form of a suitable parser that is not present with the easily parsable
-defs-format.
-\begin{ednote}{Bart}
-  Correct the 2nd sentence to something like "However, C headers are
-  difficult to parse, whereas the defs format is straightforward."
-\end{ednote}
-
-
-\begin{ednote}{Henning} This is crap, but it is there. \end{ednote}
+the C header files. However, C headers are difficult to parse, whereas
+the defs format is straightforward to parse.
 
 The bulk of the \mgtk binding is constructed automatically from the
-\texttt{gtk.defs} file. Based on this automatic construction the
-complete binding process is naturally divided in two phases: (1)
-binding ``design'', and (2) binding construction. It is important to
-note here that the design phase can be carried out for a very small
-subset of the complete toolkit after which the construction phase
-``mimics'' that for the complete toolkit.
+\texttt{gtk.defs} file.  The complete binding process is naturally
+divided in two phases: (1) binding ``design'' where we apply the
+principles described in Section~\ref{sec:encoding-classes} on a few
+representative widgets to demonstrate the structure of the binding,
+and (2) binding construction where the structure in (1) is applied to
+the entire toolkit. It is important to note here that the design phase
+can be carried out for a very small subset of the toolkit after which
+the construction phase ``mimics'' that for the complete toolkit.
 % We refer to the design as a
 %\emph{muck-up} and the result as \minimgtk.
 This phase separation makes it easier to get the design right simply
@@ -744,9 +736,10 @@ because there are fewer issues to deal with.  It also makes the work
 involved in moving the binding to other \sml compilers manageable
 (essentially just ask the compiler writers to provide the equivalent
 of the small subset for their compiler; and mimic that during the
-construction phase). It also helps when new releases of \gtk are
-produced. Most of the work in constructing the binding for the new
-release is over when the design for the small subset has been completed.
+construction phase). Finally, we hope it will help when new releases
+of \gtk are produced. Most of the work in constructing the binding for
+the new release is over when the design of the small subset has been
+completed.
 
 Let us return to our running example, and look at some example
 specifications of widgets, functions, and signals. Figure~\ref{fig:gtk-defs}
@@ -770,21 +763,31 @@ shows three entries in the \texttt{gtk.defs} file.
 (define-signal clicked
   (of-object "GtkButton")
   (return-type "void")
-  (when "first")
 )
 \end{verbatim}
 \caption{\texttt{gtk.defs} excerpt.\label{fig:gtk-defs}}
 \end{centering}
 \end{figure}
-The first entry shows the shape of widget specification 
-\begin{ednote}{Bart}
-  "...the shape of widget specification..." clarify
-\end{ednote}
-(defining \texttt{Button} to be a sub-widget of \texttt{Bin}). The
-next entry shows a function specification (that actually is a
-constructor for the \texttt{Button} widget) with return type
+The first entry shows a widget specification indicated by
+!define-object!. From the entry we see that the !GtkButton! widget
+(the name appearing right after !define-object! is a shorthand)
+inherits from !GtkBin!, and it belongs in the !Gtk! module.  We also
+see the type assigned to instances of this widget in the \gtk type
+system (which is completely unrelated to the \sml encoding given
+above).
+
+The next entry shows a function specification (that actually is a
+constructor for the \texttt{GtkButton} widget) with return type
 \texttt{GtkWidget*} (in the C implementation) and a string argument.
-Finally, we show a specification of a signal generated by buttons.
+
+The final entry shows a ``signal handler'' or (``callback'')
+specification. In this case, we specify the prototype for handlers
+of clicks on buttons. The signal handler for !clicked! for widget
+!GtkButton! does not accept any parameters, and does not return any
+values. Other signals includes parameters to, for example, specify
+which widget in a collection of widgets (for example in trees) the
+user clicked on. Others include return values to indicate, for example,
+whether to proceed or not.
 
 %\subsection{Stubs and code generation}
 %\label{sec:stubs-code-gener}
@@ -928,28 +931,17 @@ just interface to?
 \end{ednote}
 
 In this paper we have demonstrated that it is theoretically and
-practically possible to make an interface from \sml to \gtk.  This is
-interesting for several reasons: first, the \sml community gets
-access to a graphical library which is sourly needed; second, the fact
-that it is possible to make an \sml binding to \gtk really attests to
-the claimed ``interfaceability'' of \gtk because \sml is so radically
-different from C in abstraction level and paradigm; finally, we think
-that we have demonstrated that it is indeed possible to bind the entire \gnome
-development platform, using mainly machine generated stub code.
-
-\begin{ednote}{Bart}
-  Tone down the claims here.  You have one of several
-interfaces, albeit a nice one.  You may claim completeness,
-portability (when demonstrated), and ease of use.
-
-\end{ednote}
-
-
-\begin{ednote}{Bart}
-  
-Move the claims below the future work.
-
-\end{ednote}
+practically possible to make a type safe interface from \sml to \gtk.
+This is interesting for several reasons: first, \mgtk was one of the
+first graphical toolkits available to the \sml community; second, the
+fact that it is possible to make an \sml binding to \gtk really
+attests to the claimed ``interfaceability'' of \gtk because \sml is so
+radically different from C in abstraction level and paradigm; third,
+by autogenerating the binding we get a binding of the complete \gtk
+toolkit; finally, we believe that the particular way we construct the
+binding, gives us hope that we may eventually be able to bind the
+entire \gnome development platform, using mainly machine generated
+stub code.
 
 \bibliographystyle{abbrvnat}
 \bibliography{mgtk}
