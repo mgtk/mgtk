@@ -85,12 +85,46 @@ struct
     end
 
     (* construct abstract syntax *)
+    type parlist = (TypeExp.long_texp * string) list
+    fun splitList p l =
+	let fun f (elem, (acc1,acc2)) =
+	        if p elem then (elem::acc1,acc2)
+		else (acc1, elem::acc2)
+	in  List.foldr f ([],[]) l
+	end
+    fun separateParams (retType, params: parlist) =
+	let fun mkTuple ([], retType) = retType
+              | mkTuple (pars, retType) =
+	        let val tOut = if TypeInfo.isVoidType retType then pars
+			       else retType :: pars
+		in  case tOut of
+		       nil => raise Fail ("mkTuple: has to return *something*")
+		     | [t] => t
+                     | ts => TypeExp.LONG([], TypeExp.TUPLE ts)
+		end
+	    val (outPars, pars) = splitList (TypeInfo.isOutputType o #1) params
+	in  (outPars, pars, mkTuple (map #1 outPars, retType))
+	end
+    fun mkFunType (retType, []) = 
+	raise Fail ("mlFunType: no parameters")
+      | mkFunType (retType, params) =
+	let val (outPars, pars, retType) = separateParams (retType, params)
+	in  TypeExp.LONG([], TypeExp.ARROW(pars, outPars, params, retType))
+	end
+
     fun mkObjectDecl (pos, (((name, inherits), fields))) = 
 	( insertWidget name inherits
         ; AST.OBJECT_DECL (pos, TypeExp.LONG([],TypeExp.WIDGET(name,SOME inherits)),fields)
         )
-    fun mkFunctionDecl (pos, ((name, typeExp), parameters)) =
-	(AST.FUNCTION_DECL (pos, name, typeExp, parameters))
+    fun mkFunctionDecl (pos, ((name, typeExp), params)) =
+	let val dummyPair = (TypeExp.LONG([], TypeExp.PRIMTYPE "none"), "dummy")
+	    val params' = List.filter (not o TypeInfo.isNullType') params
+	    val params'' = if null params' then [dummyPair] else params'
+	    val retType = typeExp
+	    val shortType = if List.length params' = List.length params then NONE
+			    else SOME (mkFunType (retType, params''))
+	in  AST.FUNCTION_DECL (pos, name, AST.FUNTYPE(mkFunType (retType, params),shortType))
+	end
     fun mkFlagsDecl false (pos, (flagName, cs)) = 
 	( insertFlag flagName
 	; AST.FLAGS_DECL(pos, TypeExp.LONG([], TypeExp.FLAG(flagName, false)), cs)
@@ -106,7 +140,7 @@ struct
     fun mkSignalDecl (pos, ((name,signal),cbType)) = 
 	(AST.SIGNAL_DECL (pos, TypeExp.LONG([],mkTypeExp name), signal, cbType))
 
-    fun mkFunType (retType, pars) = TypeExp.LONG ([], TypeExp.ARROW(pars, retType))
+    fun mkCBType (retType, pars) = TypeExp.LONG ([], TypeExp.ARROW(pars, [], pars, retType))
 
     fun ensureNonEmpty [] = [(TypeExp.LONG ([], TypeExp.PRIMTYPE "none"), "dummy")]
       | ensureNonEmpty pars = pars
@@ -162,8 +196,7 @@ struct
     val inherits = optional (parenthesized (optional word)) >> mkInherits
     val boxedDecl = parenthesized' (defBoxed $-- word -- inherits -- repeat word -- optional size)
 
-    val cbType = parenthesized (typeExp -- (parList >> map #1))
-                 >> mkFunType
+    val cbType = parenthesized (typeExp -- parList) >> mkCBType
 
     val signalName = (string >> (fn n => [n]) )
                   || (parenthesized (string -- string) >> (fn (n,p) => [p,n]))

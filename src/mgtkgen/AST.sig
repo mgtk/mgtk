@@ -13,9 +13,12 @@ sig
     type constructor = string
     type parameter = long_texp * string
 
+    datatype funtype =
+	FUNTYPE of long_texp (* ``normal'' parameters *)
+	         * long_texp option (* short paramters *)
     datatype declaration =
 	OBJECT_DECL of pos * long_texp * (parameter list option)
-      | FUNCTION_DECL of pos * string * long_texp * (parameter list)
+      | FUNCTION_DECL of pos * string * funtype
       | FLAGS_DECL of pos * long_texp * constructor list
       | BOXED_DECL of pos * long_texp * (string list)
       | SIGNAL_DECL of pos * long_texp * string list * long_texp option

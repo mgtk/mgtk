@@ -1,3 +1,11 @@
+2000-06-18  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml (et al): Moved the construction of function types
+	from many places in Translate.sml to the construction of
+	FUNCTION_DECL in AST.sml. A TypeExp.ARROW now contains the
+	parameters and output parameters (the two first arguments), the
+	complete list of parameters, and the result type.
+
 2000-06-14  Henning Niss  <hniss@diku.dk>
 
 	* Translate.sml (et al): Added the possibility for boxed types to

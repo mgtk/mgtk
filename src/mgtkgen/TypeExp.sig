@@ -8,7 +8,8 @@ sig
     datatype texp = 
 	PRIMTYPE of string
       | TUPLE of long_texp list
-      | ARROW of long_texp list * long_texp
+      | ARROW of parlist (* parameters *) * parlist (* output parameters *) * parlist (* all parameters *)
+	       * long_texp (* return type *)
       | OPTION of long_texp
       | OUTPUT of long_texp
       | FLAG of string * bool (* is this an enum? *)
@@ -17,6 +18,7 @@ sig
       | LIST of long_texp
     and long_texp = LONG of string list (* path to the type *)
                           * texp (* the type itself *)
+    withtype parlist = (long_texp * string) list
 
     val toString: long_texp -> string
     val typeClass: long_texp -> string

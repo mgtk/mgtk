@@ -89,8 +89,8 @@ struct
             )
 	  | mkType nest toType tArg (TypeExp.TUPLE tArgs) = 
 	    prsep ($" * ") (mkLongType true toType tArg) tArgs
-	  | mkType nest toType tArg (TypeExp.ARROW(tArgs, tRet)) =
-	    parens nest (prsep ($" -> ") (mkLongType true toType tArg) tArgs
+	  | mkType nest toType tArg (TypeExp.ARROW(tArgs, _, _, tRet)) =
+	    parens nest (prsep ($" -> ") (mkLongType true toType tArg o #1) tArgs
 			&& $" -> " && mkLongType true toType (fn _ => $"base") tRet
                         )
 	  | mkType nest toType tArg (TypeExp.OPTION t) =
@@ -134,12 +134,12 @@ struct
 
 	fun mkMLPrimFreshType typExp = 
 	    (reset (); mkLongType false ML_PRIM_TYPE fresh typExp)
-	fun mkMLPrimType (TypeExp.LONG(path, TypeExp.ARROW(tArgs, tRet))) =
+	fun mkMLPrimType (TypeExp.LONG(path, TypeExp.ARROW(tArgs, tOuts, tCmp, tRet))) =
 	    if fitsDynApp tArgs (* check if it fits appX *)
-	    then mkMLPrimFreshType (TypeExp.LONG(path, TypeExp.ARROW(tArgs, tRet)))
+	    then mkMLPrimFreshType (TypeExp.LONG(path, TypeExp.ARROW(tArgs, tOuts, tCmp, tRet)))
 	    else mkMLPrimFreshType 
 		      (TypeExp.LONG(path, 
-				TypeExp.ARROW([TypeExp.LONG([],TypeExp.TUPLE tArgs)],tRet)))
+				TypeExp.ARROW([(TypeExp.LONG([],TypeExp.TUPLE (map #1 tArgs)),"")],tOuts,tCmp,tRet)))
           | mkMLPrimType t = mkMLPrimFreshType t
 
     end (* local *)

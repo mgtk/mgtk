@@ -9,8 +9,6 @@ struct
 
     fun id x = x
 
-    val fitsDynApp = TypeInfo.fitsDynApp
-
     (* mappings between defs strings representing (type) names,
        and the corresponding ML (type) names *)
     fun mlWidgetName (TypeExp.LONG(_,TypeExp.WIDGET(name,_))) = NameUtil.removePrefix name
@@ -24,45 +22,10 @@ struct
               | _ => Util.shouldntHappen "Not a signal"
         end
     fun mlFlagName name = NameUtil.remove_PREFIX name
-    fun mlEnumName name = NameUtil.remove_PREFIX name
-
-
-
-    val get_texp = TypeInfo.get_texp
-    val dummyPair = (TypeExp.LONG([], TypeExp.PRIMTYPE "none"), "dummy")
-
-
 
     type parlist = (TypeExp.long_texp * string) list
 
-    fun splitList p l =
-	let fun f (elem, (acc1,acc2)) =
-	        if p elem then (elem::acc1,acc2)
-		else (acc1, elem::acc2)
-	in  List.foldr f ([],[]) l
-	end
-
-    fun separateParams (retType, params: parlist) =
-	let fun mkTuple ([], retType) = retType
-              | mkTuple (pars, retType) =
-	        let val tOut = if TypeInfo.isVoidType retType then pars
-			       else retType :: pars
-		in  case tOut of
-		       nil => raise Fail ("mkTuple: has to return *something*")
-		     | [t] => t
-                     | ts => TypeExp.LONG([], TypeExp.TUPLE ts)
-		end
-	    val (outPars, pars) = splitList (TypeInfo.isOutputType o #1) params
-	in  (outPars, pars, mkTuple (map #1 outPars, retType))
-	end
-
-    fun mlFunType (retType, []: parlist) = 
-	raise Fail ("mlFunType: no parameters")
-      | mlFunType (retType, params: parlist) =
-	let val (outPars, pars, retType) = separateParams (retType, params)
-	in  TypeExp.LONG([], TypeExp.ARROW(map #1 pars, retType) )
-	end
-
+    fun mkArrowType (retType, pars) = TypeExp.LONG([], TypeExp.ARROW(pars, [], pars, retType))
 
     (* Helper functions *)
 
@@ -186,7 +149,7 @@ struct
 	end
 
     fun paramList (params: parlist) = 
-	if fitsDynApp params
+	if TypeInfo.fitsDynApp params
 	then $"(" && prsep ($", ") ((fn n=> $$["value ",n]) o #2) params && $")"
 	else $$["(value mgtk_params)"]
 
@@ -206,7 +169,7 @@ struct
       | declareOutParams (retType, outPars) =
 	let fun decl (tName, name) = 
 	        $"  " && TypeInfo.mkCType tName && $" " && mkOutName name && $";"
-	in     (if size(get_texp retType) > 1 then $"  value res;" && Nl else Empty)
+	in     (if size(TypeInfo.get_texp retType) > 1 then $"  value res;" && Nl else Empty)
             && prsep Nl decl outPars && Nl
 	end
 
@@ -215,26 +178,31 @@ struct
     fun mkReturn' cExp (retType as (TypeExp.PRIMTYPE "none"), outPars) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TypeInfo.fromCValue (TypeExp.LONG([], retType), $"dummy") && $";" && Nl
+
       | mkReturn' cExp (retType as (TypeExp.PRIMTYPE _), []) =
 	   $"  return " && TypeInfo.fromCValue (TypeExp.LONG([], retType), cExp) && $";" && Nl
       | mkReturn' cExp (retType as (TypeExp.PRIMTYPE _), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TypeInfo.fromCValue (tOut, mkOutName nOut) && $";" && Nl
+
       | mkReturn' cExp (retType as (TypeExp.WIDGET (wid,_)), []) =
 	   $"  return " && TypeInfo.fromCValue (TypeExp.LONG([], retType), cExp) && $";" && Nl
       | mkReturn' cExp (retType as (TypeExp.WIDGET _), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TypeInfo.fromCValue (tOut, mkOutName nOut) && $";" && Nl
+
       | mkReturn' cExp (retType as (TypeExp.POINTER _), []) =
 	   $"  return " && TypeInfo.fromCValue (TypeExp.LONG([], retType), cExp) && $";" && Nl
       | mkReturn' cExp (retType as (TypeExp.POINTER _), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TypeInfo.fromCValue (tOut, mkOutName nOut) && $";" && Nl
+
       | mkReturn' cExp (retType as (TypeExp.FLAG (fName,_)), []) =
 	   $"  return " && TypeInfo.fromCValue (TypeExp.LONG([], retType), cExp) && $";" && Nl
       | mkReturn' cExp (retType as (TypeExp.FLAG (fName,_)), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TypeInfo.fromCValue (tOut, mkOutName nOut) && $";" && Nl
+
       | mkReturn' cExp (TypeExp.PRIMTYPE _, _) = 
 	  Util.shouldntHappen("mkReturn: multiple output parameters and return type is a type name")
       | mkReturn' cExp (retType as (TypeExp.TUPLE (tOuts as (t::_)), outPars)) =
@@ -252,18 +220,17 @@ struct
 	  Util.shouldntHappen("mkReturn: wrong return type")
     and mkReturn cExp (TypeExp.LONG(path, typExp), outPars) = mkReturn' cExp (typExp, outPars)
 
-    fun mkFunDecl (name, retTyp, params, cExp) = 
-	let val params = if null params then [dummyPair] else params
-	    val (outPars, pars, retType) = separateParams (retTyp, params)
-	    val typ = mlFunType (retTyp, params)
-	in  $"/* ML type: " && TypeInfo.mkMLPrimType typ && $" */" && Nl
+    fun mkFunDecl (name, funType as TypeExp.LONG(_, TypeExp.ARROW(pars,outPars,cmp,retType)), cExp) = 
+	let val dummyPair = (TypeExp.LONG([], TypeExp.PRIMTYPE "none"), "dummy")
+	in  $"/* ML type: " && TypeInfo.mkMLPrimType funType && $" */" && Nl
          && $$["EXTERNML ", "value m", name] && paramList pars && $" { /* ML */" && Nl
          && declareOutParams (retType, outPars)
-         && (if fitsDynApp pars then Empty else extractParams pars && Nl)
+         && (if TypeInfo.fitsDynApp pars then Empty else extractParams pars && Nl)
          && mkReturn cExp (retType, outPars)
          && $"}" && Nl
          && Nl
 	end
+      | mkFunDecl _ = raise Fail("mkFunDecl: not a function type")
 
     (* Code to declare an ML function 
        ------------------------------------------------------------
@@ -284,7 +251,7 @@ struct
              text_insert'_ text chars length
     *)
 
-    fun mkMLFunDecl base (name, tExp) =
+    fun mkMLFunDecl (name, tExp) =
 	let val name' = mlFunName name
 	in  mkValDecl (name', TypeInfo.mkMLType tExp, NONE)
 	end
@@ -308,33 +275,31 @@ struct
 	$"getFlags(" && res && $")"
       | wrapResult typExp res = res
 
-    fun mkMLFunVal short (name, retTyp, params) =
-	let val (outPars, pars', retTyp') = separateParams (retTyp, params)
-
-	    val args = List.length pars'
-	    val no_args = if fitsDynApp pars' then args else 1
+    fun mkMLFunVal short (name, typ as (TypeExp.LONG(_, TypeExp.ARROW(pars',outPars,_,retTyp')))) =
+	let val no_args = if TypeInfo.fitsDynApp pars' then List.length pars' else 1
 	    val name' = mlFunName name
 	    val (c_name,ml_name) = 
 		    if short then (name ^ "_short", name' ^ "'")
 		    else (name, name')
 	    val primval = 
-		   let val typ = mlFunType (retTyp, params)
-		       val value = $$["app", Int.toString no_args,
+		   let val value = $$["app", Int.toString no_args,
 				      "(symb\"m", c_name, "\")"]
 		   in  mkValDecl (ml_name ^ "_", TypeInfo.mkMLPrimType typ, SOME value)
 		   end
-	    val funcval =  mkMLFunDecl (SOME ($"base")) (ml_name,mlFunType (retTyp,params))
+	    val funcval =  mkMLFunDecl (ml_name,typ)
                         && $$[indent, indent, "= "]
 		        && prmap mkArg pars'
                         && wrapResult retTyp' 
                                ($$[ml_name, "_ "] && 
-			         (if not(fitsDynApp pars')
+			         (if not(TypeInfo.fitsDynApp pars')
 				  then $"(" && prsep ($", ") unwrapArg pars' && $")"
 				  else prsep ($" ") unwrapArg pars')
                                )
                        && Nl && Nl
 	in  primval && funcval
 	end
+      | mkMLFunVal short (name, _) =
+	raise Fail("mkMLFunVal: not a function type")
 
     (* Code to extract fields of a widget 
        ------------------------------------------------------------
@@ -366,14 +331,14 @@ struct
 	    val macro = $$["GTK_", NameUtil.toUpper name',"("]
                         && TypeInfo.toCValue (name, $"wid") && $")"
 	    val cExp = $"(" && macro && $")" && $" -> " && $field
-	in  mkFunDecl (getFieldName (name, field), typExp, [(name,"wid")], cExp)
+	in  mkFunDecl (getFieldName (name, field), mkArrowType (typExp, [(name,"wid")]), cExp)
 	end
 
     fun mkMLGetFieldDecl name (typExp, field) =
-	mkMLFunDecl ($"base") (getFieldName(name,field), mlFunType (typExp,[(name,"wid")]))
+	mkMLFunDecl (getFieldName(name,field), mkArrowType (typExp,[(name,"wid")]))
 
     fun mkMLGetFieldVal name (typExp, field) =
-	mkMLFunVal false (getFieldName(name,field), typExp, [(name,"wid")])
+	mkMLFunVal false (getFieldName(name,field), mkArrowType (typExp, [(name,"wid")]))
 
     (* Code to declare a new widget
        ------------------------------------------------------------
@@ -562,7 +527,7 @@ struct
 	end
     fun mkMLFlagsDecl (flag, constr) =
 	let val fName = flagName flag
-	    fun prCnstr const = mkValDecl (mlEnumName const, $fName, NONE)
+	    fun prCnstr const = mkValDecl (mlFlagName const, $fName, NONE)
 	in  mkEqTypeDecl (fName, NONE)
          && prsep Empty prCnstr constr
          && Nl
@@ -571,14 +536,14 @@ struct
 	let val fName = flagName flag
 	    val fName' = flagRealName flag
 	    val tupleType = mlFlagTupleType constr
-	    fun cName const = $(mlEnumName const)
+	    fun cName const = $(mlFlagName const)
 	in  mkTypeDecl (fName, SOME ($"int"))
          && $$[indent,"val get_", fName, "_: "]
 	       && $"unit -> " && TypeInfo.mkMLPrimType tupleType && Nl
 	       && $$[indent, indent, "= app1(symb\"mgtk_get_",fName,"\")"] && Nl
          && $$[indent,"val ("] && prsep ($",") cName constr && $")" && Nl
          && $$[indent,indent,"= get_", fName, "_ ()"] && Nl
-(* we could do this, by the entire gtk.defs file only contains a
+(* we could do this, but the entire gtk.defs file only contains a
    single return value of type flag --- consequently, this seems
    excessive
 	 && $$[indent,"val getSet", fName'," = ", "isSet ["] &&
@@ -604,41 +569,36 @@ struct
     *)
 
     fun longTName tName = TypeExp.LONG([], TypeExp.PRIMTYPE tName)
-
+    val unitType = longTName "none"
     fun mlConnectType (name, NONE) = 
-	TypeExp.LONG([], TypeExp.ARROW([name,
-				TypeExp.LONG([], TypeExp.ARROW([longTName "none"], 
-						       longTName "none"))],
-			       longTName "none"))
+	mkArrowType (unitType,
+		   [(name,"wid"), (mkArrowType(unitType, [(unitType, "()")]), "cb")])
       | mlConnectType (name, SOME cb) = 
-	TypeExp.LONG([], TypeExp.ARROW([name, cb], longTName "none"))
+	mkArrowType (unitType, [(name,"wid"),(cb,"cb")])
 
     fun mlConnectFunction NONE = "unit_connect"
-      | mlConnectFunction (SOME(TypeExp.LONG(_,TypeExp.ARROW([TypeExp.LONG(_, TypeExp.PRIMTYPE "none")], TypeExp.LONG(_, TypeExp.PRIMTYPE "bool"))))) =
+      | mlConnectFunction (SOME(TypeExp.LONG(_,TypeExp.ARROW([(TypeExp.LONG(_, TypeExp.PRIMTYPE "none"),_)], _, _, TypeExp.LONG(_, TypeExp.PRIMTYPE "bool"))))) =
         "bool_connect"
       | mlConnectFunction (SOME _) = raise Fail("only know callbacks of type unit -> bool")
 
     (* Generation of C code
        ------------------------------------------------------------
     *)
-
-    fun mkCFunction (name, retTyp, params) =
-	   mkFunDecl (name, retTyp, params, mkCall (name, params))
-        && let val params' = List.filter (not o TypeInfo.isNullType') params
-	       val params'' = map (fn (TypeExp.LONG(path, TypeExp.OPTION t),n) => (TypeExp.LONG(path,TypeExp.PRIMTYPE "<ctype>"),"NULL")
-                                    | (t,n) => (t,n))
-                                  params
-	   in  if List.length params' = List.length params
-	       then Empty
-	       else mkFunDecl (name ^ "_short", retTyp, params', mkCall (name,params''))
-	   end
+    fun getParams (TypeExp.LONG(_, TypeExp.ARROW(_,_,cmp,_))) = cmp
+      | getParams _ = raise Fail("getParams: not a function type")
+    fun mkCFunction (name, AST.FUNTYPE(funType, NONE)) =
+	   mkFunDecl (name, funType, mkCall (name, getParams funType))
+      | mkCFunction (name, AST.FUNTYPE(funType, SOME shortFunType)) =
+	let fun mkNULL (TypeExp.LONG(p, TypeExp.OPTION _),n) = (TypeExp.LONG(p,TypeExp.PRIMTYPE "<ctype>"),"NULL")
+              | mkNULL (t,n) = (t,n)
+	in  mkFunDecl (name, funType, mkCall (name, getParams funType))
+         && mkFunDecl (name ^ "_short", shortFunType, mkCall (name,map mkNULL (getParams funType)))
+	end
 
     fun mkCdecl (AST.OBJECT_DECL(pos, name, fields)) =
           mkWidgetDecl (name, fields)
-      | mkCdecl (AST.FUNCTION_DECL(pos, name, retTyp, params)) =
-	let val params' = if null params then [dummyPair] else params
-	in  mkCFunction (name, retTyp, params)
-	end
+      | mkCdecl (AST.FUNCTION_DECL(pos, name, funType)) =
+	  mkCFunction (name, funType)
       | mkCdecl (AST.FLAGS_DECL(pos, name, constr)) =
            mkFlagsDecl (name, constr)
       | mkCdecl (AST.BOXED_DECL(pos, name, funcs)) =
@@ -653,14 +613,10 @@ struct
 	Nl && mkMLWidgetDecl NONE name
         && (prsep Empty (mkMLGetFieldDecl name) (case fields of SOME fields => fields | NONE => []))
         && Nl
-      | mkMLSigdecl (AST.FUNCTION_DECL(pos, name, retTyp, params)) = 
-	let val params' = List.filter (not o TypeInfo.isNullType') params
-	    val params'' = if null params' then [dummyPair] else params'
-	in  mkMLFunDecl NONE (name, mlFunType(retTyp, params))
-         && (if List.length params' = List.length params
-	     then Empty
-             else mkMLFunDecl NONE (name^"'", mlFunType(retTyp, params'')))
-	end
+      | mkMLSigdecl (AST.FUNCTION_DECL(pos, name, AST.FUNTYPE(longType, NONE))) = 
+  	   mkMLFunDecl (name, longType)
+      | mkMLSigdecl (AST.FUNCTION_DECL(pos, name, AST.FUNTYPE(longType, SOME shortType))) =
+	   mkMLFunDecl (name, longType) && mkMLFunDecl (name^"'", shortType)
       | mkMLSigdecl (AST.FLAGS_DECL(pos, name,constr)) =
 	   mkMLFlagsDecl (name, constr)
       | mkMLSigdecl (AST.SIGNAL_DECL(pos, name,signal,cbType)) =
@@ -676,14 +632,10 @@ struct
 	   mkMLWidgetDecl (SOME ($"base")) name
         && (prsep Empty (mkMLGetFieldVal name) (case fields of SOME fields => fields | NONE => []))
         && Nl
-      | mkMLStrdecl (AST.FUNCTION_DECL(pos, name, retTyp, params)) = 
-	let val params' = List.filter (not o TypeInfo.isNullType') params
-	    val params'' = if null params' then [dummyPair] else params'
-	in  mkMLFunVal false (name, retTyp, params)
-        &&  (if List.length params' = List.length params
-	     then Empty
-	     else mkMLFunVal true (name, retTyp, params''))
-	end
+      | mkMLStrdecl (AST.FUNCTION_DECL(pos, name, AST.FUNTYPE(longType,NONE))) = 
+	   mkMLFunVal false (name, longType)
+      | mkMLStrdecl (AST.FUNCTION_DECL(pos, name, AST.FUNTYPE(longType, SOME shortType))) =
+	   mkMLFunVal false (name, longType) && mkMLFunVal true (name, shortType)
       | mkMLStrdecl (AST.FLAGS_DECL(pos, name,constr)) =
 	   mkMLFlagsVal (name, constr)
       | mkMLStrdecl (AST.SIGNAL_DECL(pos, name,signal,cbType)) =
