@@ -2,12 +2,12 @@ mGTK - SML bindings for gtk+
 ============================
 
 Homepage:
-    http://www.it.edu/people/kfl/mgtk/index.html
+    http://mgtk.sourceforge.net
 
 Authors:
     Ken Friis Larsen <kfl@it.edu> and Henning Niss <hniss@diku.dk>
 
-Copyright (C) 2000 by Ken Friis Larsen and Henning Niss.
+Copyright (C) 2000, 2001 by Ken Friis Larsen and Henning Niss.
 
 
 CURRENT VERSION
@@ -76,7 +76,7 @@ COPYRIGHT NOTICE for mGTK
 -------------------------
 
 mGTK - a SML interface to the graphical toolkit gtk+
-Copyright (C) 2000 Ken Friis Larsen and Henning Niss
+Copyright (C) 2000, 2001 Ken Friis Larsen and Henning Niss
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
