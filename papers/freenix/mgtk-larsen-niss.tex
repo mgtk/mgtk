@@ -884,16 +884,14 @@ The list of language bindings for \gtk shows a plethora of different
 languages from which \gtk is accessible. In this section we briefly
 discuss the bindings most related to \mgtk.
 
-There are two major alternatives for ML-like languages to the \mgtk
-binding. (1) The !SML-Gtk! binding mentioned above.
-% \url{http://www.cs.nyu.edu/phd_students/leunga/sml-gtk/sml-gtk.html}
-%This binding is different from \mgtk in that it is made the ml-nlffi
-%bindings generator \cite{Blume:2001:nlffi}, which is currently
-%specific to the SML/NJ compiler.  
-This binding is specific to the \smlnj compiler (due to its use of
-!ml-nlffi!), and also does not handle
-memory management. (2) !lablgtk! is a \gtk binding for O'Caml.
-% \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
+When considering ML-like languages, there are two major alternatives
+to the \mgtk binding. (1) The !SML-Gtk! binding mentioned above.  This
+binding is different from \mgtk in that it is made with the !ml-nlffi!
+bindings generator \cite{Blume:2001:nlffi}, which is currently
+specific to the SML/NJ compiler.  Furthermore, it does not address
+memory management issues.
+%
+(2) !lablgtk! is a \gtk binding for O'Caml.
 O'Caml is a ML dialect different from \sml which (among other things)
 has object-oriented features. This binding, therefore, does not have
 to \emph{encode} the \gtk object hierarchy.
@@ -904,8 +902,8 @@ to \emph{encode} the \gtk object hierarchy.
 and !erlgtk! is an Erlang binding.
 % \url{http://erlgtk.sourceforge.net}
 %
-For \sml, there is also a binding of the Tk toolkit called
-!sml_tk!.
+Also bindings for other graphical toolkits, such as Tk, exists.
+For example, !sml_tk! is an \sml binding of Tk.
 % \url{http://www.informatik.uni-bremen.de/~cxl/sml_tk}
 
 The use of phantom types to express invariants about the program
@@ -913,8 +911,10 @@ is not new; the encoding of a single-inheritance hierarchy as
 above is. Independent work has established similar results
 \cite{Fluet-Pucella:2002}. %
 On the construction side of things, other bindings are also machine
-generated; for this some of the bindings use SWIG, others extract
-appropriate information from the C headers files of \gtk.
+generated; for this some of the bindings use the \emph{Simplified
+  Wrapper and Interface Generator} (SWIG) \cite{Beazley:1996}, others
+extract appropriate information directly from the C headers files of
+\gtk.
 
 From the outset the necessity of access to libraries has been realized
 in the functional programming community. Work in this area for \sml
