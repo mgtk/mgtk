@@ -5,6 +5,7 @@ structure Gtk  = struct
         val fromString : string -> cstring
     
         type t
+        val null : t
         val toString : t -> string
     
         val free : t -> unit
@@ -13,6 +14,7 @@ structure Gtk  = struct
         fun fromString s = s ^ "\000"
     
         type t = MLton.Pointer.t
+        val null = MLton.Pointer.null
         val sub = _import "mgtk_stringsub" : t * int -> char;
     
         fun toVector t =
@@ -1445,6 +1447,8 @@ structure Gtk  = struct
 	val set_default_direction : text_direction -> unit
 	val get_default_direction : unit -> text_direction
 	val reset_shapes : 'a t -> unit
+	val path : 'a t -> int * string * string
+	val class_path : 'a t -> int * string * string
 	val show_sig : (unit -> unit) -> 'a t Signal.signal
 	val hide_sig : (unit -> unit) -> 'a t Signal.signal
 	val map_sig : (unit -> unit) -> 'a t Signal.signal
@@ -2087,6 +2091,35 @@ structure Gtk  = struct
 	    = _import "gtk_widget_reset_shapes" : cptr -> unit;
 	val reset_shapes : 'a t -> unit
 	    = fn self => GObject.withPtr (self, fn self => reset_shapes_ self)
+	val path_ : cptr * int ref * CString.t ref * CString.t ref -> unit
+	    = _import "gtk_widget_path"
+		      : cptr * int ref * CString.t ref * CString.t ref -> unit;
+	val path : 'a t -> int * string * string
+	    = fn self =>
+		 let val (path_length, path, path_reversed)
+			 = (ref 0, ref CString.null, ref CString.null)
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self => path_ (self, path_length, path, 
+						    path_reversed))
+		 in (!path_length, CString.toString (!path), 
+		     CString.toString (!path_reversed))
+		 end
+	val class_path_
+	  : cptr * int ref * CString.t ref * CString.t ref -> unit
+	    = _import "gtk_widget_class_path"
+		      : cptr * int ref * CString.t ref * CString.t ref -> unit;
+	val class_path : 'a t -> int * string * string
+	    = fn self => let val (path_length, path, path_reversed)
+				 = (ref 0, ref CString.null, ref CString.null)
+			     val ret = GObject.withPtr
+					 (self, 
+					  fn self => class_path_
+						       (self, path_length, 
+							path, path_reversed))
+			 in (!path_length, CString.toString (!path), 
+			     CString.toString (!path_reversed))
+			 end
 	local open Signal
 	      infixr -->
 	in

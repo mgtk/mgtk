@@ -8,7 +8,8 @@ signature PRIMTYPES = sig
     val mkArrowTy : ('a ty -> sml_ty) * ('a ty -> sml_ty) -> 
 		    'a ty list * 'a ty -> sml_ty
     val mkArrayPrimTy : sml_ty -> sml_ty
-    val stringTy : bool -> sml_ty
+    val stringTy : bool (*negative*) -> bool (*output*) -> sml_ty
+    val outputPrimString : unit -> exp
     val toPrimString : exp -> exp
     val unwrap : string option
     val toArrayPrim : exp -> exp
@@ -35,7 +36,8 @@ structure MosmlPrimTypes : PRIMTYPES = struct
             ,  appendTypes toprimneg (ret, outputs))
 	end
     fun mkArrayPrimTy ty = SMLType.TyApp([ty],["list"])
-    val stringTy = fn _ => SMLType.StringTy
+    val stringTy = fn _ => fn _ => SMLType.StringTy
+    val outputPrimString = fn _ => TinySML.Const"\"\""
     val unwrap = SOME "repr"
     val toArrayPrim = (fn e => e)
     val toPrimString = (fn e => e)
@@ -45,15 +47,17 @@ structure MLtonPrimTypes : PRIMTYPES = struct
     type exp = TinySML.exp
     type sml_ty = SMLType.ty
     type 'a ty = (Name.name, 'a) Type.ty
-    fun mkType toprim (Type.Output(_,ty)) = SMLType.RefTy(toprim ty)
+    fun mkType toprim (ty as Type.Output(_,ty')) = SMLType.RefTy(toprim ty)
       | mkType toprim ty = toprim ty
     fun mkArrowTy (toprim,toprimneg) (pars,ret) =
 	SMLType.ArrowTy([SMLType.TupTy(List.map (mkType toprim) pars)], 
 			mkType toprimneg ret)
     fun mkArrayPrimTy ty = SMLType.TyApp([ty],["array"])
-    val stringTy = fn neg =>
-		      if neg then SMLType.TyApp([],["CString", "t"])
+    val stringTy = fn neg => fn output =>
+		      if neg orelse output
+		      then SMLType.TyApp([],["CString", "t"])
 		      else SMLType.TyApp([],["CString", "cstring"])
+    val outputPrimString = fn _ => TinySML.Var"CString.null"
     val unwrap = NONE
     val toArrayPrim = fn e => TinySML.App(TinySML.Var"Array.fromList", [e])
     val toPrimString = fn e => TinySML.App(TinySML.Var"CString.fromString", [e])
@@ -235,6 +239,43 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		   end
 *)
 
+    fun isWrapped tinfo ty =
+	case ty of
+	    Type.Base n =>
+	       let val info: info = lookup tinfo n
+	       in  #wrapped info end
+	  | Type.Tname n =>
+	       let val info: info = lookup tinfo n
+	       in  #wrapped info end
+	  | Type.WithDefault(ty,default) => isWrapped tinfo ty
+	  | Type.Ptr ty => isWrapped tinfo ty
+	  | Type.Output(pass,ty) => isWrapped tinfo ty
+	  | _ => false
+
+    fun isDefault tinfo ty =
+	case ty of
+	    Type.Ptr ty => isDefault tinfo ty
+	  | Type.Const ty => isDefault tinfo ty
+	  | Type.Output(pass,ty) => isDefault tinfo ty
+	  | Type.WithDefault(ty,default) => true
+	  | _ => false
+
+    fun isOutput isPass tinfo ty =
+	case ty of
+	    Type.Ptr ty => isOutput isPass tinfo ty
+	  | Type.Const ty => isOutput isPass tinfo ty
+	  | Type.Output(p,ty) => isPass p
+	  | Type.WithDefault(ty,default) => isOutput isPass tinfo ty
+	  | _ => false
+
+    fun isString tinfo ty =
+	case ty of
+	    Type.Ptr(ty as Type.Base n) => Name.asType n = "char"
+	  | Type.Const ty => isString tinfo ty
+	  | Type.Output(_,ty) => isString tinfo ty
+	  | Type.WithDefault(ty,default) => isString tinfo ty
+	  | _ => false
+
     fun prependPath (path,base) ty =
 	case ty of
 	    SMLType.TyApp(alphas, tyname) =>
@@ -286,7 +327,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun toPrimType negative tinfo ty = (* FIXME negative: ugly, but it works *)
 	case ty of 
 	    Type.Ptr(Type.Base n) => 
-	       if Name.asType n = "char" then Prim.stringTy negative
+	       if Name.asType n = "char" then Prim.stringTy negative false
 	       else SMLType.TyApp([],["cptr"])
 	  | Type.Ptr(ty as Type.Tname n) => 
 	       toPrimType negative tinfo ty (* FIXME: true? *)
@@ -299,9 +340,10 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       let val info: info = lookup tinfo n
 	       in  #ptype info end
 	  | Type.Const ty => toPrimType negative tinfo ty
-	  | Type.Output(pass, ty) => 
-	       (* dealt with in Prim.mkArrowTy below *)
-	       toPrimType negative tinfo ty
+	  | Type.Output(pass, ty) =>
+	       if isString tinfo ty then Prim.stringTy negative true
+	       else (* dealt with in Prim.mkArrowTy below *)
+		   toPrimType negative tinfo ty
 	  | Type.Ptr ty => SMLType.TyApp([],["cptr"])
 	  | Type.Func(pars,ret) => 
 	       Prim.mkArrowTy 
@@ -370,44 +412,6 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Const ty => fromPrimValue tinfo ty
 	  | Type.Output(pass, ty) => fromPrimValue tinfo ty
 	  | _ => id
-
-    fun isWrapped tinfo ty =
-	case ty of
-	    Type.Base n =>
-	       let val info: info = lookup tinfo n
-	       in  #wrapped info end
-	  | Type.Tname n =>
-	       let val info: info = lookup tinfo n
-	       in  #wrapped info end
-	  | Type.WithDefault(ty,default) => isWrapped tinfo ty
-	  | Type.Ptr ty => isWrapped tinfo ty
-	  | Type.Output(pass,ty) => isWrapped tinfo ty
-	  | _ => false
-
-    fun isDefault tinfo ty =
-	case ty of
-	    Type.Ptr ty => isDefault tinfo ty
-	  | Type.Const ty => isDefault tinfo ty
-	  | Type.Output(pass,ty) => isDefault tinfo ty
-	  | Type.WithDefault(ty,default) => true
-	  | _ => false
-
-    fun isOutput isPass tinfo ty =
-	case ty of
-	    Type.Ptr ty => isOutput isPass tinfo ty
-	  | Type.Const ty => isOutput isPass tinfo ty
-	  | Type.Output(p,ty) => isPass p
-	  | Type.WithDefault(ty,default) => isOutput isPass tinfo ty
-	  | _ => false
-
-    fun isString tinfo ty =
-	case ty of
-	    Type.Ptr(ty as Type.Base n) =>
-               Name.asType n = "char"
-	  | Type.Const ty => isString tinfo ty
-	  | Type.Output(_,ty) => isString tinfo ty
-	  | Type.WithDefault(ty,default) => isString tinfo ty
-	  | _ => false
 
     fun toCType tinfo ty = 
 	case ty of
@@ -489,9 +493,12 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 
     fun defaultValue tinfo ty = (* FIXME *)
 	case ty of
-	    Type.Ptr(ty as Type.Base n) => 
-	       if Name.asType n = "char" then Prim.toPrimString(Const"\"\"")
-	       else defaultValue tinfo ty
+	    Type.Ptr(ty') => 
+	    if isString tinfo ty then Prim.toPrimString(Const"\"\"")
+	    else defaultValue tinfo ty'
+	  | Type.Output(Type.OUT,ty') =>
+	    if isString tinfo ty' then Prim.outputPrimString()
+	    else defaultValue tinfo ty'
 	  | Type.Base tn => 
 	    let val info: info = lookup tinfo tn
 	    in  #default info end
@@ -499,7 +506,6 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    let val info: info = lookup tinfo tn
 	    in  #default info end
 	  | Type.Const ty => defaultValue tinfo ty
-	  | Type.Ptr ty => defaultValue tinfo ty
 	  | Type.WithDefault(ty,v) => defaultValue tinfo ty
 	  | Type.Output(pass,ty) => defaultValue tinfo ty
 	  | Type.Void => Const "()"

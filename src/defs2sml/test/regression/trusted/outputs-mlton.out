@@ -80,22 +80,17 @@ structure Gtk  = struct
 						 (self, dest_widget, src_x, 
 						  src_y, dest_x, dest_y)))
 		 in (ret, !dest_x, !dest_y) end
-	val path_
-	  : cptr * int ref * CString.cstring ref * CString.cstring ref -> unit
-	    = _import "gtk_widget_path" : cptr * int ref * CString.cstring ref 
-					* CString.cstring ref
-					  -> unit;
+	val path_ : cptr * int ref * CString.t ref * CString.t ref -> unit
+	    = _import "gtk_widget_path"
+		      : cptr * int ref * CString.t ref * CString.t ref -> unit;
 	val path : 'a t -> int * string * string
 	    = fn self =>
 		 let val (path_length, path, path_reversed)
-			 = (ref 0, ref (CString.fromString ""), 
-			    ref (CString.fromString ""))
+			 = (ref 0, ref CString.null, ref CString.null)
 		     val ret = GObject.withPtr
 				 (self, 
-				  fn self => path_ (self, path_length, 
-						    CString.fromString path, 
-						    CString.fromString
-						      path_reversed))
+				  fn self => path_ (self, path_length, path, 
+						    path_reversed))
 		 in (!path_length, CString.toString (!path), 
 		     CString.toString (!path_reversed))
 		 end

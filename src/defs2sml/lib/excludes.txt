@@ -114,10 +114,8 @@ gtk_box_query_child_packing
 gtk_text_view_get_line_yrange
 gtk_text_view_get_line_at_y
 TEMPORARY
-gtk_widget_path
-gtk_widget_class_path
-gtk_tree_view_get_cursor
 gtk_tree_selection_get_selected
+gtk_tree_view_get_cursor
 UNKNOWNTYPES
 gtk_widget_size_request
 ARRAYS

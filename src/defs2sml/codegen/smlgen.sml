@@ -144,6 +144,7 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 		      then toPrimString
 		      else fn e => e) 
 		     (App(Var"getOpt", [Tup[e, def]]))
+	      | g (e, Type.Output(Type.OUT, ty)) = e
 	      | g (e, ty) = 
 		if TypeInfo.isString tinfo ty
 		then toPrimString e

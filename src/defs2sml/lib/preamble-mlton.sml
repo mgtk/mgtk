@@ -4,6 +4,7 @@ structure CString :>
     val fromString : string -> cstring
 
     type t
+    val null : t
     val toString : t -> string
 
     val free : t -> unit
@@ -12,6 +13,7 @@ structure CString :>
     fun fromString s = s ^ "\000"
 
     type t = MLton.Pointer.t
+    val null = MLton.Pointer.null
     val sub = _import "mgtk_stringsub" : t * int -> char;
 
     fun toVector t =
