@@ -54,6 +54,7 @@ struct
     val defFlags = $$ "define-flags" || $$ "define-enum"
     val defBoxed = $$ "define-boxed"
     val defSignal = $$ "define-signal"
+    val listQual = $$ "list"
 
     (* construct abstract syntax *)
     fun mkObjectDecl (pos, (((name, inherits), fields))) = 
@@ -73,9 +74,12 @@ struct
       | ensureNonEmpty pars = pars
 
     fun singleton texp = ([], texp)
+    val mkLong = AST.LONG o singleton
+    val mkTName = AST.TYPENAME
 
     (* functions *)
-    val typeExp = word >> (AST.LONG o singleton o AST.TYPENAME)
+    val typeExp =  (word >> (mkLong o mkTName))
+                || (parenthesized (word --$ listQual) >> (mkLong o AST.LIST o mkLong o mkTName))
     val parenName = parenthesized word
     val par = parenthesized (typeExp -- word)
     val constr = parenthesized (word -- word)

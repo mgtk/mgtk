@@ -19,6 +19,7 @@ struct
       | ARROW of long_texp list * long_texp
       | OPTION of long_texp
       | OUTPUT of long_texp
+      | LIST of long_texp
     and long_texp = LONG of string list * texp
 
     fun typeClass' (TYPENAME _) = "type name"
@@ -26,6 +27,7 @@ struct
       | typeClass' (ARROW _) = "arrow"
       | typeClass' (OPTION _) = "option"
       | typeClass' (OUTPUT _) = "output"
+      | typeClass' (LIST _) = "list"
     fun typeClass (LONG (path, texp)) = typeClass' texp
 
     fun texpToString (TYPENAME s) = s
@@ -35,6 +37,7 @@ struct
 	(Util.stringSep "[" "]" " * " toString args) ^ " -> " ^ toString res
       | texpToString (OPTION long) = toString long ^ " option"
       | texpToString (OUTPUT long) = toString long ^ " output"
+      | texpToString (LIST long) = toString long ^ " list"
     and toString (LONG ([], texp)) = texpToString texp
       | toString (LONG (path, texp)) = 
 	(Util.stringSep "" "." "." (fn s=>s) path) ^ texpToString texp
@@ -99,6 +102,7 @@ struct
 	    equal_long_texp_list (args1, args2) andalso equal_long_texp (ret1, ret2)
 	  | equal_texp (OPTION texp1, OPTION texp2) = equal_long_texp (texp1, texp2)
 	  | equal_texp (OUTPUT texp1, OUTPUT texp2) = equal_long_texp (texp1, texp2)
+	  | equal_texp (LIST texp1, LIST texp2) = equal_long_texp (texp1,texp2)
 	  | equal_texp _ = false
 	and equal_long_texp (LONG (path1, texp1), LONG (path2, texp2)) = 
 	    equal_list (op =) (path1, path2) andalso equal_texp (texp1, texp2)

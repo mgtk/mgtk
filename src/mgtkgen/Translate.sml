@@ -66,7 +66,7 @@ struct
 		 else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ AST.toString long ^ ")")
           | toc' long (AST.LIST typExp, name) = 
 	    if TypeInfo.isWidget typExp 
-		 then $"mgtk_smllist_to_glist_widget(" && name && $")"
+		 then $"mgtk_smllist_to_glist_object(" && name && $")"
 	    else if TypeInfo.isString typExp 
 		 then $"mgtk_smllist_to_glist_string(" && name && $")"
 	    else Util.notImplemented "toCValue: can only handle lists of widgets or strings"

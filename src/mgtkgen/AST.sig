@@ -14,6 +14,7 @@ sig
       | ARROW of long_texp list * long_texp
       | OPTION of long_texp
       | OUTPUT of long_texp
+      | LIST of long_texp
     and long_texp = LONG of string list (* path to the type *)
                           * texp (* the type itself *)
 
