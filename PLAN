@@ -4,6 +4,8 @@ Milestone 1 (red-hens alpha 0.02):
 ----------------------------------
 v gtk_init fix (Ken) [May 1, 2000]
 * Signals
+  + What to do about duplicate signals (especially "activate" on menu
+    items is missing).
 * Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
 * Constructed data types in .defs file (GList's, arrays, etc.)
 * More functions from Sugar: latest comparison:
