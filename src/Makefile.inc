@@ -46,10 +46,10 @@ GTKCONFIG=${GTKHOME}/bin/gtk-config
 .SUFFIXES : .sml .sig .ui .uo .c .o
 
 .sig.ui:
-	$(MOSMLC) -c $<
+	$(MOSMLC) $(MOSMLINCLUDE) -c $<
 
 .sml.uo:
-	$(MOSMLC) -c $<
+	$(MOSMLC) $(MOSMLINCLUDE) -c $<
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
