@@ -358,7 +358,7 @@ and a value.)
 If the argument is the empty stack (the constant !Empty!) then the
 exception !EmptyStack! is raised (thrown). Otherwise, the argument
 has been constructed by applying !Stack! to the arguments !top! and
-!rest!: a pair consisting of !top! and !rest! is returned.
+!rest!, and then a pair consisting of !top! and !rest! is returned.
 
 Users of this library can call functions from the structure
 !Stack! by using ``dot-notation'': for example, !Stack.pop mystack!.
@@ -438,7 +438,7 @@ The construct \texttt{let}~\texttt{val}
 \textit{x} \texttt{=} \textit{exp} declares the identifier \textit{x}
 to be bound to the value obtained by evaluating the expression
 \textit{exp}.  If the only reason for evaluating \textit{exp} is for
-its side effect, one can again use the wildcard pattern.
+its side effect, one can use the wildcard pattern !_! instead of \textit{x}.
 Expressions evaluated only for their side effects can also be
 sequentialized using \texttt{;}.  The value \texttt{()}, the nullary
 tuple of type \texttt{unit}, can be used as the return value of purely
@@ -518,7 +518,7 @@ Built-in data types such as lists make GUI programming more convenient.
 As described in Section~\ref{sec:intr-backgr}, \sml is a functional
 language without object-oriented features, while \gtk is designed as an
 object-oriented library.  This mismatch makes constructing an \sml
-interface to \gtk tough.  The most difficult problem is how to represent the
+interface to \gtk tough \begin{ednote}{HN} I don't like ``tough''.\end{ednote}.  The most difficult problem is how to represent the
 subtype relations defined by a class hierarchy in \sml's type system.
 In this section, we discuss how to present a
 type-safe \sml interface to the \gtk class hierarchy.  By \emph{type-safe} we
@@ -542,11 +542,11 @@ We present a general method of taking a given
 object oriented class hierarchy and encoding it in the \sml
 type system.  The properties of the resulting encoding are: each
 class type has a corresponding \sml type; the encoding is
-\emph{complete} (all typing allowed by the class
+\emph{complete} (all typings allowed by the class
 hierarchy is also allowed by the encoding); and the encoding is
-\emph{sound} (all typing that is disallowed by the class
+\emph{sound} (all typings that is disallowed by the class
 hierarchy is also disallowed by the encoding).  The last property is
-also called type safety.  In type-theoretic jargon, the trick is to
+also called ``type safety''.  In type-theoretic jargon, the trick is to
 use parametric polymorphism and \emph{existential types} to encode
 inheritance subtyping.  In particular we use \emph{phantom types} to
 encode the inheritance path.
@@ -640,8 +640,8 @@ code to really comprehend the trick.
 val add : 'path container -> 'a widget 
                                -> unit
 \end{SMLcode}
-This declaration says that !add! takes two arguments, an object of type
-\classname{Container} and a widget: it returns !unit! as result.
+This specification says that !add! takes two arguments, an object of type
+\classname{Container} and a widget, and that it returns !unit! as result.
 Similarly,  the method !set_title! from class
 \classname{Window} has the type:
 \begin{SMLcode}
@@ -649,7 +649,7 @@ val set_title : 'path window -> string
                                -> unit
 \end{SMLcode}
 That is, !set_title! takes two arguments, an object of type 
-\classname{Window} and a string: it returns !unit!.
+\classname{Window} and a string, and it returns !unit!.
 
 
 \item[Constructors] We have to be a bit careful with constructors.  If
@@ -694,7 +694,7 @@ type !base!.  In addition to the signature !Window! we also need a
 structure called !Window! that implements the actual calls to the
 relevant \gtk C functions.
 
-Does this encoding really allow all the things that the class
+Does this encoding really allow all the things that the \gtk class
 hierarchy allows?  Yes. For example, the function
 \texttt{Container.add} has type:
 \begin{SMLcode}
@@ -897,7 +897,7 @@ the same across all compilers.
 %
 One finds \sml and \gtk implementations on a large variety of
 platforms. Thus, the GUI porting work in moving application programs from one of these
-platforms to another is largely eliminated.
+platforms to another is largely eliminated. \begin{ednote}{HN} is this not too understated? \end{ednote}
 
 The \mgtk binding already targets two of the main \sml systems,
 \mosml~\cite{Mosml-webpage:2003} and \mlton~\cite{MLton-webpage:2003}.
