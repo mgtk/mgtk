@@ -47,6 +47,30 @@ struct
     val toWidget = super
     val toObject = super
 
+    (* convert a list of flags to a word *)
+    local
+	infix orb andb
+	val notb = Word.notb 
+	val op orb = Word.orb 
+	val op andb = Word.andb
+	val W = Word.fromInt
+	fun set(f,res) = W f orb res
+	fun unset(f, res) = notb(W f) andb res
+    in
+	(* val setFlagsGeneral : flag -> flag list -> flag list -> flag *)
+	fun setFlagsGeneral init pos neg =
+	    let val res = List.foldl set (W init) pos
+		val res = List.foldl unset res neg
+	    in  Word.toInt res
+	    end
+	(* we only need to set flags from the no flag *)
+        (* val setFlags : flag list -> flag *)
+        fun setFlags pos =
+	    let val res = List.foldl set 0w0 pos
+	    in  Word.toInt res
+	    end
+    end
+
     local
 	prim_type GtkArgs
 

@@ -203,18 +203,25 @@ EXTERNML value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
 /* *** glist stuff *** */
 #define mgtk_isCons(x) (Tag_val(x) != 0)
 #define MGTK_SMLLIST_TO_GLIST(sls,gls,conv)		\
-        do {gls = NULL;					\
+        {gls = NULL;					\
 	 while (mgtk_isCons(sls))			\
 	 {						\
 	   value elem = Field(sls, 0);			\
 	   gls = g_list_append (gls,conv(elem));	\
 	   sls = Field(sls, 1);				\
-	 }} while(0)
+	 }						\
+        }
 
 /* Shows how MGTK_SMLLIST_TO_GLIST can be used */
 GList* mgtk_smllist_to_glist_string(value smllist) {
   GList* glist;
   MGTK_SMLLIST_TO_GLIST(smllist,glist,String_val);
+  return glist;
+}
+
+GList* mgtk_smllist_to_glist_object(value smllist) {
+  GList* glist;
+  MGTK_SMLLIST_TO_GLIST(smllist,glist,GtkObj_val);
   return glist;
 }
 

@@ -819,7 +819,7 @@
    (visibility-notify GDK_VISIBILITY_NOTIFY)
    (no-expose GDK_NO_EXPOSE))
 
-(define-flags GdkEventMask
+(define-enum GdkEventMask;;; Henning: should be a flag
    (exposure-mask GDK_EXPOSURE_MASK)
    (pointer-motion-mask GDK_POINTER_MOTION_MASK)
    (pointer-motion-hint-mask GDK_POINTER_MOTION_HINT_MASK)
@@ -4109,12 +4109,12 @@
    (int destx) (int desty)
    (int width) (int height)))
 
-(define-func gtk_preview_draw_row
-  none
-  ((GtkPreview preview)
-   (string data)
-   (int x) (int y)
-   (int width)))
+;;;(define-func gtk_preview_draw_row
+;;;  none
+;;;  ((GtkPreview preview)
+;;;   (string data)
+;;;   (int x) (int y)
+;;;   (int width)))
 
 (define-func gtk_preview_set_expand
   none
@@ -4272,10 +4272,10 @@
   ((GtkTree tree)
    (GtkWidget child)))
 
-;;;(define-func gtk_tree_remove_items
-;;;  none
-;;;  ((GtkTree tree)
-;;;   (GList* items)))
+(define-func gtk_tree_remove_items
+  none
+  ((GtkTree tree)
+   ((GtkTreeItem list) items)))
 
 (define-func gtk_tree_clear_items
   none
@@ -5888,10 +5888,10 @@
    (GtkItem item)
    (string item_value)))
 
-;;;(define-func gtk_combo_set_popdown_strings
-;;;  none
-;;;  ((GtkCombo combo)
-;;;   (GList* strings)))
+(define-func gtk_combo_set_popdown_strings
+  none
+  ((GtkCombo combo)
+   ((string list) strings)))
 
 (define-func gtk_combo_disable_activate
   none
