@@ -98,77 +98,84 @@ struct
     type 'a Object = 'a GtkBasis.Object
     local
         structure GB = GtkBasis
-        prim_type GtkArgs
+        prim_type GValues
+        prim_type GValue
 
-        type callback_data = GtkArgs * int
-        type callback = callback_data -> unit
-        type callback_id  = int
+        type callback_data = GValue * GValues * int
+	type callback = callback_data -> unit
+	type callback_id  = int
 
-        val callbackTable : (callback_id, callback) Polyhash.hash_table
-          = Polyhash.mkPolyTable(401, Domain)
-        
-        val add  = Polyhash.insert callbackTable
-        val peek = Polyhash.peek callbackTable
-                             
-        local
-            val intern = ref 0;
-        in
-        val localId = fn f => f (!intern before intern := !intern + 1)
-        end
+	val callbackTable : (int, callback) Polyhash.hash_table
+                          = Polyhash.mkPolyTable(401, Domain)
+                      
+	val add  = Polyhash.insert callbackTable
+	val peek = Polyhash.peek callbackTable
 
-        fun dispatch id data =
-            case peek id of
-                SOME f => f data(* handle e => main_quit_with e)*)
-              | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
-                                     Int.toString id^")")
+	local
+	    val intern = ref 0;
+	in
+	    val localId = fn f => f (!intern before intern := !intern + 1)
+	end
+
+	fun dispatch id data =
+	    case peek id of
+		SOME f => f data    (* FIXME: we need a handle here, but what 
+                                              should it do *)
+	      | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
+				     Int.toString id^")")
 
         fun destroy id = Polyhash.remove callbackTable id
-                     
-        val dummy = ( Callback.register "mgtk_callback_dispatch" dispatch
+
+	val dummy = ( Callback.register "mgtk_callback_dispatch" dispatch
                     ; Callback.register "mgtk_callback_destroy" destroy
-                    )
+		    )
         open Dynlib
         val symb = GB.symb
+
         (* UNSAFE: no error checking in the set and get functions! *)
-        type 'a setter = GtkArgs -> int -> 'a -> unit
-        val setBool : bool setter = app3(symb "mgtk_set_retpos_bool")
-        val setInt  : int setter  = app3(symb "mgtk_set_retpos_int")
+        type 'a setter = GValue -> 'a -> unit
+        val setBool : bool setter = app2(symb "mgtk_set_bool")
+        val setInt  : int setter  = app2(symb "mgtk_set_int")
 
 
-        type 'a getter = GtkArgs -> int -> 'a
+        type 'a getter = GValues -> int -> 'a
         val getBool   : bool getter   = app2(symb "mgtk_get_pos_bool")
         val getInt    : int getter    = app2(symb "mgtk_get_pos_int")
-        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
+(*        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
         val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
         val getString : string getter = app2(symb "mgtk_get_pos_string")
-
-        fun register f = localId(fn id => (add (id, f); id))
-        val signal_connect : GB.cptr -> string -> int -> bool -> int
-          = app4(symb"mgtk_signal_connect")
-
+*)
+	fun register f = localId(fn id => (add (id, f); id))
+	val signal_connect : GB.cptr -> string -> int -> bool -> int
+	                   = app4(symb"mgtk_signal_connect")
     in
-    datatype state = S of GtkArgs * int * int
+    datatype state = S of GValue * GValues * int * int
     type ('a, 'b) trans   = 'a * state -> 'b * state
     type ('a, 'rest) read = ('a -> 'rest, 'rest) trans
     type 'a return        = ('a, unit) trans
 
-    fun state f arg max = (f, S(arg, max, 0))
+    fun state f ret arg max = (f, S(ret, arg, max, 0+1))
+    (* NOTE: the +1 is for the object connected to *)
 
-    fun wrap conv f (arg, max) = ignore(conv(state f arg max)) 
+    fun wrap conv f (ret, arg, max) = ignore(conv(state f ret arg max)) 
 
-    fun getter get (f, S(arg, max, next)) = 
-        if next < max
-        then (f (get arg next), S(arg, max, next+1))
+    fun getter get (f, S(ret, arg, max, next)) = 
+        if next < max  (* FIXME: it should be < but that gives problems with
+                                  return_unit.  Currently unsafe! *)
+        then (f (get arg next), S(ret, arg, max, next+1))
         else (app print ["next = ", Int.toString next," max = ",Int.toString max, "\n"]; raise Subscript)
 
 
-    fun drop (f, S(arg, max, next)) = 
-        if next < max then (f, S(arg, max, next+1))
+    fun drop (f, S(ret, arg, max, next)) = 
+        if next < max then (f, S(ret, arg, max, next+1))
         else raise Subscript
 
-    fun setter set (x, dummy as S(arg, max, next)) =
-        if next = max then (set arg max x; ((),dummy))
-        else (app print ["next = ", Int.toString next," max = ",Int.toString max, "\n"]; raise Subscript)
+    fun setter set (x, dummy as S(ret, arg, max, next)) =
+        if next = max then (set ret x; ((),dummy))
+        else (app print ["next = ", 
+                         Int.toString next,
+                         " max = ",
+                         Int.toString max, "\n"]; raise Subscript)
 
     fun int x        = getter getInt x
     fun return_int x = setter setInt x
@@ -179,7 +186,7 @@ struct
     
     (* FIXME: convince Ken that this correct *)
     fun void (f, state) = (f(), state)
-    fun return_void (f, S(arg, max, next)) = (f, S(arg,max+1,next))
+    fun return_void (f, S(ret, arg, max, next)) = (f, S(ret, arg,max+1,next))
 
     fun unit x        = getter (fn _ => fn _ => ()) x
     fun return_unit x =  x

@@ -1,9 +1,12 @@
 fun hello _ = print "Hello World\n"
 
 fun delete_event _ = ( print "delete event occurred\n"
-		     ; false)
+		     ; false
+                     )
 
-fun destroy _ = Gtk.main_quit()
+fun destroy _ = ( print "destroy! \n"
+                ; Gtk.main_quit()
+                )
 
 fun main _ =
     let val _      = Gtk.init(CommandLine.name()::CommandLine.arguments())
