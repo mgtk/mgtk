@@ -198,3 +198,20 @@
   )
 )
 
+(define-object TreeStore
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkTreeStore")
+  (gtype-id "GTK_TYPE_TREE_STORE")
+  (implements "GtkTreeModel")
+)
+
+(define-method append
+  (of-object "GtkTreeStore")
+  (c-name "gtk_tree_store_append")
+  (return-type "none")
+  (parameters
+    '("GtkTreeIter*" "iter" (output))
+    '("GtkTreeIter*" "parent" (null-ok))
+  )
+)

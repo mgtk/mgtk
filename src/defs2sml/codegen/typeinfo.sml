@@ -138,7 +138,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
         ,("GValue",    (fn _ => SMLType.TyApp([],["GValue","GValue"]),
 			SMLType.TyApp([],["GValue","GValue"]),
-			"GValue_val", "make_GValue", TinyC.TStar(TinyC.TTyName "GValue"),NONE,Const""))
+			"GValue_val", "create_GValue", TinyC.TStar(TinyC.TTyName "GValue"),NONE,Const""))
         ]
 
     fun init () = 

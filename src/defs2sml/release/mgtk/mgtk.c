@@ -247,7 +247,7 @@ EXTERNML value mgtk_g_value_set_string (value s){
 }
 
 static inline value make_GValue(const GValue* val) {
-  value res = alloc(1, Abstract_tag);
+  value res = alloc(2, Abstract_tag); // Hack: assume that C owns the GValue 
   GValue_val_nocast(res) = (value) val;
   return res;
 }
@@ -3139,7 +3139,7 @@ EXTERNML value mgtk_gtk_tree_model_get_path(value self, value iter) { /* ML */
 EXTERNML value mgtk_gtk_tree_model_get_value(value self, value iter, value column, value valu_in) { /* ML */
     GValue* valu = *((GValue**) GValue_val(valu_in));
     gtk_tree_model_get_value(GtkObj_val(self), GtkTreeIter_val(iter), Int_val(column), &valu);
-    return make_GValue(valu);
+    return create_GValue(valu);
 }
 
 /* ML type: cptr -> cptr -> bool * cptr */

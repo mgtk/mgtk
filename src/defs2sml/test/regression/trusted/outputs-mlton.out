@@ -104,8 +104,8 @@ structure Gtk  = struct
 	type 'a t = 'a editable_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toEditable : 'a t -> base t
-	val insert_text : 'a t -> string -> int -> int option -> int option
-	val insert_text' : 'a t -> string -> int -> int option
+	val insert_text : 'a t -> string -> int -> int option -> int
+	val insert_text' : 'a t -> string -> int -> int
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -118,7 +118,7 @@ structure Gtk  = struct
 	val insert_text_ : cptr * CString.cstring * int * int ref -> unit
 	    = _import "gtk_editable_insert_text"
 		      : cptr * CString.cstring * int * int ref -> unit;
-	val insert_text : 'a t -> string -> int -> int option -> int option
+	val insert_text : 'a t -> string -> int -> int option -> int
 	    = fn self => fn new_text => fn new_text_length => fn position =>
 		 let val position = ref position
 		     val ret = GObject.withPtr
@@ -128,9 +128,9 @@ structure Gtk  = struct
 				       (self, CString.fromString new_text, 
 					new_text_length, position))
 		 in !position end
-	val insert_text' : 'a t -> string -> int -> int option
+	val insert_text' : 'a t -> string -> int -> int
 	    = fn self => fn new_text => fn new_text_length =>
-		 let val position = ref position
+		 let val position = ref 0
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self =>
@@ -313,6 +313,47 @@ structure Gtk  = struct
 		     TreeViewColumn.inherit () (fn () => !focus_column))
 		 end
     end
+    structure TreeStore :>
+      sig
+	type base
+	type 'a treestore_t
+	type 'a t = 'a treestore_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeStore : 'a t -> base t
+	val asTreeModel : 'a t -> base TreeModel.t
+	val append : 'a t -> treeiter option -> treeiter
+	val append' : 'a t -> treeiter
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a treestore_t = unit
+	type 'a t = 'a treestore_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeStore obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	fun asTreeModel obj
+	  = TreeModel.inherit
+	      () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val append_ : cptr * cptr ref * cptr -> unit
+	    = _import "gtk_tree_store_append" : cptr * cptr ref * cptr -> unit;
+	val append : 'a t -> treeiter option -> treeiter
+	    = fn self => fn parent =>
+		 let val iter = ref GObject.null
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self =>
+				     append_ (self, iter, 
+					      getOpt (parent, GObject.null)))
+		 in !iter end
+	val append' : 'a t -> treeiter
+	    = fn self => let val iter = ref GObject.null
+			     val ret = GObject.withPtr
+					 (self, 
+					  fn self => append_ (self, iter, 
+							      GObject.null))
+			 in !iter end
+    end
 end
 
 
@@ -358,3 +399,6 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
 
 
 /* *** TreeView *** */
+
+
+/* *** TreeStore *** */
