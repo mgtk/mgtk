@@ -417,6 +417,9 @@ struct
 			App(Var(pRef "inherit"),[Var "witness",Var "con"]))))
 	 ++ StrOnly(FunDecl("make"(*^Name.asModule name*),[VarPat"ptr"],None,
 		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")])))
+	 ++ Some(FunDecl("to"^Name.asModule name, [VarPat "obj"],
+	         Some([TyApp([TyVar "'a"],["t"])] ==> TyApp([TyVar "base"],["t"])),
+		 App(Var"inherit", [Unit,Fn("()",App(Var"repr",[Var"obj"]))])))
          ++ StrOnly(Comment NONE)
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)
