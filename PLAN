@@ -4,13 +4,16 @@ Milestone 1 (red-hens alpha 0.02):
 ----------------------------------
 v gtk_init fix (Ken) [May 1, 2000]
 * Signals
-  + What to do about duplicate signals (especially "activate" on menu
-    items is missing).
+  v What to do about duplicate signals (especially "activate" on menu
+    items is missing). [Fixed (Henning, May 31, 2000). Such signals,
+    that previously clashed, have their widget name as part of the
+    SML connection function name.]
 * Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
 * Constructed data types in .defs file (GList's, arrays, etc.)
 * More functions from Sugar: latest comparison:
   + bitmaps / drawables
   + cursors
+* Incoporate Mike's Win32 port
 
 Milestone 2 (release version 1.0):
 ----------------------------------
