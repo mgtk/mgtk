@@ -41,7 +41,11 @@
 
   for widget pointers?
 
-+ Consider removing all XXX_ functions to save ``globals''.
++ Each mgtk function (in Gtk.sml) has two incarnations: first a
+  ``primitive'' version where all constructors have been unwrapped
+  and then a version that simply calls the primitive. This scheme
+  was introduced to get load-time warnings about non-existing
+  C functions. Perhaps it is safe to remove now?
 
 + We really should differentiate between enums and flags.  Currently
   it is not possible to set more than one flag (since flags are
