@@ -31,7 +31,8 @@ test-compile: $(MAIN)
 	echo "Regression test results ... "; \
         for file in $$files ; do \
 	      base=`basename $$file .defs`; \
-              ./$(MAIN) $$file -cp lib/preamble.c -o $(REGRESSIONDIR)/output/$$base ; \
+              ./$(MAIN) $$file -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$$base ; \
+	      mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$$base.sml ; \
 	      gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$$base.c ; \
         done
 

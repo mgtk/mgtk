@@ -9,7 +9,9 @@ struct
 		if toLower e = toLower e' then loop (p,p') acc
 		else (rev acc, e'::p')
 	      | loop ([], p') acc = (rev acc, p')
+(*
 	      | loop (_, []) acc = ([],rev acc) (* FIXME *)
+*)
 	    val (path,base) = loop (current, splits) []
         in  (path,base)
 	end
