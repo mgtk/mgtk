@@ -55,7 +55,7 @@ if you would help us answer the following questions (this is your
 change to have some influence):
 
 (1) ``Manual'' or ``automatic'' initialization (should Gtk.init
-    be called explicitly, or is it comfortable that the library takes
+    be called explicitly, or is it better that the library takes
     care of the initialization)?
 
 (2) Names for functions with optional parameters.  At the moment there
