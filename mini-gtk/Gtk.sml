@@ -19,7 +19,7 @@ struct
     end
 
     (* Basic GTK stuff *)
-    val init_ : string vector -> unit = app1(symb "mgtk_init")
+    val init_ : string vector -> string list = app1(symb "mgtk_init")
     fun init args = 
 	let val args =
 	        case args of

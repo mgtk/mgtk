@@ -12,7 +12,7 @@ sig
     val inherit  : 'a -> constructor -> 'a Object
     val toObject : 'a Object -> base Object
 
-    val init : string list -> unit
+    val init : string list -> string list
     val main : unit -> unit
     val main_quit : unit -> unit
 
@@ -47,7 +47,7 @@ struct
     end
 
     (* Basic GTK stuff *)
-    val init_ : string vector -> unit = app1(symb "mgtk_init")
+    val init_ : string vector -> string list = app1(symb "mgtk_init")
     fun init args = 
 	let val args =
 	        case args of

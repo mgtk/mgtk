@@ -6,7 +6,7 @@ app load ["Dynlib", "Polyhash", "Callback"];
 *)
 signature Gtk =
 sig
-    val init : string list -> unit
+    val init : string list -> string list
     val main : unit -> unit
     val main_quit : unit -> unit
 
