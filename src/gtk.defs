@@ -1003,13 +1003,9 @@
    (status-pixmap GDK_IC_STATUS_PIXMAP)
    (status-colormap GDK_IC_STATUS_COLORMAP)
    (all-req GDK_IC_ALL_REQ)
-;;;    (client-window GDK_IC_CLIENT_WINDOW)
    (preedit-area-req GDK_IC_PREEDIT_AREA_REQ)
-;;;    (preedit-fontset GDK_IC_PREEDIT_FONTSET)
    (preedit-position-req GDK_IC_PREEDIT_POSITION_REQ)
-;;;   (preedit-fontset GDK_IC_PREEDIT_FONTSET)
-;;;   (status-area-req GDK_IC_STATUS_AREA_REQ)
-;;;   (status-fontset GDK_IC_STATUS_FONTSET))
+   (status-area-req GDK_IC_STATUS_AREA_REQ)
    )
 
 (define-flags GdkWMDecoration
