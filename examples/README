@@ -5,14 +5,22 @@ This directory contains a few example programs to get you started with
 mGTK.  In order to try the example programs, issue the following
 commands
 
-(1) Build mgtk as described in ../src/README
+(1) Build mGTK as described in ../INSTALL
 
-(2) make
+(2) make (Unix) or nmake /f Makefile.w32 (Windows with MSVC)
 
-(3) export MGTKHOME=../src  (when using bash)
-    setenv MGTKHOME ../src  (when using [t]csh)
+(3) set an environment variable:
+    Unix:
+      export MGTKHOME=..  (when using bash)
+      setenv MGTKHOME ..  (when using [t]csh)
 
-(4) mosml -I ../src
+    Windows:
+      set MGTKHOME=..
+
+    Under Windows you *may* need to copy the file $(MGTKHOME)/mgtk.so
+    to the examples directory and then unset MGTKHOME.
+
+(4) mosml -I ..
 
 (5) load "<file>";  (where <file> is the name of the file
                      *without* the .uo extension)
@@ -43,10 +51,11 @@ treeexample2.sml | Like treeexample, but show how closures can be used to
                  | determine which item is signaled.
 menuexmple.sml   | Shows how to use menus
 moside/          | A larger example providing a small GUI for MosML
+                 | (This will probably not work under Windows!)
 
 
 
 Enjoy!
 
 ----------------------------------------------------------------------
-			Henning Niss and Ken Friis Larsen, April, 2000
+  			 Henning Niss and Ken Friis Larsen, June, 2000

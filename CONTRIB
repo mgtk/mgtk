@@ -33,6 +33,3 @@
 * Make a systematic testing, maybe by porting the testgtk suite.
 
 * Write documentation, especially a tutorial would be nice.
-
-* Make a win32 port.
-

@@ -24,8 +24,8 @@ GDKCONFIG=$(GDKSRC)\gdk
 GLIBSRC=$(GTKHOME)\glib
 
 # Various utility programs
-REMOVE=rm -f
-MOVE=mv
+REMOVE=del
+MOVE=ren
 
 
 # For Windows, use:

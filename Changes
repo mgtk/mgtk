@@ -1,10 +1,17 @@
 ----------------------------------------------------------------------
 Changes since mgtk-alpha-0.01
 
+* Added a Win32 port (thanks to Mike Thomas!).
+
 * Added a bunch of widgets and functions from the Sugar gtk.defs file.
+
+* Added some signals that previously clashed with other, ``more 
+  important'', ones. Such a signal has as it's SML connect function
+  the name ``connect_<widget name>_<signal name>''.
 
 * Fixed some bugs. For example,
   + command line arguments are now passed on to gtk_init.
   + short version of functions with no arguments are now also in the
     signature.
+  + added a GtkType enumeration.
 ----------------------------------------------------------------------

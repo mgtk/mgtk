@@ -5,8 +5,9 @@ done by the command:
 	    export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
 
 
-Note this is *not* intendet as a real application, it is just a small
-demo program.
+Note this is *not* intended as a real application, it is just a small
+demo program.  Since this uses the Unix module, you may have problems
+trying it out under Windows.
 
 The Unix module was written by Peter Sestoft and will be part of
 Moscow ML version 2.00.

@@ -15,15 +15,15 @@ mgtk.so: $(COBJS)
 	$(DYNLD) /Fe$@ $(COBJS) $(LIBS) /link /subsystem:console
 
 clean:
-	del *.ui
-	del *.uo
-	del *.obj
-	del *.so
-	del *.def
-	del *.dll
-	del *.exp
-	del *.lib
-	del Makefile.bak
+	$(REMOVE) *.ui
+	$(REMOVE) *.uo
+	$(REMOVE) *.obj
+	$(REMOVE) *.so
+	$(REMOVE) *.def
+	$(REMOVE) *.dll
+	$(REMOVE) *.exp
+	$(REMOVE) *.lib
+	$(REMOVE) Makefile.bak
 
 depend : 
 	mv Makefile Makefile.bak

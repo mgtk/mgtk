@@ -3,17 +3,78 @@ BUILDING MGTK
 
 Building mGTK should be easy.
 
-Let ${MGTKHOME} be the directory in which you unpacked mGtk.
+Let $(MGTKHOME) be the directory in which you unpacked mGTK.
 
-(1) Configure everything by changing ${MGTKHOME}/Makefile.inc to
-    match your setup.
+* On Unix machines:
 
-(2) Building mGTK
+  (0) Get GTK+ :-)
 
-    (a) make
+  (1) Configure mGTK.
 
-You can now try some of the examples in the ${MGTKHOME}/examples
-directory.  Remember the read the README file there
+      Configure everything by changing $(MGTKHOME)/Makefile.inc to
+      match your setup.
+
+  (2) Build mGTK.
+
+      Type make
+
+
+* On Windows machines (using Microsoft Visual C++):
+
+  (0) Get the Windows port of GTK+ from http://www.gimp.org/win32/.
+
+      Be sure to get the ``Developer Packages'' (get the glib, the
+      gtk+, and the extralibs packages). Copy the following files to
+      the Windows system directory:
+
+        src/glib/glib-1.3.dll
+        src/glib/gmodule-1.3.dll
+        src/glib/gthread-1.3.dll
+        src/gtk+/gdk/gdk-1.3.dll
+        src/gtk+/gtk/gtk-1.3.dll
+
+        pthreads-snap-1999-05-30/pthread.dll
+        intl/gnu-intl.dll  
+
+      We have had problems with the April 16. snapshot. Get the version
+      from Febuary 15 instead!
+  
+  (2) Patch the runtime part of MosML.
+
+      A number of functions in mosml/src/runtime/{callback.h,memory.h}
+      has to be declared EXTERN. Change the files to the following
+      declarations.
+
+      callback.h (replace extern with EXTERN)
+
+        EXTERN valueptr get_valueptr(char* nam);
+        EXTERN value get_value(valueptr mvp);
+        EXTERN value callbackptr(valueptr closureptr, value arg1);
+        EXTERN value callbackptr2(valueptr closureptr, value arg1, value arg2);
+        EXTERN value callbackptr3(valueptr closureptr, value arg1, value arg2, 
+        EXTERN void registervalue(char* nam, value mlval);
+        EXTERN void unregistervalue(char* nam);
+        EXTERN void registercptr(char* nam, void* cptr);
+
+      memory.h (insert EXTERN)
+
+        EXTERN char * stat_alloc (asize_t);                /* Size in bytes. */
+        EXTERN void stat_free (char *);
+
+      Then recompile (and reinstall) MosML.
+
+  (3) Configure mGTK.
+
+      Configure everything by changing $(MGTKHOME)/Makedefs.w32 to
+      match your setup.
+
+  (4) Build mGTK.
+
+      Type nmake /f Makefile.w32
+
+
+You can now try some of the examples in the $(MGTKHOME)/examples
+directory.  Remember to read the README file there
 
 ---------------------------------------------------------------------- 
-                        Ken Friis Larsen and Henning Niss, April, 2000
+                         Ken Friis Larsen and Henning Niss, June, 2000
