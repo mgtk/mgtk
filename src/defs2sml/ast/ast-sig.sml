@@ -29,20 +29,23 @@ sig
 	Method of 't
       | Field of 't
       | Boxed of {copy: string, release: string} option
-      | Enum of 'n list
+      | Enum of bool (* flag? *) * 'n list
       | Signal of 't
     and api_type =
         ApiTy of string
       | ArrowTy of (string * api_type) list * api_type
       | Defaulted of api_type * string
 
-    val pp: ('n * 'modi -> string) * ('n * 'memi -> string)
-            -> (string -> unit) -> ('n, 'modi, 'memi) module -> unit
+    type ('n,'t) ast_module = 
+	 ('n, 
+	  ('n*'n option*'n list) option,
+	  ('n, 't) api_info
+         ) module
 
-    val ppName: ('modi -> string) * ('memi -> string) -> (string -> unit)
-                 -> (Name.name, 'modi, 'memi) module -> unit
+    val pp: ('n * 'modi) Pretty.pp * ('n * 'memi) Pretty.pp
+            -> ('n, 'modi, 'memi) module Pretty.pp
 
-    val ppString: ('modi -> string) * ('memi -> string) -> (string -> unit)
-                 -> (string, 'modi, 'memi) module -> unit
+    val ppAstType : api_type Pretty.pp
+    val ppAst: 'n Pretty.pp -> 't Pretty.pp -> ('n,'t) ast_module Pretty.pp
 
 end (* signature AST *)

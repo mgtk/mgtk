@@ -70,45 +70,61 @@ struct
 	  | Member{name,info} => fmem ((name,info),acc)
 
 
-    fun pp (ppMod, ppMem) outputter module =
-	let fun spaces n = String.implode(List.tabulate(n, fn _ => #" "))
-	    fun loop indent (Module{name,members,info}) =
-		( outputter(spaces indent)
-		; outputter (ppMod (name,info))
-		; outputter "\n"
-		; List.app (loop' (indent+4)) members
-		)
-	    and loop' indent (Sub(module)) = loop indent module
-	      | loop' indent (Member{name,info}) =
-		( outputter(spaces indent)
-		; outputter (ppMem (name,info))
-		; outputter "\n"
-		)
-	in  loop 0 module  end
-
-    local 
-	fun ppMod ppModI (n,i) = "module " ^ Name.toString n ^ ppModI i
-	fun ppMem ppMemI (n,i) = "member " ^ Name.toString' n ^ ppMemI i
-    in
-	val ppName = fn (ppModI, ppMemI) => pp (ppMod ppModI, ppMem ppMemI)
-    end
-
-    local 
-	fun ppMod ppModI (n,i) = "module " ^ n ^ ppModI i
-	fun ppMem ppMemI (n,i) = "member " ^ n ^ ppMemI i
-    in
-        val ppString = fn (ppModI, ppMemI) => pp (ppMod ppModI, ppMem ppMemI)
-    end
-
     datatype ('n,'t) api_info =
 	Method of 't
       | Field of 't
       | Boxed of {copy:string, release:string} option
-      | Enum of 'n list
+      | Enum of bool (* flag? *) * 'n list
       | Signal of 't
     and api_type =
         ApiTy of string
       | ArrowTy of (string * api_type) list * api_type
       | Defaulted of api_type * string
+
+    type ('n,'t) ast_module = 
+	 ('n, 
+	  ('n*'n option*'n list) option,
+	  ('n, 't) api_info
+         ) module
+
+    local 
+	open Pretty
+	fun ppI start ppn ppi (n,i) = ppString start ++ ppn n ++ ppi i
+    in 
+
+    fun pp (ppMod, ppMem) module =
+	let fun loop (Module{name,members,info}) = 
+		close(1,"end")
+                  (always 4 ( ppMod(name,info) , ilist "#" loop' members ) )
+	    and loop' (Sub module) = loop module
+	      | loop' (Member{name,info}) = ppMem(name,info)
+	in  loop module end
+
+    fun ppAstType (ApiTy s) = Pretty.ppString s
+      | ppAstType (Defaulted(ty,v)) = 
+	  ppAstType ty ++ ("with "^+ ppString v)
+      | ppAstType (ArrowTy (pars,ret)) =
+	  let fun f (par,ty) = ppBinary(ppString par,":",ppAstType ty)
+	  in  ppBinary(ilist " #* " f pars, "->", ppAstType ret) end
+
+    fun ppAst ppn ppt =
+	let fun ppmodi NONE = empty
+	      | ppmodi (SOME(ty, parent, impl)) =
+		let val ty = ": " ^+ ppn ty
+		    val parent = case parent of 
+				     NONE => empty
+				   | SOME ty => "extends " ^+ ppn ty
+		    val impl = "implements " ^+ clist ",# " ppn impl
+		in  ty ++ parent ++ impl end
+	    fun ppmemi (Method ty) = ": method " ^+ ppt ty
+	      | ppmemi (Field ty)  = ": field "  ^+ ppt ty
+	      | ppmemi (Signal ty) = ": signal " ^+ ppt ty
+	      | ppmemi (Boxed func) = ppString ": boxed"
+	      | ppmemi (Enum(flag, ss)) =
+		  (if flag then ": flag " else ": enum ")
+                  ^+ bracket "{#}" (clist ",# " ppn ss)
+	in  pp (ppI "module" ppn ppmodi, ppI "member" ppn ppmemi) end
+    end (* local *)
+
 
 end (* structure AST *)

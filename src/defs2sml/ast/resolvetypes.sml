@@ -68,7 +68,7 @@ structure ResolveTypes :> ResolveTypes = struct
 	case member of
 	    AST.Method ty => AST.Method(resTy ty)
           | AST.Field ty => AST.Field(resTy ty)
-          | AST.Enum mems => AST.Enum(mems)
+          | AST.Enum(flag, mems) => AST.Enum(flag,mems)
           | AST.Signal ty => AST.Signal(resTy ty)
 	  | AST.Boxed funcs => AST.Boxed funcs
 
@@ -81,24 +81,12 @@ structure ResolveTypes :> ResolveTypes = struct
 
     (* For debugging: *)
     val resolve = fn module => 
-        let fun pptype ty = Type.show (fn s => s) (fn s => s) ty
-	    fun ppmodi (SOME(ty, parent, impl)) = 
-		": " ^ ty ^
-		   (case parent of NONE => "" | SOME ty => " extends " ^ ty)
-                ^  (case impl of [] => "" 
-			       | _ => Util.stringSep " implements " "" ", " (fn s => s) impl)
-	      | ppmodi NONE = ""
-	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
-	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty
-	      | ppmemi (AST.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " (fn s=>s) ss
-	      | ppmemi (AST.Signal ty) = ": signal " ^ pptype ty
-	      | ppmemi (AST.Boxed func) = ": boxed"
-	    val print = TextIO.print
-
+        let val pps = Pretty.ppString
+	    val pp = AST.ppAst pps (Type.pp pps pps)
 	    val module' = resolve module
 	in  if Debug.included "ResolveTypes.debug_resolve_types" then
 		( print("After resolving types:\n")
-		; AST.ppString (ppmodi, ppmemi) print module' )
+		; Pretty.ppPlain (pp module') TextIO.stdOut)
 	    else ()
           ; module'
         end

@@ -1,6 +1,6 @@
 name: /util/pretty/pretty + /util/util
-ast: name + /util/
-fromdefs: name /defs/defs ast + /util/ /util/
-resolvenames: ast name type + /util/
+ast: /util/pretty/pretty name + /util/
+fromdefs: /util/pretty/pretty name /defs/defs ast + /util/ /util/
+resolvenames: /util/pretty/pretty ast name type + /util/
 type: /util/pretty/pretty + /util/util
-resolvetypes: ast name type /util/ resolvenames
+resolvetypes: ast name type /util/pretty/pretty /util/ resolvenames

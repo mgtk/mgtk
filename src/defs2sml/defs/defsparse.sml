@@ -203,8 +203,9 @@ struct
         ||  parens ("values" &-- valueList)         >> Values
         )
     val enuAttribs = repeat1 enuAttrib >> (op::)
-    val enum = parens ( (&"define-enum" || &"define-flags")
-                        #-- defWord -- enuAttribs) >> tagFn Enum
+    val enum = parens ( (  &"define-enum"   |> Enum false
+                        || &"define-flags"  |> Enum true)
+                        >>= (fn t => (defWord -- enuAttribs) >> tagFn t) )
 
     (* Function like things *)
     val truth = &"#t" |> true || &"#f" |> false

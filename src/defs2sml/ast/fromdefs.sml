@@ -98,9 +98,9 @@ structure FromDefs :> FromDefs = struct
 			      ( TextIO.print("Problems ("^msg^") with " ^ name)
 			      ; raise AttribNotFound msg)
                    )
-	      | Enum =>
+	      | Enum flag =>
 		   let val md = probableModule (getModule def) Name.separateWords name
-		       val mem = Member{name=name,info=A.Enum(getValues def handle AttribNotFound _ => [])}
+		       val mem = Member{name=name,info=A.Enum(flag,getValues def handle AttribNotFound _ => [])}
 		   in  insert map md mem end
 	      | Signal =>
 		   let val md = getObject def
@@ -150,31 +150,17 @@ structure FromDefs :> FromDefs = struct
 	in  convert () end
 
     (* For debugging: *)
+    local open Pretty in
     val fromDefs = fn top => fn defs => 
-        let fun pptype (AST.ApiTy s) = s
-	      | pptype (AST.Defaulted(ty,v)) = pptype ty ^ "[def: "^v^"]"
-	      | pptype (AST.ArrowTy (pars,ret)) =
-		Util.stringSep "[" ("] -> "^pptype ret) ", " (fn (s,ty)=>s^":"^pptype ty) pars
-	    fun ppmodi (SOME(ty, parent, impl)) = 
-		": " ^ ty 
-		^  (case parent of NONE => "" | SOME ty => " extends " ^ ty)
-                ^  (case impl of [] => "" 
-			       | _ => Util.stringSep " implements " "" ", " (fn s => s) impl)
-	      | ppmodi NONE = ""
-	    fun ppmemi (A.Method ty) = ": method " ^ pptype ty
-	      | ppmemi (A.Field ty) = ": field " ^ pptype ty
-	      | ppmemi (A.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " (fn s=>s) ss
-	      | ppmemi (A.Boxed _) = ": boxed"
-	      | ppmemi (A.Signal ty) = ": signal " ^ pptype ty
-	    val print = TextIO.print
-
+        let val pp = AST.ppAst ppString AST.ppAstType
 	    val module' = fromDefs top defs
 	in  if Debug.included "FromDefs.debug_defs" then
 		( print("After building defs:\n")
-		; AST.ppString (ppmodi, ppmemi) print module')
+		; ppPlain (pp module') TextIO.stdOut)
 	    else ()
           ; module'
         end
+    end (* local *)
 
 end (* structure FromDefs *)
 

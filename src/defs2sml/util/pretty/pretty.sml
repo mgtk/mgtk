@@ -57,7 +57,7 @@ struct
   in
     fun plainOutput (<*,*>) = { init_spell = ""
 			      , make_indent = mkindent NORMAL <* *> true
-			      , make_token = #2
+			      , make_token = fn(style,str) => str
 			      , newline_spell = "\n"
 			      , exit_spell = ""
 		              }
@@ -140,7 +140,7 @@ struct
 
   fun always k (t1,t2) = break(0,k)(forcemulti t1, t2)
 
-  fun ppFold tree dev
+  fun ppFold tree (dev : device)
       = let fun ftoken (_,s) = s
 	    val lines = format (NORMAL,#1) { vindentpenalty = 30
 				       	   , vindentwidth = 71
@@ -166,5 +166,7 @@ struct
 			 end
 	
   fun ppToString tree = concat (map #2 (noformat ((),#2) tree))
+
+  fun ppPlain tree os = ppPrint tree (plainOutput("(*","*)")) os
 
 end (* structure Pretty *)

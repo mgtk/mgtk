@@ -41,7 +41,7 @@ structure Defs = struct
     datatype def_tag =
 	Object
       | Boxed
-      | Enum
+      | Enum of bool (* flags? *)
       | Function
       | Method
       | Signal

@@ -13,8 +13,6 @@ signature TYPE = sig
       | Func of (string * ('n,'v) ty) list * ('n,'v) ty
       | WithDefault of ('n,'v) ty * 'v
 
-    val show: ('n -> string) -> ('v -> string) -> ('n,'v) ty -> string
-
     val pp : 'n Pretty.pp -> 'v Pretty.pp -> ('n,'v) ty Pretty.pp
 
     val map: ('n1 -> 'n2) -> ('n1,'v) ty -> ('n2,'v) ty

@@ -142,13 +142,6 @@ structure PPengine :> PPengine = struct
     			    | f (Break(how,sub)) = Break(f how,Indent(w1,sub))
 		      in f end
 
-  fun danno ann (w,h,how) = (w,h,
-			     Break(Line(LEAF(concat["·(",
-						    Int.toString w,"x"
-						   ,Int.toString h
-						   ,") ",ann])),
-				   Text("",how)))
-		      	    
   fun format (topanno,acons) {vindentpenalty,vindentwidth,width} toptree =
       let
 	(*--------------------------------------------------------------

@@ -28,29 +28,6 @@ structure Type :> TYPE = struct
     fun mapi f ty = mapiv f (fn (_,d) => d) ty
     fun map f ty = mapi (fn (_,n) => f n) ty
 
-    val toUpper = String.map Char.toUpper
-    fun show show_tname show_default ty =
-	let fun shw ty =
-		case ty of
-		    Void => "VOID"
-		  | Base n => toUpper(show_tname n)
-		  | Tname n => show_tname n
-		  | Ptr ty => shw ty ^ " ref"
-		  | Const ty => shw ty ^ " const"
-		  | Arr(i, ty) => 
-		      shw ty ^ " array" ^ 
-		               (case i of NONE => ""
-					| SOME l => "["^Int.toString l^"]")
-		  | Func(pars, ty) => 
-		      Util.stringSep "{" "}" "*" 
-				     (fn (p,t) => p^":"^shw t)
-				     pars
-	                ^ "-> " ^ shw ty
-		  | WithDefault(ty,d) => 
-		      "<" ^ shw ty ^ "> [" ^ show_default d ^ "]"
-	in  shw ty
-	end
-
     local open Pretty
     in
       fun parens my safe tree = if my<=safe then bracket "(#)" tree else tree

@@ -85,12 +85,12 @@ structure Name :> NAME = struct
     (* names *)
     type name = {path: string list, fullpath: string list, base: string list}
 
-    fun equal (n1, n2) =
+    fun equal (n1: name, n2: name) =
 	#path n1 = #path n2 andalso
 	#fullpath n1 = #fullpath n2 andalso
 	#base n1 = #base n2
 
-    fun toString name = 
+    fun toString (name:name) = 
 	(case #path name of
 	     [] => ""
 	   | p => Util.stringSep "" "." "." (fn s=>s) p
@@ -118,7 +118,7 @@ structure Name :> NAME = struct
     fun compare (n1, n2) = Util.listCmp String.compare (#base n1, #base n2)
 *)
 
-    fun compare (n1, n2) = 
+    fun compare (n1:name, n2:name) = 
 	let fun tos ns = Util.stringSep "" "" "" (fn s=>s) ns
 	in  String.compare(tos (#fullpath n1 @ #path n1 @ #base n1), 
 			   tos (#fullpath n2 @ #path n2 @ #base n2))
@@ -128,9 +128,9 @@ structure Name :> NAME = struct
 	{path=[],fullpath=[],base=separateWords base}
 
     fun fromPaths (fullpath,path,base) = {fullpath=fullpath,path=path,base=base}
-    val getPath = #path
-    val getFullPath = #fullpath
-    val getBase = #base
+    val getPath : name -> string list = #path
+    val getFullPath : name -> string list = #fullpath
+    val getBase : name -> string list = #base
 
 
     (* make sure a name gets output as a valid ML name *)
@@ -195,18 +195,6 @@ structure Name :> NAME = struct
 	end
 *)
     local 
-	structure H = Polyhash
-	exception NotFound
-	val trans_table = H.mkPolyTable (17, NotFound)
-	val () =
-	    List.app (fn (str, trans) => H.insert trans_table (str, trans))
-		[ ("cellrenderer",  "cell_renderer")
-		, ("textbuffer", "text_buffer")
-		, ("withbuffer",  "with_buffer")
-		]
-	fun ify str = H.find trans_table str
-	              handle NotFound => str
-
 	fun ify [] acc = rev acc
 	  | ify ("CellRenderer"::rest) acc = ify rest ("Renderer"::"Cell"::acc)
 	  | ify ("TextBuffer"::rest) acc = ify rest ("Buffer"::"Text"::acc)
@@ -249,7 +237,7 @@ structure Name :> NAME = struct
 	  | ify ("ProgressBar"::rest) acc = ify rest ("Bar"::"Progress"::acc)
 	  | ify (w::rest) acc = ify rest (w::acc)	    
     in
-    fun cify name =
+    fun cify (name:name) =
 	fromPaths(ify (#fullpath name) [],
 		  ify (#path name) [],
 		  ify (#base name) [])

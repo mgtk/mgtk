@@ -42,7 +42,7 @@ functor GenCMLton(structure TypeInfo : TypeInfo)
 
     fun trans typeinfo (name, member) = 
 	case member of
-	    AST.Enum enums =>
+	    AST.Enum(flag,enums) =>
 	        let val fresh = List.tabulate(List.length enums, fn i => "x"^Int.toString i)
 		    val construct = List.map(fn (v,c) => Ass(Var("*"^v),TStar TInt,Var(Name.asCEnumConst c))) (ListPair.zip(fresh,enums))
 		    val body = 

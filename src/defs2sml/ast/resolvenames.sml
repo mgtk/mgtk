@@ -35,11 +35,12 @@ struct
     type 'a module_info = ('a * 'a option * 'a list) option
     type 'a member_info = ('a, 'a ty) AST.api_info
 
+    structure Set = Splayset
+
     fun resolve module =
 	let 
 	    val show_path = Util.stringSep "{" "}" "-" (fn s => s)
 		    
-	    structure Set = Splayset
 	    fun compare (n1, n2) = 
 		let fun tos ns = Util.stringSep "" "" "" (fn s=>s) ns
 		in  String.compare(tos(Name.getFullPath n1 @ Name.getBase n1), 
@@ -82,11 +83,11 @@ struct
 			in  Member{name=name',
 				   info= resMemInfo current info}
 			end
-	    and resMemInfo current (Enum enums) =
+	    and resMemInfo current (Enum(flags, enums)) =
 		let fun res e = 
 			let val (f,p,b) = toName id (Name.separateUnderscores) current e
 			in  Name.fromPaths(f,p,b) end
-		in  Enum(List.map res enums) end
+		in  Enum(flags,List.map res enums) end
 	      | resMemInfo current (Method ty) = Method(resType current ty)
 	      | resMemInfo current (Field ty) = Field(resType current ty)
 	      | resMemInfo current (Signal ty) = Signal(resType current ty)
@@ -129,25 +130,10 @@ struct
     (* For debugging: *)
     val resolve = fn module => 
         let val module' = resolve module
-
-	    fun pptype ty = Type.show Name.toString' Name.toString' ty
-	    fun ppmodi (SOME(ty, parent,impl)) = 
-		": " ^ Name.toString' ty ^
-		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)
-                ^  (case impl of [] => "" 
-			       | _ => Util.stringSep " implements " "" ", " Name.toString' impl)
-	      | ppmodi NONE = ""
-	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
-	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty
-	      | ppmemi (AST.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " Name.toString' ss
-	      | ppmemi (AST.Signal ty) = ": signal " ^ pptype ty
-	      | ppmemi (AST.Boxed func) = ": boxed"
-
-	    val print = TextIO.print
-	    
+	    val pp = AST.ppAst Name.pp (Type.pp Name.pp' Name.pp')
 	in  if Debug.included "ResolveNames.debug_resolve_names" then
 		( print("After resolving names:\n")
-		; AST.ppName (ppmodi, ppmemi) print module')
+		; Pretty.ppPlain (pp module') TextIO.stdOut )
 	    else ()
           ; module'
         end

@@ -295,7 +295,7 @@ struct
                   val (GDK_IMAGE_NORMAL,GDK_IMAGE_SHARED,GDK_IMAGE_FASTEST)
                       = get_gdk_image_type_ ()
             *)
-	  | AST.Enum consts => 
+	  | AST.Enum(flag,consts) => 
 	        let val cname = Name.asCEnum name
 		    val name = Name.asEnum name
 		    val primty = Prims.getEnumsTy (List.length consts)

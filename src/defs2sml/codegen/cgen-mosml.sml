@@ -76,7 +76,7 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 			  body),
 		      SOME ty)]
 		end
-	  | AST.Enum enums =>
+	  | AST.Enum(flag,enums) =>
 	        let val construct = List.foldl (fn (e,(c,i)) => (Ass(Call("Field", NONE, [Var "res", Int i]),TInt,Call("Val_int",NONE,[Var (Name.asCEnumConst e)]))::c,i+1)) ([],0) enums
 		    val body = 
 			Block(NONE,[VDecl("res",TValue,SOME(Call("alloc_tuple",NONE,[Int(List.length enums)])))],

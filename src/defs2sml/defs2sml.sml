@@ -142,28 +142,17 @@ fun main () =
 	val api = order api
 
 	val debug = fn module => 
-        let fun pptype ty = Type.show (Name.toString') (Name.toString') ty
-	    fun ppmodi (SOME(ty, parent, impl)) = 
-		": " ^ Name.toString' ty ^
-		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)
-                ^  (case impl of [] => "" 
-			       | _ => Util.stringSep " implements " "" ", " Name.toString' impl)
-	      | ppmodi NONE = ""
-	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
-	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty
-	      | ppmemi (AST.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " Name.toString' ss
-	      | ppmemi (AST.Signal ty) = ": signal " ^ pptype ty
-	      | ppmemi (AST.Boxed func) = ": boxed"
-	    val print = TextIO.print
+        let val pp = AST.ppAst Name.pp (Type.pp Name.pp Name.pp)
 	in  if Debug.included "ResolveTypes.debug_resolve_types" then
-		( print("After resolving types:\n")
-		; AST.ppName (ppmodi, ppmemi) print module )
+		( print("After resolving types and names:\n")
+		; Pretty.ppPlain (pp module) TextIO.stdOut )
 	    else ()
         end
 
         (* 4. Resolve types and names *)
 	val api = ResolveNames.resolve (ResolveTypes.resolve api)
-	val _ = debug api
+	val _ = debug api (* resolvetypes only knows how to handle
+			     stringe'd versions of ASTs *)
 
 	val (modules,values) = AST.fold (fn (mn,(m,v)) => (m+1,v), fn (mn,(m,v)) => (m,v+1)) (0,0) api
 	val _ = MsgUtil.close ("  corresponding to " ^ Int.toString modules ^ "(sub)modules with " ^ Int.toString values ^ " values\n")

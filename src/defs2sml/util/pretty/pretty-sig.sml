@@ -56,5 +56,5 @@ sig
    *)
   val ppPrint: style pptree -> device -> TextIO.outstream -> unit
   val ppToString: style pptree -> string
-
+  val ppPlain: style pptree -> TextIO.outstream -> unit
 end 
