@@ -236,6 +236,16 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 
     fun call func arg = TinyC.Call(func, NONE, [arg])
 
+    local open TinySML in
+    fun prependPath n exp = (* FIXME *)
+	case exp of
+	    App(Var "make", [arg]) =>
+	       let val p = Name.getPath n
+	       in  App(Long(Name.fromPaths(p,p,["inherit"])), 
+		       [Unit,Fn("()", arg)]) end
+	  | exp => exp
+    end (* local *)
+
     fun fromPrimValue tinfo ty =
 	case ty of
 	    Type.Base n =>
@@ -246,7 +256,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       )
 	  | Type.Tname n =>
 	       (let val info: info = lookup tinfo n
-		in  #fromprim info
+		in  (prependPath n) o #fromprim info
 		end
 		    handle NotFound => raise Unbound n
 	       )
