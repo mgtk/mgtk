@@ -9,11 +9,22 @@ fun month_changed cal _ =
 			  Date.Jan => 1
                         | Date.Feb => 2
                         | Date.Mar => 3
-                        | _ => 4)
+			| Date.Apr => 4
+			| Date.May => 5
+			| Date.Jun => 6
+			| Date.Jul => 7
+			| Date.Aug => 8
+			| Date.Sep => 9
+			| Date.Oct => 10
+			| Date.Nov => 11
+			| Date.Dec => 12)
     in  if setYear = year andalso setMonth = month andalso setDay = day
         then ( print ("Doing nothing!\n") )
         else ( print ("Changed month; reseting to current date\n")
-             ; print ("  (you requested: " ^ concat [Word.toString setYear,", ", Word.toString setMonth, ", ", Word.toString setDay] ^ ")\n")
+             ; print (concat["  (you requested: ", 
+			     Word.toString setYear,", ", 
+			     Word.toString setMonth, ", ", 
+			     Word.toString setDay, ")\n"])
              ; Gtk.calendar_select_day cal day
              ; Gtk.calendar_select_month cal month year
              ; ())
