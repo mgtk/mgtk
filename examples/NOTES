@@ -1,3 +1,16 @@
+treeview.sml
+------------
+An example adopted from "Mono, A Developers Notebook"
+(04-gtk/07-treeview).  Shows how to use TreeView as a tree-view
+widget.
+
+Defects:
+  - The program does not compile.
+  - We need to handle GtkTreeIter, in particullar as the return
+    (actually out-param) for append. 
+  - The same as those for listview.sml
+
+
 listview.sml
 ------------
 An example adopted from "Mono, A Developers Notebook"
