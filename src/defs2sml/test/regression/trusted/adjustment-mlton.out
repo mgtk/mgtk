@@ -13,8 +13,9 @@ structure Gtk = struct
         type base = unit
         type 'a object_t = unit
         type 'a t = 'a object_t GObject.t
-        fun inherit w con = GObject.inherit () con
-        fun make ptr = GObject.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in GObject.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
     end
     signature Adjustment = sig
@@ -31,8 +32,9 @@ structure Gtk = struct
         type base = unit
         type 'a adjustment_t = unit
         type 'a t = 'a adjustment_t Object.t
-        fun inherit w con = Object.inherit () con
-        fun make ptr = Object.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Object.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val new_ : real * real * real * real * real * real -> cptr
             = _import "gtk_adjustment_new" : real * real * real * real * real * real -> cptr;

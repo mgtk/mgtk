@@ -117,7 +117,6 @@ sig
     val int    : (int,    'rest) read
     val char   : (char,   'rest) read
     val double : (real,   'rest) read
-    val string : (string, 'rest) read
     val unit   : (unit,   'rest) read
 
     val void : (unit, 'rest) read
@@ -126,7 +125,6 @@ sig
     val return_int    : int    return
     val return_char   : char   return
     val return_double : real   return
-    val return_string : string return
     val return_unit   : unit   return
 
     val return_void : unit return
@@ -252,6 +250,12 @@ struct
 
     fun bool x        = getter getBool x
     fun return_bool x = setter setBool x
+
+    fun char x        = getter getChar x
+    fun return_char x = setter setChar x
+
+    fun double x        = getter getDouble x
+    fun return_double x = setter setDouble x
 
     
     (* FIXME: convince Ken that this correct *)

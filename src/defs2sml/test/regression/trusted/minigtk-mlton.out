@@ -13,8 +13,9 @@ structure Gtk = struct
         type base = unit
         type 'a object_t = unit
         type 'a t = 'a object_t GObject.t
-        fun inherit w con = GObject.inherit () con
-        fun make ptr = GObject.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in GObject.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
     end
     signature Widget = sig
@@ -38,8 +39,9 @@ structure Gtk = struct
         type base = unit
         type 'a widget_t = unit
         type 'a t = 'a widget_t Object.t
-        fun inherit w con = Object.inherit () con
-        fun make ptr = Object.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Object.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val destroy_ : cptr -> unit
             = _import "gtk_widget_destroy" : cptr -> unit;
@@ -97,8 +99,9 @@ structure Gtk = struct
         type base = unit
         type 'a container_t = unit
         type 'a t = 'a container_t Widget.t
-        fun inherit w con = Widget.inherit () con
-        fun make ptr = Widget.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Widget.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val set_border_width_ : cptr * int -> unit
             = _import "gtk_container_set_border_width" : cptr * int -> unit;
@@ -130,8 +133,9 @@ structure Gtk = struct
         type base = unit
         type 'a bin_t = unit
         type 'a t = 'a bin_t Container.t
-        fun inherit w con = Container.inherit () con
-        fun make ptr = Container.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Container.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
     end
     signature Window = sig
@@ -152,8 +156,9 @@ structure Gtk = struct
         type base = unit
         type 'a window_t = unit
         type 'a t = 'a window_t Bin.t
-        fun inherit w con = Bin.inherit () con
-        fun make ptr = Bin.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Bin.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         type type_t = int
         val get_type_t_ : int ref * int ref -> unit
@@ -183,8 +188,9 @@ structure Gtk = struct
         type base = unit
         type 'a button_t = unit
         type 'a t = 'a button_t Bin.t
-        fun inherit w con = Bin.inherit () con
-        fun make ptr = Bin.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Bin.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val get_type_ : unit -> int
             = _import "gtk_button_get_type" : unit -> int;
@@ -228,8 +234,9 @@ structure Gtk = struct
         type base = unit
         type 'a editable_t = unit
         type 'a t = 'a editable_t Widget.t
-        fun inherit w con = Widget.inherit () con
-        fun make ptr = Widget.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Widget.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val get_chars_ : cptr * int * int -> CString.t
             = _import "gtk_editable_get_chars" : cptr * int * int -> CString.t;
@@ -249,8 +256,9 @@ structure Gtk = struct
         type base = unit
         type 'a celleditable_t = unit
         type 'a t = 'a celleditable_t Widget.t
-        fun inherit w con = Widget.inherit () con
-        fun make ptr = Widget.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Widget.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
     end
     signature Entry = sig
@@ -267,8 +275,11 @@ structure Gtk = struct
         type base = unit
         type 'a entry_t = unit
         type 'a t = 'a entry_t Editable.t CellEditable.t Widget.t
-        fun inherit w con = Widget.inherit () con
-        fun make ptr = Widget.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = ()
+        val witness = Editable.inherit witness con
+        val witness = CellEditable.inherit witness con in Widget.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val get_text_ : cptr -> CString.t
             = _import "gtk_entry_get_text" : cptr -> CString.t;

@@ -349,12 +349,25 @@ struct
          ++ Some(TypeDecl((["'a"],[witness_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[type_t]), 
 		    Some(TyApp([path],[parent_t]))))
+(*
+   fun inherit w con = 
+       let val con = let val ptr = con () in fn () => ptr end
+           val editableWitness = Editable.inherit () con
+           val cellEditableWitness = CellEditable.inherit editableWitness con
+       in  Widget.inherit cellEditableWitness con
+       end
+*)
          ++ Some(FunDecl("inherit",[VarPat "w",VarPat "con"],
 		    (* 'a -> GObject.constructor -> 'a t *)
 		    SigOnly([TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"])),
-		    App(Var(pRef "inherit"),[Unit,Var "con"])))
+		    Let(SeqDecl (
+			   Some(ValDecl(VarPat "con", None, Let(ValDecl(VarPat "ptr",None,App(Var "con",[Unit])),Fn("()",Var"ptr"))))
+                        :: Some(ValDecl(VarPat "witness", None, Unit))
+			:: List.map (fn i => Some(ValDecl(VarPat "witness", None, App(Var(Name.asModule i ^ ".inherit"), [Var "witness", Var "con"])))) impl
+                        ),
+			App(Var(pRef "inherit"),[Var "witness",Var "con"]))))
 	 ++ StrOnly(FunDecl("make"(*^Name.asModule name*),[VarPat"ptr"],None,
-		    App(Var(pRef "inherit"),[Unit,Fn("()",Var"ptr")])))
+		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")])))
          ++ StrOnly(Comment NONE)
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)

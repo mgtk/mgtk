@@ -117,7 +117,11 @@ structure TinySML = struct
 		      "_import \"" ^ cglobal ^ "\" : " ^ SMLType.toString ty ^ ";"
 		  | SeqExp es => Util.stringSep "" "" "; " (show_exp 1) es
 		  | Let(d,e) =>
-		      "let " ^ show d ^ " in " ^ show_exp 1 e ^ " end"
+		      let val dstr = show d
+		      in  if printing dstr
+			  then "let " ^ show d ^ " in " ^ show_exp 1 e ^ " end"
+			  else show_exp 1 e
+		      end
 
 	    and show decl =
 		case decl of

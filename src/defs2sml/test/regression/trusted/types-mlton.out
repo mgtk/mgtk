@@ -22,8 +22,9 @@ structure Gtk = struct
         type base = unit
         type 'a settings_t = unit
         type 'a t = 'a settings_t GObject.t
-        fun inherit w con = GObject.inherit () con
-        fun make ptr = GObject.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in GObject.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
     end
     signature Style = sig
@@ -39,8 +40,9 @@ structure Gtk = struct
         type base = unit
         type 'a style_t = unit
         type 'a t = 'a style_t GObject.t
-        fun inherit w con = GObject.inherit () con
-        fun make ptr = GObject.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in GObject.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
     end
     signature RcStyle = sig
@@ -57,8 +59,9 @@ structure Gtk = struct
         type base = unit
         type 'a rcstyle_t = unit
         type 'a t = 'a rcstyle_t GObject.t
-        fun inherit w con = GObject.inherit () con
-        fun make ptr = GObject.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in GObject.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val rc_get_style_by_paths_ : cptr * CString.cstring * CString.cstring * int -> cptr
             = _import "gtk_rc_get_style_by_paths" : cptr * CString.cstring * CString.cstring * int -> cptr;
@@ -78,8 +81,9 @@ structure Gtk = struct
         type base = unit
         type 'a object_t = unit
         type 'a t = 'a object_t GObject.t
-        fun inherit w con = GObject.inherit () con
-        fun make ptr = GObject.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in GObject.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
     end
     signature Widget = sig
@@ -96,8 +100,9 @@ structure Gtk = struct
         type base = unit
         type 'a widget_t = unit
         type 'a t = 'a widget_t Object.t
-        fun inherit w con = Object.inherit () con
-        fun make ptr = Object.inherit () (fn () => ptr)
+        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
+        val witness = () in Object.inherit witness con end
+        fun make ptr = inherit () (fn () => ptr)
 
         val modify_style_ : cptr * cptr -> unit
             = _import "gtk_widget_modify_style" : cptr * cptr -> unit;
