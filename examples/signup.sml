@@ -1,4 +1,4 @@
-(* An example adopted from "Mono: A Developers Notebook" *)
+(* An example adopted from "Mono: A Developers Notebook" (04-gtk/03-signup) *)
 
 local open Gtk
       infixr --> 
