@@ -45,8 +45,7 @@ fun stop error =
           | Message s
               => progname ^ ": " ^ s
   in
-     output(std_err, message); output(std_err, "\n"); flush_out std_err;
-     exit 2
+     raise Bad (message)
   end;
 
 fun lookup k [] = raise Subscript
