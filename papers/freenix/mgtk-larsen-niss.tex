@@ -137,6 +137,48 @@ for programming in the small (that is, functions, data structures and
 algorithms), and a \emph{module language} for programming in the large.
 
 
+\begin{figure*}[thp]
+\mbox{}\hfill{}
+\begin{minipage}[t]{.46\linewidth}
+\begin{verbatim}
+signature STACK = sig 
+  type 'a stack
+  exception EmptyStack
+  val empty : 'a stack
+  val push  : 'a * 'a stack -> 'a stack
+  val pop   : 'a stack -> 'a * 'a stack
+end
+\end{verbatim}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{.46\linewidth}
+\begin{verbatim}
+structure Stack :> STACK =
+struct
+  datatype 'a stack =
+           Empty
+         | Stack of 'a * 'a stack
+  exception EmptyStack
+  val empty = Empty
+  fun push(elem, stack) = 
+      Stack(elem, stack)
+  fun pop stack =
+      case stack of
+          Empty => raise EmptyStack
+        | Stack(top, rest) => 
+          (top, rest)
+end
+\end{verbatim}
+\end{minipage}
+\hfill\mbox{}
+\caption{Simple stack library implemented in SML.}
+  \label{fig:stack-lib}
+\end{figure*}
+
+Figure~\ref{fig:stack-lib} show a small stack library implemented in
+SML.  This examples shows most of the important features of SML.
+
+
 %  \sml also features algebraic
 %datatypes, pattern-matching, tuples and records, first-class and
 %anonymous functions, exception handling, immutable data types and
