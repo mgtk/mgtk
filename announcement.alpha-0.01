@@ -1,0 +1,98 @@
+ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT
+
+This is the announcement of the first public-available version of
+mGTK.  This version is called green-horses-and-blue-ducks (or
+mgtk-alpha-0.01). 
+
+
+What is mGTK? 
+-------------
+mGTK is glue code to make GTK+ (the Gimp Toolkit) accessible from SML,
+thereby providing a convenient interface for SML programmers to
+develop visual applications.
+
+For the moment only the Moscow ML compiler is supported. 
+
+
+Download
+--------
+mGTK can be obtained from the mGTK homepage at 
+
+     http://www.it.edu/people/kfl/mgtk
+
+
+What is Gtk+? 
+-------------
+Gtk+ is a wonderful graphic toolkit written in C for X-Window that was
+originally developed as the basis for the gimp. It is currently being
+ported to Win32 by Tor Lillqvist.  For more information about gtk+
+refer to the gtk+ homepage at http://www.gtk.org
+
+
+What does mGTK provide?
+-----------------------
+Almost all of the mGTK library is machine generated, thus it supports
+nearly the whole of gtk+.  Last time we made statistics the count was:
+
+* 87 widgets
+* 647 functions
+* 126 signals
+
+But at the moment there exists no real documentation describing mGTK.
+
+
+Contact information
+-------------------
+If you have comments, bug reports, feature request, or just wants to
+say that that you think that mGTK is cool, then please send an email
+to: mgtk@it.edu
+
+
+Helping out
+-----------
+When you have played a bit with this release we would be must grateful
+if you would help us answer the following questions (this is your
+change to have some influence):
+
+(1) ``Manuel'' or ``automatic'' initialization (should Gtk.init
+    be called explicit, or is it comfortable that the library takes
+    care of the initialization)?
+
+(2) Names for functions with optional parameters.  At the moment is
+    there two versions of functions that takes optional parameters:
+    one with the normal gtk+ name, for example:
+   
+	val text_new: 'a GtkAdjustment option -> 'b GtkAdjustment option
+                                              -> base GtkText
+
+    and one with the normal name and a pling, for example:
+
+        val text_new': unit -> base GtkText
+   
+    The plinged version corresponds the the normal version called with
+    all optional arguments set to NONE.
+ 
+    Should this be the other way around?  That is, should the version
+    the the optional arguments be called name_full. 
+
+(3) Should the functions that may fail return a option or should they
+    raise an exception.
+
+
+Authors
+-------
+mGTK was developed by 
+
+* Ken Friis Larsen (http://www.it.edu/people/kfl)
+* Henning Niss (http://www.diku.dk/users/hniss)
+
+in our free time.
+
+
+
+Sweet SML'ing
+
+Ken Friis Larsen and Henning Niss
+
+
+ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT
