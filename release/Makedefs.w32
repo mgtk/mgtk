@@ -1,6 +1,6 @@
 # mGtk - Makefile.inc
 # Configuration for nmake under Windows 32
-# (taken from Makefile.inc for Moscow ML)
+# (taken from Makedefs.w32 for Moscow ML)
 
 
 # Toplevel directory of unpacked distribution
