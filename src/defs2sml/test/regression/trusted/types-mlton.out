@@ -160,6 +160,60 @@ structure Gtk  = struct
 		       GObject.withPtr
 			 (style, fn style => modify_style_ (self, style)))
     end
+    signature Calendar = sig
+	type base
+	type 'a calendar_t
+	type 'a t = 'a calendar_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toCalendar : 'a t -> base t
+	type display_options
+	val SHOW_HEADING : display_options
+	val SHOW_DAY_NAMES : display_options
+	val NO_MONTH_CHANGE : display_options
+	val SHOW_WEEK_NUMBERS : display_options
+	val WEEK_START_MONDAY : display_options
+	val display_options : 'a t -> display_options list -> unit
+	val get_display_options : 'a t -> display_options list
+    end
+    structure Calendar :> Calendar = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a calendar_t = unit
+	type 'a t = 'a calendar_t Widget.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Widget.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toCalendar obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	type display_options = int
+	val get_display_options_
+	  : int ref * int ref * int ref * int ref * int ref -> unit
+	    = _import "mgtk_get_gtk_calendar_display_options"
+		      : int ref * int ref * int ref * int ref * int ref
+			-> unit;
+	val (SHOW_HEADING, SHOW_DAY_NAMES, NO_MONTH_CHANGE, SHOW_WEEK_NUMBERS, 
+	     WEEK_START_MONDAY)
+	    = let val (x0, x1, x2, x3, x4)
+		      = (ref 0, ref 0, ref 0, ref 0, ref 0)
+	      in get_display_options_ (x0, x1, x2, x3, x4); 
+		 (! x0, ! x1, ! x2, ! x3, ! x4)
+		 
+	      end
+	val display_options_ : cptr * int -> unit
+	    = _import "gtk_calendar_display_options" : cptr * int -> unit;
+	val display_options : 'a t -> display_options list -> unit
+	    = fn self => fn flags =>
+		 GObject.withPtr
+		   (self, fn self => display_options_ (self, Flags.set flags))
+	val get_display_options_ : cptr -> int
+	    = _import "gtk_calendar_get_display_options" : cptr -> int;
+	val get_display_options : 'a t -> display_options list
+	    = fn self =>
+		 Flags.get (GObject.withPtr
+			      (self, fn self => get_display_options_ self))
+    end
 end
 
 
@@ -190,3 +244,15 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
 
 
 /* *** Widget *** */
+
+
+/* *** Calendar *** */
+/* ML type: unit */
+EXTERNML void mgtk_get_gtk_calendar_display_options(int* x0, int* x1, int* x2, int* x3, int* x4) {
+    *x4 = GTK_CALENDAR_WEEK_START_MONDAY;
+    *x3 = GTK_CALENDAR_SHOW_WEEK_NUMBERS;
+    *x2 = GTK_CALENDAR_NO_MONTH_CHANGE;
+    *x1 = GTK_CALENDAR_SHOW_DAY_NAMES;
+    *x0 = GTK_CALENDAR_SHOW_HEADING;
+}
+

@@ -26,6 +26,7 @@ signature TypeInfo = sig
     val toSignalType: typeinfo -> 'a ty -> SMLType.ty
 
     val fromPrimValue: typeinfo -> 'a ty -> TinySML.exp -> TinySML.exp
+    val toPrimValue: typeinfo -> 'a ty -> TinySML.exp -> TinySML.exp
 
     val isWrapped: typeinfo -> 'a ty -> bool
     val isDefault : typeinfo -> 'a ty -> bool

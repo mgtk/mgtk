@@ -1,0 +1,199 @@
+structure Gtk  = struct
+    
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+    signature Object = sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+    end
+    structure Object :> Object = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj = inherit () (fn () => repr obj)
+    end
+    signature Widget = sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+    end
+    structure Widget :> Widget = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj = inherit () (fn () => repr obj)
+    end
+    signature Container = sig
+	type base
+	type 'a container_t
+	type 'a t = 'a container_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toContainer : 'a t -> base t
+    end
+    structure Container :> Container = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a container_t = unit
+	type 'a t = 'a container_t Widget.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Widget.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toContainer obj = inherit () (fn () => repr obj)
+    end
+    signature Bin = sig
+	type base
+	type 'a bin_t
+	type 'a t = 'a bin_t Container.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toBin : 'a t -> base t
+    end
+    structure Bin :> Bin = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a bin_t = unit
+	type 'a t = 'a bin_t Container.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Container.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toBin obj = inherit () (fn () => repr obj)
+    end
+    signature Window = sig
+	type base
+	type 'a window_t
+	type 'a t = 'a window_t Bin.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWindow : 'a t -> base t
+    end
+    structure Window :> Window = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a window_t = unit
+	type 'a t = 'a window_t Bin.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Bin.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWindow obj = inherit () (fn () => repr obj)
+    end
+    signature Dialog = sig
+	type base
+	type 'a dialog_t
+	type 'a t = 'a dialog_t Window.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toDialog : 'a t -> base t
+	type flags
+	val MODAL : flags
+	val DESTROY_WITH_PARENT : flags
+	val NO_SEPARATOR : flags
+	val new_with_buttons : string option -> 'a Window.t option 
+			    -> flags list option -> string option
+			       -> base t
+	val new_with_buttons' : unit -> base t
+    end
+    structure Dialog :> Dialog = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a dialog_t = unit
+	type 'a t = 'a dialog_t Window.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Window.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toDialog obj = inherit () (fn () => repr obj)
+	type flags = int
+	val get_flags_ : unit -> int * int * int
+	    = app1 (symb"mgtk_get_gtk_dialog_flags")
+	val (MODAL, DESTROY_WITH_PARENT, NO_SEPARATOR) = get_flags_ ()
+	val new_with_buttons_ : string -> cptr -> int -> string -> cptr
+	    = app4 (symb"mgtk_gtk_dialog_new_with_buttons")
+	val new_with_buttons : string option -> 'a Window.t option 
+			    -> flags list option -> string option
+			       -> base t
+	    = fn title => fn parent => fn flags => fn first_button_text =>
+		 make (new_with_buttons_
+			 (getOpt (title, ""))
+			 (getOpt (Option.map repr parent, GObject.null))
+			 (getOpt (Option.map Flags.set flags, 0))
+			 (getOpt (first_button_text, "")))
+	val new_with_buttons' : unit -> base t
+	    = fn dummy => make (new_with_buttons_ "" GObject.null 0 "")
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** Container *** */
+
+
+/* *** Bin *** */
+
+
+/* *** Window *** */
+
+
+/* *** Dialog *** */
+/* ML type: unit */
+EXTERNML value mgtk_get_gtk_dialog_flags(value dummy) { /* ML */
+    value res = alloc_tuple(3);
+    Field(res, 0) = Val_int(GTK_DIALOG_MODAL);
+    Field(res, 1) = Val_int(GTK_DIALOG_DESTROY_WITH_PARENT);
+    Field(res, 2) = Val_int(GTK_DIALOG_NO_SEPARATOR);
+    return res;
+}
+
+/* ML type: string -> cptr -> int -> string -> cptr */
+EXTERNML value mgtk_gtk_dialog_new_with_buttons(value title, value parent, value flags, value first_button_text) { /* ML */
+    return Val_GtkObj(gtk_dialog_new_with_buttons(String_val(title), GtkObj_val(parent), Int_val(flags), String_val(first_button_text)));
+}
+

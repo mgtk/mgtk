@@ -221,6 +221,9 @@ struct
 			raise Skip("Unbound type name: "^Name.toString' n)
 
 		    fun var (par,ty) = (Var par, ty)
+		    fun prim (par,ty) = 
+			(TypeInfo.toPrimValue tinfo ty par, ty)
+			handle TypeInfo.Unbound n => ubnd n
 		    fun wrap (par,ty) =
 			(if TypeInfo.isWrapped tinfo ty
 			 then (Prims.unWrap (ty,par),ty)
@@ -229,7 +232,7 @@ struct
 		    fun trans (par, ty) = 
 			(par, Type.mapiv (fn (ty,n)=>n) (transCValue tinfo) ty)
 
-		    val pars' = List.map (trans o wrap o var) parsty
+		    val pars' = List.map (trans o wrap o prim o var) parsty
 
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 

@@ -148,6 +148,51 @@ structure Gtk  = struct
 	val modify_style : 'a t -> 'b RcStyle.t -> unit
 	    = fn self => fn style => modify_style_ (repr self) (repr style)
     end
+    signature Calendar = sig
+	type base
+	type 'a calendar_t
+	type 'a t = 'a calendar_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toCalendar : 'a t -> base t
+	type display_options
+	val SHOW_HEADING : display_options
+	val SHOW_DAY_NAMES : display_options
+	val NO_MONTH_CHANGE : display_options
+	val SHOW_WEEK_NUMBERS : display_options
+	val WEEK_START_MONDAY : display_options
+	val display_options : 'a t -> display_options list -> unit
+	val get_display_options : 'a t -> display_options list
+    end
+    structure Calendar :> Calendar = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a calendar_t = unit
+	type 'a t = 'a calendar_t Widget.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Widget.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toCalendar obj = inherit () (fn () => repr obj)
+	type display_options = int
+	val get_display_options_ : unit -> int * int * int * int * int
+	    = app1 (symb"mgtk_get_gtk_calendar_display_options")
+	val (SHOW_HEADING, SHOW_DAY_NAMES, NO_MONTH_CHANGE, SHOW_WEEK_NUMBERS, 
+	     WEEK_START_MONDAY)
+	    = get_display_options_ ()
+	val display_options_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_calendar_display_options")
+	val display_options : 'a t -> display_options list -> unit
+	    = fn self => fn flags =>
+		 display_options_ (repr self) (Flags.set flags)
+	val get_display_options_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_calendar_get_display_options")
+	val get_display_options : 'a t -> display_options list
+	    = fn self => Flags.get (get_display_options_ (repr self))
+    end
 end
 
 
@@ -213,5 +258,30 @@ EXTERNML value mgtk_gtk_rc_get_style_by_paths(value settings, value widget_path,
 EXTERNML value mgtk_gtk_widget_modify_style(value self, value style) { /* ML */
     gtk_widget_modify_style(GtkObj_val(self), GtkObj_val(style));
     return Val_unit;
+}
+
+
+
+/* *** Calendar *** */
+/* ML type: unit */
+EXTERNML value mgtk_get_gtk_calendar_display_options(value dummy) { /* ML */
+    value res = alloc_tuple(5);
+    Field(res, 0) = Val_int(GTK_CALENDAR_SHOW_HEADING);
+    Field(res, 1) = Val_int(GTK_CALENDAR_SHOW_DAY_NAMES);
+    Field(res, 2) = Val_int(GTK_CALENDAR_NO_MONTH_CHANGE);
+    Field(res, 3) = Val_int(GTK_CALENDAR_SHOW_WEEK_NUMBERS);
+    Field(res, 4) = Val_int(GTK_CALENDAR_WEEK_START_MONDAY);
+    return res;
+}
+
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_calendar_display_options(value self, value flags) { /* ML */
+    gtk_calendar_display_options(GtkObj_val(self), Int_val(flags));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_calendar_get_display_options(value self) { /* ML */
+    return Val_int(gtk_calendar_get_display_options(GtkObj_val(self)));
 }
 

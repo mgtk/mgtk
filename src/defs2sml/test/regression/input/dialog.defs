@@ -1,0 +1,69 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+)
+
+(define-object Container
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkContainer")
+  (gtype-id "GTK_TYPE_CONTAINER")
+)
+
+(define-object Bin
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkBin")
+  (gtype-id "GTK_TYPE_BIN")
+)
+
+(define-object Window
+  (in-module "Gtk")
+  (parent "GtkBin")
+  (c-name "GtkWindow")
+  (gtype-id "GTK_TYPE_WINDOW")
+)
+
+(define-object Dialog
+  (in-module "Gtk")
+  (parent "GtkWindow")
+  (c-name "GtkDialog")
+  (gtype-id "GTK_TYPE_DIALOG")
+  (fields
+    '("GtkWidget*" "vbox")
+    '("GtkWidget*" "action_area")
+  )
+)
+
+(define-flags DialogFlags
+  (in-module "Gtk")
+  (c-name "GtkDialogFlags")
+  (gtype-id "GTK_TYPE_DIALOG_FLAGS")
+  (values
+    '("modal" "GTK_DIALOG_MODAL")
+    '("destroy-with-parent" "GTK_DIALOG_DESTROY_WITH_PARENT")
+    '("no-separator" "GTK_DIALOG_NO_SEPARATOR")
+  )
+)
+
+(define-function gtk_dialog_new_with_buttons
+  (c-name "gtk_dialog_new_with_buttons")
+  (is-constructor-of GtkDialog)
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-gchar*" "title" (null-ok) (default "NULL"))
+    '("GtkWindow*" "parent" (null-ok) (default "NULL"))
+    '("GtkDialogFlags" "flags" (default "0"))
+    '("const-gchar*" "first_button_text" (null-ok) (default "NULL"))
+  )
+  (varargs #t)
+)

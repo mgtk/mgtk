@@ -42,6 +42,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		 toc: string (* which function to call *),
 		 fromc: string (* which function to call *),
 		 super: name option,
+		 toprim: string option (* which function to call *),
 		 fromprim: TinySML.exp -> TinySML.exp,
 		 wrapped: bool
 		}
@@ -54,6 +55,17 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun id x = x
     fun make e = TinySML.App(TinySML.Var("make"), [e])
     fun ccall name = fn e => TinyC.Call(name,NONE,[e])
+
+    fun addObject (table,name) =
+	let 
+	    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
+	    val info = {toc="GtkObj_val",fromc="Val_GtkObj",
+			ptype=SMLType.TyApp([],["cptr"]),
+			fromprim = make, toprim = NONE, wrapped = true,
+			stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
+			super=NONE}
+	in  add(table,name,info)  end
+
     val basic =
 	[("int",       (fn _ => SMLType.IntTy,SMLType.IntTy,
 		        "Int_val", "Val_int", NONE))
@@ -81,21 +93,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		        "Int_val", "Val_int", NONE))
         ]
 
-    fun addObject (table,name) =
-	let 
-	    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
-	    val info = {toc="GtkObj_val",fromc="Val_GtkObj",
-			ptype=SMLType.TyApp([],["cptr"]),
-			fromprim = make, wrapped = true,
-			stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
-			super=NONE}
-	in  add(table,name,info)  end
-
     fun init () = 
 	let fun a ((n,i),t)=
 		add(t,Name.fromPaths([],[],[n]),
 		    {stype= #1 i,ptype= #2 i,toc= #3 i, 
-		     wrapped = false, fromprim = id,
+		     wrapped = false, fromprim = id, toprim = NONE,
 		     fromc= #4 i,super= #5 i})
 	    val table = List.foldl a (Splaymap.mkDict Name.compare) basic
 	in  addObject(table, Name.fromString "GObject")
@@ -116,20 +118,31 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    and bmem (AST.Sub module,table) = bmod(module,table)
 	      | bmem (AST.Member{name,info},table) =
 		case info of
-		    AST.Enum _ => 
+		    AST.Enum(false (* not a flag *), _) => 
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
 			    {toc="Int_val", fromc="Val_int",
-			     fromprim=id, wrapped = false,
+			     fromprim=id, toprim = NONE, wrapped = false,
 			     ptype=SMLType.IntTy, super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asEnum name])})
+                    )
+		  | AST.Enum(true (* a flag *), _) => 
+		    (MsgUtil.debug("Binding " ^ Name.toString' name);
+		        add(table,name,
+			    {toc="Int_val", fromc="Val_int",
+			     toprim= SOME"Flags.set",
+			     fromprim=fn e => TinySML.App(TinySML.Var"Flags.get",[e]),
+			     wrapped = false,
+			     ptype=SMLType.IntTy, super=NONE,
+			     stype=fn _ => 
+				SMLType.TyApp([SMLType.TyApp([],[Name.asEnum name])],["list"])})
                     )
 		  | AST.Boxed _ =>
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
 			    {toc=(Name.asCBoxed name^"_val"), 
 			     fromc=("Val_"^Name.asCBoxed name),
-			     fromprim=id, wrapped = false,
+			     fromprim=id, toprim=NONE, wrapped = false,
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
                     )
@@ -147,6 +160,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	in  next
 	end
 
+(*
     fun pp table =
 	let open Pretty
 	    fun ppinfo {stype,ptype,toc,fromc,super,fromprim,wrapped} = 
@@ -165,6 +179,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
                      ; TextIO.closeOut os
 		     ; table
 		   end
+*)
 
     fun prependPath (path,base) ty =
 	case ty of
@@ -258,6 +273,38 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | exp => exp
     end (* local *)
 
+    fun toprimvalue tinfo ty =
+	case ty of
+	    Type.Base n =>
+	       (let val info: info = lookup tinfo n
+		in  #toprim info
+		end
+		    handle NotFound => raise Unbound n
+	       )
+	  | Type.Tname n =>
+	       (let val info: info = lookup tinfo n
+		in  #toprim info
+		end
+		    handle NotFound => raise Unbound n
+	       )
+	  | Type.WithDefault(ty,default) => toprimvalue tinfo ty
+	  | Type.Ptr ty => toprimvalue tinfo ty (* FIXME: ? *)
+	  | Type.Const ty => toprimvalue tinfo ty
+	  | _ => NONE
+    local open TinySML in
+    fun toPrimValue tinfo ty =
+	case ty of
+	    Type.WithDefault(ty,default) =>
+	       (case toprimvalue tinfo ty of
+		    NONE => id
+		  | SOME f => fn e => App(Var"Option.map", [Var f, e])
+               )
+	  | ty =>
+	       (case toprimvalue tinfo ty of
+		    NONE => id
+		  | SOME f => fn e => App(Var f, [e])
+               )
+    end (* local *)
     fun fromPrimValue tinfo ty =
 	case ty of
 	    Type.Base n =>
@@ -276,6 +323,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Ptr ty => fromPrimValue tinfo ty (* FIXME: ? *)
 	  | Type.Const ty => fromPrimValue tinfo ty
 	  | _ => id
+
     fun isWrapped tinfo ty =
 	case ty of
 	    Type.Base n =>

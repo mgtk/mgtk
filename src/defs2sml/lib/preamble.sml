@@ -234,3 +234,56 @@ struct
 
     end	
 end
+
+signature Flags = sig
+    val setGeneral : int -> int list -> int list -> int 
+    val set : int list -> int
+    val get : int -> int list
+    val isSet : int list -> int -> int list
+    val areTheseSet : int list -> int -> bool
+end
+
+structure Flags = struct
+    (* convert a list of flags to a word *)
+    infix orb andb
+    val notb = Word.notb 
+    val op orb = Word.orb 
+    val op andb = Word.andb
+    val W = Word.fromInt
+    fun set(f,res) = W f orb res
+    fun unset(f, res) = notb(W f) andb res
+
+    fun setGeneral init pos neg =
+	let val res = List.foldl set (W init) pos
+	    val res = List.foldl unset res neg
+	in  Word.toInt res
+	end
+
+    (* we only need to set flags from the no flag *)
+    val set = fn pos =>
+	let val res = List.foldl set 0w0 pos
+	in  Word.toInt res
+	end
+
+    (* Checks which flags from possible is set in flag *)
+    fun isSet possible flag =
+	let val f = W flag
+	    fun isIn pos = (f andb (W pos)) <> 0w0
+	in  List.filter isIn possible
+	end
+
+    fun get f =
+	let val flag = W f
+	    fun loop p acc = 
+		let val acc = if (flag andb p) <> 0w0 
+			      then Word.toInt p :: acc
+			      else acc
+		    val next = Word.<<(p, 0w1)
+		in  if next = 0w0 then acc
+		    else loop next acc
+		end
+	in  loop 0w1 []
+	end
+
+    fun areTheseSet flags flag = ((W(set flags)) andb (W flag)) <> 0w0
+end

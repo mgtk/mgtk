@@ -129,3 +129,38 @@
     '("int" "accel_mods")
   )
 )
+
+(define-object Calendar
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkCalendar")
+  (gtype-id "GTK_TYPE_CALENDAR")
+)
+
+(define-flags CalendarDisplayOptions
+  (in-module "Gtk")
+  (c-name "GtkCalendarDisplayOptions")
+  (gtype-id "GTK_TYPE_CALENDAR_DISPLAY_OPTIONS")
+  (values
+    '("show-heading" "GTK_CALENDAR_SHOW_HEADING")
+    '("show-day-names" "GTK_CALENDAR_SHOW_DAY_NAMES")
+    '("no-month-change" "GTK_CALENDAR_NO_MONTH_CHANGE")
+    '("show-week-numbers" "GTK_CALENDAR_SHOW_WEEK_NUMBERS")
+    '("week-start-monday" "GTK_CALENDAR_WEEK_START_MONDAY")
+  )
+)
+
+(define-method display_options
+  (of-object "GtkCalendar")
+  (c-name "gtk_calendar_display_options")
+  (return-type "none")
+  (parameters
+    '("GtkCalendarDisplayOptions" "flags")
+  )
+)
+
+(define-method display_options
+  (of-object "GtkCalendar")
+  (c-name "gtk_calendar_get_display_options")
+  (return-type "GtkCalendarDisplayOptions")
+)
