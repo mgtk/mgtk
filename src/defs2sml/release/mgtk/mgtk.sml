@@ -734,6 +734,39 @@ structure Gtk  = struct
 	= app1 (symb"mgtk_gtk_requisition_get_type")
     val requisition_get_type : unit -> GType.t
 	= fn dummy => requisition_get_type_ dummy
+    type file_chooser_action = int
+    val get_file_chooser_action_ : unit -> int * int * int * int
+	= app1 (symb"mgtk_get_gtk_file_chooser_action")
+    val (FILE_CHOOSER_ACTION_OPEN, FILE_CHOOSER_ACTION_SAVE, 
+	 FILE_CHOOSER_ACTION_SELECT_FOLDER, FILE_CHOOSER_ACTION_CREATE_FOLDER)
+	= get_file_chooser_action_ ()
+    type file_chooser_error = int
+    val get_file_chooser_error_ : unit -> int * int
+	= app1 (symb"mgtk_get_gtk_file_chooser_error")
+    val (FILE_CHOOSER_ERROR_NONEXISTENT, FILE_CHOOSER_ERROR_BAD_FILENAME)
+	= get_file_chooser_error_ ()
+    type file_filter_flags = int
+    val get_file_filter_flags_ : unit -> int * int * int * int
+	= app1 (symb"mgtk_get_gtk_file_filter_flags")
+    val (FILE_FILTER_FILENAME, FILE_FILTER_URI, FILE_FILTER_DISPLAY_NAME, 
+	 FILE_FILTER_MIME_TYPE)
+	= get_file_filter_flags_ ()
+    
+    val file_info_get_type_ : unit -> GType.t
+	= app1 (symb"mgtk_gtk_file_info_get_type")
+    val file_info_get_type : unit -> GType.t
+	= fn dummy => file_info_get_type_ dummy
+    val file_system_get_type_ : unit -> GType.t
+	= app1 (symb"mgtk_gtk_file_system_get_type")
+    val file_system_get_type : unit -> GType.t
+	= fn dummy => file_system_get_type_ dummy
+    val file_folder_get_type_ : unit -> GType.t
+	= app1 (symb"mgtk_gtk_file_folder_get_type")
+    val file_folder_get_type : unit -> GType.t
+	= fn dummy => file_folder_get_type_ dummy
+    
+    
+    
     structure AccelGroup :>
       sig
 	type base
@@ -10104,71 +10137,6 @@ structure Gtk  = struct
 	val set_preview_text : 'a t -> string -> unit
 	    = fn self => fn text => set_preview_text_ (repr self) text
     end
-    structure FileSelection :>
-      sig
-	type base
-	type 'a fileselection_t
-	type 'a t = 'a fileselection_t Dialog.t
-	val inherit : 'a -> GObject.constructor -> 'a t
-	val toFileSelection : 'a t -> base t
-	val get_type : unit -> GType.t
-	val new : string option -> base t
-	val new' : unit -> base t
-	val set_filename : 'a t -> string -> unit
-	val get_filename : 'a t -> string
-	val complete : 'a t -> string -> unit
-	val show_fileop_buttons : 'a t -> unit
-	val hide_fileop_buttons : 'a t -> unit
-	val set_select_multiple : 'a t -> bool -> unit
-	val get_select_multiple : 'a t -> bool
-      end = struct
-	open Dynlib
-	type cptr = GObject.cptr
-	val repr = GObject.repr
-	val symb = GtkBasis.symb
-	type base = unit
-	type 'a fileselection_t = unit
-	type 'a t = 'a fileselection_t Dialog.t
-	fun inherit w con = Dialog.inherit () con
-	fun make ptr = inherit () (fn () => ptr)
-	fun toFileSelection obj = inherit () (fn () => repr obj)
-	val get_type_ : unit -> GType.t
-	    = app1 (symb"mgtk_gtk_file_selection_get_type")
-	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
-	val new_ : string -> cptr = app1 (symb"mgtk_gtk_file_selection_new")
-	val new : string option -> base t
-	    = fn title => make (new_ (getOpt (title, "")))
-	val new' : unit -> base t = fn dummy => make (new_ "")
-	val set_filename_ : cptr -> string -> unit
-	    = app2 (symb"mgtk_gtk_file_selection_set_filename")
-	val set_filename : 'a t -> string -> unit
-	    = fn self => fn filename => set_filename_ (repr self) filename
-	val get_filename_ : cptr -> string
-	    = app1 (symb"mgtk_gtk_file_selection_get_filename")
-	val get_filename : 'a t -> string
-	    = fn self => get_filename_ (repr self)
-	val complete_ : cptr -> string -> unit
-	    = app2 (symb"mgtk_gtk_file_selection_complete")
-	val complete : 'a t -> string -> unit
-	    = fn self => fn pattern => complete_ (repr self) pattern
-	val show_fileop_buttons_ : cptr -> unit
-	    = app1 (symb"mgtk_gtk_file_selection_show_fileop_buttons")
-	val show_fileop_buttons : 'a t -> unit
-	    = fn self => show_fileop_buttons_ (repr self)
-	val hide_fileop_buttons_ : cptr -> unit
-	    = app1 (symb"mgtk_gtk_file_selection_hide_fileop_buttons")
-	val hide_fileop_buttons : 'a t -> unit
-	    = fn self => hide_fileop_buttons_ (repr self)
-	val set_select_multiple_ : cptr -> bool -> unit
-	    = app2 (symb"mgtk_gtk_file_selection_set_select_multiple")
-	val set_select_multiple : 'a t -> bool -> unit
-	    = fn self => fn select_multiple =>
-		 set_select_multiple_ (repr self) select_multiple
-	val get_select_multiple_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_file_selection_get_select_multiple")
-	val get_select_multiple : 'a t -> bool
-	    = fn self => get_select_multiple_ (repr self)
-    end
     structure ColorSelectionDialog :>
       sig
 	type base
@@ -10265,5 +10233,414 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_clipboard_wait_is_text_available")
 	val wait_is_text_available : 'a t -> bool
 	    = fn self => wait_is_text_available_ (repr self)
+    end
+    structure FileChooser :>
+      sig
+	type base
+	type 'a filechooser_t
+	type 'a t = 'a filechooser_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileChooser : 'a t -> base t
+	val get_type : unit -> GType.t
+	val set_action : 'a t -> file_chooser_action -> unit
+	val get_action : 'a t -> file_chooser_action
+	val set_local_only : 'a t -> bool -> unit
+	val get_local_only : 'a t -> bool
+	val set_select_multiple : 'a t -> bool -> unit
+	val get_select_multiple : 'a t -> bool
+	val set_current_name : 'a t -> string -> unit
+	val get_filename : 'a t -> string
+	val set_filename : 'a t -> string -> bool
+	val select_filename : 'a t -> string -> bool
+	val unselect_filename : 'a t -> string -> unit
+	val select_all : 'a t -> unit
+	val unselect_all : 'a t -> unit
+	val set_current_folder : 'a t -> string -> bool
+	val get_current_folder : 'a t -> string
+	val get_uri : 'a t -> string
+	val set_uri : 'a t -> string -> bool
+	val select_uri : 'a t -> string -> bool
+	val unselect_uri : 'a t -> string -> unit
+	val set_current_folder_uri : 'a t -> string -> bool
+	val get_current_folder_uri : 'a t -> string
+	val set_preview_widget : 'a t -> 'b Widget.t -> unit
+	val get_preview_widget : 'a t -> base Widget.t
+	val set_preview_widget_active : 'a t -> bool -> unit
+	val get_preview_widget_active : 'a t -> bool
+	val set_use_preview_label : 'a t -> bool -> unit
+	val get_use_preview_label : 'a t -> bool
+	val get_preview_filename : 'a t -> string
+	val get_preview_uri : 'a t -> string
+	val set_extra_widget : 'a t -> 'b Widget.t -> unit
+	val get_extra_widget : 'a t -> base Widget.t
+	val add_filter : 'a t -> 'b t -> unit
+	val remove_filter : 'a t -> 'b t -> unit
+	val set_filter : 'a t -> 'b t -> unit
+	val get_filter : 'a t -> base t
+	val dialog_get_type : unit -> GType.t
+	val dialog_new_with_backend
+	  : string -> 'a Window.t -> file_chooser_action -> string -> string
+	    -> base t
+	val widget_get_type : unit -> GType.t
+	val widget_new_with_backend : file_chooser_action -> string -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a filechooser_t = unit
+	type 'a t = 'a filechooser_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileChooser obj = inherit () (fn () => repr obj)
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_file_chooser_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val set_action_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_action")
+	val set_action : 'a t -> file_chooser_action -> unit
+	    = fn self => fn action => set_action_ (repr self) action
+	val get_action_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_file_chooser_get_action")
+	val get_action : 'a t -> file_chooser_action
+	    = fn self => get_action_ (repr self)
+	val set_local_only_ : cptr -> bool -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_local_only")
+	val set_local_only : 'a t -> bool -> unit
+	    = fn self => fn local_only =>
+		 set_local_only_ (repr self) local_only
+	val get_local_only_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_file_chooser_get_local_only")
+	val get_local_only : 'a t -> bool
+	    = fn self => get_local_only_ (repr self)
+	val set_select_multiple_ : cptr -> bool -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_select_multiple")
+	val set_select_multiple : 'a t -> bool -> unit
+	    = fn self => fn select_multiple =>
+		 set_select_multiple_ (repr self) select_multiple
+	val get_select_multiple_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_file_chooser_get_select_multiple")
+	val get_select_multiple : 'a t -> bool
+	    = fn self => get_select_multiple_ (repr self)
+	val set_current_name_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_current_name")
+	val set_current_name : 'a t -> string -> unit
+	    = fn self => fn name => set_current_name_ (repr self) name
+	val get_filename_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_chooser_get_filename")
+	val get_filename : 'a t -> string
+	    = fn self => get_filename_ (repr self)
+	val set_filename_ : cptr -> string -> bool
+	    = app2 (symb"mgtk_gtk_file_chooser_set_filename")
+	val set_filename : 'a t -> string -> bool
+	    = fn self => fn filename => set_filename_ (repr self) filename
+	val select_filename_ : cptr -> string -> bool
+	    = app2 (symb"mgtk_gtk_file_chooser_select_filename")
+	val select_filename : 'a t -> string -> bool
+	    = fn self => fn filename => select_filename_ (repr self) filename
+	val unselect_filename_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_unselect_filename")
+	val unselect_filename : 'a t -> string -> unit
+	    = fn self => fn filename => unselect_filename_ (repr self) filename
+	val select_all_ : cptr -> unit
+	    = app1 (symb"mgtk_gtk_file_chooser_select_all")
+	val select_all : 'a t -> unit = fn self => select_all_ (repr self)
+	val unselect_all_ : cptr -> unit
+	    = app1 (symb"mgtk_gtk_file_chooser_unselect_all")
+	val unselect_all : 'a t -> unit = fn self => unselect_all_ (repr self)
+	val set_current_folder_ : cptr -> string -> bool
+	    = app2 (symb"mgtk_gtk_file_chooser_set_current_folder")
+	val set_current_folder : 'a t -> string -> bool
+	    = fn self => fn filename =>
+		 set_current_folder_ (repr self) filename
+	val get_current_folder_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_chooser_get_current_folder")
+	val get_current_folder : 'a t -> string
+	    = fn self => get_current_folder_ (repr self)
+	val get_uri_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_chooser_get_uri")
+	val get_uri : 'a t -> string = fn self => get_uri_ (repr self)
+	val set_uri_ : cptr -> string -> bool
+	    = app2 (symb"mgtk_gtk_file_chooser_set_uri")
+	val set_uri : 'a t -> string -> bool
+	    = fn self => fn uri => set_uri_ (repr self) uri
+	val select_uri_ : cptr -> string -> bool
+	    = app2 (symb"mgtk_gtk_file_chooser_select_uri")
+	val select_uri : 'a t -> string -> bool
+	    = fn self => fn uri => select_uri_ (repr self) uri
+	val unselect_uri_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_unselect_uri")
+	val unselect_uri : 'a t -> string -> unit
+	    = fn self => fn uri => unselect_uri_ (repr self) uri
+	val set_current_folder_uri_ : cptr -> string -> bool
+	    = app2 (symb"mgtk_gtk_file_chooser_set_current_folder_uri")
+	val set_current_folder_uri : 'a t -> string -> bool
+	    = fn self => fn uri => set_current_folder_uri_ (repr self) uri
+	val get_current_folder_uri_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_chooser_get_current_folder_uri")
+	val get_current_folder_uri : 'a t -> string
+	    = fn self => get_current_folder_uri_ (repr self)
+	val set_preview_widget_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_preview_widget")
+	val set_preview_widget : 'a t -> 'b Widget.t -> unit
+	    = fn self => fn preview_widget =>
+		 set_preview_widget_ (repr self) (repr preview_widget)
+	val get_preview_widget_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_file_chooser_get_preview_widget")
+	val get_preview_widget : 'a t -> base Widget.t
+	    = fn self => Widget.inherit
+			   () (fn () => get_preview_widget_ (repr self))
+	val set_preview_widget_active_ : cptr -> bool -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_preview_widget_active")
+	val set_preview_widget_active : 'a t -> bool -> unit
+	    = fn self => fn active =>
+		 set_preview_widget_active_ (repr self) active
+	val get_preview_widget_active_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_file_chooser_get_preview_widget_active")
+	val get_preview_widget_active : 'a t -> bool
+	    = fn self => get_preview_widget_active_ (repr self)
+	val set_use_preview_label_ : cptr -> bool -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_use_preview_label")
+	val set_use_preview_label : 'a t -> bool -> unit
+	    = fn self => fn use_label =>
+		 set_use_preview_label_ (repr self) use_label
+	val get_use_preview_label_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_file_chooser_get_use_preview_label")
+	val get_use_preview_label : 'a t -> bool
+	    = fn self => get_use_preview_label_ (repr self)
+	val get_preview_filename_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_chooser_get_preview_filename")
+	val get_preview_filename : 'a t -> string
+	    = fn self => get_preview_filename_ (repr self)
+	val get_preview_uri_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_chooser_get_preview_uri")
+	val get_preview_uri : 'a t -> string
+	    = fn self => get_preview_uri_ (repr self)
+	val set_extra_widget_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_extra_widget")
+	val set_extra_widget : 'a t -> 'b Widget.t -> unit
+	    = fn self => fn extra_widget =>
+		 set_extra_widget_ (repr self) (repr extra_widget)
+	val get_extra_widget_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_file_chooser_get_extra_widget")
+	val get_extra_widget : 'a t -> base Widget.t
+	    = fn self => Widget.inherit
+			   () (fn () => get_extra_widget_ (repr self))
+	val add_filter_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_add_filter")
+	val add_filter : 'a t -> 'b t -> unit
+	    = fn self => fn filter => add_filter_ (repr self) (repr filter)
+	val remove_filter_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_remove_filter")
+	val remove_filter : 'a t -> 'b t -> unit
+	    = fn self => fn filter => remove_filter_ (repr self) (repr filter)
+	val set_filter_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_file_chooser_set_filter")
+	val set_filter : 'a t -> 'b t -> unit
+	    = fn self => fn filter => set_filter_ (repr self) (repr filter)
+	val get_filter_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_file_chooser_get_filter")
+	val get_filter : 'a t -> base t
+	    = fn self => make (get_filter_ (repr self))
+	val dialog_get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_file_chooser_dialog_get_type")
+	val dialog_get_type : unit -> GType.t
+	    = fn dummy => dialog_get_type_ dummy
+	val dialog_new_with_backend_
+	  : string -> cptr -> int -> string -> string -> cptr
+	    = app5 (symb"mgtk_gtk_file_chooser_dialog_new_with_backend")
+	val dialog_new_with_backend
+	  : string -> 'a Window.t -> file_chooser_action -> string -> string
+	    -> base t
+	    = fn title => fn parent => fn action => fn backend => 
+	      fn first_button_text =>
+		 make (dialog_new_with_backend_
+			 title (repr parent) action backend first_button_text)
+	val widget_get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_file_chooser_widget_get_type")
+	val widget_get_type : unit -> GType.t
+	    = fn dummy => widget_get_type_ dummy
+	val widget_new_with_backend_ : int -> string -> cptr
+	    = app2 (symb"mgtk_gtk_file_chooser_widget_new_with_backend")
+	val widget_new_with_backend : file_chooser_action -> string -> base t
+	    = fn action => fn backend =>
+		 make (widget_new_with_backend_ action backend)
+    end
+    structure FileChooserDialog :>
+      sig
+	type base
+	type 'a filechooserdialog_t
+	type 'a t = 'a filechooserdialog_t Dialog.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileChooserDialog : 'a t -> base t
+	val asFileChooser : 'a t -> base FileChooser.t
+	val new : string -> 'a Window.t option -> file_chooser_action 
+	       -> 'b Window.t option
+		  -> base t
+	val new' : string -> file_chooser_action -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a filechooserdialog_t = unit
+	type 'a t = 'a filechooserdialog_t Dialog.t
+	fun inherit w con = Dialog.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileChooserDialog obj = inherit () (fn () => repr obj)
+	fun asFileChooser obj = FileChooser.inherit () (fn () => repr obj)
+	val new_ : string -> cptr -> int -> cptr -> cptr
+	    = app4 (symb"mgtk_gtk_file_chooser_dialog_new")
+	val new : string -> 'a Window.t option -> file_chooser_action 
+	       -> 'b Window.t option
+		  -> base t
+	    = fn title => fn parent => fn action => fn first_button_text =>
+		 make (new_ title
+			    (getOpt (Option.map repr parent, GObject.null))
+			    action
+			    (getOpt (Option.map repr first_button_text, 
+				     GObject.null)))
+	val new' : string -> file_chooser_action -> base t
+	    = fn title => fn action =>
+		 make (new_ title GObject.null action GObject.null)
+    end
+    structure FileChooserWidget :>
+      sig
+	type base
+	type 'a filechooserwidget_t
+	type 'a t = 'a filechooserwidget_t VBox.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileChooserWidget : 'a t -> base t
+	val asFileChooser : 'a t -> base FileChooser.t
+	val new : file_chooser_action -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a filechooserwidget_t = unit
+	type 'a t = 'a filechooserwidget_t VBox.t
+	fun inherit w con = VBox.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileChooserWidget obj = inherit () (fn () => repr obj)
+	fun asFileChooser obj = FileChooser.inherit () (fn () => repr obj)
+	val new_ : int -> cptr = app1 (symb"mgtk_gtk_file_chooser_widget_new")
+	val new : file_chooser_action -> base t
+	    = fn action => make (new_ action)
+    end
+    structure FileFilter :>
+      sig
+	type base
+	type 'a filefilter_t
+	type 'a t = 'a filefilter_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileFilter : 'a t -> base t
+	val get_type : unit -> GType.t
+	val new : unit -> base t
+	val set_name : 'a t -> string -> unit
+	val get_name : 'a t -> string
+	val add_mime_type : 'a t -> string -> unit
+	val add_pattern : 'a t -> string -> unit
+	val get_needed : 'a t -> file_filter_flags list
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a filefilter_t = unit
+	type 'a t = 'a filefilter_t Object.t
+	fun inherit w con = Object.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileFilter obj = inherit () (fn () => repr obj)
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_file_filter_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val new_ : unit -> cptr = app1 (symb"mgtk_gtk_file_filter_new")
+	val new : unit -> base t = fn dummy => make (new_ dummy)
+	val set_name_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_filter_set_name")
+	val set_name : 'a t -> string -> unit
+	    = fn self => fn name => set_name_ (repr self) name
+	val get_name_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_filter_get_name")
+	val get_name : 'a t -> string = fn self => get_name_ (repr self)
+	val add_mime_type_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_filter_add_mime_type")
+	val add_mime_type : 'a t -> string -> unit
+	    = fn self => fn mime_type => add_mime_type_ (repr self) mime_type
+	val add_pattern_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_filter_add_pattern")
+	val add_pattern : 'a t -> string -> unit
+	    = fn self => fn pattern => add_pattern_ (repr self) pattern
+	val get_needed_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_file_filter_get_needed")
+	val get_needed : 'a t -> file_filter_flags list
+	    = fn self => Flags.get (get_needed_ (repr self))
+    end
+    structure FileSelection :>
+      sig
+	type base
+	type 'a fileselection_t
+	type 'a t = 'a fileselection_t Dialog.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileSelection : 'a t -> base t
+	val get_type : unit -> GType.t
+	val new : string -> base t
+	val set_filename : 'a t -> string -> unit
+	val get_filename : 'a t -> string
+	val complete : 'a t -> string -> unit
+	val show_fileop_buttons : 'a t -> unit
+	val hide_fileop_buttons : 'a t -> unit
+	val set_select_multiple : 'a t -> bool -> unit
+	val get_select_multiple : 'a t -> bool
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a fileselection_t = unit
+	type 'a t = 'a fileselection_t Dialog.t
+	fun inherit w con = Dialog.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileSelection obj = inherit () (fn () => repr obj)
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_file_selection_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val new_ : string -> cptr = app1 (symb"mgtk_gtk_file_selection_new")
+	val new : string -> base t = fn title => make (new_ title)
+	val set_filename_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_selection_set_filename")
+	val set_filename : 'a t -> string -> unit
+	    = fn self => fn filename => set_filename_ (repr self) filename
+	val get_filename_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_file_selection_get_filename")
+	val get_filename : 'a t -> string
+	    = fn self => get_filename_ (repr self)
+	val complete_ : cptr -> string -> unit
+	    = app2 (symb"mgtk_gtk_file_selection_complete")
+	val complete : 'a t -> string -> unit
+	    = fn self => fn pattern => complete_ (repr self) pattern
+	val show_fileop_buttons_ : cptr -> unit
+	    = app1 (symb"mgtk_gtk_file_selection_show_fileop_buttons")
+	val show_fileop_buttons : 'a t -> unit
+	    = fn self => show_fileop_buttons_ (repr self)
+	val hide_fileop_buttons_ : cptr -> unit
+	    = app1 (symb"mgtk_gtk_file_selection_hide_fileop_buttons")
+	val hide_fileop_buttons : 'a t -> unit
+	    = fn self => hide_fileop_buttons_ (repr self)
+	val set_select_multiple_ : cptr -> bool -> unit
+	    = app2 (symb"mgtk_gtk_file_selection_set_select_multiple")
+	val set_select_multiple : 'a t -> bool -> unit
+	    = fn self => fn select_multiple =>
+		 set_select_multiple_ (repr self) select_multiple
+	val get_select_multiple_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_file_selection_get_select_multiple")
+	val get_select_multiple : 'a t -> bool
+	    = fn self => get_select_multiple_ (repr self)
     end
 end

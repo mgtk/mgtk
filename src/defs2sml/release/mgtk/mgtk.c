@@ -1295,6 +1295,49 @@ EXTERNML value mgtk_gtk_requisition_get_type(value dummy) { /* ML */
   return Val_int(gtk_requisition_get_type());
 }
 
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_file_chooser_action(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_FILE_CHOOSER_ACTION_OPEN);
+  Field(res, 1) = Val_int(GTK_FILE_CHOOSER_ACTION_SAVE);
+  Field(res, 2) = Val_int(GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  Field(res, 3) = Val_int(GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_file_chooser_error(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_FILE_CHOOSER_ERROR_NONEXISTENT);
+  Field(res, 1) = Val_int(GTK_FILE_CHOOSER_ERROR_BAD_FILENAME);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_file_filter_flags(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_FILE_FILTER_FILENAME);
+  Field(res, 1) = Val_int(GTK_FILE_FILTER_URI);
+  Field(res, 2) = Val_int(GTK_FILE_FILTER_DISPLAY_NAME);
+  Field(res, 3) = Val_int(GTK_FILE_FILTER_MIME_TYPE);
+  return res;
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_info_get_type(value dummy) { /* ML */
+  return Val_int(gtk_file_info_get_type());
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_system_get_type(value dummy) { /* ML */
+  return Val_int(gtk_file_system_get_type());
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_folder_get_type(value dummy) { /* ML */
+  return Val_int(gtk_file_folder_get_type());
+}
+
 
 
 /* *** AccelGroup *** */
@@ -8360,59 +8403,6 @@ EXTERNML value mgtk_gtk_font_selection_dialog_set_preview_text(value self, value
 
 
 
-/* *** FileSelection *** */
-/* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_file_selection_get_type(value dummy) { /* ML */
-    return Val_int(gtk_file_selection_get_type());
-}
-
-/* ML type: string -> cptr */
-EXTERNML value mgtk_gtk_file_selection_new(value title) { /* ML */
-    return Val_GtkObj(gtk_file_selection_new(String_val(title)));
-}
-
-/* ML type: cptr -> string -> unit */
-EXTERNML value mgtk_gtk_file_selection_set_filename(value self, value filename) { /* ML */
-    gtk_file_selection_set_filename(GtkObj_val(self), String_val(filename));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string */
-EXTERNML value mgtk_gtk_file_selection_get_filename(value self) { /* ML */
-    return my_copy_string(gtk_file_selection_get_filename(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> string -> unit */
-EXTERNML value mgtk_gtk_file_selection_complete(value self, value pattern) { /* ML */
-    gtk_file_selection_complete(GtkObj_val(self), String_val(pattern));
-    return Val_unit;
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_file_selection_show_fileop_buttons(value self) { /* ML */
-    gtk_file_selection_show_fileop_buttons(GtkObj_val(self));
-    return Val_unit;
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_file_selection_hide_fileop_buttons(value self) { /* ML */
-    gtk_file_selection_hide_fileop_buttons(GtkObj_val(self));
-    return Val_unit;
-}
-
-/* ML type: cptr -> bool -> unit */
-EXTERNML value mgtk_gtk_file_selection_set_select_multiple(value self, value select_multiple) { /* ML */
-    gtk_file_selection_set_select_multiple(GtkObj_val(self), Bool_val(select_multiple));
-    return Val_unit;
-}
-
-/* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_file_selection_get_select_multiple(value self) { /* ML */
-    return Val_bool(gtk_file_selection_get_select_multiple(GtkObj_val(self)));
-}
-
-
-
 /* *** ColorSelectionDialog *** */
 /* ML type: string -> cptr */
 EXTERNML value mgtk_gtk_color_selection_dialog_new(value title) { /* ML */
@@ -8467,5 +8457,333 @@ EXTERNML value mgtk_gtk_clipboard_wait_for_text(value self) { /* ML */
 /* ML type: cptr -> bool */
 EXTERNML value mgtk_gtk_clipboard_wait_is_text_available(value self) { /* ML */
     return Val_bool(gtk_clipboard_wait_is_text_available(GtkObj_val(self)));
+}
+
+
+
+/* *** FileChooser *** */
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_chooser_get_type(value dummy) { /* ML */
+    return Val_int(gtk_file_chooser_get_type());
+}
+
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_action(value self, value action) { /* ML */
+    gtk_file_chooser_set_action(GtkObj_val(self), Int_val(action));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_file_chooser_get_action(value self) { /* ML */
+    return Val_int(gtk_file_chooser_get_action(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_local_only(value self, value local_only) { /* ML */
+    gtk_file_chooser_set_local_only(GtkObj_val(self), Bool_val(local_only));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_file_chooser_get_local_only(value self) { /* ML */
+    return Val_bool(gtk_file_chooser_get_local_only(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_select_multiple(value self, value select_multiple) { /* ML */
+    gtk_file_chooser_set_select_multiple(GtkObj_val(self), Bool_val(select_multiple));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_file_chooser_get_select_multiple(value self) { /* ML */
+    return Val_bool(gtk_file_chooser_get_select_multiple(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_current_name(value self, value name) { /* ML */
+    gtk_file_chooser_set_current_name(GtkObj_val(self), String_val(name));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_chooser_get_filename(value self) { /* ML */
+    return my_copy_string(gtk_file_chooser_get_filename(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string -> bool */
+EXTERNML value mgtk_gtk_file_chooser_set_filename(value self, value filename) { /* ML */
+    return Val_bool(gtk_file_chooser_set_filename(GtkObj_val(self), String_val(filename)));
+}
+
+/* ML type: cptr -> string -> bool */
+EXTERNML value mgtk_gtk_file_chooser_select_filename(value self, value filename) { /* ML */
+    return Val_bool(gtk_file_chooser_select_filename(GtkObj_val(self), String_val(filename)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_chooser_unselect_filename(value self, value filename) { /* ML */
+    gtk_file_chooser_unselect_filename(GtkObj_val(self), String_val(filename));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_file_chooser_select_all(value self) { /* ML */
+    gtk_file_chooser_select_all(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_file_chooser_unselect_all(value self) { /* ML */
+    gtk_file_chooser_unselect_all(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> bool */
+EXTERNML value mgtk_gtk_file_chooser_set_current_folder(value self, value filename) { /* ML */
+    return Val_bool(gtk_file_chooser_set_current_folder(GtkObj_val(self), String_val(filename)));
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_chooser_get_current_folder(value self) { /* ML */
+    return my_copy_string(gtk_file_chooser_get_current_folder(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_chooser_get_uri(value self) { /* ML */
+    return my_copy_string(gtk_file_chooser_get_uri(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string -> bool */
+EXTERNML value mgtk_gtk_file_chooser_set_uri(value self, value uri) { /* ML */
+    return Val_bool(gtk_file_chooser_set_uri(GtkObj_val(self), String_val(uri)));
+}
+
+/* ML type: cptr -> string -> bool */
+EXTERNML value mgtk_gtk_file_chooser_select_uri(value self, value uri) { /* ML */
+    return Val_bool(gtk_file_chooser_select_uri(GtkObj_val(self), String_val(uri)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_chooser_unselect_uri(value self, value uri) { /* ML */
+    gtk_file_chooser_unselect_uri(GtkObj_val(self), String_val(uri));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> bool */
+EXTERNML value mgtk_gtk_file_chooser_set_current_folder_uri(value self, value uri) { /* ML */
+    return Val_bool(gtk_file_chooser_set_current_folder_uri(GtkObj_val(self), String_val(uri)));
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_chooser_get_current_folder_uri(value self) { /* ML */
+    return my_copy_string(gtk_file_chooser_get_current_folder_uri(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_preview_widget(value self, value preview_widget) { /* ML */
+    gtk_file_chooser_set_preview_widget(GtkObj_val(self), GtkObj_val(preview_widget));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_get_preview_widget(value self) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_get_preview_widget(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_preview_widget_active(value self, value active) { /* ML */
+    gtk_file_chooser_set_preview_widget_active(GtkObj_val(self), Bool_val(active));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_file_chooser_get_preview_widget_active(value self) { /* ML */
+    return Val_bool(gtk_file_chooser_get_preview_widget_active(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_use_preview_label(value self, value use_label) { /* ML */
+    gtk_file_chooser_set_use_preview_label(GtkObj_val(self), Bool_val(use_label));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_file_chooser_get_use_preview_label(value self) { /* ML */
+    return Val_bool(gtk_file_chooser_get_use_preview_label(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_chooser_get_preview_filename(value self) { /* ML */
+    return my_copy_string(gtk_file_chooser_get_preview_filename(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_chooser_get_preview_uri(value self) { /* ML */
+    return my_copy_string(gtk_file_chooser_get_preview_uri(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_extra_widget(value self, value extra_widget) { /* ML */
+    gtk_file_chooser_set_extra_widget(GtkObj_val(self), GtkObj_val(extra_widget));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_get_extra_widget(value self) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_get_extra_widget(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_file_chooser_add_filter(value self, value filter) { /* ML */
+    gtk_file_chooser_add_filter(GtkObj_val(self), GtkObj_val(filter));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_file_chooser_remove_filter(value self, value filter) { /* ML */
+    gtk_file_chooser_remove_filter(GtkObj_val(self), GtkObj_val(filter));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_file_chooser_set_filter(value self, value filter) { /* ML */
+    gtk_file_chooser_set_filter(GtkObj_val(self), GtkObj_val(filter));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_get_filter(value self) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_get_filter(GtkObj_val(self)));
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_chooser_dialog_get_type(value dummy) { /* ML */
+    return Val_int(gtk_file_chooser_dialog_get_type());
+}
+
+/* ML type: string -> cptr -> int -> string -> string -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_dialog_new_with_backend(value title, value parent, value action, value backend, value first_button_text) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_dialog_new_with_backend(String_val(title), GtkObj_val(parent), Int_val(action), String_val(backend), String_val(first_button_text)));
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_chooser_widget_get_type(value dummy) { /* ML */
+    return Val_int(gtk_file_chooser_widget_get_type());
+}
+
+/* ML type: int -> string -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_widget_new_with_backend(value action, value backend) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_widget_new_with_backend(Int_val(action), String_val(backend)));
+}
+
+
+
+/* *** FileChooserDialog *** */
+/* ML type: string -> cptr -> int -> cptr -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_dialog_new(value title, value parent, value action, value first_button_text) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_dialog_new(String_val(title), GtkObj_val(parent), Int_val(action), GtkObj_val(first_button_text)));
+}
+
+
+
+/* *** FileChooserWidget *** */
+/* ML type: int -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_widget_new(value action) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_widget_new(Int_val(action)));
+}
+
+
+
+/* *** FileFilter *** */
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_filter_get_type(value dummy) { /* ML */
+    return Val_int(gtk_file_filter_get_type());
+}
+
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_file_filter_new(value dummy) { /* ML */
+    return Val_GtkObj(gtk_file_filter_new());
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_filter_set_name(value self, value name) { /* ML */
+    gtk_file_filter_set_name(GtkObj_val(self), String_val(name));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_filter_get_name(value self) { /* ML */
+    return my_copy_string(gtk_file_filter_get_name(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_filter_add_mime_type(value self, value mime_type) { /* ML */
+    gtk_file_filter_add_mime_type(GtkObj_val(self), String_val(mime_type));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_filter_add_pattern(value self, value pattern) { /* ML */
+    gtk_file_filter_add_pattern(GtkObj_val(self), String_val(pattern));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_file_filter_get_needed(value self) { /* ML */
+    return Val_int(gtk_file_filter_get_needed(GtkObj_val(self)));
+}
+
+
+
+/* *** FileSelection *** */
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_selection_get_type(value dummy) { /* ML */
+    return Val_int(gtk_file_selection_get_type());
+}
+
+/* ML type: string -> cptr */
+EXTERNML value mgtk_gtk_file_selection_new(value title) { /* ML */
+    return Val_GtkObj(gtk_file_selection_new(String_val(title)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_selection_set_filename(value self, value filename) { /* ML */
+    gtk_file_selection_set_filename(GtkObj_val(self), String_val(filename));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_selection_get_filename(value self) { /* ML */
+    return my_copy_string(gtk_file_selection_get_filename(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_selection_complete(value self, value pattern) { /* ML */
+    gtk_file_selection_complete(GtkObj_val(self), String_val(pattern));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_file_selection_show_fileop_buttons(value self) { /* ML */
+    gtk_file_selection_show_fileop_buttons(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_file_selection_hide_fileop_buttons(value self) { /* ML */
+    gtk_file_selection_hide_fileop_buttons(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_file_selection_set_select_multiple(value self, value select_multiple) { /* ML */
+    gtk_file_selection_set_select_multiple(GtkObj_val(self), Bool_val(select_multiple));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_file_selection_get_select_multiple(value self) { /* ML */
+    return Val_bool(gtk_file_selection_get_select_multiple(GtkObj_val(self)));
 }
 
