@@ -13,11 +13,11 @@ v Signals
   + bitmaps / drawables
   + cursors
 v Incoporate Mike's Win32 port [Fixed: Henning, June 5, 2000]
-v Fix  mgtk_callback_destroy [Fixed: Ken, June 6, 2000]
-* Fix GC bugs.  
+* Fix  mgtk_callback_destroy
+* Fix GC bugs.
   v I think there is one in mgtk_callback_dispatch [Fixed: Ken, June
-    6, 2000.  I don't think there are any GC bugs in header.c now.]
-  + fix mgtkgen
+    6, 2000.  I don't think there are any GC bugs in header.c now]
+  + Fix mgtkgen
 * Flags
 
 Milestone 2 (release version 1.0):
