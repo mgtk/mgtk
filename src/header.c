@@ -173,7 +173,7 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   value res;
   valueptr mvp;
 
-  Push_roots(r, 2);  // because both alloc_tuple and Val_GtkObj allocates
+  Push_roots(r, 3);  // because both alloc_tuple and Val_GtkObj allocates
     r[0] = Val_GtkObj(object);
     r[1] = wrap_GtkArg(args);
     res  = alloc_tuple(3);
