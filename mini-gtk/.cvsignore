@@ -1,8 +1,11 @@
 *.ui *.uo
 buttons-galore
+buttons-galore-mlton
 helloworld
 helloworld-flat
+helloworld-mlton
 helloworld-mlton.h
 helloworld-new
+mgtk-mlton.s
 mgtk.s
 mosml-interf

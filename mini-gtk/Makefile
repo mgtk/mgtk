@@ -8,7 +8,16 @@ MOSMLHOME=/usr/lib/mosml
 MOSMLRUNTIME=$(MOSMLHOME)/include
 MOSMLBIN=/usr/bin
 
-all: helloworld-new helloworld-flat mgtk.so mosml-interf
+MLTONINCLUDE=/usr/lib/mlton/self/include
+
+.PHONY: all mlton mosml
+
+all: mosml mlton
+
+mosml: helloworld-new helloworld-flat mgtk.so buttons-galore
+
+mlton: helloworld-mlton buttons-galore-mlton
+
 
 MiniGtk.uo MiniGtk.ui: MiniGtk.sml
 	$(MOSMLBIN)/mosmlc -c -toplevel MiniGtk.sml
@@ -38,5 +47,28 @@ mgtk.o: mgtk.c
 	gcc -c -O3 -fPIC -Wall -Dunix -I$(MOSMLRUNTIME) \
 	                              `pkg-config --cflags gtk+-2.0` mgtk.c 
 
+
+# MLton stuff
+mgtk-mlton.o: mgtk-mlton.c
+	gcc -c -O2 -I$(MLTONINCLUDE) \
+		   `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
+
+
+buttons-galore-mlton: buttons-galore-mlton.cm mgtk-mlton.o \
+                      $(shell mlton -stop f buttons-galore-mlton.cm)
+	mlton -output buttons-galore-mlton -verbose 2 buttons-galore-mlton.cm \
+	      mgtk-mlton.o `pkg-config --libs gtk+-2.0`
+
+
+helloworld-mlton: helloworld-mlton.cm mgtk-mlton.o \
+                  $(shell mlton -stop f helloworld-mlton.cm)
+	mlton -output helloworld-mlton -verbose 2 helloworld-mlton.cm \
+	      mgtk-mlton.o `pkg-config --libs gtk+-2.0`
+
+
+
+
+
+
 clean:
-	rm *.{o,so,uo,ui}
+	rm *.{o,so,uo,ui} helloworld-mlton buttons-galore-mlton

@@ -14,25 +14,13 @@
 #define EXTERNML
 #endif
 
-
-/* TODO: 
-
-   . Don't use void* so extensively.  Use the cast functions provided by gtk.
-     For instance, use #define GtkObj_val(x) ((G_OBJECT(FIELD(x,1))))
-     instead of the definition below. We might even want to declare widget
-     specific _val macros a la: 
-     #define GtkContainer_val(x) ((GTK_CONTAINER(Field(x,1))))
-
-   . Perhaps rename Val_GtkObj to make_GtkObj or something similar.
-
-*/
-
-
+/* FIXME: Do we really want this? */
 EXTERNML char mgtk_stringsub(char *s, int i) {
   return s[i];
 }
 
 
+/* FIXME: Does MLton really like this */
 EXTERNML void mgtk_init(char** argv, int argc) { /* ML */
   gtk_init(&argc, &argv);
 }
@@ -40,8 +28,8 @@ EXTERNML void mgtk_init(char** argv, int argc) { /* ML */
 
 /* *** GValue stuff *** */
 
-#define MGTK_MakeGetter(name, rettype, gval_getter)              \
-EXTERNML rettype name (GValue* args, long p) { /* ML */   \
+#define MGTK_MakeGetter(name, rettype, gval_getter)     \
+EXTERNML rettype name (GValue* args, long p) { /* ML */ \
   return gval_getter(&args[p]);                         \
 }
 
