@@ -4,14 +4,12 @@ Small editor.  Shows how to use status bar, text view, notebook (tabs),
 and file chooser.
 
 Planned feature (not implemented yet):
-  - Support for "Save", and "Close" actions
   - Populate the edit menu, to show how to work with the clipboard
   - Better error handling (i.e., better than non-existing)
   - Keep track of modified buffers
   - Perhaps add a toolbar
 
 Defects:
-  - Missing support for file chooser
   - Missing support for unicode.  Try to open a file non-ascii characters,
     or a file with non-ascii in the file name.
 
@@ -86,7 +84,18 @@ Defects:
 
 
 
-OLD DEFECTS:
+OLD NOTES:
+
+editor.sml (2004/11/01)
+-----------------------
+
+  - Missing support for file chooser
+  - Support for "Save", and "Close" actions
+
+  => initially simply included file chooser support by backporting
+     appropriate parts of the Gtk+ 2.4 defs file. With the move to
+     Gtk+ 2.4 proper this is no longer necessary.
+  => more editor work to add some of the missing actions.
 
 treeview.sml & listview.sml  (2004/10/28)
 -----------------------------------------
