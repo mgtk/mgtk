@@ -1,0 +1,27 @@
+Freenix artikel:
+ * Hvad og hvorfor: SML
+ * Gtk+ er interessant (og C var et godt impl. valg)
+ * SML er ikke OO (tester Gtk+-folkenes "hypotese")
+ * typer / type inferens / parametrisk polymorfi (eventuelt C++ alternativ)
+   muligvis nedtone teori, fokusere på eksempler og illustrere hvordan
+   man får typefejl
+ * proces (fra mini muck-up til fyldt toolkit)
+ * SML + Gtk+ er godt
+ * MLton og Moscow ML (SML.NET med Gtk#?)
+ * perspektiv og visioner
+
+Ken?: skelet
+Ken?: de fire første punkter
+Henning?: de tre næste
+Fælles: perspektiv og vision
+
+mGtk+:
+ * 0.90 til 16. december / 1.0 efter "wide spread announcement and use"
+ * alt funktionalitet fra nuværende mGtk+ (Gtk+ v. 1.2.12) med
+ * Gtk+ 2.2 (specielt nye fancy widgets som treeviews)
+ * modulariseret
+ * MLton og Moscow ML
+ * applikationer (Moscow ML hjælpesystem, IDE, killer-app)
+
+Henning: de fem første punkter.
+Ken: kigge på muck-up af "besværlige" treeview koncepter

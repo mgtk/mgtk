@@ -1,0 +1,77 @@
+\documentclass[workingdraft,endnotes]{usetex-v1}
+% 1. workingdraft:
+%
+%       For initial submission and shepherding.  Features prominent
+%       date, notice of draft status, page numbers, and annotation
+%       facilities.  The three supported annotation macros are:
+%               \edannote{text}         -- anonymous annotation note
+%               \begin{ednote}{who}     -- annotation note attributed
+%                 text                          to ``who''
+%               \end{ednote}
+%               \HERE                   -- a marker that can be left
+%                                               in the text and easily
+%                                               searched for later
+%
+% In addition, the option "endnotes" permits the use of the
+% otherwise-disabled, Usenix-deprecated footnote{} command in
+% documents.  In this case, be sure to include a
+% \makeendnotes command at the end of your document or
+% the endnotes will not actually appear.
+%
+\usepackage{url}
+\usepackage{graphicx}
+
+
+
+
+
+\begin{document}
+
+\title{mGTK}
+
+\docstatus{Submitted to USENIX'04 (FREENIX track)}
+
+\author{
+\authname{Ken Friis Larsen}
+%\authaddr{Your Department}
+%\authaddr{Your Institution}
+%\authaddr{ Your City, State, ZIP}
+\authurl{\url{ken@friislarsen.net}}
+%\authurl{\url{http://host.dom/yoururl}}
+\and
+\authname{Henning Niss}
+\authaddr{Department of Innovation}
+\authaddr{IT University of Copenhagen}
+\authaddr{Denmark}
+\authurl{\url{hniss@it.edu}}
+\authurl{\url{http://www.it.edu/people/hniss}}
+%
+} % end author
+
+\maketitle
+
+\begin{abstract}
+  mGTK is glue code to make GTK+ accessible from Standard ML. This
+  provides a convenient way for SML programmers to add GUI features to
+  applications.
+\end{abstract}
+
+
+\section{Why Standard ML and GTK+}
+
+\begin{ednote}{KFL}
+  \begin{itemize}
+  \item Hvad og hvorfor: SML  
+  \item Gtk+ er interessant (og C var et godt
+    impl. valg)  
+  \item SML er ikke OO (tester Gtk+-folkenes "hypotese")
+\end{itemize}
+\end{ednote}
+
+Standard ML (SML) is a functional language with imperative features
+widely used for teaching and in reasearch. 
+
+
+
+\end{document}
+
