@@ -6,43 +6,48 @@
 structure TypeInfo =
 struct
 
+    (* Convenience: *)
+    structure U  = Util
+    structure TE = TypeExp
+    structure NU = NameUtil
+
     open WSeq
     infix &&
 
     (* 5 is this is the largest X, such that Dynlib.appX exists *)
     fun fitsDynApp params = List.length params <= 5
 
-    fun mlEnumTypeName name = NameUtil.separateWords #"_" (NameUtil.removePrefix name)
-    fun mlFlagsTypeName name = NameUtil.separateWords #"_" (NameUtil.removePrefix name)
-    fun mlBoxedTypeName name = NameUtil.separateWords #"_" name
+    fun mlEnumTypeName name = NU.separateWords #"_" (NU.removePrefix name)
+    fun mlFlagsTypeName name = NU.separateWords #"_" (NU.removePrefix name)
+    fun mlBoxedTypeName name = NU.separateWords #"_" name
 
-    fun get_texp (TypeExp.LONG (_, typExp)) = typExp
+    fun get_texp (TE.LONG (_, typExp)) = typExp
 
     (* predicates *)
     local 
-	fun isstring (TypeExp.PRIMTYPE "string") = true
-	  | isstring (TypeExp.PRIMTYPE "static_string") = true
+	fun isstring (TE.PRIMTYPE "string") = true
+	  | isstring (TE.PRIMTYPE "static_string") = true
 	  | isstring _ = false
     in  fun isString long = isstring (get_texp long)
 	fun isString' (long, name) = isString long
     end
 
     local 
-	fun isnull (TypeExp.OPTION _) = true
+	fun isnull (TE.OPTION _) = true
 	  | isnull _ = false
     in  fun isNullType long = isnull (get_texp long)
 	fun isNullType' (long, name) = isNullType long
     end
 
     local 
-	fun isoutput (TypeExp.OUTPUT _) = true
+	fun isoutput (TE.OUTPUT _) = true
 	  | isoutput _ = false
     in  fun isOutputType long = isoutput (get_texp long)
 	fun isOutputType' (long, name) = isOutputType long
     end
 
     local
-	fun isvoid (TypeExp.PRIMTYPE "none") = true
+	fun isvoid (TE.PRIMTYPE "none") = true
           | isvoid _ = false
     in  fun isVoidType long = isvoid (get_texp long)
 	fun isVoidType' (long, name) = isVoidType long
@@ -50,7 +55,7 @@ struct
 
 
     (* Generate appropriate C and ML versions of the types specified *)
-    fun mkc (TypeExp.PRIMTYPE tName) = 
+    fun mkc (TE.PRIMTYPE tName) = 
 	(case tName of
              "none" => $"void"
 	 |   "int" => $"int"
@@ -60,13 +65,13 @@ struct
          |   "string" => $"char*"
          |   "static_string" => $"char*"
          |   "GtkType" => $"int"
-         |   _ => Util.shouldntHappen "mkc: unknown primitive type"
+         |   _ => U.shouldntHappen "mkc: unknown primitive type"
 	)
-      | mkc (TypeExp.OUTPUT t) = mkCType t
-      | mkc (TypeExp.WIDGET (wid,_)) = $"GtkObject"
-      | mkc (TypeExp.POINTER (boxed,_)) = $boxed
-      | mkc (TypeExp.FLAG (fName,_)) = $fName
-      | mkc _ = Util.notImplemented "mkCType: not a type name"
+      | mkc (TE.OUTPUT t) = mkCType t
+      | mkc (TE.WIDGET (wid,_)) = $"GtkObject"
+      | mkc (TE.POINTER (boxed,_)) = $boxed
+      | mkc (TE.FLAG (fName,_)) = $fName
+      | mkc _ = U.notImplemented "mkCType: not a type name"
     and mkCType long = mkc (get_texp long)
 
     local
@@ -75,7 +80,7 @@ struct
 	fun parens true wseq = $"(" && wseq && $")"
           | parens false wseq = wseq
 
-	fun mkType nest _ tArg (TypeExp.PRIMTYPE tName) = 
+	fun mkType nest _ tArg (TE.PRIMTYPE tName) = 
 	    (case tName of
 		 "none" => $"unit"
              |   "int" => $"int"
@@ -85,37 +90,37 @@ struct
              |   "string" => $"string"
              |   "static_string" => $"string"
              |   "GtkType" => $"gtk_type"
-	     |   _ => Util.shouldntHappen "mkType: unknown primitive type"
+	     |   _ => U.shouldntHappen "mkType: unknown primitive type"
             )
-	  | mkType nest toType tArg (TypeExp.TUPLE tArgs) = 
+	  | mkType nest toType tArg (TE.TUPLE tArgs) = 
 	    prsep ($" * ") (mkLongType true toType tArg) tArgs
-	  | mkType nest toType tArg (TypeExp.ARROW(tArgs, _, _, tRet)) =
+	  | mkType nest toType tArg (TE.ARROW(tArgs, _, _, tRet)) =
 	    parens nest (prsep ($" -> ") (mkLongType true toType tArg o #1) tArgs
 			&& $" -> " && mkLongType true toType (fn _ => $"base") tRet
                         )
-	  | mkType nest toType tArg (TypeExp.OPTION t) =
+	  | mkType nest toType tArg (TE.OPTION t) =
 	    (mkLongType nest toType tArg t) && $" option"
-	  | mkType nest toType tArg (TypeExp.OUTPUT t) =
+	  | mkType nest toType tArg (TE.OUTPUT t) =
 	    mkLongType nest toType tArg t
-          | mkType nest ML_TYPE tArg (TypeExp.WIDGET (wid,_)) =
+          | mkType nest ML_TYPE tArg (TE.WIDGET (wid,_)) =
 	    (fn argTyp => argTyp && $" " && $wid) (tArg ()) 
-          | mkType nest ML_PRIM_TYPE tArg (TypeExp.WIDGET (wid,_)) =
+          | mkType nest ML_PRIM_TYPE tArg (TE.WIDGET (wid,_)) =
 	    (fn argTyp => $"gtkobj") (tArg ()) 
-          | mkType nest toType tArg (TypeExp.LIST t) = 
+          | mkType nest toType tArg (TE.LIST t) = 
 	    (mkLongType nest toType tArg t) && $" list"
-          | mkType nest ML_TYPE tArg (TypeExp.FLAG (fName,false)) = 
+          | mkType nest ML_TYPE tArg (TE.FLAG (fName,false)) = 
 	    $$[mlFlagsTypeName fName, " list"]
-          | mkType nest ML_TYPE tArg (TypeExp.FLAG (fName,true)) = 
+          | mkType nest ML_TYPE tArg (TE.FLAG (fName,true)) = 
 	    $(mlFlagsTypeName fName)
-          | mkType nest ML_PRIM_TYPE tArg (TypeExp.FLAG(fName,_)) = 
+          | mkType nest ML_PRIM_TYPE tArg (TE.FLAG(fName,_)) = 
 	    $"int"
-          | mkType nest ML_TYPE tArg (TypeExp.POINTER (boxed,NONE)) = 
+          | mkType nest ML_TYPE tArg (TE.POINTER (boxed,NONE)) = 
 	    $(mlBoxedTypeName boxed)
-          | mkType nest ML_PRIM_TYPE tArg (TypeExp.POINTER (boxed,NONE)) = 
+          | mkType nest ML_PRIM_TYPE tArg (TE.POINTER (boxed,NONE)) = 
 	    $(mlBoxedTypeName boxed)
-          | mkType nest ML_TYPE tArg (TypeExp.POINTER (boxed,SOME _)) = 
+          | mkType nest ML_TYPE tArg (TE.POINTER (boxed,SOME _)) = 
 	    (fn argTyp => argTyp && $" " && $(mlBoxedTypeName boxed)) (tArg())
-          | mkType nest ML_PRIM_TYPE tArg (TypeExp.POINTER (boxed,SOME _)) = 
+          | mkType nest ML_PRIM_TYPE tArg (TE.POINTER (boxed,SOME _)) = 
 	    (fn argTyp => argTyp && $" " && $(mlBoxedTypeName boxed)) (tArg())
 	and mkLongType nest toType tArg long = 
 	    mkType nest toType tArg (get_texp long)
@@ -134,12 +139,12 @@ struct
 
 	fun mkMLPrimFreshType typExp = 
 	    (reset (); mkLongType false ML_PRIM_TYPE fresh typExp)
-	fun mkMLPrimType (TypeExp.LONG(path, TypeExp.ARROW(tArgs, tOuts, tCmp, tRet))) =
+	fun mkMLPrimType (TE.LONG(path, TE.ARROW(tArgs, tOuts, tCmp, tRet))) =
 	    if fitsDynApp tArgs (* check if it fits appX *)
-	    then mkMLPrimFreshType (TypeExp.LONG(path, TypeExp.ARROW(tArgs, tOuts, tCmp, tRet)))
+	    then mkMLPrimFreshType (TE.LONG(path, TE.ARROW(tArgs, tOuts, tCmp, tRet)))
 	    else mkMLPrimFreshType 
-		      (TypeExp.LONG(path, 
-				TypeExp.ARROW([(TypeExp.LONG([],TypeExp.TUPLE (map #1 tArgs)),"")],tOuts,tCmp,tRet)))
+		      (TE.LONG(path, 
+				TE.ARROW([(TE.LONG([],TE.TUPLE (map #1 tArgs)),"")],tOuts,tCmp,tRet)))
           | mkMLPrimType t = mkMLPrimFreshType t
 
     end (* local *)
@@ -154,8 +159,8 @@ struct
     *)
     local 
 	(* ugly hack: remove <ctype> *)
-	fun toc long (TypeExp.PRIMTYPE "<ctype>", name) = name
-	  | toc long (TypeExp.PRIMTYPE tName, name) = 
+	fun toc long (TE.PRIMTYPE "<ctype>", name) = name
+	  | toc long (TE.PRIMTYPE tName, name) = 
 	    (case tName of
 		"none" => $"Unit_val"
 	     |  "int" => $"Int_val(" && name && $")"
@@ -165,32 +170,32 @@ struct
              |  "string" => $"String_val(" && name && $")"
              |  "static_string" => $"String_val(" && name && $")"
              |   "GtkType" => $"Int_val(" && name && $")"
-	     |  _ => Util.shouldntHappen "toCValue: unknown primitive type"
+	     |  _ => U.shouldntHappen "toCValue: unknown primitive type"
 	    )
-	  | toc long (TypeExp.FLAG (fName,_), name) = $"Int_val(" && name && $")"
-	  | toc long (TypeExp.WIDGET (wid,_), name) = $"GtkObj_val(" && name && $")"
-	  | toc long (TypeExp.POINTER (boxed,_), name) = $boxed && $"_val(" && name && $")"
+	  | toc long (TE.FLAG (fName,_), name) = $"Int_val(" && name && $")"
+	  | toc long (TE.WIDGET (wid,_), name) = $"GtkObj_val(" && name && $")"
+	  | toc long (TE.POINTER (boxed,_), name) = $boxed && $"_val(" && name && $")"
 	  | toc long (typExp, name) = 
-	    Util.notImplemented ("toCValue: not a type name: " ^ TypeExp.toString long)
+	    U.notImplemented ("toCValue: not a type name: " ^ TE.toString long)
 
 	(* ugly hack: options *)
-	fun toc' long (TypeExp.OPTION (TypeExp.LONG(_,TypeExp.WIDGET _)), name) =
+	fun toc' long (TE.OPTION (TE.LONG(_,TE.WIDGET _)), name) =
 	    $"GtkObjOption_nullok(" && name && $")"
-          | toc' long (TypeExp.OPTION (TypeExp.LONG(_,TypeExp.POINTER _)), name) =
+          | toc' long (TE.OPTION (TE.LONG(_,TE.POINTER _)), name) =
 	    $"GtkObjOption_nullok(" && name && $")"
-	  | toc' long (TypeExp.OPTION typExp', name) =
+	  | toc' long (TE.OPTION typExp', name) =
 	    if isString typExp' 
 	    then $"StringOption_nullok(" && name && $")"
-	    else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ TypeExp.toString long ^ ")")
-          | toc' long (TypeExp.LIST (TypeExp.LONG(_,TypeExp.WIDGET _)), name) = 
+	    else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ TE.toString long ^ ")")
+          | toc' long (TE.LIST (TE.LONG(_,TE.WIDGET _)), name) = 
 	    $"mgtk_smllist_to_glist_object(" && name && $")"
-          | toc' long (TypeExp.LIST typExp, name) = 
+          | toc' long (TE.LIST typExp, name) = 
 	    if isString typExp 
 	    then $"mgtk_smllist_to_glist_string(" && name && $")"
-	    else Util.notImplemented "toCValue: can only handle lists of widgets or strings"
+	    else U.notImplemented "toCValue: can only handle lists of widgets or strings"
 	  | toc' long (typExp, name) = toc long (typExp, name)
 
-	fun fromc long (TypeExp.PRIMTYPE tName, name) = 
+	fun fromc long (TE.PRIMTYPE tName, name) = 
 	    (case tName of
 		 "none" => $"Val_unit"
              |   "int" => $"Val_int(" && name && $")"
@@ -200,21 +205,21 @@ struct
 	     |   "string" => $"copy_string(" && name && $")"
 	     |   "static_string" => $"copy_string(" && name && $")"
              |   "GtkType" => $"Val_int(" && name && $")"
-	     |   _ => Util.shouldntHappen "fromCValue: unknown primitive type"
+	     |   _ => U.shouldntHappen "fromCValue: unknown primitive type"
             )
-	  | fromc long (TypeExp.OUTPUT (widType as (TypeExp.LONG(_, TypeExp.WIDGET _))), name) =
+	  | fromc long (TE.OUTPUT (widType as (TE.LONG(_, TE.WIDGET _))), name) =
 	    fromCValue (widType, $"&" && name)
-	  | fromc long (TypeExp.OUTPUT (ptrType as (TypeExp.LONG(_, TypeExp.POINTER _))), name) =
+	  | fromc long (TE.OUTPUT (ptrType as (TE.LONG(_, TE.POINTER _))), name) =
 	    fromCValue (ptrType, $"&" && name)
-	  | fromc long (TypeExp.OUTPUT (flagType as (TypeExp.LONG(_,TypeExp.FLAG _))), name) = 
+	  | fromc long (TE.OUTPUT (flagType as (TE.LONG(_,TE.FLAG _))), name) = 
 	    fromCValue (flagType, name)
-	  | fromc long' (TypeExp.OUTPUT (tName as (TypeExp.LONG(_, TypeExp.PRIMTYPE _))), name) = 
+	  | fromc long' (TE.OUTPUT (tName as (TE.LONG(_, TE.PRIMTYPE _))), name) = 
 	    fromCValue (tName, name)
-          | fromc long (TypeExp.WIDGET (wid,_), name) = $"Val_GtkObj(" && name && $")"
-          | fromc long (TypeExp.POINTER (boxed,_), name) = $"Val_" && $boxed && $"(" && name && $")"
-	  | fromc long (TypeExp.FLAG (fName,_), name) = $"Val_int(" && name && $")"
+          | fromc long (TE.WIDGET (wid,_), name) = $"Val_GtkObj(" && name && $")"
+          | fromc long (TE.POINTER (boxed,_), name) = $"Val_" && $boxed && $"(" && name && $")"
+	  | fromc long (TE.FLAG (fName,_), name) = $"Val_int(" && name && $")"
 	  | fromc long (typExp, name) = 
-	    Util.notImplemented ("fromCValue: neither type name or output type (" ^ TypeExp.toString long ^ ")")
+	    U.notImplemented ("fromCValue: neither type name or output type (" ^ TE.toString long ^ ")")
 	    
 	and fromCValue (long, name) = fromc long (get_texp long, name)
 
