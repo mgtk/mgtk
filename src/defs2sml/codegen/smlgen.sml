@@ -1,5 +1,5 @@
 (* mgtk --- an SML binding for GTK.                                          *)
-(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
 structure GenSML :>
     sig
@@ -17,28 +17,6 @@ structure GenSML :>
     end =
 struct
 
-    fun debugName name = 
-	let val base = Name.getBase name
-	    val path = Name.getPath name
-	    val full = Name.getFullPath name
-	in  
-	    (case path of
-		 [] => ""
-	       | p => Util.stringSep "" "." "." (fn s=>s) p
-		      ) 
-            ^ Util.stringSep "{" "}" "." (fn s=>s) full
-	    ^ Util.stringSep "" "" ":" (fn s=>s) base
-	end
-
-
-
-    val mosml_structure_header = ref [
-        "open Dynlib\n\n",
-        "type cptr = GObject.cptr\n",
-        "val repr  = GObject.repr\n",
-        "val symb  = GtkBasis.symb\n"
-    ]
-				  
     datatype exp =
 	Unit 
       | Var of string
@@ -201,7 +179,7 @@ struct
                        = fn label => makeBut(new_with_label_ label)
             *)
 	    AST.Method ty => 
-		let val cname = Name.asCMethod name
+		let val cname = Name.asCStub name
 		    val name = Name.asMethod name
 		    val parsty = Type.getParams ty
 		    val (pars,tys) = ListPair.unzip parsty
@@ -215,7 +193,7 @@ struct
 		    val fromtype = SMLType.fromTypeSeq()
 		in  StrOnly(
                        ValDecl(VarPat(name^"_"), Some(SMLType.primtypeFromType ty), 
-			       ccall ("m"^cname) (List.length pars)))
+			       ccall cname (List.length pars)))
                  ++ Some(
                        ValDecl(VarPat name, Some(fromtype ty),
  			       List.foldr Fn (App(Var(name^"_"), pars')) pars))

@@ -115,6 +115,7 @@ structure Name :> NAME = struct
 	end
 *)
     val asCEnum = asCName "_" toLower
-    val asCMethod = asCName "_" toLower
+    val asCFunc = asCName "_" toLower
+    fun asCStub name = "mgtk_" ^ asCName "_" toLower name
 
 end (* structure Name *)

@@ -16,7 +16,7 @@ struct
     and mapi_member (f,g) current member =
 	case member of
 	    Sub module => Sub(mapi_module (f,g) current module)
-          | Member {name,info} => Member{name=name,info=g(current,info)}
+          | Member {name,info} => Member{name=name,info=g(name,info)}
     fun mapi (f,g) (m as Module{name,members,info}) = mapi_module (f,g) name m
 
     fun map (f,g) = mapi (fn (_,i1) => f i1, fn (_,i2) => g i2)

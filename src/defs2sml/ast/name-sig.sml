@@ -26,6 +26,7 @@ signature NAME = sig
     val asType: name -> string
 
     val asCEnum: name -> string
-    val asCMethod: name -> string
+    val asCFunc: name -> string
+    val asCStub: name -> string
 
 end (* signature Name *)

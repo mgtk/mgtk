@@ -48,27 +48,27 @@ structure Gtk :> Gtk = struct
         fun inherit w con = Object.inherit () con
         fun makeWidget ptr = Object.inherit () (fn () => repr ptr)
         val destroy_ : cptr -> unit
-            = app1 (symb"mgtk_widget_destroy")
+            = app1 (symb"mgtk_gtk_widget_destroy")
         val destroy : 'a Widget.t -> unit
             = fn self => destroy_ (repr self)
         val show_ : cptr -> unit
-            = app1 (symb"mgtk_widget_show")
+            = app1 (symb"mgtk_gtk_widget_show")
         val show : 'a Widget.t -> unit
             = fn self => show_ (repr self)
         val show_now_ : cptr -> unit
-            = app1 (symb"mgtk_widget_show_now")
+            = app1 (symb"mgtk_gtk_widget_show_now")
         val show_now : 'a Widget.t -> unit
             = fn self => show_now_ (repr self)
         val hide_ : cptr -> unit
-            = app1 (symb"mgtk_widget_hide")
+            = app1 (symb"mgtk_gtk_widget_hide")
         val hide : 'a Widget.t -> unit
             = fn self => hide_ (repr self)
         val show_all_ : cptr -> unit
-            = app1 (symb"mgtk_widget_show_all")
+            = app1 (symb"mgtk_gtk_widget_show_all")
         val show_all : 'a Widget.t -> unit
             = fn self => show_all_ (repr self)
         val hide_all_ : cptr -> unit
-            = app1 (symb"mgtk_widget_hide_all")
+            = app1 (symb"mgtk_gtk_widget_hide_all")
         val hide_all : 'a Widget.t -> unit
             = fn self => hide_all_ (repr self)
     end
@@ -97,19 +97,19 @@ structure Gtk :> Gtk = struct
         fun inherit w con = Widget.inherit () con
         fun makeContainer ptr = Widget.inherit () (fn () => repr ptr)
         val set_border_width_ : cptr -> int -> unit
-            = app2 (symb"mgtk_container_set_border_width")
+            = app2 (symb"mgtk_gtk_container_set_border_width")
         val set_border_width : 'a Container.t -> int -> unit
             = fn self => fn border_width => set_border_width_ (repr self) border_width
         val get_border_width_ : cptr -> int
-            = app1 (symb"mgtk_container_get_border_width")
+            = app1 (symb"mgtk_gtk_container_get_border_width")
         val get_border_width : 'a Container.t -> int
             = fn self => get_border_width_ (repr self)
         val add_ : cptr -> cptr -> unit
-            = app2 (symb"mgtk_container_add")
+            = app2 (symb"mgtk_gtk_container_add")
         val add : 'a Container.t -> 'b Widget.t -> unit
             = fn self => fn widget => add_ (repr self) widget
         val remove_ : cptr -> cptr -> unit
-            = app2 (symb"mgtk_container_remove")
+            = app2 (symb"mgtk_gtk_container_remove")
         val remove : 'a Container.t -> 'b Widget.t -> unit
             = fn self => fn widget => remove_ (repr self) widget
     end
@@ -160,24 +160,127 @@ structure Gtk :> Gtk = struct
         fun inherit w con = Bin.inherit () con
         fun makeButton ptr = Bin.inherit () (fn () => repr ptr)
         val get_type_ : unit -> cptr
-            = app1 (symb"mgtk_button_get_type")
+            = app1 (symb"mgtk_gtk_button_get_type")
         val get_type : unit -> 'a GType.t
             = fn dummy => get_type_ dummy
         val new_ : unit -> cptr
-            = app1 (symb"mgtk_button_new")
+            = app1 (symb"mgtk_gtk_button_new")
         val new : unit -> 'a Widget.t
             = fn dummy => new_ dummy
         val new_with_label_ : string -> cptr
-            = app1 (symb"mgtk_button_new_with_label")
+            = app1 (symb"mgtk_gtk_button_new_with_label")
         val new_with_label : string -> 'a Widget.t
             = fn label => new_with_label_ label
         val set_label_ : cptr -> string -> unit
-            = app2 (symb"mgtk_button_set_label")
+            = app2 (symb"mgtk_gtk_button_set_label")
         val set_label : 'a Button.t -> string -> unit
             = fn self => fn label => set_label_ (repr self) label
         val get_label_ : cptr -> string
-            = app1 (symb"mgtk_button_get_label")
+            = app1 (symb"mgtk_gtk_button_get_label")
         val get_label : 'a Button.t -> string
             = fn self => get_label_ (repr self)
     end
 end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_destroy(value self) { /* ML */
+    gtk_widget_destroy(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_show(value self) { /* ML */
+    gtk_widget_show(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_show_now(value self) { /* ML */
+    gtk_widget_show_now(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_hide(value self) { /* ML */
+    gtk_widget_hide(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_show_all(value self) { /* ML */
+    gtk_widget_show_all(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_widget_hide_all(value self) { /* ML */
+    gtk_widget_hide_all(GtkObj_val(self));
+    return Val_unit;
+}
+
+
+
+/* *** Container *** */
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_container_set_border_width(value self, value border_width) { /* ML */
+    gtk_container_set_border_width(GtkObj_val(self), Int_val(border_width));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_container_get_border_width(value self) { /* ML */
+    return Val_int(gtk_container_get_border_width(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_container_add(value self, value widget) { /* ML */
+    gtk_container_add(GtkObj_val(self), GtkObj_val(widget));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_container_remove(value self, value widget) { /* ML */
+    gtk_container_remove(GtkObj_val(self), GtkObj_val(widget));
+    return Val_unit;
+}
+
+
+
+/* *** Bin *** */
+
+
+/* *** Button *** */
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_button_get_type(value dummy) { /* ML */
+    return Val_int(gtk_button_get_type());
+}
+
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_button_new(value dummy) { /* ML */
+    return Val_GtkObj(gtk_button_new());
+}
+
+/* ML type: string -> cptr */
+EXTERNML value mgtk_gtk_button_new_with_label(value label) { /* ML */
+    return Val_GtkObj(gtk_button_new_with_label(String_val(label)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_button_set_label(value self, value label) { /* ML */
+    gtk_button_set_label(GtkObj_val(self), String_val(label));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_button_get_label(value self) { /* ML */
+    return copy_string(gtk_button_get_label(GtkObj_val(self)));
+}
+

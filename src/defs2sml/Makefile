@@ -1,5 +1,5 @@
 # mgtk --- an SML binding for GTK.                                          
-# (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       
+# (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004.    
 
 REGRESSIONDIR=test/regression
 MAIN=defs2sml$(EXEEXT)
@@ -18,6 +18,6 @@ regression: $(MAIN)
 	echo "Regression test results ... "; \
         for file in $$files ; do \
 	      base=`basename $$file .defs`; \
-              ./$(MAIN) $$file > $(REGRESSIONDIR)/output/$$base.out 2> /dev/null ; \
+              ./$(MAIN) $$file -o $(REGRESSIONDIR)/output/$$base.out 2> /dev/null ; \
 	      diff -Naur $(REGRESSIONDIR)/trusted/$$base.out $(REGRESSIONDIR)/output/$$base.out ; \
         done

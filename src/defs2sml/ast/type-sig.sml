@@ -16,5 +16,6 @@ signature Type = sig
     val map: ('n1 -> 'n2) -> 'n1 ty -> 'n2 ty
 
     val getParams: 'a ty -> (string * 'a ty) list
+    val getRetType: 'a ty -> 'a ty
 
 end (* signature Type *)

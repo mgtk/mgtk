@@ -3,3 +3,5 @@
 
 smltype: /ast/type /util/util /ast/name
 smlgen: /ast/ast /ast/name /ast/type /util/ smltype
+tinyc: /util/util
+cgen: /ast/ast /ast/name /ast/type tinyc smltype

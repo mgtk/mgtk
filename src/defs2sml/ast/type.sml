@@ -47,4 +47,7 @@ structure Type :> Type = struct
     fun getParams(Func(pars,_)) = pars
       | getParams _ = raise Fail("getParams: Not a function type")
 
+    fun getRetType(Func(_,ret)) = ret
+      | getRetType _ = raise Fail("getRetType: Not a function type")
+
 end (* structure Type *)
