@@ -61,7 +61,7 @@ struct
 
     (* "primitives" *)
     fun ccall name args =
-	let val app = if args > 5 then "appXX" (* FIXME: need to tuple args *)
+	let val app = if args > 5 then "app1" (* FIXME: need to tuple args *)
 		      else "app" ^ Int.toString args
 	in  App(Var app, [App(Var "symb", [Str name])])
 	end
@@ -167,6 +167,7 @@ struct
     type name = Name.name
     type typeexp = name Type.ty
 
+    exception Skip of string
     fun trans (name,member) =
 	case member of
             (* METHODS 
@@ -190,9 +191,13 @@ struct
 					then App (Var"repr",[Var par])
 					else Var par
 		    val pars' = List.map wrap parsty
-		    val fromtype = SMLType.fromTypeSeq()
+		    val fromtype' = SMLType.fromTypeSeq()
+		    fun fromtype ty = fromtype' ty
+				      handle Fail m => raise Skip m
+		    fun primtypeFromType ty = SMLType.primtypeFromType ty
+					      handle Fail m => raise Skip m
 		in  StrOnly(
-                       ValDecl(VarPat(name^"_"), Some(SMLType.primtypeFromType ty), 
+                       ValDecl(VarPat(name^"_"), Some(primtypeFromType ty), 
 			       ccall cname (List.length pars)))
                  ++ Some(
                        ValDecl(VarPat name, Some(fromtype ty),
@@ -232,14 +237,13 @@ struct
 		in  Some(ValDecl(VarPat name, None, Var name))
 		end
 
-    exception Skip
     fun header name info =
 	let val (typ,parent) = 
 		case info of
 		    SOME (Type.Tname n,parent) => 
 		       (Name.asType n, case parent of NONE => raise Fail("moduleTypes: no parent")
 						    | SOME(Type.Tname p) => p)
-		  | _ => raise Skip
+		  | _ => raise Skip("No type information")
 
 	    val base_t = "base"
 	    val witness_t = typ ^ "_t"
@@ -263,11 +267,15 @@ struct
 	 ++ StrOnly(FunDecl("make"^Name.asModule name,[VarPat"ptr"],None,
 		    App(Var(pRef "inherit"),[Unit,Fn("()",App(Var "repr",[Var"ptr"]))])))
 	end
-	    handle Skip => None (* Was EmptyDecl *)
+	    handle Skip msg => None (* Was EmptyDecl *)
 
 
     local
 	open AST 
+	val trans = fn (name,member) => trans (name,member)
+		   handle Skip msg => ( TextIO.output(TextIO.stdErr,
+		       "Error translating " ^ Name.toString name ^ ": " ^msg^"\n")
+                     ; None)
 	fun generate_module (Module{name,members,info}) = 
 	    let val subs = List.concat(List.map generate_member members)
 	    in  [ Module{name=name, info=SIGNATURE, 

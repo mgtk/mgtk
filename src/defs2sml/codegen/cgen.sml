@@ -50,9 +50,10 @@ struct
 		    "int" => call "Int_val"
 		  |  "uint" => call "Int_val"
 		  |  "float" => call "Double_val"
+		  |  "double" => call "Double_val"
 		  |  "bool" => call "Bool_val"
 		  |  "char" => call "Int_val" (* FIXME: ? *)
-		  |  _ => raise Fail "toCValue: unknown base type"
+		  |  _ => raise Fail("toCValue: unknown base type ("^base^")")
 		)
 	  | Type.Ptr(Type.Base "char") => call "String_val"
 	  | Type.Ptr(Type.Tname n) => call "GtkObj_val"
@@ -71,9 +72,10 @@ struct
 		    "int" => call "Val_int"
 		  | "uint" => call "Val_int"
 		  | "float" => call "copy_double"
+		  | "double" => call "copy_double"
 		  | "bool" => call "Val_bool"
 		  | "char" => call "Val_int" (* FIXME: ? *)
-		  | _ => raise Fail "fromCValue: unknown base type"
+		  | _ => raise Fail("fromCValue: unknown base type ("^base^")")
                 )
 	  | Type.Ptr(Type.Base "char") => call "copy_string"
 	  | Type.Ptr(Type.Tname n) => call "Val_GtkObj"
@@ -85,30 +87,48 @@ struct
 	  | Type.Arr _ => raise Fail "fromCValue: not implemented (Arr)"
 	  | Type.Func _ => raise Fail "fromCValue: shouldn't happen (Func)"
 
+    exception Skip of string
+
     fun trans (name, member) = 
 	case member of
 	    AST.Method ty => 
 	        let fun isVoid (Type.Void) = true
 		      | isVoid _ = false
-		    val parsty = Type.getParams ty
+		    val parsty = map (fn(p,t)=>if p="value" then ("valu",t)
+					       else (p,t)) 
+				     (Type.getParams ty)
+		    val args = if List.length parsty > 5
+			       then [("mgtk_params", Type.Base "int")]
+			       else parsty
 		    fun f (par,Type.Void) = NONE
 		      | f (par,ty) = SOME(toCValue ty (Var par))
+				     handle Fail m => raise Skip m
 		    val parsty' = List.mapPartial f parsty
 		    val ret = Type.getRetType ty
+
+		    fun f ((par,ty),i) = VDecl(par,TValue,SOME(Call("Field", NONE, [Var "mgtk_params", Int(Int.toString i)])))
+		    val extract = if List.length parsty > 5 
+				  then List.map f (ListPair.zip(parsty,List.tabulate(List.length parsty, fn i=>i)))
+				  else []
 		    val call = fromCValue ret (Call(Name.asCFunc name, NONE, parsty'))
+			       handle Fail m => raise Skip m
 		    val body = 
-			Block(NONE,[], 
+			Block(NONE,extract, 
 			  Comment "ML" ::
                           (if isVoid ret then [Exp(call),Return(Var("Val_unit"))]
 			   else [Return(call)])
                         )
 		    fun f (par,ty) = (par,TValue)
-		in  SOME(Fun(Proto(SOME"EXTERNML",Name.asCStub name, map f parsty, TValue), 
+		in  SOME(Fun(Proto(SOME"EXTERNML",Name.asCStub name, map f args, TValue), 
 			     body),
 			 ty)
 		end
 	  | _ => NONE
 
+    val trans = fn (name, member) => trans (name, member)
+		   handle Skip msg => ( TextIO.output(TextIO.stdErr,
+		       "Error translating " ^ Name.toString name ^ ": " ^msg^"\n")
+                     ; NONE)
     fun generate module = 
 	AST.mapi (fn (module,info) => info, trans) module
 

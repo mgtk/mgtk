@@ -73,13 +73,18 @@ struct
 		  | VerbExp e => e
 		  | Call(f,cast,args) => 
 		       f ^ Util.stringSep "(" ")" ", " showExp args
+	    fun showDecl (VDecl(x,ty,e)) =
+		indent^showTy ty ^" "^ x ^" = "^
+		(case e of NONE => "" | SOME e => showExp e)^";\n"
 	    fun showStmt stmt =
 		case stmt of
 		    Empty => ""
 		  | Exp e => indent^showExp e ^ ";\n"
 		  | Ass(l,_,r) => indent^showExp l ^ " = " ^ showExp r ^ ";\n"
 		  | Block(label,decls, Comment c :: stmts) =>
-		       ("{ /* "^c^" */\n") ^ Util.stringSep "" "}\n" "" showStmt stmts
+		       ("{ /* "^c^" */\n") 
+		       ^ Util.stringSep "" "" "" showDecl decls
+		       ^ Util.stringSep "" "}\n" "" showStmt stmts
 		  | Block(label,decls, stmts) =>
 		       Util.stringSep "{\n" "}\n" "" showStmt stmts
 		  | Return e => indent^"return " ^ showExp e ^ ";\n"

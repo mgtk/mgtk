@@ -11,6 +11,7 @@ structure SMLType = struct
       | CharTy
       | UnitTy
       | BoolTy
+      | RealTy
       | StringTy
       | TyVar of tyvar
       | TupTy of ty list
@@ -26,12 +27,10 @@ structure SMLType = struct
 	  | StringTy => "string"
 	  | UnitTy => "unit"
 	  | BoolTy => "bool"
+	  | RealTy => "real"
 	  | TyVar a => a
 	  | TupTy tys => Util.stringSep "" "" " * " show tys
-	  | ArrowTy (tys,ty2) =>
-	    if length tys <= 5 
-	    then Util.stringSep "" " -> " " -> " show tys ^ show ty2
-	    else Util.stringSep "" " -> " " * " show tys ^ show ty2
+	  | ArrowTy (tys,ty2) =>Util.stringSep "" " -> " " -> " show tys ^ show ty2
 	  | TyApp([],tname) => show_tname tname
 	  | TyApp([ty],tname) => show ty ^ " " ^ show_tname tname
 	  | TyApp(tys,tname) => Util.stringSep "(" (") "^show_tname tname) "," show tys
@@ -43,7 +42,9 @@ structure SMLType = struct
       | baseType "int"   = IntTy
       | baseType "char"  = CharTy
       | baseType "bool"  = BoolTy
-      | baseType t = raise Fail("Unrecognized base type: " ^ t)
+      | baseType "float" = RealTy
+      | baseType "double" = RealTy
+      | baseType t = raise Fail("Type -> SML type: Unrecognized base type: "^t)
 
     fun fromType fresh ty =
 	case ty of
@@ -82,7 +83,9 @@ structure SMLType = struct
 	  | Type.Const ty => primtypeFromType ty
 	  | Type.Ptr ty => TyApp([],["cptr"])
 	  | Type.Func(pars,ret) => 
-	       ArrowTy(List.map (primtypeFromType o #2) pars, primtypeFromType ret)
+	       if List.length pars > 5 
+	       then ArrowTy([TupTy(List.map (primtypeFromType o #2) pars)], primtypeFromType ret)
+	       else ArrowTy(List.map (primtypeFromType o #2) pars, primtypeFromType ret)
 	  | Type.Arr(len,ty) => TyApp([],["..."]) (* FIXME *)
 
 end (* structure SMLType *)

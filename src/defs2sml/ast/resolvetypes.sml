@@ -27,7 +27,7 @@ structure ResolveTypes :> ResolveTypes = struct
 	fun name_char ch = Char.isAlphaNum ch orelse dash_char ch
 	val tname = getChars1 name_char >> (fn n => Tname n)
 
-	val base = bool || int || uint || ptr || char || tname
+	val base = bool || int || uint || ptr || char || float || double || tname
 	val simple = void || base || tname
 
 	val array = simple -- "[" $-- num --$ "]" 
