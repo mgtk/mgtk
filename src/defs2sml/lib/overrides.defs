@@ -1,0 +1,362 @@
+(override-parameters gtk_editable_insert_text
+  (of-object GtkEditable)
+  (parameters
+    ("gint*" "position" (inout))
+  )
+)
+(override-parameters gtk_icon_size_lookup
+  (of-object Gtk)
+  (parameters
+    ("gint*" "width" (output))
+    ("gint*" "height" (output))
+  )
+)
+(override-parameters gtk_list_store_append
+  (of-object GtkListStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_list_store_insert
+  (of-object GtkListStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_list_store_insert_after
+  (of-object GtkListStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_list_store_insert_before
+  (of-object GtkListStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_list_store_prepend
+  (of-object GtkListStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_list_store_remove
+  (of-object GtkListStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (inout))
+  )
+)
+(override-parameters gtk_scrolled_window_get_policy
+  (of-object GtkScrolledWindow)
+  (parameters
+    ("GtkPolicyType*" "hscrollbar_policy" (output))
+    ("GtkPolicyType*" "vscrollbar_policy" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_bounds
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "start" (output))
+    ("GtkTextIter*" "end" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_end_iter
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_iter_at_child_anchor
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_iter_at_line
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_iter_at_line_index
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_iter_at_line_offset
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_iter_at_mark
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_iter_at_offset
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_selection_bounds
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "start" (output))
+    ("GtkTextIter*" "end" (output))
+  )
+)
+(override-parameters gtk_text_buffer_get_start_iter
+  (of-object GtkTextBuffer)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_iter_backward_search
+  (of-object GtkTextIter)
+  (parameters
+    ("GtkTextIter*" "match_start" (output))
+    ("GtkTextIter*" "match_end" (output))
+  )
+)
+(override-parameters gtk_text_iter_forward_search
+  (of-object GtkTextIter)
+  (parameters
+    ("GtkTextIter*" "match_start" (output))
+    ("GtkTextIter*" "match_end" (output))
+  )
+)
+(override-parameters gtk_text_view_get_iter_at_location
+  (of-object GtkTextView)
+  (parameters
+    ("GtkTextIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_text_view_get_iter_location
+  (of-object GtkTextView)
+  (parameters
+    ("GdkRectangle*" "location" (output))
+  )
+)
+(override-parameters gtk_text_view_get_line_at_y
+  (of-object GtkTextView)
+  (parameters
+    ("GtkTextIter*" "target_iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_get_iter
+  (of-object GtkTreeModel)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_get_iter_first
+  (of-object GtkTreeModel)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_get_iter_from_string
+  (of-object GtkTreeModel)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_get_value
+  (of-object GtkTreeModel)
+  (parameters
+    ("GValue*" "value" (inout))
+  )
+)
+(override-parameters gtk_tree_model_iter_children
+  (of-object GtkTreeModel)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_iter_next
+  (of-object GtkTreeModel)
+  (parameters
+    ("GtkTreeIter*" "iter" (inout))
+  )
+)
+(override-parameters gtk_tree_model_iter_nth_child
+  (of-object GtkTreeModel)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_iter_parent
+  (of-object GtkTreeModel)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_sort_convert_child_iter_to_iter
+  (of-object GtkTreeModelSort)
+  (parameters
+    ("GtkTreeIter*" "sort_iter" (output))
+  )
+)
+(override-parameters gtk_tree_model_sort_convert_iter_to_child_iter
+  (of-object GtkTreeModelSort)
+  (parameters
+    ("GtkTreeIter*" "child_iter" (output))
+  )
+)
+(override-parameters gtk_tree_selection_get_selected
+  (of-object GtkTreeSelection)
+  (parameters
+    ("GtkTreeModel**" "model" (output))
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_store_append
+  (of-object GtkTreeStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_store_insert
+  (of-object GtkTreeStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_store_insert_after
+  (of-object GtkTreeStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_store_insert_before
+  (of-object GtkTreeStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_store_prepend
+  (of-object GtkTreeStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (output))
+  )
+)
+(override-parameters gtk_tree_store_remove
+  (of-object GtkTreeStore)
+  (parameters
+    ("GtkTreeIter*" "iter" (inout))
+  )
+)
+(override-parameters gtk_tree_view_get_background_area
+  (of-object GtkTreeView)
+  (parameters
+    ("GdkRectangle*" "rect" (output))
+  )
+)
+(override-parameters gtk_tree_view_get_cell_area
+  (of-object GtkTreeView)
+  (parameters
+    ("GdkRectangle*" "rect" (output))
+  )
+)
+(override-parameters gtk_tree_view_get_cursor
+  (of-object GtkTreeView)
+  (parameters
+    ("GtkTreeViewColumn**" "focus_column" (output))
+    ("GtkTreePath**" "path" (output))
+  )
+)
+(override-parameters gtk_tree_view_get_dest_row_at_pos
+  (of-object GtkTreeView)
+  (parameters
+    ("GtkTreePath**" "path" (output))
+    ("GtkTreeViewDropPosition*" "pos" (output))
+  )
+)
+(override-parameters gtk_tree_view_get_drag_dest_row
+  (of-object GtkTreeView)
+  (parameters
+    ("GtkTreePath**" "path" (output))
+    ("GtkTreeViewDropPosition*" "pos" (output))
+  )
+)
+(override-parameters gtk_widget_class_path
+  (of-object GtkWidget)
+  (parameters
+    ("gchar**" "path" (output))
+    ("gchar**" "path_reversed" (output))
+    ("guint*" "path_length" (output))
+  )
+)
+(override-parameters gtk_widget_get_pointer
+  (of-object GtkWidget)
+  (parameters
+    ("gint*" "x" (output))
+    ("gint*" "y" (output))
+  )
+)
+(override-parameters gtk_widget_get_size_request
+  (of-object GtkWidget)
+  (parameters
+    ("gint*" "width" (output))
+    ("gint*" "height" (output))
+  )
+)
+(override-parameters gtk_widget_intersect
+  (of-object GtkWidget)
+  (parameters
+    ("GdkRectangle*" "intersection" (output))
+  )
+)
+(override-parameters gtk_widget_path
+  (of-object GtkWidget)
+  (parameters
+    ("gchar**" "path" (output))
+    ("gchar**" "path_reversed" (output))
+    ("guint*" "path_length" (output))
+  )
+)
+(override-parameters gtk_widget_size_request
+  (of-object GtkWidget)
+  (parameters
+    ("GtkRequisition*" "requisition" (output))
+  )
+)
+(override-parameters gtk_widget_translate_coordinates
+  (of-object GtkWidget)
+  (parameters
+    ("gint*" "dest_x" (output))
+    ("gint*" "dest_y" (output))
+  )
+)
+(override-parameters gtk_window_get_default_size
+  (of-object GtkWindow)
+  (parameters
+    ("gint*" "width" (output))
+    ("gint*" "height" (output))
+  )
+)
+(override-parameters gtk_window_get_position
+  (of-object GtkWindow)
+  (parameters
+    ("gint*" "root_x" (output))
+    ("gint*" "root_y" (output))
+  )
+)
+(override-parameters gtk_window_get_size
+  (of-object GtkWindow)
+  (parameters
+    ("gint*" "width" (output))
+    ("gint*" "height" (output))
+  )
+)
+(override-parameters size_request
+  (of-object GtkWidget)
+  (parameters
+    ("GtkRequisition*" "requisition" (inout))
+  )
+)

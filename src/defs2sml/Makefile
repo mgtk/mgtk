@@ -75,6 +75,13 @@ regcompile: $(MAIN) $(patsubst %.defs,regcomp-%,$(REGFILES))
 trusted:
 	cp $(REGOUT)/*.out $(REGTRS)
 
+# Generate meta data .defs files
+
+GTKAPIXML=api/other/gtk-sharp-1.0/gtk/gtk-api.raw
+GTKMETADATA=api/other/gtk-sharp-1.0/gtk/Gtk.metadata
+lib/overrides.defs: $(GTKAPIXML) $(GTKMETADATA) tools/metadata2defs.pl
+	tools/metadata2defs.pl $(GTKAPIXML) $(GTKMETADATA) > $@
+
 # Generate binding
 DEFSOPTS=$(OPTIONS) --separate-struct -as api/pygtk/gtk.defs > defs.log 2>&1
 DEFSOPTSMOSML=-co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml
