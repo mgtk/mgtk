@@ -26,7 +26,7 @@ all: mosml mlton
 
 mosml: helloworld buttons-galore signup menus listview treeview
 
-mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview treeview
+mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview-mlton treeview-mlton
 
 
 # mosml stuff

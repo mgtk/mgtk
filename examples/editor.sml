@@ -62,8 +62,8 @@ datatype chooser_kind = OPEN | SAVE
 fun getFile kind =
     let val (title, action, stock) = 
             case kind of 
-                OPEN => ("Open File", FILE_CHOOSER_ACTION_OPEN, "gtk-open")
-              | SAVE => ("Save As", FILE_CHOOSER_ACTION_SAVE, "gtk-save-as")
+                OPEN => ("Open File", FileChooser.ACTION_OPEN, "gtk-open")
+              | SAVE => ("Save As", FileChooser.ACTION_SAVE, "gtk-save-as")
 
         val dialog = FileChooserDialog.new title NONE action NONE
         val _ = map (uncurry (Dialog.add_button dialog))
@@ -81,7 +81,7 @@ fun getFile kind =
     end
 
 fun setUpGui() = 
-    let val w = let val w = Window.new' ()
+    let val w = let val w = Window.new Window.TOPLEVEL
                 in  Window.set_title w "Editor"
                   ; Window.set_default_size w 260 150
                   ; Signal.connect w (Widget.delete_event_sig delete_event)
@@ -169,10 +169,10 @@ fun setUpGui() =
                 end
             
 
-        val vbox = VBox.new' ()
-    in  Box.pack_start vbox menubar (SOME false) (SOME false) (SOME 0)
-      ; Box.pack_start' vbox notebook 
-      ; Box.pack_start vbox statusbar (SOME false) (SOME false) (SOME 0)
+        val vbox = VBox.new false 0
+    in  Box.pack_start vbox menubar false false 0
+      ; Box.pack_start vbox notebook true true 0
+      ; Box.pack_start vbox statusbar false false 0
       ; Container.add w vbox
       ; Widget.show_all w
       ; connectOpen openAction
