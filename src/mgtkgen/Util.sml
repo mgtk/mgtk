@@ -40,8 +40,8 @@ struct
       | explain (General.SysErr (c,_)) = TextIO.output(TextIO.stdOut, "System Error exception: " ^ c ^ "\n")
       | explain (General.Out_of_memory) = TextIO.output(TextIO.stdOut, "no more memory\n")
       | explain (General.Invalid_argument s) = TextIO.output(TextIO.stdOut, "invalid argument: " ^ s ^ "\n")
-      | explain (General.Graphic_failure s) = TextIO.output(TextIO.stdOut, "graphic failure: " ^ s ^ "\n")
-
+(*      | explain (General.Graphic_failure s) = TextIO.output(TextIO.stdOut, "graphic failure: " ^ s ^ "\n")
+*)
       | explain exn = (TextIO.output(TextIO.stdOut, "Uncaught exception\n"); raise exn)
 
     (* extend the messages of the exception with a string *)
