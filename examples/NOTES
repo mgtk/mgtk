@@ -3,12 +3,13 @@ editor.sml
 Small editor.  Shows how to use status bar, text view, and file chooser.
 
 Planned feature (not implemented yet):
-  - Support for "Save", "Save as", and "Close" actions
+  - Support for "Save", and "Close" actions
   - Populate the edit menu, to show how to work with the clipboard
   - Better error handling (i.e., better than non-existing)
   - Keep track of open buffers
   - Keep track of modified buffers
   - Perhaps add tabs, so that each file get its own tab
+  - Perhaps add a toolbar
 
 Defects:
   - Missing support for file chooser

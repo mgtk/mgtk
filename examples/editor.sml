@@ -17,24 +17,25 @@ fun makeMenubar agrp =
                           ; item
                         end
 
-        val openItem = let val item = ImageMenuItem.new_from_stock "gtk-open" agrp
-                       in  MenuShell.append file_menu item
-                         ; item
-                       end
+        fun makeStockItem menu stock =
+            let val item = ImageMenuItem.new_from_stock stock agrp
+            in  MenuShell.append menu item
+              ; item
+            end
 
-        val closeItem = let val item = ImageMenuItem.new_from_stock "gtk-close" agrp
-                        in  MenuShell.append file_menu item
-                          ; item
-                        end
+
+        val openItem = makeStockItem file_menu "gtk-open"
+
+        val closeItem = makeStockItem file_menu "gtk-close"
+
+        val saveAsItem = makeStockItem file_menu "gtk-save-as"
 		
 	val _ = MenuShell.append file_menu (SeparatorMenuItem.new())
 		
-	val quitItem = let val item = ImageMenuItem.new_from_stock "gtk-quit" agrp
+        val quitItem = let val item = makeStockItem file_menu "gtk-quit"
                        in  Signal.connect item (MenuItem.activate_sig GtkBasis.main_quit)
-                         ; MenuShell.append file_menu item
                          ; item
                        end
-
 
         (* edit menu *)
 	val edit_menu = Menu.new ()
@@ -44,7 +45,9 @@ fun makeMenubar agrp =
                          ; item
                        end
 
-    in  (mb, Signal.connect openItem, Signal.connect closeItem)
+        fun activateConnect item action = Signal.connect item (MenuItem.activate_sig action)
+
+    in  (mb, activateConnect openItem, activateConnect closeItem, activateConnect saveAsItem)
     end
 
 datatype chooser_kind = OPEN | SAVE 
@@ -61,7 +64,7 @@ fun getFile kind =
                     , (stock       , RESPONSE_ACCEPT)
                     ]
 
-        val result = if Dialog.run dialog =  RESPONSE_ACCEPT orelse true then 
+        val result = if Dialog.run dialog =  RESPONSE_ACCEPT then 
                          let val chooser = FileChooserDialog.asFileChooser dialog
                          in  SOME(FileChooser.get_filename chooser)
                          end
@@ -87,7 +90,7 @@ fun setUpGui() =
         val menu_context = Statusbar.get_context_id statusbar "Menu bar"
         fun say msg = ignore(Statusbar.push statusbar menu_context msg)
 
-        val (menubar, connectOpen, connectClose) = makeMenubar agrp
+        val (menubar, connectOpen, connectClose, connectSaveAs) = makeMenubar agrp
 
         val textView = TextView.new()
 
@@ -107,6 +110,25 @@ fun setUpGui() =
                      end
             end
 
+        fun saveAsAction () =
+            let val filename = getFile SAVE
+            in  case filename of
+                    NONE => say "The buffer was not saved"
+                  | SOME path =>
+                    let (* FIXME: check permissions and stuff *)
+                         val {dir, file} = OS.Path.splitDirFile path
+                         val _ = OS.FileSys.chDir dir
+                         val dev = TextIO.openOut file
+                         val buffer = TextView.get_buffer textView
+                         val (startIter, endIter) = TextBuffer.get_bounds buffer
+                         val content = TextBuffer.get_text buffer startIter endIter (SOME false)
+                     in  TextIO.output(dev, content)
+                       ; TextIO.closeOut dev 
+                       ; say ("Buffer saved to file "^file)
+                     end
+            end
+
+
         val scrolled = let val sw = ScrolledWindow.new'()
                        in  ScrolledWindow.set_policy sw POLICY_AUTOMATIC POLICY_AUTOMATIC
                          ; Container.add sw textView
@@ -119,8 +141,9 @@ fun setUpGui() =
       ; Box.pack_start vbox statusbar (SOME false) (SOME false) (SOME 0)
       ; Container.add w vbox
       ; Widget.show_all w
-      ; connectOpen (MenuItem.activate_sig openAction)
-      ; connectClose (MenuItem.activate_sig (fn () => say "Close 4"))
+      ; connectOpen openAction
+      ; connectClose (fn () => say "Close")
+      ; connectSaveAs saveAsAction
     end
 
 fun main () = ( GtkBasis.init(CommandLine.name()::CommandLine.arguments())
