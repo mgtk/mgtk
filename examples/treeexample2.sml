@@ -64,8 +64,8 @@ fun add_items tree itemnames =
     in  app add_sub itemnames
     end
 
-fun main(args) =
-    let val _ = Gtk.init(args)
+fun main() =
+    let val _ = Gtk.init(CommandLine.arguments())
 	val (window,scrolled) = window()
         val tree = tree scrolled
 	val _ = add_items tree ["Foo", "Bar", "Baz", "Quux", "Maurice"]
