@@ -8,7 +8,7 @@ commands
 Using Moscow ML:
 ----------------
 
-(1) Build mGTK (just type make in parent dir)
+(1) Build mGTK (just type make in mgtk dir)
 
 (2) make mosml 
 
@@ -19,6 +19,10 @@ Using Moscow ML:
 
     Windows:
       set MGTKHOME=\mgtk-pre-0.93
+
+    OR
+
+    copy $MGTKHOME/mgtk.so to the current dir. 
 
 (4) Run an example.  For instance 
       ./signup
