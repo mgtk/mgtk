@@ -36,6 +36,8 @@ structure FromDefs :> FromDefs = struct
 				   | SOME p => insert map p (Sub md)
 	in  Map.insert(map, name, md) end
 
+    val demotedModuleName = "GtkDemoted"
+
     fun trans top metadata (def, map) =
 	let val name = getName def handle AttribNotFound _ => #1 def
 	    fun probableModule nothing split name = 
@@ -57,7 +59,7 @@ structure FromDefs :> FromDefs = struct
 		    val module = loop (tl words) [Name.capitalize(hd words)]
 		in  if module = nothing then
 			( MsgUtil.warning("Demoting "^name^" to top-level module " ^nothing)
-			  ; nothing)
+			  ; demotedModuleName)
 		    else module
 		end
 	    fun getMeta md = Map.peek(metadata, md^"."^name)
@@ -96,7 +98,8 @@ structure FromDefs :> FromDefs = struct
 				else NONE
 		       val ty = functype (getMeta md) NONE rt def
 		       val mem = Member{name=name, info=A.Method ty}
-		   in  insert map md mem
+		   in  if isDeprecated def then map
+		       else insert map md mem
 		   end
 		       handle AttribNotFound msg => 
 			      ( TextIO.print("Problems ("^msg^") with " ^ name)
@@ -107,7 +110,8 @@ structure FromDefs :> FromDefs = struct
 		   let val md = getObject def
 		       val ty = functype (getMeta md) (SOME md) NONE def
 		       val mem = Member{name=name,info=A.Method ty}
-		   in  insert map md mem
+		   in  if isDeprecated def then map
+		       else insert map md mem
 		   end
 		       handle AttribNotFound msg => 
 			      ( TextIO.print("Problems ("^msg^") with " ^ name)
@@ -206,13 +210,15 @@ structure FromDefs :> FromDefs = struct
     fun fromDefs top defs metadefs
 	: (string,module_info,member_info) AST.module =
 	let val md = interpretMetadata metadefs
-	    val map = List.foldl (trans top md) (new empty top NONE NONE) defs
+	    val map = new empty top NONE NONE
+	    val map = new map demotedModuleName (SOME top) NONE
+	    val map = List.foldl (trans top md) map defs
 	    fun convert (Module{name,members=mbs,info}) =
 		A.Module{name=name,info=info,
 			 members=List.map convert' (rev(!mbs))}
 	    and convert' (Sub module) = A.Sub (convert module)
 	      | convert' (Member{name,info}) = A.Member{name=name,info=info}
-	in  convert(Map.find(map, top)) end
+	in  convert(Map.find(map,top)) end
 
     (* For debugging: *)
     local open Pretty in

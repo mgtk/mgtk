@@ -4,33 +4,6 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    type icon_size = int
-    val get_icon_size_ : unit -> int * int * int * int * int * int * int
-	= app1 (symb"mgtk_get_gtk_icon_size")
-    val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
-	 ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
-	 ICON_SIZE_DIALOG)
-	= get_icon_size_ ()
-    val icon_size_register_ : string -> int -> int -> int
-	= app3 (symb"mgtk_gtk_icon_size_register")
-    val icon_size_register : string -> int -> int -> icon_size
-	= fn name => fn width => fn height =>
-	     icon_size_register_ name width height
-    val accel_groups_activate_ : cptr -> int -> int -> bool
-	= app3 (symb"mgtk_gtk_accel_groups_activate")
-    val accel_groups_activate : 'a GObject.t -> int -> int -> bool
-	= fn object => fn accel_key => fn accel_mods =>
-	     accel_groups_activate_ (repr object) accel_key accel_mods
-    structure IconSet :>
-      sig
-	type t
-      end = struct
-	open Dynlib
-	type cptr = GObject.cptr
-	val repr = GObject.repr
-	val symb = GtkBasis.symb
-	type t = GObject.cptr
-    end
     structure Settings :>
       sig
 	type base
@@ -69,6 +42,63 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toStyle obj = inherit () (fn () => repr obj)
     end
+    structure Demoted :>
+      sig
+	type icon_size
+	val ICON_SIZE_INVALID : icon_size
+	val ICON_SIZE_MENU : icon_size
+	val ICON_SIZE_SMALL_TOOLBAR : icon_size
+	val ICON_SIZE_LARGE_TOOLBAR : icon_size
+	val ICON_SIZE_BUTTON : icon_size
+	val ICON_SIZE_DND : icon_size
+	val ICON_SIZE_DIALOG : icon_size
+	val icon_size_register : string -> int -> int -> icon_size
+	val rc_get_style_by_paths
+	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
+	val accel_groups_activate : 'a GObject.t -> int -> int -> bool
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type icon_size = int
+	val get_icon_size_ : unit -> int * int * int * int * int * int * int
+	    = app1 (symb"mgtk_get_gtk_icon_size")
+	val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
+	     ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
+	     ICON_SIZE_DIALOG)
+	    = get_icon_size_ ()
+	val icon_size_register_ : string -> int -> int -> int
+	    = app3 (symb"mgtk_gtk_icon_size_register")
+	val icon_size_register : string -> int -> int -> icon_size
+	    = fn name => fn width => fn height =>
+		 icon_size_register_ name width height
+	val rc_get_style_by_paths_
+	  : cptr -> string -> string -> GType.t -> cptr
+	    = app4 (symb"mgtk_gtk_rc_get_style_by_paths")
+	val rc_get_style_by_paths
+	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
+	    = fn settings => fn widget_path => fn class_path => fn typ =>
+		 Style.inherit
+		   ()
+		   (fn () => rc_get_style_by_paths_
+			       (repr settings) widget_path class_path typ)
+	val accel_groups_activate_ : cptr -> int -> int -> bool
+	    = app3 (symb"mgtk_gtk_accel_groups_activate")
+	val accel_groups_activate : 'a GObject.t -> int -> int -> bool
+	    = fn object => fn accel_key => fn accel_mods =>
+		 accel_groups_activate_ (repr object) accel_key accel_mods
+    end
+    structure IconSet :>
+      sig
+	type t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+    end
     structure RcStyle :>
       sig
 	type base
@@ -76,8 +106,6 @@ structure Gtk  = struct
 	type 'a t = 'a rcstyle_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toRcStyle : 'a t -> base t
-	val get_style_by_paths
-	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -89,15 +117,6 @@ structure Gtk  = struct
 	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toRcStyle obj = inherit () (fn () => repr obj)
-	val get_style_by_paths_ : cptr -> string -> string -> GType.t -> cptr
-	    = app4 (symb"mgtk_gtk_rc_get_style_by_paths")
-	val get_style_by_paths
-	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
-	    = fn settings => fn widget_path => fn class_path => fn typ =>
-		 Style.inherit ()
-			       (fn () => get_style_by_paths_
-					   (repr settings) widget_path
-					   class_path typ)
     end
     structure Object :>
       sig
@@ -215,27 +234,41 @@ end
 
 
 /* *** Gtk *** */
+
+
+/* *** Settings *** */
+
+
+/* *** Style *** */
+
+
+/* *** Demoted *** */
 /* ML type: unit -> int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
-  value res = alloc_tuple(7);
-  Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
-  Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
-  Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
-  Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
-  Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
-  Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
-  Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
-  return res;
+    value res = alloc_tuple(7);
+    Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
+    Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
+    Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
+    Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
+    Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
+    Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
+    Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
+    return res;
 }
 
 /* ML type: string -> int -> int -> int */
 EXTERNML value mgtk_gtk_icon_size_register(value name, value width, value height) { /* ML */
-  return Val_int(gtk_icon_size_register(String_val(name), Int_val(width), Int_val(height)));
+    return Val_int(gtk_icon_size_register(String_val(name), Int_val(width), Int_val(height)));
+}
+
+/* ML type: cptr -> string -> string -> GType.t -> cptr */
+EXTERNML value mgtk_gtk_rc_get_style_by_paths(value settings, value widget_path, value class_path, value type) { /* ML */
+    return Val_GtkObj(gtk_rc_get_style_by_paths(GtkObj_val(settings), String_val(widget_path), String_val(class_path), Int_val(type)));
 }
 
 /* ML type: cptr -> int -> int -> bool */
 EXTERNML value mgtk_gtk_accel_groups_activate(value object, value accel_key, value accel_mods) { /* ML */
-  return Val_bool(gtk_accel_groups_activate(GtkObj_val(object), Int_val(accel_key), Int_val(accel_mods)));
+    return Val_bool(gtk_accel_groups_activate(GtkObj_val(object), Int_val(accel_key), Int_val(accel_mods)));
 }
 
 
@@ -257,18 +290,7 @@ value Val_GtkIconSet(void* obj) {
 
 
 
-/* *** Settings *** */
-
-
-/* *** Style *** */
-
-
 /* *** RcStyle *** */
-/* ML type: cptr -> string -> string -> GType.t -> cptr */
-EXTERNML value mgtk_gtk_rc_get_style_by_paths(value settings, value widget_path, value class_path, value type) { /* ML */
-    return Val_GtkObj(gtk_rc_get_style_by_paths(GtkObj_val(settings), String_val(widget_path), String_val(class_path), Int_val(type)));
-}
-
 
 
 /* *** Object *** */

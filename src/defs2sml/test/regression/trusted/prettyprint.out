@@ -4,128 +4,206 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    type anchortype = int
-    val get_anchortype_
-      : unit -> int * int * int * int * int * int * int * int * int * int 
-	      * int * int * int * int * int * int * int
-	= app1 (symb"mgtk_get_gtk_anchortype")
-    val (ANCHOR_CENTER, ANCHOR_NORTH, ANCHOR_NORTH_WEST, ANCHOR_NORTH_EAST, 
-	 ANCHOR_SOUTH, ANCHOR_SOUTH_WEST, ANCHOR_SOUTH_EAST, ANCHOR_WEST, 
-	 ANCHOR_EAST, ANCHOR_N, ANCHOR_NW, ANCHOR_NE, ANCHOR_S, ANCHOR_SW, 
-	 ANCHOR_SE, ANCHOR_W, ANCHOR_E)
-	= get_anchortype_ ()
-    type movement_step = int
-    val get_movement_step_
-      : unit -> int * int * int * int * int * int * int * int * int
-	= app1 (symb"mgtk_get_gtk_movement_step")
-    val (MOVEMENT_LOGICAL_POSITIONS, MOVEMENT_VISUAL_POSITIONS, 
-	 MOVEMENT_WORDS, MOVEMENT_DISPLAY_LINES, MOVEMENT_DISPLAY_LINE_ENDS, 
-	 MOVEMENT_PARAGRAPHS, MOVEMENT_PARAGRAPH_ENDS, MOVEMENT_PAGES, 
-	 MOVEMENT_BUFFER_ENDS)
-	= get_movement_step_ ()
-    type rc_tokentype = int
-    val get_rc_tokentype_
-      : unit -> int * int * int * int * int * int * int * int * int * int 
-	      * int * int * int * int * int * int * int * int * int * int 
-	      * int * int * int * int * int * int * int * int * int * int 
-	      * int * int * int * int * int * int * int * int
-	= app1 (symb"mgtk_get_gtk_rc_tokentype")
-    val
-      (RC_TOKEN_INVALID, RC_TOKEN_INCLUDE, RC_TOKEN_NORMAL, RC_TOKEN_ACTIVE, 
-       RC_TOKEN_PRELIGHT, RC_TOKEN_SELECTED, RC_TOKEN_INSENSITIVE, 
-       RC_TOKEN_FG, RC_TOKEN_BG, RC_TOKEN_TEXT, RC_TOKEN_BASE, 
-       RC_TOKEN_XTHICKNESS, RC_TOKEN_YTHICKNESS, RC_TOKEN_FONT, 
-       RC_TOKEN_FONTSET, RC_TOKEN_FONT_NAME, RC_TOKEN_BG_PIXMAP, 
-       RC_TOKEN_PIXMAP_PATH, RC_TOKEN_STYLE, RC_TOKEN_BINDING, RC_TOKEN_BIND, 
-       RC_TOKEN_WIDGET, RC_TOKEN_WIDGET_CLASS, RC_TOKEN_CLASS, 
-       RC_TOKEN_LOWEST, RC_TOKEN_GTK, RC_TOKEN_APPLICATION, RC_TOKEN_THEME, 
-       RC_TOKEN_RC, RC_TOKEN_HIGHEST, RC_TOKEN_ENGINE, RC_TOKEN_MODULE_PATH, 
-       RC_TOKEN_IM_MODULE_PATH, RC_TOKEN_IM_MODULE_FILE, RC_TOKEN_STOCK, 
-       RC_TOKEN_LTR, RC_TOKEN_RTL, RC_TOKEN_LAST)
-	= get_rc_tokentype_ ()
+    structure Demoted :>
+      sig
+	type anchortype
+	val ANCHOR_CENTER : anchortype
+	val ANCHOR_NORTH : anchortype
+	val ANCHOR_NORTH_WEST : anchortype
+	val ANCHOR_NORTH_EAST : anchortype
+	val ANCHOR_SOUTH : anchortype
+	val ANCHOR_SOUTH_WEST : anchortype
+	val ANCHOR_SOUTH_EAST : anchortype
+	val ANCHOR_WEST : anchortype
+	val ANCHOR_EAST : anchortype
+	val ANCHOR_N : anchortype
+	val ANCHOR_NW : anchortype
+	val ANCHOR_NE : anchortype
+	val ANCHOR_S : anchortype
+	val ANCHOR_SW : anchortype
+	val ANCHOR_SE : anchortype
+	val ANCHOR_W : anchortype
+	val ANCHOR_E : anchortype
+	type movement_step
+	val MOVEMENT_LOGICAL_POSITIONS : movement_step
+	val MOVEMENT_VISUAL_POSITIONS : movement_step
+	val MOVEMENT_WORDS : movement_step
+	val MOVEMENT_DISPLAY_LINES : movement_step
+	val MOVEMENT_DISPLAY_LINE_ENDS : movement_step
+	val MOVEMENT_PARAGRAPHS : movement_step
+	val MOVEMENT_PARAGRAPH_ENDS : movement_step
+	val MOVEMENT_PAGES : movement_step
+	val MOVEMENT_BUFFER_ENDS : movement_step
+	type rc_tokentype
+	val RC_TOKEN_INVALID : rc_tokentype
+	val RC_TOKEN_INCLUDE : rc_tokentype
+	val RC_TOKEN_NORMAL : rc_tokentype
+	val RC_TOKEN_ACTIVE : rc_tokentype
+	val RC_TOKEN_PRELIGHT : rc_tokentype
+	val RC_TOKEN_SELECTED : rc_tokentype
+	val RC_TOKEN_INSENSITIVE : rc_tokentype
+	val RC_TOKEN_FG : rc_tokentype
+	val RC_TOKEN_BG : rc_tokentype
+	val RC_TOKEN_TEXT : rc_tokentype
+	val RC_TOKEN_BASE : rc_tokentype
+	val RC_TOKEN_XTHICKNESS : rc_tokentype
+	val RC_TOKEN_YTHICKNESS : rc_tokentype
+	val RC_TOKEN_FONT : rc_tokentype
+	val RC_TOKEN_FONTSET : rc_tokentype
+	val RC_TOKEN_FONT_NAME : rc_tokentype
+	val RC_TOKEN_BG_PIXMAP : rc_tokentype
+	val RC_TOKEN_PIXMAP_PATH : rc_tokentype
+	val RC_TOKEN_STYLE : rc_tokentype
+	val RC_TOKEN_BINDING : rc_tokentype
+	val RC_TOKEN_BIND : rc_tokentype
+	val RC_TOKEN_WIDGET : rc_tokentype
+	val RC_TOKEN_WIDGET_CLASS : rc_tokentype
+	val RC_TOKEN_CLASS : rc_tokentype
+	val RC_TOKEN_LOWEST : rc_tokentype
+	val RC_TOKEN_GTK : rc_tokentype
+	val RC_TOKEN_APPLICATION : rc_tokentype
+	val RC_TOKEN_THEME : rc_tokentype
+	val RC_TOKEN_RC : rc_tokentype
+	val RC_TOKEN_HIGHEST : rc_tokentype
+	val RC_TOKEN_ENGINE : rc_tokentype
+	val RC_TOKEN_MODULE_PATH : rc_tokentype
+	val RC_TOKEN_IM_MODULE_PATH : rc_tokentype
+	val RC_TOKEN_IM_MODULE_FILE : rc_tokentype
+	val RC_TOKEN_STOCK : rc_tokentype
+	val RC_TOKEN_LTR : rc_tokentype
+	val RC_TOKEN_RTL : rc_tokentype
+	val RC_TOKEN_LAST : rc_tokentype
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type anchortype = int
+	val get_anchortype_
+	  : unit -> int * int * int * int * int * int * int * int * int * int 
+		  * int * int * int * int * int * int * int
+	    = app1 (symb"mgtk_get_gtk_anchortype")
+	val (ANCHOR_CENTER, ANCHOR_NORTH, ANCHOR_NORTH_WEST, 
+	     ANCHOR_NORTH_EAST, ANCHOR_SOUTH, ANCHOR_SOUTH_WEST, 
+	     ANCHOR_SOUTH_EAST, ANCHOR_WEST, ANCHOR_EAST, ANCHOR_N, ANCHOR_NW, 
+	     ANCHOR_NE, ANCHOR_S, ANCHOR_SW, ANCHOR_SE, ANCHOR_W, ANCHOR_E)
+	    = get_anchortype_ ()
+	type movement_step = int
+	val get_movement_step_
+	  : unit -> int * int * int * int * int * int * int * int * int
+	    = app1 (symb"mgtk_get_gtk_movement_step")
+	val (MOVEMENT_LOGICAL_POSITIONS, MOVEMENT_VISUAL_POSITIONS, 
+	     MOVEMENT_WORDS, MOVEMENT_DISPLAY_LINES, 
+	     MOVEMENT_DISPLAY_LINE_ENDS, MOVEMENT_PARAGRAPHS, 
+	     MOVEMENT_PARAGRAPH_ENDS, MOVEMENT_PAGES, MOVEMENT_BUFFER_ENDS)
+	    = get_movement_step_ ()
+	type rc_tokentype = int
+	val get_rc_tokentype_
+	  : unit -> int * int * int * int * int * int * int * int * int * int 
+		  * int * int * int * int * int * int * int * int * int * int 
+		  * int * int * int * int * int * int * int * int * int * int 
+		  * int * int * int * int * int * int * int * int
+	    = app1 (symb"mgtk_get_gtk_rc_tokentype")
+	val (RC_TOKEN_INVALID, RC_TOKEN_INCLUDE, RC_TOKEN_NORMAL, 
+	     RC_TOKEN_ACTIVE, RC_TOKEN_PRELIGHT, RC_TOKEN_SELECTED, 
+	     RC_TOKEN_INSENSITIVE, RC_TOKEN_FG, RC_TOKEN_BG, RC_TOKEN_TEXT, 
+	     RC_TOKEN_BASE, RC_TOKEN_XTHICKNESS, RC_TOKEN_YTHICKNESS, 
+	     RC_TOKEN_FONT, RC_TOKEN_FONTSET, RC_TOKEN_FONT_NAME, 
+	     RC_TOKEN_BG_PIXMAP, RC_TOKEN_PIXMAP_PATH, RC_TOKEN_STYLE, 
+	     RC_TOKEN_BINDING, RC_TOKEN_BIND, RC_TOKEN_WIDGET, 
+	     RC_TOKEN_WIDGET_CLASS, RC_TOKEN_CLASS, RC_TOKEN_LOWEST, 
+	     RC_TOKEN_GTK, RC_TOKEN_APPLICATION, RC_TOKEN_THEME, RC_TOKEN_RC, 
+	     RC_TOKEN_HIGHEST, RC_TOKEN_ENGINE, RC_TOKEN_MODULE_PATH, 
+	     RC_TOKEN_IM_MODULE_PATH, RC_TOKEN_IM_MODULE_FILE, RC_TOKEN_STOCK, 
+	     RC_TOKEN_LTR, RC_TOKEN_RTL, RC_TOKEN_LAST)
+	    = get_rc_tokentype_ ()
+    end
 end
 
 
 /* *** Gtk *** */
+
+
+/* *** Demoted *** */
 /* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_anchortype(value dummy) { /* ML */
-  value res = alloc_tuple(17);
-  Field(res, 0) = Val_int(GTK_ANCHOR_CENTER);
-  Field(res, 1) = Val_int(GTK_ANCHOR_NORTH);
-  Field(res, 2) = Val_int(GTK_ANCHOR_NORTH_WEST);
-  Field(res, 3) = Val_int(GTK_ANCHOR_NORTH_EAST);
-  Field(res, 4) = Val_int(GTK_ANCHOR_SOUTH);
-  Field(res, 5) = Val_int(GTK_ANCHOR_SOUTH_WEST);
-  Field(res, 6) = Val_int(GTK_ANCHOR_SOUTH_EAST);
-  Field(res, 7) = Val_int(GTK_ANCHOR_WEST);
-  Field(res, 8) = Val_int(GTK_ANCHOR_EAST);
-  Field(res, 9) = Val_int(GTK_ANCHOR_N);
-  Field(res, 10) = Val_int(GTK_ANCHOR_NW);
-  Field(res, 11) = Val_int(GTK_ANCHOR_NE);
-  Field(res, 12) = Val_int(GTK_ANCHOR_S);
-  Field(res, 13) = Val_int(GTK_ANCHOR_SW);
-  Field(res, 14) = Val_int(GTK_ANCHOR_SE);
-  Field(res, 15) = Val_int(GTK_ANCHOR_W);
-  Field(res, 16) = Val_int(GTK_ANCHOR_E);
-  return res;
+    value res = alloc_tuple(17);
+    Field(res, 0) = Val_int(GTK_ANCHOR_CENTER);
+    Field(res, 1) = Val_int(GTK_ANCHOR_NORTH);
+    Field(res, 2) = Val_int(GTK_ANCHOR_NORTH_WEST);
+    Field(res, 3) = Val_int(GTK_ANCHOR_NORTH_EAST);
+    Field(res, 4) = Val_int(GTK_ANCHOR_SOUTH);
+    Field(res, 5) = Val_int(GTK_ANCHOR_SOUTH_WEST);
+    Field(res, 6) = Val_int(GTK_ANCHOR_SOUTH_EAST);
+    Field(res, 7) = Val_int(GTK_ANCHOR_WEST);
+    Field(res, 8) = Val_int(GTK_ANCHOR_EAST);
+    Field(res, 9) = Val_int(GTK_ANCHOR_N);
+    Field(res, 10) = Val_int(GTK_ANCHOR_NW);
+    Field(res, 11) = Val_int(GTK_ANCHOR_NE);
+    Field(res, 12) = Val_int(GTK_ANCHOR_S);
+    Field(res, 13) = Val_int(GTK_ANCHOR_SW);
+    Field(res, 14) = Val_int(GTK_ANCHOR_SE);
+    Field(res, 15) = Val_int(GTK_ANCHOR_W);
+    Field(res, 16) = Val_int(GTK_ANCHOR_E);
+    return res;
 }
 
 /* ML type: unit -> int * int * int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_movement_step(value dummy) { /* ML */
-  value res = alloc_tuple(9);
-  Field(res, 0) = Val_int(GTK_MOVEMENT_LOGICAL_POSITIONS);
-  Field(res, 1) = Val_int(GTK_MOVEMENT_VISUAL_POSITIONS);
-  Field(res, 2) = Val_int(GTK_MOVEMENT_WORDS);
-  Field(res, 3) = Val_int(GTK_MOVEMENT_DISPLAY_LINES);
-  Field(res, 4) = Val_int(GTK_MOVEMENT_DISPLAY_LINE_ENDS);
-  Field(res, 5) = Val_int(GTK_MOVEMENT_PARAGRAPHS);
-  Field(res, 6) = Val_int(GTK_MOVEMENT_PARAGRAPH_ENDS);
-  Field(res, 7) = Val_int(GTK_MOVEMENT_PAGES);
-  Field(res, 8) = Val_int(GTK_MOVEMENT_BUFFER_ENDS);
-  return res;
+    value res = alloc_tuple(9);
+    Field(res, 0) = Val_int(GTK_MOVEMENT_LOGICAL_POSITIONS);
+    Field(res, 1) = Val_int(GTK_MOVEMENT_VISUAL_POSITIONS);
+    Field(res, 2) = Val_int(GTK_MOVEMENT_WORDS);
+    Field(res, 3) = Val_int(GTK_MOVEMENT_DISPLAY_LINES);
+    Field(res, 4) = Val_int(GTK_MOVEMENT_DISPLAY_LINE_ENDS);
+    Field(res, 5) = Val_int(GTK_MOVEMENT_PARAGRAPHS);
+    Field(res, 6) = Val_int(GTK_MOVEMENT_PARAGRAPH_ENDS);
+    Field(res, 7) = Val_int(GTK_MOVEMENT_PAGES);
+    Field(res, 8) = Val_int(GTK_MOVEMENT_BUFFER_ENDS);
+    return res;
 }
 
 /* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_rc_tokentype(value dummy) { /* ML */
-  value res = alloc_tuple(38);
-  Field(res, 0) = Val_int(GTK_RC_TOKEN_INVALID);
-  Field(res, 1) = Val_int(GTK_RC_TOKEN_INCLUDE);
-  Field(res, 2) = Val_int(GTK_RC_TOKEN_NORMAL);
-  Field(res, 3) = Val_int(GTK_RC_TOKEN_ACTIVE);
-  Field(res, 4) = Val_int(GTK_RC_TOKEN_PRELIGHT);
-  Field(res, 5) = Val_int(GTK_RC_TOKEN_SELECTED);
-  Field(res, 6) = Val_int(GTK_RC_TOKEN_INSENSITIVE);
-  Field(res, 7) = Val_int(GTK_RC_TOKEN_FG);
-  Field(res, 8) = Val_int(GTK_RC_TOKEN_BG);
-  Field(res, 9) = Val_int(GTK_RC_TOKEN_TEXT);
-  Field(res, 10) = Val_int(GTK_RC_TOKEN_BASE);
-  Field(res, 11) = Val_int(GTK_RC_TOKEN_XTHICKNESS);
-  Field(res, 12) = Val_int(GTK_RC_TOKEN_YTHICKNESS);
-  Field(res, 13) = Val_int(GTK_RC_TOKEN_FONT);
-  Field(res, 14) = Val_int(GTK_RC_TOKEN_FONTSET);
-  Field(res, 15) = Val_int(GTK_RC_TOKEN_FONT_NAME);
-  Field(res, 16) = Val_int(GTK_RC_TOKEN_BG_PIXMAP);
-  Field(res, 17) = Val_int(GTK_RC_TOKEN_PIXMAP_PATH);
-  Field(res, 18) = Val_int(GTK_RC_TOKEN_STYLE);
-  Field(res, 19) = Val_int(GTK_RC_TOKEN_BINDING);
-  Field(res, 20) = Val_int(GTK_RC_TOKEN_BIND);
-  Field(res, 21) = Val_int(GTK_RC_TOKEN_WIDGET);
-  Field(res, 22) = Val_int(GTK_RC_TOKEN_WIDGET_CLASS);
-  Field(res, 23) = Val_int(GTK_RC_TOKEN_CLASS);
-  Field(res, 24) = Val_int(GTK_RC_TOKEN_LOWEST);
-  Field(res, 25) = Val_int(GTK_RC_TOKEN_GTK);
-  Field(res, 26) = Val_int(GTK_RC_TOKEN_APPLICATION);
-  Field(res, 27) = Val_int(GTK_RC_TOKEN_THEME);
-  Field(res, 28) = Val_int(GTK_RC_TOKEN_RC);
-  Field(res, 29) = Val_int(GTK_RC_TOKEN_HIGHEST);
-  Field(res, 30) = Val_int(GTK_RC_TOKEN_ENGINE);
-  Field(res, 31) = Val_int(GTK_RC_TOKEN_MODULE_PATH);
-  Field(res, 32) = Val_int(GTK_RC_TOKEN_IM_MODULE_PATH);
-  Field(res, 33) = Val_int(GTK_RC_TOKEN_IM_MODULE_FILE);
-  Field(res, 34) = Val_int(GTK_RC_TOKEN_STOCK);
-  Field(res, 35) = Val_int(GTK_RC_TOKEN_LTR);
-  Field(res, 36) = Val_int(GTK_RC_TOKEN_RTL);
-  Field(res, 37) = Val_int(GTK_RC_TOKEN_LAST);
-  return res;
+    value res = alloc_tuple(38);
+    Field(res, 0) = Val_int(GTK_RC_TOKEN_INVALID);
+    Field(res, 1) = Val_int(GTK_RC_TOKEN_INCLUDE);
+    Field(res, 2) = Val_int(GTK_RC_TOKEN_NORMAL);
+    Field(res, 3) = Val_int(GTK_RC_TOKEN_ACTIVE);
+    Field(res, 4) = Val_int(GTK_RC_TOKEN_PRELIGHT);
+    Field(res, 5) = Val_int(GTK_RC_TOKEN_SELECTED);
+    Field(res, 6) = Val_int(GTK_RC_TOKEN_INSENSITIVE);
+    Field(res, 7) = Val_int(GTK_RC_TOKEN_FG);
+    Field(res, 8) = Val_int(GTK_RC_TOKEN_BG);
+    Field(res, 9) = Val_int(GTK_RC_TOKEN_TEXT);
+    Field(res, 10) = Val_int(GTK_RC_TOKEN_BASE);
+    Field(res, 11) = Val_int(GTK_RC_TOKEN_XTHICKNESS);
+    Field(res, 12) = Val_int(GTK_RC_TOKEN_YTHICKNESS);
+    Field(res, 13) = Val_int(GTK_RC_TOKEN_FONT);
+    Field(res, 14) = Val_int(GTK_RC_TOKEN_FONTSET);
+    Field(res, 15) = Val_int(GTK_RC_TOKEN_FONT_NAME);
+    Field(res, 16) = Val_int(GTK_RC_TOKEN_BG_PIXMAP);
+    Field(res, 17) = Val_int(GTK_RC_TOKEN_PIXMAP_PATH);
+    Field(res, 18) = Val_int(GTK_RC_TOKEN_STYLE);
+    Field(res, 19) = Val_int(GTK_RC_TOKEN_BINDING);
+    Field(res, 20) = Val_int(GTK_RC_TOKEN_BIND);
+    Field(res, 21) = Val_int(GTK_RC_TOKEN_WIDGET);
+    Field(res, 22) = Val_int(GTK_RC_TOKEN_WIDGET_CLASS);
+    Field(res, 23) = Val_int(GTK_RC_TOKEN_CLASS);
+    Field(res, 24) = Val_int(GTK_RC_TOKEN_LOWEST);
+    Field(res, 25) = Val_int(GTK_RC_TOKEN_GTK);
+    Field(res, 26) = Val_int(GTK_RC_TOKEN_APPLICATION);
+    Field(res, 27) = Val_int(GTK_RC_TOKEN_THEME);
+    Field(res, 28) = Val_int(GTK_RC_TOKEN_RC);
+    Field(res, 29) = Val_int(GTK_RC_TOKEN_HIGHEST);
+    Field(res, 30) = Val_int(GTK_RC_TOKEN_ENGINE);
+    Field(res, 31) = Val_int(GTK_RC_TOKEN_MODULE_PATH);
+    Field(res, 32) = Val_int(GTK_RC_TOKEN_IM_MODULE_PATH);
+    Field(res, 33) = Val_int(GTK_RC_TOKEN_IM_MODULE_FILE);
+    Field(res, 34) = Val_int(GTK_RC_TOKEN_STOCK);
+    Field(res, 35) = Val_int(GTK_RC_TOKEN_LTR);
+    Field(res, 36) = Val_int(GTK_RC_TOKEN_RTL);
+    Field(res, 37) = Val_int(GTK_RC_TOKEN_LAST);
+    return res;
 }
 

@@ -112,6 +112,12 @@ structure Defs = struct
 	              (fn (Implements n) => SOME n | _ => NONE) atts
 	end
 
+    fun isDeprecated (def: definition) =
+	let val atts = #3 def
+	in  lookup "deprecated" (fn Deprecated => SOME true | _ => NONE) atts
+	    handle AttribNotFound _ => false
+	end
+
     type override = attrib (* but only OfObject, ReturnType, and Params
                               should occur *)
     datatype metadata =

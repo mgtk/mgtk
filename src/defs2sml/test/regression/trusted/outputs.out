@@ -4,18 +4,35 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    type icon_size = int
-    val get_icon_size_ : unit -> int * int * int * int * int * int * int
-	= app1 (symb"mgtk_get_gtk_icon_size")
-    val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
-	 ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
-	 ICON_SIZE_DIALOG)
-	= get_icon_size_ ()
-    val icon_size_lookup_ : int -> bool * int * int
-	= app1 (symb"mgtk_gtk_icon_size_lookup")
-    val icon_size_lookup : icon_size -> bool * int * int
-	= fn size => let val (res0, res1, res2) = icon_size_lookup_ size
-		     in (res0, res1, res2) end
+    structure Demoted :>
+      sig
+	type icon_size
+	val ICON_SIZE_INVALID : icon_size
+	val ICON_SIZE_MENU : icon_size
+	val ICON_SIZE_SMALL_TOOLBAR : icon_size
+	val ICON_SIZE_LARGE_TOOLBAR : icon_size
+	val ICON_SIZE_BUTTON : icon_size
+	val ICON_SIZE_DND : icon_size
+	val ICON_SIZE_DIALOG : icon_size
+	val icon_size_lookup : icon_size -> bool * int * int
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type icon_size = int
+	val get_icon_size_ : unit -> int * int * int * int * int * int * int
+	    = app1 (symb"mgtk_get_gtk_icon_size")
+	val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
+	     ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
+	     ICON_SIZE_DIALOG)
+	    = get_icon_size_ ()
+	val icon_size_lookup_ : int -> bool * int * int
+	    = app1 (symb"mgtk_gtk_icon_size_lookup")
+	val icon_size_lookup : icon_size -> bool * int * int
+	    = fn size => let val (res0, res1, res2) = icon_size_lookup_ size
+			 in (res0, res1, res2) end
+    end
     structure Object :>
       sig
 	type base
@@ -321,31 +338,34 @@ end
 
 
 /* *** Gtk *** */
+
+
+/* *** Demoted *** */
 /* ML type: unit -> int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
-  value res = alloc_tuple(7);
-  Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
-  Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
-  Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
-  Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
-  Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
-  Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
-  Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
-  return res;
+    value res = alloc_tuple(7);
+    Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
+    Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
+    Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
+    Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
+    Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
+    Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
+    Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
+    return res;
 }
 
 /* ML type: int -> bool */
 EXTERNML value mgtk_gtk_icon_size_lookup(value size) { /* ML */
-  value result;
-  value res;
-  int width;
-  int height;
-  res = Val_bool(gtk_icon_size_lookup(Int_val(size), &width, &height));
-  result = alloc_tuple(3);
-  Field(result, 0) = res;
-  Field(result, 1) = Val_int(width);
-  Field(result, 2) = Val_int(height);
-  return result;
+    value result;
+    value res;
+    int width;
+    int height;
+    res = Val_bool(gtk_icon_size_lookup(Int_val(size), &width, &height));
+    result = alloc_tuple(3);
+    Field(result, 0) = res;
+    Field(result, 1) = Val_int(width);
+    Field(result, 2) = Val_int(height);
+    return result;
 }
 
 

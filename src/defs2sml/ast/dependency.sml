@@ -6,13 +6,16 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
     structure A = AST
     structure T = Type
     structure M = Splaymap
+    structure S = Splayset
 
     val empty = M.mkDict String.compare
+    val emptySet = S.empty String.compare
     fun lookup deps name =
 	case M.peek(deps,name) of
-	    NONE => []
+	    NONE => emptySet
 	  | SOME d => d
-    fun add ((name,dep),deps) = M.insert(deps,name,lookup deps name @ [dep])
+    fun add ((name,d),deps) = M.insert(deps,name,S.add(lookup deps name,d))
+    fun addList ((name,ds),deps) = M.insert(deps,name,S.addList(lookup deps name, ds))
 	    
     fun dependencies module =
 	let fun loop (A.Module{name,info,members}, deps) = 
@@ -29,7 +32,7 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
 (*		      | get (A.Signal ty) = freeTyNames ty*)
 		      | get (A.Signal ty) = []
 		    val ds = List.map (fn dep => (name,dep)) (get info)
-		in  List.foldl add deps ds end
+		in  addList ((name,get info), deps) end
 	in  loop (module, empty) end
 					
     fun build module =
@@ -54,10 +57,11 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
 	    val map = build module
 	    fun findModule name = M.find(map,name)
 	    val deps = dependencies module
-	    fun loop (A.Module{name,info=(done,info),members}) =
+	    fun loop (A.Module{name,info,members=[]}) = []
+	      | loop (A.Module{name,info=(done,info),members}) =
 		if !done then []
 		else let val _ = done := true
-			 val ds = lookup deps name
+			 val ds = S.listItems(lookup deps name)
 		     in  List.concat (List.map loop'' ds) @
 			 [A.Module{name=name,info=info,
 				   members=List.concat(List.map loop' members)}]
@@ -68,10 +72,18 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
 		(case findModule name of
 		     SOME module => loop module
 		   | NONE => []
-		) handle M.NotFound => ( print("NotFound("^name^")\n") ; [] )
+		) handle M.NotFound => (MsgUtil.warning("Unbound dependency ("^name^")\n") ; [] )
 	in  case loop module of
-		[m] => m
-	      | _ => Util.abort 54321
+		[] => Util.abort 54321
+	      | [m] => m
+	      | ms =>
+		let val _ = MsgUtil.warning "Toplevel module depends on:\n"
+		    val deps = Util.stringSep "  {" "}\n" "," 
+					      (fn (A.Module{name,...}) => name)
+					      ms
+		    val _ = MsgUtil.warning deps
+		in  hd(rev ms)
+		end
 	end
 
 end (* structure DependencyReorder *)

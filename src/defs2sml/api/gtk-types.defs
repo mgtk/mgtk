@@ -2504,3 +2504,34 @@
   (c-name "GtkCTreeNode")
   (gtype-id "GTK_TYPE_CTREE_NODE")
 )
+
+;HN;
+(define-object GtkBindingSet
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkBindingSet")
+)
+
+(define-object GtkFileInfo
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkFileInfo")
+)
+
+(define-object GtkFileSystem
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkFileSystem")
+)
+
+(define-object GtkFileFolder
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkFileFolder")
+)
+
+(define-object TreePath
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkTreePath")
+)

@@ -1,28 +1,42 @@
 structure Gtk  = struct
     
     type cptr = GObject.cptr
-    type icon_size = int
-    val get_icon_size_ : int ref * int ref * int ref * int ref * int ref 
-		       * int ref * int ref
-			 -> unit
-	= _import "mgtk_get_gtk_icon_size" : int ref * int ref * int ref 
-					   * int ref * int ref * int ref 
-					   * int ref
-					     -> unit;
-    val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
-	 ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
-	 ICON_SIZE_DIALOG)
-	= let val (x0, x1, x2, x3, x4, x5, x6)
-		  = (ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0)
-	  in get_icon_size_ (x0, x1, x2, x3, x4, x5, x6)
-	   ; (!x0, !x1, !x2, !x3, !x4, !x5, !x6)
-	  end
-    val icon_size_lookup_ : int * int ref * int ref -> bool
-	= _import "gtk_icon_size_lookup" : int * int ref * int ref -> bool;
-    val icon_size_lookup : icon_size -> bool * int * int
-	= fn size => let val (width, height) = (ref 0, ref 0)
-			 val ret = icon_size_lookup_ (size, width, height)
-		     in (ret, !width, !height) end
+    structure Demoted :>
+      sig
+	type icon_size
+	val ICON_SIZE_INVALID : icon_size
+	val ICON_SIZE_MENU : icon_size
+	val ICON_SIZE_SMALL_TOOLBAR : icon_size
+	val ICON_SIZE_LARGE_TOOLBAR : icon_size
+	val ICON_SIZE_BUTTON : icon_size
+	val ICON_SIZE_DND : icon_size
+	val ICON_SIZE_DIALOG : icon_size
+	val icon_size_lookup : icon_size -> bool * int * int
+      end = struct
+	type cptr = GObject.cptr
+	type icon_size = int
+	val get_icon_size_ : int ref * int ref * int ref * int ref * int ref 
+			   * int ref * int ref
+			     -> unit
+	    = _import "mgtk_get_gtk_icon_size" : int ref * int ref * int ref 
+					       * int ref * int ref * int ref 
+					       * int ref
+						 -> unit;
+	val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
+	     ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
+	     ICON_SIZE_DIALOG)
+	    = let val (x0, x1, x2, x3, x4, x5, x6)
+		      = (ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0)
+	      in get_icon_size_ (x0, x1, x2, x3, x4, x5, x6)
+	       ; (!x0, !x1, !x2, !x3, !x4, !x5, !x6)
+	      end
+	val icon_size_lookup_ : int * int ref * int ref -> bool
+	    = _import "gtk_icon_size_lookup" : int * int ref * int ref -> bool;
+	val icon_size_lookup : icon_size -> bool * int * int
+	    = fn size => let val (width, height) = (ref 0, ref 0)
+			     val ret = icon_size_lookup_ (size, width, height)
+			 in (ret, !width, !height) end
+    end
     structure Object :>
       sig
 	type base
@@ -347,15 +361,18 @@ end
 
 
 /* *** Gtk *** */
+
+
+/* *** Demoted *** */
 /* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
-  *x6 = GTK_ICON_SIZE_DIALOG;
-  *x5 = GTK_ICON_SIZE_DND;
-  *x4 = GTK_ICON_SIZE_BUTTON;
-  *x3 = GTK_ICON_SIZE_LARGE_TOOLBAR;
-  *x2 = GTK_ICON_SIZE_SMALL_TOOLBAR;
-  *x1 = GTK_ICON_SIZE_MENU;
-  *x0 = GTK_ICON_SIZE_INVALID;
+    *x6 = GTK_ICON_SIZE_DIALOG;
+    *x5 = GTK_ICON_SIZE_DND;
+    *x4 = GTK_ICON_SIZE_BUTTON;
+    *x3 = GTK_ICON_SIZE_LARGE_TOOLBAR;
+    *x2 = GTK_ICON_SIZE_SMALL_TOOLBAR;
+    *x1 = GTK_ICON_SIZE_MENU;
+    *x0 = GTK_ICON_SIZE_INVALID;
 }
 
 

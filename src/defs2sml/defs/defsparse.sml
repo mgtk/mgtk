@@ -212,6 +212,8 @@ structure DefsParse :> DEFSPARSE = struct
 	       >> (fn (p,a) => ("none", case a of SOME p => p | NONE => p, []))
     val properties = repeat1 prop >> op::
 
+    exception Skip
+
     val truth = &"#t" |> true || &"#f" |> false
     val funAttrib = (* too liberal since it is used for all func things *)
         (   parens ("c-name" &-- word)              >> CName
@@ -243,7 +245,7 @@ structure DefsParse :> DEFSPARSE = struct
     val property = parens ("define-property" &-- word 
                            -- repeat0 (parens (word -- word)))
 
-    val definitions = repeat1 (  function >> SOME || method >> SOME 
+    val definitions = repeat1 (  function >> SOME || method >> SOME
                               || object   >> SOME || boxed >> SOME
                               || enum     >> SOME || signal >> SOME
                               || property |> NONE
