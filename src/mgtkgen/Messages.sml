@@ -19,9 +19,9 @@ struct
     val text_length = 74
     fun pad string = StringCvt.padRight #" " text_length string
     fun say stream string = TextIO.output(stream, string ^ "\n")
-    fun print AST.C stream string = say stream ("/* " ^ pad string ^ "*/")
-      | print AST.SIG stream string = say stream ("(* " ^ pad string ^ "*)")
-      | print AST.SML stream string = say stream ("(* " ^ pad string ^ "*)")
+    fun print State.C stream string = say stream ("/* " ^ pad string ^ "*/")
+      | print State.SIG stream string = say stream ("(* " ^ pad string ^ "*)")
+      | print State.SML stream string = say stream ("(* " ^ pad string ^ "*)")
 
     fun showCommandLine () = 
 	WSeq.flatten (WSeq.prsep (WSeq.$" ") (fn s => WSeq.$s) (getArguments()))

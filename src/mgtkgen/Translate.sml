@@ -656,7 +656,7 @@ struct
 	   in  mkValDecl' ($"connect_" && TI.MLSignalName signal, 
 			   TI.mkMLType(mlConnectType (name, cbType)),
 			   SOME($$["fn wid => fn cb => ", cnc_func,
-				   " wid \"", A.signalOf signal, "\" cb"]))
+				   " wid \""] && TI.CSignalName signal && $"\" cb"))
 	   end
       | mkMLStrdecl (A.BOXED_DECL(pos, name, _)) =
 	   mkMLBoxedVal name
@@ -667,9 +667,9 @@ struct
     *)
     fun translate os target decls =
 	let val t = case target of
-	               A.C => mkCdecl
-                     | A.SIG => mkMLSigdecl
-                     | A.SML => mkMLStrdecl
+	               State.C => mkCdecl
+                     | State.SIG => mkMLSigdecl
+                     | State.SML => mkMLStrdecl
 	    fun trans d = (t d) 
 		          handle exn => 
 			      ( U.explain (U.extend exn (A.nameOf d))

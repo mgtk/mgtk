@@ -43,10 +43,10 @@ struct
 	(Util.stringSep "[" "]" " * " (toString o #1) args) ^ " -> " ^ toString res
       | toString (OPTION texp) = toString texp ^ " option"
       | toString (OUTPUT texp) = toString texp ^ " output"
-      | toString (FLAG ((path,name),false)) = NU.nameToString(path,name) ^ " flag"
-      | toString (FLAG ((path,name),true)) =  NU.nameToString(path,name) ^ " enum"
-      | toString (POINTER ((path,boxed),inherits)) = NU.nameToString(path,boxed)
-      | toString (WIDGET ((path,name),parent)) = NU.nameToString(path,name) ^ " widget"
+      | toString (FLAG (name,false)) = NU.combine "_" name ^ " flag"
+      | toString (FLAG (name,true)) =  NU.combine "_" name ^ " enum"
+      | toString (POINTER (name,inherits)) = NU.combine "_" name ^ " boxed"
+      | toString (WIDGET (name,parent)) = NU.combine "" name ^ " widget"
       | toString (LIST texp) = toString texp ^ " list"
 
     fun widgetOf (tExp as WIDGET _) = toString tExp

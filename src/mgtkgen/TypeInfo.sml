@@ -95,6 +95,7 @@ new *)
               | _ => U.shouldntHappen "Not a signal"
         end
 
+    fun CSignalName (path,base) = prmap $ (path@base)
 
     (* 5 is this is the largest X, such that Dynlib.appX exists *)
     fun fitsDynApp params = List.length params <= 5

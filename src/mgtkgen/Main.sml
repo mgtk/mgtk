@@ -18,7 +18,6 @@ val headFile: string option ref = ref NONE
 val footFile: string option ref = ref NONE
 val insertEnd: bool ref = ref false
 val verbose : bool ref = ref false
-val target = ref AST.C
 
 fun copyStream os is =TextIO.output (os, TextIO.inputAll is)
 
@@ -56,10 +55,10 @@ fun insertFoot (outstream, file) =
 		else ()
 
 fun translate (outstream, decls) =
-    Translate.translate outstream (!target) decls
+    Translate.translate outstream (!State.target) decls
 
 fun message (outstream, func) =
-    func (!target) outstream
+    func (!State.target) outstream
 
 fun chat msg =
     if !verbose then say (msg)
@@ -70,17 +69,17 @@ fun phase (msg, func) = (chat msg; func ())
 (* auxillary functions used in ArgParse.parse below *)
 fun generateStructure () = 
     ( chat "  generating ML structure\n"
-    ; target := AST.SML
+    ; State.target := State.SML
     ; insertEnd := true
     ; headFile := SOME("header.sml"))
 fun generateSignature () = 
     ( chat "  generating ML signature\n"
-    ; target := AST.SIG
+    ; State.target := State.SIG
     ; insertEnd := true
     ; headFile := SOME("header.sig"))
 fun generateC ()         = 
     ( chat "  generating C code\n"
-    ; target := AST.C
+    ; State.target := State.C
     ; headFile := SOME("header.c"))
 fun setVerbose ()        = verbose := true
 fun outputFile fName     = 
@@ -116,10 +115,10 @@ fun showVersion () =
 fun showFunctionality () =
     ( say ("functionality: ")
     ; case !headFile of SOME fName => say(fName ^ "+") | NONE => ()
-    ; case !target of
-         AST.SML => say ("toSML(")
-       | AST.SIG => say ("toSIG(")
-       | AST.C   => say ("toC(")
+    ; case !State.target of
+         State.SML => say ("toSML(")
+       | State.SIG => say ("toSIG(")
+       | State.C   => say ("toC(")
     ; say (!inFile ^ ")")
     ; case !footFile of SOME fName => say("+" ^ fName) | NONE => ()
     ; say (" -> ")

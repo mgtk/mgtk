@@ -18,6 +18,9 @@ old*)
     val toLower = (String.map Char.toLower)
     val toUpper = (String.map Char.toUpper)
 
+    fun combine sep (path,base) = 
+	Util.stringSep "" "" sep (fn s => s) (path@base)
+
     open WSeq
     val toLower' = $ o toLower o flatten
     val toUpper' = $ o toUpper o flatten
@@ -58,9 +61,5 @@ old*)
 	    val word' = split word []
 	in  implode word'
 	end
-
-    fun id x = x
-    fun nameToString (path,base) = 
-	Util.stringSep "" (Util.stringSep "." "" "." id base) "." id path
 
 end (* structure NameUtil *)

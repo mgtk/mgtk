@@ -9,14 +9,13 @@
 structure AST :> AST =
 struct
 
-    type tname = TypeExp.tname
-    type texp = TypeExp.texp
+    (* Convenience *)
+    structure TE = TypeExp
+    structure NU = NameUtil
 
-    type name = NameUtil.name
+    type texp = TE.texp
+    type name = NU.name
 
-    datatype target = SIG | SML | C
-
-    type constructor = name
     type parameter = texp * string
 
     type pos = int * int
@@ -27,7 +26,7 @@ struct
 	MODULE_DECL of pos * bool (* explicit? *) * string list
       | OBJECT_DECL of pos * texp * (parameter list option)
       | FUNCTION_DECL of pos * name * funtype
-      | FLAGS_DECL of pos * texp * constructor list
+      | FLAGS_DECL of pos * texp * name list
       | BOXED_DECL of pos * texp * string list
       | SIGNAL_DECL of pos * texp * name * texp option
 
@@ -43,14 +42,13 @@ struct
     fun isSignal (SIGNAL_DECL _) = true
       | isSignal _ = false
 
-    fun signalOf (path,base) = Util.stringSep "" "" "" (fn s=>s) (path@base)
-
-    fun nameOf (MODULE_DECL (_,_,path)) = Util.stringSep "" "" "." (fn s=>s) path
-      | nameOf (OBJECT_DECL (_, obj, _)) = TypeExp.widgetOf obj
-      | nameOf (FUNCTION_DECL (_, funname, _)) = NameUtil.nameToString funname
-      | nameOf (FLAGS_DECL (_, flag, _)) = TypeExp.flagOf flag
-      | nameOf (BOXED_DECL (_, pointer, _)) = TypeExp.boxedOf pointer
-      | nameOf (SIGNAL_DECL (_, widget, signal, _)) = signalOf signal
+    fun combine' sep = Util.stringSep "" "" sep (fn s=>s)
+    fun nameOf (MODULE_DECL (_,_,path)) = combine' "." path
+      | nameOf (OBJECT_DECL (_, obj, _)) = TE.widgetOf obj
+      | nameOf (FUNCTION_DECL (_, funname, _)) = NU.combine "_" funname
+      | nameOf (FLAGS_DECL (_, flag, _)) = TE.flagOf flag
+      | nameOf (BOXED_DECL (_, pointer, _)) = TE.boxedOf pointer
+      | nameOf (SIGNAL_DECL (_, widget, signal, _)) = NU.combine "" signal
 
     fun typeOf (MODULE_DECL _) = "module"
       | typeOf (OBJECT_DECL _) = "object"
@@ -79,7 +77,7 @@ struct
 	fun equal_pair eq ((x1,y1),(x2,y2)) = eq (x1,y1) andalso eq (y1,y2)
 
 	fun equal_par ((typExp1, name1), (typExp2, name2)) = 
-	    TypeExp.equal_texp (typExp1, typExp2) andalso name1 = name2
+	    TE.equal_texp (typExp1, typExp2) andalso name1 = name2
 	fun equal_pars (pars1, pars2) = equal_list equal_par (pars1, pars2)
 	fun equal_pars_opt (pars1, pars2) = 
 	    equal_opt (equal_list equal_par) (pars1, pars2)
@@ -88,19 +86,19 @@ struct
 	fun equal (MODULE_DECL (_,exp1,path1), MODULE_DECL(_,exp2,path2)) =
 	    exp1=exp2 andalso equal_list (op=) (path1,path2)
 	  | equal (OBJECT_DECL(_,wid1,fields1), OBJECT_DECL(_,wid2,fields2)) =
-	    TypeExp.equal_texp (wid1,wid2) andalso equal_pars_opt (fields1,fields2)
+	    TE.equal_texp (wid1,wid2) andalso equal_pars_opt (fields1,fields2)
 	  | equal (FUNCTION_DECL(_,name1,funtype1), FUNCTION_DECL(_,name2,funtype2)) =
-	    TypeExp.equal_name (name1,name2) andalso equal_funtype (funtype1, funtype2)
+	    TE.equal_name (name1,name2) andalso equal_funtype (funtype1, funtype2)
 	  | equal (FLAGS_DECL(_,flag1,cons1), FLAGS_DECL(_,flag2,cons2)) =
-	    TypeExp.equal_texp (flag1,flag2) andalso equal_list (op =) (cons1,cons2)
+	    TE.equal_texp (flag1,flag2) andalso equal_list (op =) (cons1,cons2)
 	  | equal (BOXED_DECL(_,typ1,funcs1), BOXED_DECL(_,typ2,funcs2)) =
-	    TypeExp.equal_texp (typ1,typ2) andalso TypeExp.equal_texp (typ1,typ2)
+	    TE.equal_texp (typ1,typ2) andalso TE.equal_texp (typ1,typ2)
 	    andalso equal_list (op =) (funcs1, funcs2)
 	  | equal (SIGNAL_DECL(_,wid1,signal1,cbType1), SIGNAL_DECL(_,wid2,signal2,cbType2)) =
-	    TypeExp.equal_texp (wid1,wid2) andalso TypeExp.equal_name (signal1,signal2) andalso equal_opt TypeExp.equal_texp (cbType1, cbType2)
+	    TE.equal_texp (wid1,wid2) andalso TE.equal_name (signal1,signal2) andalso equal_opt TE.equal_texp (cbType1, cbType2)
 	  | equal _ = false
 	and equal_funtype (FUNTYPE (long1,short1), FUNTYPE(long2,short2)) =
-	    TypeExp.equal_texp (long1,long2) andalso equal_opt TypeExp.equal_texp (short1,short2)
+	    TE.equal_texp (long1,long2) andalso equal_opt TE.equal_texp (short1,short2)
     end (* local *)
 
 

@@ -15,18 +15,35 @@ sig
     val toLower': wseq -> wseq
     val toUpper': wseq -> wseq
 
-    val nameToString: name -> string
+    val combine: string -> name -> string
 
 end
 
 (*
 
+   Type [name] represents names occurring in the input file. All names
+   have been split into their constituent parts by the parser. A name
+   consists of a "path" and a "base". The path specifies in which
+   module hierarchy the name resides. The base is a list of words
+   making up the name.
+
    [separate_words sep s] constructs a string from s such that words
-   (delimited by upper case letter; a word can consist of all caps)
-   are separated by sep. The returned string is all lower case.
+   in s are separated by sep. New words a begun with an upper case
+   letter; even though a word can consist of entirely upper case
+   letters. As special Gtk+ feature words with only one upper case
+   letter are not considered single words. Examples
+
+   - separate_words sep "GtkWidgetType" => "Gtk" sep "Widget" sep "Type"
+   - separate_words sep "GtkGCType"     => "Gtk" sep "GC" sep "Type"
+   - separate_words sep "GtkCList"      => "Gtk" sep "CList"
 
    [toLower s] converts s to all lower case.
-
    [toUpper s] converts s to all upper case.
+
+   [toLower' wseq] converts the sequence wseq to all lower case.
+   [toUpper wseq] converts the sequence wseq to all lower case.
+
+   [combine sep n] converts the name (a path and a base) to a string
+   by separating the parts with sep.
 
 *)

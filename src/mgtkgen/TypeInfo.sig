@@ -47,6 +47,8 @@ sig
     val CBoxedName:  texp -> wseq
     val CFlagName:   texp -> wseq
 
+    val CSignalName: name -> wseq
+
     val CFunName: name -> wseq
     val CFunNameWithoutOpt: name -> wseq
     val CConstrName: name -> wseq

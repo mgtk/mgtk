@@ -7,11 +7,8 @@ sig
     type texp = TypeExp.texp
     type name = NameUtil.name
 
-    datatype target = SIG | SML | C
-
     type pos = int * int
 
-    type constructor = name
     type parameter = texp * string
 
     datatype funtype =
@@ -21,7 +18,7 @@ sig
 	MODULE_DECL of pos * bool (* explicit? *) * string list
       | OBJECT_DECL of pos * texp * (parameter list option)
       | FUNCTION_DECL of pos * name * funtype
-      | FLAGS_DECL of pos * texp * constructor list
+      | FLAGS_DECL of pos * texp * name list
       | BOXED_DECL of pos * texp * string list (* ref/unref function names *)
       | SIGNAL_DECL of pos * texp * name * texp option
 
@@ -33,7 +30,6 @@ sig
     val isSignal: declaration -> bool
 
     val nameOf: declaration -> string
-    val signalOf: name -> string
     val typeOf: declaration -> string
     val posOf: declaration -> pos
 
@@ -45,33 +41,26 @@ end
 
 (*
 
-   Type [target] is a type for making it possible to make target
-   specific functions. It has the obvious interpretation.
+   Type [declaration] (and it's auxiallary types [parameter] and
+   [funtype]) is the type of declarations in the .defs file. Type
+   [parameter] specifies parameters (function arguments and fields of
+   widgets). A parameter consists of a type expression and a
+   name. Type [funtype] specifies function types; the optional part is
+   included if the function takes arguments with defaults.
 
-   Type [texp] is the type of values returned by the parser
-   for parts of the .defs file corresponding to types.
-
-   Type [declaration] (and it's auxiallary types [constructor] and
-   [parameter]) is the type of declarations in the .defs file.
-
-   [typeClass typExp] returns a string explaining the ``kind'' of the
-   type expression typExp.
-
-   [toString texp] returns a string representation of the type
-   expression texp.
+   Type [pos] represents positions in the input file; use
+   Util.extractSource to extract the referenced part.
 
    [isXXX decl] returns true if decl is an XXX, where XXX can be
-   Widget, Function, Enum, Boxed, or Signal.
-
-   [posOf decl] returns the position of the declaration in the .defs
-   file.
+   Widget, Function, Enum, Flags, Boxed, or Signal.
 
    [nameOf decl] returns the name of the object being declared by the
    declaration decl.
 
-   [signalOf signal] returns the Gtk-signal part of the signal signal.
-
    [typeOf decl] returns a string describing the type of declaration.
+
+   [posOf decl] returns the position of the declaration in the .defs
+   file.
 
    [equal (decl1, decl2)] returns true if the two declarations decl1
    and decl2 are identical; false otherwise.
@@ -80,7 +69,8 @@ end
    name they declare.
 
    [declOrder (decl1, decl2)] compare decl1 and decl2 based on the
-   type of declaration (objects < functions < signals < enums < boxeds)
+   type of declaration 
+        (objects < functions < signals < enums/flags < boxeds)
    and the name being declared.
 
 *)
