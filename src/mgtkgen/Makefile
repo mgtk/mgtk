@@ -8,13 +8,15 @@ OBJS=Combinators.uo Stream.uo WSeq.uo Util.uo NameUtil.uo \
      ArgParse.uo Messages.uo Main.uo
 PROG=mgtkgen
 
+SUBDIRS=regression tools
+
 all: $(PROG)
 
 $(PROG): $(OBJS)
-	$(MOSMLC) -g -o $(PROG) Main.uo
+	$(MOSMLC) -o $(PROG) Main.uo
 
 test: $(PROG)
-	cd regression && $(MAKE)
+	cd regression && $(MAKE) fresh
 
 clean:
 	$(REMOVE) *~
@@ -22,7 +24,11 @@ clean:
 	$(REMOVE) Makefile.bak
 
 realclean: clean
-	cd regression && $(MAKE) clean
+	@dirs='$(SUBDIRS)'; for dir in $$dirs; do \
+	   cd $$dir; \
+	   $(MAKE) realclean; \
+           cd ..; \
+        done
 
 depend: 
 	$(REMOVE) Makefile.bak

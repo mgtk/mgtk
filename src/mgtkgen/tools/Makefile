@@ -23,6 +23,8 @@ clean:
 	$(REMOVE) $(TOOLS)
 	$(REMOVE) Makefile.bak
 
+realclean: clean
+
 depend: 
 	$(REMOVE) Makefile.bak
 	$(MOVE) Makefile Makefile.bak

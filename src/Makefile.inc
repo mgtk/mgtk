@@ -3,6 +3,9 @@
 # (taken from Makefile.inc for Moscow ML)
 
 
+# Toplevel directory of unpacked distribution
+TOPDIR=${HOME}/mgtk
+
 # Where to install stuff
 MGTKHOME=${HOME}/mgtk
 
@@ -32,7 +35,6 @@ SHELL=/bin/sh
 
 # ---------- You shouldn't need to edit below this line ------------
 
-TOPDIR=..
 BINDIR=$(TOPDIR)/bin
 LIBDIR=$(TOPDIR)/src
 

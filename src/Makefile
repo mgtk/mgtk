@@ -16,6 +16,7 @@ MGTKOBJS=Gtk.ui Gtk.uo mgtk.so
 CFILES=mgtk.c
 COBJS=mgtk.o
 
+SUBDIRS=mgtkgen
 
 all: mgtkobjs
 
@@ -40,5 +41,12 @@ clean:
 	$(REMOVE) *.o *.so
 	$(REMOVE) Makefile.bak
 
-realclean: clean
+gtkclean: clean
 	$(REMOVE) Gtk.sig Gtk.sml mgtk.c
+
+realclean: gtkclean
+	@dirs='$(SUBDIRS)'; for dir in $$dirs; do \
+	   cd $$dir; \
+	   $(MAKE) realclean; \
+           cd ..; \
+        done
