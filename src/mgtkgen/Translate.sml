@@ -300,7 +300,7 @@ struct
                        && Nl && Nl
 	in  primval && funcval
 	end
-      | mkMLFunValSusp short _ =
+      | mkMLFunVal short _ =
 	raise Fail("mkMLFunVal: not a function type")
 
     fun mkMLFunValSusp short (funname,typ as (TE.ARROW(pars',outPars,_,retTyp'))) =
