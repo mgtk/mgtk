@@ -1,0 +1,11 @@
+exercises.tex
+answers.tex
+*.aux
+*.log
+*.dvi
+*.bbl
+*.blg
+*.ps
+*.idx
+*.ind
+*.ilg
