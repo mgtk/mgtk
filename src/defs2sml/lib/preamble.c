@@ -90,25 +90,6 @@ static inline long length(value xs) {
   return sum;  
 }
 
-/*
-static inline T* Array_val (value list, T (*conv_val)(value)) {
-  if (!IsCons(list)) {
-    return NULL;
-  } else {
-    int i = 0;
-    T* res = (T*) malloc(sizeof(T) * length(list));
-    Push_roots(tmp, 1);
-      tmp[0] = list;
-      while (IsCons(tmp[0])) {
-	res[i++] = conv_val(Head(tmp[0]));
-        tmp[0] = Tail(tmp[0]);
-      }
-    Pop_roots();
-    return res;
-  }
-}
-*/
-
 #define list_to_array(T, result, conv_val, list) {                        \
   if (!IsCons(list)) {                                                    \
     (result) = NULL;                                                      \
@@ -206,7 +187,9 @@ EXTERNML value mgtk_main_quit(value dummy) { /* ML */
 
 /* ML type: unit -> unit */
 EXTERNML value mgtk_get_null(value dummy) { /* ML */
-  return (value) NULL;
+  value res = alloc(1, Abstract_tag);
+  Field(res,1) = NULL;
+  return res;
 }
 
 

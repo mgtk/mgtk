@@ -85,6 +85,7 @@ struct
 		  | Float f => Real.toString f
 		  | Cast(t,e) => "(" ^ showTy t ^ ") " ^ showExp e
 		  | VerbExp e => e
+		  | Call("",cast,[arg]) => showExp arg
 		  | Call(f,cast,args) => 
 		       f ^ Util.stringSep "(" ")" ", " showExp args
 	    fun showDecl (VDecl(x,ty,e)) =
