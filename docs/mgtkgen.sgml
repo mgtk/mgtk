@@ -131,7 +131,7 @@ The options have the following meanings:
 
   <varlistentry><term><option>-end</option></term>
     <listitem><para>
-        Inserts <syntax>end</syntax> as the footer. This is implied by
+        Inserts <literal>end</literal> as the footer. This is implied by
         <option>-sig</option> and <option>-sml</option> above to end
         the signature/structure declaration.
     </para></listitem>
@@ -243,7 +243,7 @@ here
 <para>
 The specification of signals is not standard; all other grammar rules
 are induced from the <filename>gtk.defs</filename> file in the
-<system>PyGtk</system> distribution. However, <system>PyGtk</system>
+<literal>PyGtk</literal> distribution. However, <literal>PyGtk</literal>
 does not specify signals, and consequently a declaration in the style
 of the remaining declarations was added.
 </para>
@@ -269,11 +269,11 @@ gtk.defs file.
 The .defs file contains
 
   <programlisting role="Scheme">
+
     (define-object GtkDialog (GtkWindow)
        (fields
           (GtkVBox vbox)
-          (GtkHBox action_area)))
-  </programlisting>
+          (GtkHBox action_area)))</programlisting>
 </para>
 
 <para>
@@ -291,29 +291,30 @@ The corresponding generated code is
 
 <listitem><para><filename>.c</filename>
   <programlisting role="C">
+
     /* *** Dialog stuff *** */
 
     /* ML type: gtkobj -> gtkobj */
     value mgtk_dialog_get_vbox(value wid) { /* ML */
       return Val_GtkObj((GTK_DIALOG(GtkObj_val(wid))) -> vbox);
-    }
-  </programlisting>
+    }</programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sig</filename>
   <programlisting role="SML">
+
     (* *** Dialog *** *)
 
     type 'a dialog_t
     type 'a GtkDialog = 'a dialog_t GtkWindow
 
     val dialog_get_vbox: 'a GtkDialog -> base GtkVBox
-    ...
-  </programlisting>
+    ...</programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sml</filename>
   <programlisting role="SML">
+
     (* *** Dialog *** *)
 
     type 'a dialog_t = base
@@ -324,8 +325,7 @@ The corresponding generated code is
     val dialog_get_vbox: 'a GtkDialog -> base GtkVBox
         = fn OBJ wid => OBJ(dialog_get_vbox_ wid)
 
-    ...
-  </programlisting>
+    ... </programlisting>
 </para></listitem>
 
 </itemizedlist>
@@ -339,17 +339,17 @@ The corresponding generated code is
 <para>
 The <filename>.defs</filename> file contains
   <programlisting role="Scheme">
+
     (define-func gtk_frame_new
        GtkFrame
-       ((string label (null-ok))))
-  </programlisting>
+       ((string label (null-ok)))) </programlisting>
 and
   <programlisting role="Scheme">
+
     (define-func gtk_label_get
        none
        ((GtkLabel label)
-        (string str (output))))
-  </programlisting>
+        (string str (output)))) </programlisting>
 </para>
 
 <para>
@@ -359,6 +359,7 @@ The corresponding generated code is
 
 <listitem><para><filename>.c</filename>
   <programlisting role="C">
+
     /* ML type: string option -> gtkobj */
     value mgtk_frame_new(value label) { /* ML */
       return Val_GtkObj(gtk_frame_new(StringOption_nullok(label)));
@@ -367,32 +368,32 @@ The corresponding generated code is
     /* ML type: unit -> gtkobj */
     value mgtk_frame_new_short() { /* ML */
       return Val_GtkObj(gtk_frame_new(NULL));
-    }
-  </programlisting>
+    }</programlisting>
 and
   <programlisting role="C">
+
     /* ML type: gtkobj -> string */
     value mgtk_label_get(value label) { /* ML */
       char* resstr;
-      gtk_label_get(GtkObj_val(label), &resstr);
+      gtk_label_get(GtkObj_val(label), &amp;resstr);
       return copy_string(resstr);
-    }
-  </programlisting>
+    }</programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sig</filename>
   <programlisting role="SML">
+
     val frame_new: string option -> base GtkFrame
-    val frame_new': unit -> base GtkFrame
-  </programlisting>
+    val frame_new': unit -> base GtkFrame</programlisting>
 and
   <programlisting role="SML">
-    val label_get: 'a GtkLabel -> string
-  </programlisting>
+
+    val label_get: 'a GtkLabel -> string</programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sml</filename>
   <programlisting role="SML">
+
     val frame_new_: string option -> gtkobj
         = app1(symb"mgtk_frame_new")
     val frame_new: string option -> base GtkFrame
@@ -401,15 +402,14 @@ and
     val frame_new'_: unit -> gtkobj
         = app1(symb"mgtk_frame_new_short")
     val frame_new': unit -> base GtkFrame
-        = fn label => OBJ(frame_new'_ label)
-  </programlisting>
+        = fn label => OBJ(frame_new'_ label)</programlisting>
 and
   <programlisting role="SML">
+
     val label_get_: gtkobj -> string
         = app1(symb"mgtk_label_get")
     val label_get: 'a GtkLabel -> string
-        = fn OBJ label => label_get_ label
-  </programlisting>
+        = fn OBJ label => label_get_ label</programlisting>
 </para></listitem>
 
 </itemizedlist>
@@ -422,12 +422,12 @@ and
 <para>
 The <filename>.defs</filename> file contains
   <programlisting role="Scheme">
+
     (define-enum GtkArrowType
        (up GTK_ARROW_UP)
        (down GTK_ARROW_DOWN)
        (left GTK_ARROW_LEFT)
-       (right GTK_ARROW_RIGHT))
-  </programlisting>
+       (right GTK_ARROW_RIGHT))</programlisting>
 </para>
 
 <para>
@@ -445,6 +445,7 @@ The corresponding generated code is
 
 <listitem><para><filename>.c</filename>
   <programlisting role="C">
+
     /* ML type: unit -> int * int * int * int */
     value mgtk_get_arrow_type (value dummy) { /* ML */
       value res = alloc_tuple(4);
@@ -453,28 +454,27 @@ The corresponding generated code is
       Field(res,2) = Val_int(GTK_ARROW_LEFT);
       Field(res,3) = Val_int(GTK_ARROW_RIGHT);
       return res;
-    }
-  </programlisting>
+    } </programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sig</filename>
   <programlisting role="SML">
+
     type arrow_type
     val ARROW_UP: arrow_type
     val ARROW_DOWN: arrow_type
     val ARROW_LEFT: arrow_type
-    val ARROW_RIGHT: arrow_type
-  </programlisting>
+    val ARROW_RIGHT: arrow_type </programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sml</filename>
   <programlisting role="SML">
+
     type arrow_type = int
     val get_arrow_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_arrow_type")
     val (ARROW_UP,ARROW_DOWN,ARROW_LEFT,ARROW_RIGHT)
-        = get_arrow_type_ ()
-  </programlisting>
+        = get_arrow_type_ () </programlisting>
 </para></listitem>
 
 </itemizedlist>
@@ -487,10 +487,10 @@ The corresponding generated code is
 <para>
 The <filename>.defs</filename> file contains
   <programlisting role="Scheme" format=linespecific>
+
     (define-boxed GdkFont
        gdk_font_ref
-       gdk_font_unref)
-  </programlisting>
+       gdk_font_unref)</programlisting>
 </para>
 
 <para>
@@ -504,6 +504,7 @@ The corresponding generated code is
   below). Being a boxed type, we have to remember to increase/decrease
   reference counts with the supplied functions.
   <programlisting role="C">
+
     #define GdkFont_val(x) ((void*) Field(x, 1))
 
     static void ml_finalize_gdk_font (value val) {
@@ -516,20 +517,19 @@ The corresponding generated code is
       res = alloc_final (2, ml_finalize_gdk_font, 0, 1);
       GdkFont_val(res) = (value) obj ;
       return res;
-    }
-  </programlisting>
+    } </programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sig</filename>
   <programlisting role="SML">
-    type gdk_font
-  </programlisting>
+
+    type gdk_font </programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sml</filename>
   <programlisting role="SML">
-    prim_type gdk_font
-  </programlisting>
+
+    prim_type gdk_font </programlisting>
 </para></listitem>
 
 </itemizedlist>
@@ -546,8 +546,8 @@ The corresponding generated code is
 <para>
 The <filename>.defs</filename> file contains
 <programlisting role="Scheme">
-    (define-signal GtkButton "clicked")
-</programlisting>
+
+    (define-signal GtkButton "clicked")</programlisting>
 </para>
 
 <para>
@@ -563,16 +563,15 @@ The corresponding generated code is
 
 <listitem><para><filename>.sig</filename>
   <programlisting role="SML">
-    val connect_clicked: 'a GtkButton -> (unit -> unit) -> unit
-  </programlisting>
+
+    val connect_clicked: 'a GtkButton -> (unit -> unit) -> unit </programlisting>
 </para></listitem>
 
 <listitem><para><filename>.sml</filename>
   <programlisting role="SML">
 
     val connect_clicked: 'a GtkButton -> (unit -> unit) -> unit
-        = fn wid => fn cb => unit_connect wid "clicked" cb
-  </programlisting>
+        = fn wid => fn cb => unit_connect wid "clicked" cb </programlisting>
 </para></listitem>
 
 </itemizedlist>
