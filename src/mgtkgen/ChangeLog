@@ -1,6 +1,10 @@
-2001-03-22  Ken Friis Larsen  <kfl@church.al.cl.cam.ac.uk>
+2001-03-23  Ken Friis Larsen  <kfl@it.edu>
 
-	* Translate.sml (Repository): Removed the XXX_val_nocast macro
+	* Translate.sml: Use the new signal infrastructure 
+
+2001-03-22  Ken Friis Larsen  <kfl@it.edu>
+
+	* Translate.sml: Removed the XXX_val_nocast macro
 	definition.
 
 2000-07-21  Henning Niss  <hniss@diku.dk>
