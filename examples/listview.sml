@@ -54,9 +54,8 @@ fun setUpGui() =
             let fun loop i = 
                     if i < n then 
                         let val iter = ListStore.append store 
-                        in  ListStore.set_value store iter 
-                                                [ "Point "^Int.toString i
-                                                , "Distance "^Int.toString(4-i)]
+                        in  ListStore.set_value store iter 0 ("Point "^Int.toString i)
+                          ; ListStore.set_value store iter 1 ("Distance "^Int.toString(4-i))
                         end
                     else ()
             in loop 0
