@@ -1,5 +1,7 @@
 local open Gtk in
 
+fun uncurry f (x,y) = f x y
+
 fun delete_event _ = ( GtkBasis.main_quit()
 		     ; true
                      )
@@ -46,21 +48,23 @@ fun makeMenubar agrp say =
     end
 
 fun getFile () =
-   (* let val dialog = FileChooserDialog.new "Open File" NONE
+    let val dialog = FileChooserDialog.new "Open File" NONE
                                            FILE_CHOOSER_ACTION_OPEN
-                                           [("gtk-cancel", RESPONSE_CANCEL) ,
-				            ("gtk-open", RESPONSE_ACCEPT)]
-                                          
+					   NONE
+        val _ = map (uncurry (Dialog.add_button dialog))
+                    [ ("gtk-cancel", RESPONSE_CANCEL)
+                    , ("gtk-open"  , RESPONSE_ACCEPT)
+                    ]
+(*
+	val _ = Signal.connect dialog (Dialog.response_sig (fn _ => Widget.destroy dialog))
+*)
         val response = Dialog.run dialog  
     in  if response = RESPONSE_ACCEPT then 
             let val chooser = FileChooserDialog.asFileChooser dialog
-            in  FileChooser.get_filename chooser
+            in  SOME(FileChooser.get_filename chooser)
             end
         else NONE
     end
-    *)
-   SOME "foobar.txt"
-
 
 fun setUpGui() = 
     let val w = let val w = Window.new' ()
