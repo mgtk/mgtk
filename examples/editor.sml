@@ -6,7 +6,7 @@ fun delete_event _ = ( GtkBasis.main_quit()
 		     ; true
                      )
 
-fun makeMenubar agrp say = 
+fun makeMenubar agrp = 
     let val mb = MenuBar.new()
 
         (* file menu *)
@@ -47,17 +47,20 @@ fun makeMenubar agrp say =
     in  (mb, Signal.connect openItem, Signal.connect closeItem)
     end
 
-fun getFile () =
-    let val dialog = FileChooserDialog.new "Open File" NONE
-                                           FILE_CHOOSER_ACTION_OPEN
-					   NONE
+datatype chooser_kind = OPEN | SAVE 
+
+fun getFile kind =
+    let val (title, action, stock) = 
+            case kind of 
+                OPEN => ("Open File", FILE_CHOOSER_ACTION_OPEN, "gtk-open")
+              | SAVE => ("Save As", FILE_CHOOSER_ACTION_SAVE, "gtk-save-as")
+
+        val dialog = FileChooserDialog.new title NONE action NONE
         val _ = map (uncurry (Dialog.add_button dialog))
                     [ ("gtk-cancel", RESPONSE_CANCEL)
-                    , ("gtk-open"  , RESPONSE_ACCEPT)
+                    , (stock       , RESPONSE_ACCEPT)
                     ]
-(*
-	val _ = Signal.connect dialog (Dialog.response_sig (fn _ => Widget.destroy dialog))
-*)
+
         val result = if Dialog.run dialog =  RESPONSE_ACCEPT then 
                          let val chooser = FileChooserDialog.asFileChooser dialog
                          in  SOME(FileChooser.get_filename chooser)
@@ -84,21 +87,21 @@ fun setUpGui() =
         val menu_context = Statusbar.get_context_id statusbar "Menu bar"
         fun say msg = ignore(Statusbar.push statusbar menu_context msg)
 
-        val (menubar, connectOpen, connectClose) = makeMenubar agrp say
+        val (menubar, connectOpen, connectClose) = makeMenubar agrp
 
         val textView = TextView.new()
 
         fun openAction () =
-            let val filename = getFile()
+            let val filename = getFile OPEN
             in   case filename of
                      NONE => say "No file selected"
-                   | SOME name => 
+                   | SOME filename => 
                      let (* FIXME: check permissions and stuff *)
-                         val dev = TextIO.openIn name
+                         val dev = TextIO.openIn filename
                          val content = TextIO.inputAll dev before TextIO.closeIn dev
                          val buffer = TextView.get_buffer textView
                      in  TextBuffer.set_text buffer content ~1
-                       ; say (Int.toString (TextBuffer.get_line_count buffer) ^ " lines")
+                       ; say (OS.Path.file filename ^ " has " ^ Int.toString (TextBuffer.get_line_count buffer) ^ " lines")
                      end
             end
 
