@@ -9,7 +9,7 @@ What is mGTK?
 -------------
 mGTK is glue code to make GTK+ (the Gimp Toolkit) accessible from SML,
 thereby providing a convenient interface for SML programmers to
-develop visual applications.
+develop applications with a graphical user interface.
 
 For the moment only the Moscow ML compiler is supported. 
 
@@ -19,6 +19,13 @@ Download
 mGTK can be obtained from the mGTK homepage at 
 
      http://www.it.edu/people/kfl/mgtk
+
+
+Current Release
+---------------
+The current release is an alpha release.  It is quite stable, but the
+interface may (will) change, so do not expect that names and types
+will be the same in the next
 
 
 What is Gtk+? 
@@ -46,6 +53,10 @@ Contact information
 If you have comments, bug reports, feature request, or just wants to
 say that that you think that mGTK is cool, then please send an email
 to: mgtk@it.edu
+
+We do not have any mailing lists yet but if you want be sure to be
+informed when the next release of mGTK is ready, then send a mail to
+mgtk@it.edu with subject: mgtk-announce subscribe
 
 
 Helping out
@@ -79,6 +90,7 @@ change to have some influence):
 (3) Should the functions that may fail return an option or should they
     raise an exception.
 
+Or you can look in the CONTRIB file in the distribution.
 
 Authors
 -------
