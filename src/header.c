@@ -13,7 +13,6 @@
 
    . Don't use void* so extensively.  Use the cast functions provided by gtk.
 
-   . Fix mgtk_init
 */
 
 
@@ -39,6 +38,7 @@ value Val_GtkObj (void* obj) {
 
 /* ML type: string vector -> unit */
 value mgtk_init(value args) { /* ML */
+  /* PRECONDITION: Wosize_val(args) > 0 */
   int argc, i;
   char** argv;
 
@@ -46,7 +46,7 @@ value mgtk_init(value args) { /* ML */
   argv = (char**) stat_alloc(sizeof(char*) * argc);
 
   /* Assumes that gtk_init don't changes the strings; if it does we should use
-     copy_string instead of String_val */
+     toCstring instead of String_val */
   for (i=0; i<argc; i++) {
     argv[i] = String_val(Field(args, i)); 
   }
