@@ -34,6 +34,10 @@ helloworld-flat: Gtk.uo helloworld-flat.sml
 helloworld-new: helloworld-new.sml MiniGtk.ui MiniGtk.uo
 	$(MOSMLBIN)/mosmlc -o helloworld-new MiniGtk.ui helloworld-new.sml
 
+buttons-galore: buttons-galore.sml MiniGtk.ui MiniGtk.uo
+	$(MOSMLBIN)/mosmlc -o buttons-galore MiniGtk.ui buttons-galore.sml
+
+
 mosml-interf: mosml-interf.sml MiniGtk.ui MiniGtk.uo
 	$(MOSMLBIN)/mosmlc -o mosml-interf MiniGtk.ui mosml-interf.sml
 
