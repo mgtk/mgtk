@@ -1,3 +1,6 @@
+(* defs2sml --- generate wrapper code from .defs file.                      *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000.                        *)
+
 signature TypeInfo =
 sig
 

@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------
 BUILDING MGTK
 
-Building mGtk is a two phase process. First mgtkgen --- the program
+Building mGtk is a two phase process. First defs2sml --- the program
 that generates the source code from a specification file --- has to be
 built, and then the files constituting the API can be built.
 
@@ -10,7 +10,7 @@ Let ${MGTKHOME} be the directory in which you unpacked mGtk.
 (1) Configure everything by changing ${MGTKHOME}/src/Makefile.inc to
     match your setup.
 
-(2) Building mgtkgen
+(2) Building defs2sml
 
     (a) cd ${MGTKHOME}/src/mgtkgen
 

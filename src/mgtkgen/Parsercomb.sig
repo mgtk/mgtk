@@ -1,3 +1,9 @@
+(* defs2sml --- generate wrapper code from .defs file.                      *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000.                        *)
+(* This code: (c) Fritz Henglein, Ken Larse, Peter Sestoft.                 *)
+(*            Taken from the MosML compiler (directory examples/parsercomb).*)
+(*            Documentation by sestoft@dina.kvl.dk.                         *)
+
 (* Parsercomb -- parser combinators *)
 
 signature Parsercomb =
