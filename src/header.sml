@@ -69,6 +69,15 @@ struct
 	    let val res = List.foldl set 0w0 pos
 	    in  Word.toInt res
 	    end
+
+	(* Checks which flags from possible is set in flag
+           val isSet : flag list -> flag -> flag list *) 
+	fun isSet possible flag =
+	    let val f = W flag
+		fun isIn pos = (f andb (W pos)) <> 0w0
+	    in  List.filter isIn possible
+	    end
+
     end
 
     local
