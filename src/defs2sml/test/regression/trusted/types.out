@@ -17,6 +17,11 @@ structure Gtk  = struct
     val icon_size_register : string -> int -> int -> icon_size
 	= fn name => fn width => fn height =>
 	     icon_size_register_ name width height
+    val accel_groups_activate_ : cptr -> int -> int -> bool
+	= app3 (symb"mgtk_gtk_accel_groups_activate")
+    val accel_groups_activate : 'a GObject.t -> int -> int -> bool
+	= fn object => fn accel_key => fn accel_mods =>
+	     accel_groups_activate_ (repr object) accel_key accel_mods
     signature Settings = sig
 	type base
 	type 'a settings_t
@@ -177,6 +182,11 @@ EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
 /* ML type: string -> int -> int -> int */
 EXTERNML value mgtk_gtk_icon_size_register(value name, value width, value height) { /* ML */
   return Val_int(gtk_icon_size_register(String_val(name), Int_val(width), Int_val(height)));
+}
+
+/* ML type: cptr -> int -> int -> bool */
+EXTERNML value mgtk_gtk_accel_groups_activate(value object, value accel_key, value accel_mods) { /* ML */
+  return Val_bool(gtk_accel_groups_activate(GtkObj_val(object), Int_val(accel_key), Int_val(accel_mods)));
 }
 
 

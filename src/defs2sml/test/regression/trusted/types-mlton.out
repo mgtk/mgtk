@@ -25,6 +25,13 @@ structure Gtk  = struct
     val icon_size_register : string -> int -> int -> icon_size
 	= fn name => fn width => fn height =>
 	     icon_size_register_ (CString.fromString name, width, height)
+    val accel_groups_activate_ : cptr * int * int -> bool
+	= _import "gtk_accel_groups_activate" : cptr * int * int -> bool;
+    val accel_groups_activate : 'a GObject.t -> int -> int -> bool
+	= fn object => fn accel_key => fn accel_mods =>
+	     GObject.withPtr (object, 
+			      fn object => accel_groups_activate_
+					     (object, accel_key, accel_mods))
     signature Settings = sig
 	type base
 	type 'a settings_t

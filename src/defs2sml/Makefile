@@ -70,15 +70,24 @@ regcomp-%: regcompgen-%
 
 regcompile: $(MAIN) $(patsubst %.defs,regcomp-%,$(REGFILES))
 
+trusted:
+	cp $(REGOUT)/*.out $(REGTRS)
 
 # Generate binding
+DEFSOPTS=$(OPTIONS) api/pygtk/gtk.defs > defs.log 2>&1
+DEFSOPTSMOSML=-co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml
+DEFSOPTSMLTON=--mlton -co mgtk-mlton.c -so mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml
+
 mgtk.c mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c
-	./$(MAIN) -co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gtk.defs > defs.log 2>&1
+	./$(MAIN) $(DEFSOPTSMOSML) $(DEFSOPTS)
+
+mgdk.c mgdk.sml: $(MAIN) api/pygtk/gdk.defs api/pygtk/gdk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c
+	./$(MAIN) -co mgdk.c -so mgdk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gdk.defs
 
 mgtk-mlton.c mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
-	./$(MAIN) --mlton -co mgtk-mlton.c -so mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml api/pygtk/gtk.defs 
+	./$(MAIN) $(DEFSOPTSMLTON) $(DEFSOPTS)
 
-compile: $(MAIN) mgtk.c mgtk.sml
+mosml: $(MAIN) mgtk.c mgtk.sml
 	mosmlc -toplevel -liberal -c mgtk.sml
 	gcc $(CINCLUDE) -c mgtk.c
 
@@ -90,9 +99,11 @@ mgtk-mlton.o: mgtk-mlton.c
 	gcc -c -O2 -I$(MLTONINCLUDE) \
 		   `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
 
-mltoncompile: $(MAIN) mgtk-mlton.sml mgtk-mlton.o
+mlton: $(MAIN) mgtk-mlton.sml mgtk-mlton.o
 	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" mgtk-mlton.cm mgtk-mlton.o
 
+
+# Clean-up
 realclean:
 	rm -f mgtk.c mgtk.sml mgtk.o mgtk
 	rm -f mgtk-mlton.c mgtk-mlton.sml mgtk-mlton.o mgtk-mlton

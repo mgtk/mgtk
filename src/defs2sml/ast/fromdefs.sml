@@ -62,6 +62,7 @@ structure FromDefs :> FromDefs = struct
 					    info=SOME(name,parent,implements)})
 		   in  new (insert map md mem) name r end
 	      | Function =>
+		   (
 		   let val md = 
 		       (getConstructor def)
 		       handle AttribNotFound _ => 
@@ -83,11 +84,20 @@ structure FromDefs :> FromDefs = struct
 		       val mem = Member{name=name,
 					info=A.Method(functype NONE rt def)}
 		   in  insert map md mem end
+		       handle AttribNotFound msg => 
+			      ( TextIO.print("Problems ("^msg^") with " ^ name)
+			      ; raise AttribNotFound msg)
+                   )
 	      | Method => 
+                   (
 		   let val md = getObject def
 		       val mem = Member{name=name,
 					info=A.Method(functype (SOME md) NONE def)}
 		   in  insert map md mem end
+		       handle AttribNotFound msg => 
+			      ( TextIO.print("Problems ("^msg^") with " ^ name)
+			      ; raise AttribNotFound msg)
+                   )
 	      | Enum =>
 		   let val md = probableModule (getModule def) Name.separateWords name
 		       val mem = Member{name=name,info=A.Enum(getValues def handle AttribNotFound _ => [])}
