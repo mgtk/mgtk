@@ -49,29 +49,105 @@
 \maketitle
 
 \begin{abstract}
-  We describe \mgtk a stub code library that makes the graphical
-  toolkit \gtk, written in C, accessible for the programming language
-  Standard~ML (\sml).  
+  We describe \mgtk a language binding that makes the graphical
+  toolkit \gtk, written in C, accessible for programs written in the
+  programming language Standard~ML (\sml).  This is not a trivial task
+  because \gtk is based on an object-oriented and \sml is functional
+  language with a non--object-oriented type system.  In this paper we
+  describe how it is possible to encode a single-inheritance
+  class-hierarchy using \sml's type system and we describe how we
+  machine-generate most of the library to utilise the limited
+  man-power of the project.
 \end{abstract}
 
 
-\section{Why Standard ML and GTK+}
 
-\begin{ednote}{KFL}
-  \begin{itemize}
-  \item Hvad og hvorfor: SML  
-  \item Gtk+ er interessant (og C var et godt
+\section{Introduction}
+\label{sec:intr-backgr}
+
+
+
+\subsection{Standard ML and GTK+}
+
+\begin{ednote}{Ken}
+  * Hvad og hvorfor: SML  
+  
+  * Gtk+ er interessant (og C var et godt
     impl. valg)  
-  \item SML er ikke OO (tester Gtk+-folkenes "hypotese")
-\end{itemize}
+  
+  * SML er ikke OO (tester Gtk+-folkenes "hypotese")
 \end{ednote}
 
-Standard ML (SML) is a functional language with imperative features
+Standard ML (\sml) is a functional language with imperative features
 widely used for teaching and in reasearch. 
 
 
 
-\section{Related Work}
+\subsection{Overview of this paper}
+\label{sec:overview-this-paper}
+
+
+
+\section{Encoding of classes}
+\label{sec:encoding-classes}
+
+
+\begin{ednote}{Ken}
+  * Phantom types are inheritance paths.
+
+  * We have one witness type per subtype.
+  
+  * We get upcasts for free.
+  
+  * Use base for plumbing.
+
+  * Only single-inheritance is handled.
+\end{ednote}
+
+
+
+\section{Example}
+\label{sec:example}
+
+\begin{ednote}{}
+  Mini-mgtk and a hello-world example
+\end{ednote}
+
+
+
+\section{Process}
+\label{sec:process}
+
+\begin{ednote}{Henning}
+  Fra mini muck-up til fuld toolkit
+\end{ednote}
+
+
+\subsection{Stubs and code generation}
+\label{sec:stubs-code-gener}
+
+
+
+
+
+\section{Synergy}
+\label{sec:synergy}
+
+\begin{ednote}{Henning}
+  SML + Gtk+ er godt
+\end{ednote}
+
+
+
+\section{Supported \sml compilers}
+\label{sec:supp-sml-comp}
+
+\begin{ednote}{Henning}
+  MLton og Moscow ML (SML.NET med Gtk\#?)
+\end{ednote}
+
+
+\section{Related work}
 \label{sec:related-work}
 
  Brainstorm of related work:
@@ -110,6 +186,8 @@ widely used for teaching and in reasearch.
 In this paper we have demonstrated that is theoretical and practically
 possible to make an interface from SML to GTK.
 
+\bibliographystyle{abbrv}
+\bibliography{mgtk}
 
 \end{document}
 
