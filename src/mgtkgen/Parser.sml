@@ -24,7 +24,7 @@ struct
     (* lexer like definitions *)
     val comment = skipWS (";" $-- (getChars0 (fn c=>not(c= #"\n"))) --$ "\n")
     fun skipComment pf = repeat0 comment #-- skipWS pf
-    fun skipCommentWS pf = skipWS (skipComment pf)
+    fun skipCommentWS pf = skipComment pf
 
     val $ = skipCommentWS o Parsercomb.$
 
