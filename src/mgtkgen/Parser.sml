@@ -57,19 +57,45 @@ struct
     val defSignal = $$ "define-signal"
     val listQual = $$ "list"
 
+    (* name resolution *)
+    local
+	type type_info = string -> AST.texp
+	exception Find
+	val (table: (string, type_info) Polyhash.hash_table) = 
+	    Polyhash.mkPolyTable (*(hash, compare)*) (99, Find)
+	(* insert some primitive types in the symbol table *)
+	val _ = app (fn n => Polyhash.insert table (n,AST.TYPENAME))
+	            ["none","int","uint","float","bool","string",
+		     "static_string", "GtkObject", "GtkWidget",
+		     "GtkGtkType"
+		    ]
+    in  fun insert tName func = Polyhash.insert table (tName, func)
+	fun insertTypeName tName = insert tName AST.TYPENAME
+	fun insertFlag tName = insert tName (fn n => AST.FLAG(n,false))
+	fun insertEnum tName = insert tName (fn n => AST.FLAG(n,true))
+	fun lookup tName =
+	    ((Polyhash.find table tName)
+	     handle Find => Util.notFound("unbound type name: " ^ tName))
+	fun mkTypeExp name = (lookup name) name
+    end
+
     (* construct abstract syntax *)
     fun mkObjectDecl (pos, (((name, inherits), fields))) = 
-	AST.OBJECT_DECL (pos, name,inherits,fields)
+	(insertTypeName name; AST.OBJECT_DECL (pos, name,inherits,fields))
     fun mkFunctionDecl (pos, ((name, typeExp), parameters)) =
-	AST.FUNCTION_DECL (pos, name, typeExp, parameters)
-    fun mkEnumDecl (pos, (enum, cs)) = 
-	AST.ENUM_DECL(pos, enum, cs)
-    fun mkFlagsDecl (pos, (flagName, cs)) = 
-	AST.FLAGS_DECL(pos, AST.LONG([], AST.FLAG flagName), cs)
+	(AST.FUNCTION_DECL (pos, name, typeExp, parameters))
+    fun mkFlagsDecl false (pos, (flagName, cs)) = 
+	( insertFlag flagName
+	; AST.FLAGS_DECL(pos, AST.LONG([], AST.FLAG(flagName, false)), cs)
+        )
+      | mkFlagsDecl true (pos, (flagName, cs)) =
+	( insertEnum flagName
+	; AST.FLAGS_DECL(pos, AST.LONG([], AST.FLAG(flagName, true)), cs)
+        )
     fun mkBoxedDecl (pos, ((name, names), size)) =
-	AST.BOXED_DECL (pos, name, names, size)
+	(insertTypeName name; AST.BOXED_DECL (pos, name, names, size))
     fun mkSignalDecl (pos, ((name,signal),cbType)) = 
-	AST.SIGNAL_DECL (pos, name, signal, cbType)
+	(AST.SIGNAL_DECL (pos, name, signal, cbType))
 
     fun mkFunType (retType, pars) = AST.LONG ([], AST.ARROW(pars, retType))
 
@@ -78,11 +104,10 @@ struct
 
     fun singleton texp = ([], texp)
     val mkLong = AST.LONG o singleton
-    val mkTName = AST.TYPENAME
 
     (* functions *)
-    val typeExp =  (word >> (mkLong o mkTName))
-                || (parenthesized (word --$ listQual) >> (mkLong o AST.LIST o mkLong o mkTName))
+    val typeExp =  (word >> (mkLong o mkTypeExp))
+                || (parenthesized (word --$ listQual) >> (mkLong o AST.LIST o mkLong o mkTypeExp))
     val parenName = parenthesized word
     val par = parenthesized (typeExp -- word)
     val constr = parenthesized (word $-- word)
@@ -134,8 +159,8 @@ struct
 
     val decl' = (fncDecl >> mkFunctionDecl)
              || (objDecl >> mkObjectDecl) 
-             || (enumDecl >> mkEnumDecl)
-             || (flagsDecl >> mkFlagsDecl)
+             || (enumDecl >> mkFlagsDecl true)
+             || (flagsDecl >> mkFlagsDecl false)
              || (boxedDecl >> mkBoxedDecl)
              || (signalDecl >> mkSignalDecl)
 

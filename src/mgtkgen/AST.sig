@@ -14,7 +14,7 @@ sig
       | ARROW of long_texp list * long_texp
       | OPTION of long_texp
       | OUTPUT of long_texp
-      | FLAG of string
+      | FLAG of string * bool (* is this an enum? *)
       | LIST of long_texp
     and long_texp = LONG of string list (* path to the type *)
                           * texp (* the type itself *)
@@ -27,7 +27,6 @@ sig
     datatype declaration =
 	OBJECT_DECL of pos * string * string * (parameter list option)
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
-      | ENUM_DECL of pos * string * constructor list
       | FLAGS_DECL of pos * long_texp * constructor list
       | BOXED_DECL of pos * string * (string list) * string option
       | SIGNAL_DECL of pos * string * string list * long_texp option
