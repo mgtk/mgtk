@@ -20,9 +20,11 @@ mGTK can be obtained from the mGTK homepage at
      http://www.it.edu/people/kfl/mgtk
 
 mGTK is distributed in source form, and is known to compile on Linux
-and Windows. Binaries for Windows exists thus eliminating the need for
-a C compiler. In principle, mGTK should run on all platforms supported
+and Windows. In principle, mGTK should run on all platforms supported
 by Moscow ML and GTK+.
+
+We provide binaries for Windows in order to eliminate the need for a C
+compiler.
 
 
 News in the red-hens release
