@@ -357,4 +357,45 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Arr _ => raise Fail "fromCValue: not implemented (Arr)"
 	  | Type.Func _ => raise Fail "fromCValue: shouldn't happen (Func)"
 
+(*
+		    fun show ty =
+			let open Type
+			    fun loop Void = "void"
+			      | loop (Func(args,ret)) = 
+				   Util.stringSep "" "" " --> " (loop o #2) args
+				   ^ " --> " ^ "return_" ^ loop ret
+			      | loop (Base tn) = 
+				   (case Name.asType tn of
+					"uint" => "int"
+				      | ty => ty
+                                   )
+			      | loop (Tname tn) = 
+				   (* FIXME: ? *) "unit"
+			      | loop (Ptr ty) = loop ty
+			      | loop (Const ty) = loop ty
+			      | loop (Arr(i, ty)) = raise Fail("signal (dyn): not impl for "^name)
+			in  loop ty end
+*)
+    fun toSignalType tinfo ty =
+	let fun loop ty =
+		case ty of
+		    Type.Void => SMLType.TyApp([],["void"]) (* FIXME: HACK *)
+		  | Type.Ptr ty => loop ty
+		  | Type.Const ty => loop ty
+		  | Type.Func(args,ret) =>
+		    SMLType.ArrowTy(List.map (loop o #2) args, loop ret)
+		  | Type.WithDefault(ty,_) => loop ty
+		  | Type.Tname tn => SMLType.UnitTy (* FIXME: true? *)
+		  | Type.Base tn =>
+		    (let val info: info = lookup tinfo tn
+		     in  #ptype info
+		     end
+			 handle NotFound => raise Unbound tn
+                    )
+		  | Type.Arr(i,ty) => 
+		    raise Fail("toSignalType(arr): not implemented")
+	    val ret = SMLType.TyApp([SMLType.TyApp([SMLType.TyVar "'a"], ["t"])], 
+				    ["Signal","signal"])
+	in  SMLType.ArrowTy([loop ty], ret) end
+
 end (* structure TypeInfo *)

@@ -82,7 +82,7 @@ sig
     val bool   : (bool,   'rest) read
     val int    : (int,    'rest) read
     val char   : (char,   'rest) read
-    val double : (real,   'rest) read
+    val real   : (real,   'rest) read
     val string : (string, 'rest) read
     val unit   : (unit,   'rest) read
 
@@ -91,7 +91,7 @@ sig
     val return_bool   : bool   return
     val return_int    : int    return
     val return_char   : char   return
-    val return_double : real   return
+    val return_real   : real   return
     val return_string : string return
     val return_unit   : unit   return
 
@@ -155,7 +155,7 @@ struct
         val setBool   : bool setter   = app2(symb "mgtk_set_bool")
         val setInt    : int setter    = app2(symb "mgtk_set_int")
         val setChar   : char setter   = app2(symb "mgtk_set_char")
-        val setDouble : real setter   = app2(symb "mgtk_set_double")
+        val setReal   : real setter   = app2(symb "mgtk_set_real")
         val setString : string setter = app2(symb "mgtk_set_string")
 
 
@@ -163,7 +163,7 @@ struct
         val getBool   : bool getter   = app2(symb "mgtk_get_pos_bool")
         val getInt    : int getter    = app2(symb "mgtk_get_pos_int")
         val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
-        val getDouble : real getter   = app2(symb "mgtk_get_pos_double")
+        val getReal   : real getter   = app2(symb "mgtk_get_pos_real")
         val getString : string getter = app2(symb "mgtk_get_pos_string")
 (*
         val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
@@ -203,8 +203,8 @@ struct
     fun char x        = getter getChar x
     fun return_char x = setter setChar x
 
-    fun double x        = getter getDouble x
-    fun return_double x = setter setDouble x
+    fun real x          = getter getReal x
+    fun return_real x   = setter setReal x
 
     fun string x        = getter getString x
     fun return_string x = setter setString x

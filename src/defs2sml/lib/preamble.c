@@ -198,7 +198,7 @@ MGTK_MakeSetter(mgtk_set_bool, g_value_set_boolean, Bool_val)
 MGTK_MakeSetter(mgtk_set_long, g_value_set_long, Long_val)
 MGTK_MakeSetter(mgtk_set_int, g_value_set_int, Long_val)
 MGTK_MakeSetter(mgtk_set_char, g_value_set_char, Char_val)
-MGTK_MakeSetter(mgtk_set_double, g_value_set_double, Double_val)
+MGTK_MakeSetter(mgtk_set_real, g_value_set_double, Double_val)
 MGTK_MakeSetter(mgtk_set_string, g_value_set_string, copy_sml_string)
 
 /*
@@ -208,7 +208,7 @@ MGTK_MakeGetter(mgtk_get_pos_uchar, GTK_VALUE_UCHAR, Val_long)
 MGTK_MakeGetter(mgtk_get_pos_bool, g_value_get_boolean, Val_bool)
 MGTK_MakeGetter(mgtk_get_pos_int, g_value_get_int, Val_long)
 MGTK_MakeGetter(mgtk_get_pos_char, g_value_get_char, Val_char)
-MGTK_MakeGetter(mgtk_get_pos_double, g_value_get_double, copy_double)
+MGTK_MakeGetter(mgtk_get_pos_real, g_value_get_double, copy_double)
 MGTK_MakeGetter(mgtk_get_pos_string, g_value_get_string, copy_sml_string_to_value)
 /*
 MGTK_MakeGetter(mgtk_get_pos_uint, GTK_VALUE_UINT, Val_long)

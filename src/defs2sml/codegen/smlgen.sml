@@ -348,52 +348,26 @@ struct
 *)
 	  | AST.Signal ty =>
 	        let val name = Name.asSignal name
-		    fun show ty =
-			let open Type
-			    fun loop Void = "void"
-			      | loop (Func(args,ret)) = 
-				   Util.stringSep "" "" " --> " (loop o #2) args
-				   ^ " --> " ^ "return_" ^ loop ret
-			      | loop (Base tn) = 
-				   (case Name.asType tn of
-					"uint" => "int"
-				      | ty => ty
-                                   )
-			      | loop (Tname tn) = 
-				   (* FIXME: ? *) "unit"
-			      | loop (Ptr ty) = loop ty
-			      | loop (Const ty) = loop ty
-			      | loop (Arr(i, ty)) = raise Fail("signal (dyn): not impl for "^name)
+		    fun toTypeExp (SMLType.ArrowTy([ty],ret)) =
+			(* signal types have this particular shape *)
+			let fun loop (SMLType.ArrowTy(args,ret)) =
+			       Util.stringSep "" "" " --> " loop args
+			       ^ " --> " ^ "return_" ^ loop ret
+			      | loop (SMLType.TupTy _) = Util.abort 452346
+			      | loop (SMLType.RefTy _) = Util.abort 452348
+			      | loop (SMLType.TyApp([],["void"])) = "void"
+			      | loop ty = SMLType.toString ty
 			in  loop ty end
-		    fun toSmlType ty =
-			let open Type
-			    fun loop Void = UnitTy
-			      | loop (Ptr ty) = loop ty
-			      | loop (Const ty) = loop ty
-			      | loop (Func(args,ret)) = 
-				   ArrowTy(List.map (loop o #2) args, loop ret)
-			      | loop (Tname tn) = UnitTy
-			      | loop (Base tn) =
-				   (case Name.asType tn of
-					"bool" => BoolTy
-				      | "char" => CharTy
-				      | "uint" => IntTy
-				      | "int" => IntTy
-				      | "double" => RealTy
-				      | "float" => RealTy
-				      | ty => raise Fail("signal: not impl:" ^ty ^ " for " ^name)
-                                   )
-			      | loop (Arr(i,ty)) = raise Fail("signal (stat): not impl for "^name)
-			    val ret = TyApp([TyApp([TyVar "'a"], ["t"])], ["Signal","signal"])
-			in  ArrowTy([loop ty], ret) end
+		      | toTypeExp _ = Util.abort 443535
+		    val ty = TypeInfo.toSignalType tinfo ty
 		    val args = [Str name, Const "false", 
-				Const("("^show ty^")"), Var "f"]
+				Const("("^toTypeExp ty^")"), Var "f"]
 		    fun toUnderscore #"-" = #"_"
 		      | toUnderscore ch = ch
+		    val name' = (String.map toUnderscore name)^"_sig"
 		in  Some(Local(StrOnly(Open ["Signal"]) ++ StrOnly(Infix(SOME Right, ["-->"])),
-			 (ValDecl(VarPat((String.map toUnderscore name)^"_sig"), 
-				      Some(toSmlType ty), 
-				      Fn("f", App(Var("signal"), args))))))
+			 (ValDecl(VarPat(name'), Some(ty), 
+				  Fn("f", App(Var("signal"), args))))))
 		end
 
     fun header tinfo (name, info) =

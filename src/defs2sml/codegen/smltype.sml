@@ -56,6 +56,7 @@ structure SMLType :> SML_TYPE = struct
 	  | TupTy tys => parens 2 safe (ilist " #* " (pp 2) tys)
 	  | ArrowTy (tys, ty) => 
 	      parens 1 safe (ppBinary(ilist " #-> " (pp 1) tys, "->", pp 1 ty))
+	  | TyApp([],["void"]) => ppString "unit" (* FIXME: HACK *)
 	  | TyApp([],tname) => ppTyName tname
 	  | TyApp([ty],tname) => pp 2 ty ++ ppTyName tname
 	  | TyApp(tys,tname) =>

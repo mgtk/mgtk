@@ -23,6 +23,7 @@ signature TypeInfo = sig
     val toSMLType: typeinfo -> (unit->string) -> 'a ty -> SMLType.ty
     val toSMLTypeSeq: typeinfo -> 'a ty -> SMLType.ty
     val toPrimType: typeinfo -> 'a ty -> SMLType.ty
+    val toSignalType: typeinfo -> 'a ty -> SMLType.ty
 
     val fromPrimValue: typeinfo -> 'a ty -> TinySML.exp -> TinySML.exp
 
