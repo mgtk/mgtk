@@ -1,3 +1,5 @@
+(module Gtk)
+
 (define-object GtkAdjustment (GtkData)
   (fields
    (float value)

@@ -3,7 +3,7 @@
 
 (* TODO: Clean-up this code and document it! *)
 
-structure TypeInfo =
+structure TypeInfo :> TypeInfo =
 struct
 
     (* Convenience: *)
@@ -13,54 +13,113 @@ struct
 
     open WSeq
     infix &&
+	
+    type texp = TE.texp
+    type tname = TE.tname
+    type name = NU.name
+
+
+(* new
+    fun MLNamePath path name = prsep ($".") $ path && $"." && $name
+new *)
+
+    fun combine path = Util.stringSep "" "" "" (fn s=>s) path
+    fun underscore path = Util.stringSep "" "" "_" (fn s=>s) path
+
+    fun MLNamePath (path, base) = combine (path @ base) 
+    fun MLUnderscorePath (path, base) = underscore (path @ base)
+
+    fun mapPath f (path,base) = (map f path, map f base)
+
+    fun fstPath (path,base) = (path,[])
+    fun sndPath (path,base) = ([],base)
+
+    fun MLName (TE.PRIMTYPE tName) = 
+	(case tName of
+	     "none" => ([],["unit"])
+	   |   "int" => ([],["int"])
+	   |   "uint" => ([],["word"])
+	   |   "float" => ([],["real"])
+	   |   "bool" => ([],["bool"])
+	   |   "string" => ([],["string"])
+	   |   "static_string" => ([],["string"])
+	   |   "GtkType" => (["Gtk"], ["type"])
+           |   _ => U.shouldntHappen "MLName: unknown primtive type"
+	)
+      | MLName (TE.WIDGET ((path, wid),_)) = (path, wid)
+      | MLName (TE.POINTER ((path, boxed),_)) = (path, boxed)
+      | MLName (TE.FLAG ((path, fName),_)) = (path, fName)
+      | MLName _ = U.notImplemented "MLName: not a C type"
+
+    val MLWidgetName = MLNamePath o MLName
+    val MLShortWidgetName = MLNamePath o sndPath o MLName
+    val MLBoxedName  = MLUnderscorePath o (mapPath NU.toLower) o MLName
+    val MLFlagName =   MLUnderscorePath o (mapPath NU.toLower) o MLName
+
+    val removeUnderscores = String.translate (fn #"_" => "" | c => String.str c)
+    val CWidgetName  = removeUnderscores o MLNamePath o MLName
+    val CBoxedName   = removeUnderscores o MLNamePath o MLName
+    val CFlagName    = removeUnderscores o MLNamePath o MLName
+
+    fun tlPath (path,base) = 
+	case path of 
+	    [] => Util.shouldntHappen "tlPath: Empty path"
+	|   _ => let val (pre,rest) = (hd path, tl path)
+		 in  if NU.toLower pre = "gdk" then (path, base)
+		     else (rest, base)
+		 end
+
+    fun addPre  pre name  = pre ^ name 
+    fun addSuff suff name = name ^ suff
+    val MLFunName = MLUnderscorePath o (mapPath NU.toLower) o tlPath
+    val MLFunNameWithoutOpt = addSuff "'" o MLFunName
+
+    val MLConstrName = MLUnderscorePath o (mapPath NU.toUpper) o tlPath
+
+    val CFunName = MLUnderscorePath o (mapPath NU.toLower)
+    val CFunNameWithoutOpt = addSuff "_short" o CFunName
+
+    val CConstrName = MLUnderscorePath o (mapPath NU.toUpper)
+
+
+    fun MLSignalName (path,base) = 
+	let val signal = path @ base
+	    fun cnv signal = String.map (fn #"-" => #"_" | ch => ch) signal
+	in  case signal of
+	        [signal] => cnv signal
+              | [prefix,signal] => cnv (prefix ^ "_" ^ signal)
+              | _ => U.shouldntHappen "Not a signal"
+        end
+
 
     (* 5 is this is the largest X, such that Dynlib.appX exists *)
     fun fitsDynApp params = List.length params <= 5
 
-    fun mlEnumTypeName name = NU.separateWords #"_" (NU.removePrefix name)
-    fun mlFlagsTypeName name = NU.separateWords #"_" (NU.removePrefix name)
-    fun mlBoxedTypeName name = NU.separateWords #"_" name
-
-    fun get_texp (TE.LONG (_, typExp)) = typExp
-    fun get_path (TE.LONG (path, _)) = path
-
     (* predicates *)
-    local 
-	fun isstring (TE.PRIMTYPE "string") = true
-	  | isstring (TE.PRIMTYPE "static_string") = true
-	  | isstring _ = false
-    in  fun isString long = isstring (get_texp long)
-	fun isString' (long, name) = isString long
-    end
+    fun isString (TE.PRIMTYPE "string") = true
+      | isString (TE.PRIMTYPE "static_string") = true
+      | isString _ = false
+    fun isString' (texp, name) = isString texp
 
-    local 
-	fun isnull (TE.OPTION _) = true
-	  | isnull _ = false
-    in  fun isNullType long = isnull (get_texp long)
-	fun isNullType' (long, name) = isNullType long
-    end
+    fun isNullType (TE.OPTION _) = true
+      | isNullType _ = false
+    fun isNullType' (texp, name) = isNullType texp
 
-    local 
-	fun isoutput (TE.OUTPUT _) = true
-	  | isoutput _ = false
-    in  fun isOutputType long = isoutput (get_texp long)
-	fun isOutputType' (long, name) = isOutputType long
-    end
+    fun isOutputType (TE.OUTPUT _) = true
+      | isOutputType _ = false
+    fun isOutputType' (texp, name) = isOutputType texp
+    
+    fun isVoidType (TE.PRIMTYPE "none") = true
+      | isVoidType _ = false
+    fun isVoidType' (texp, name) = isVoidType texp
 
-    local
-	fun isvoid (TE.PRIMTYPE "none") = true
-          | isvoid _ = false
-    in  fun isVoidType long = isvoid (get_texp long)
-	fun isVoidType' (long, name) = isVoidType long
-    end
-
-    fun compoundType (TE.ARROW _) = true
-      | compoundType (TE.TUPLE _) = true
-      | compoundType _ = false
+    fun isCompoundType (TE.ARROW _) = true
+      | isCompoundType (TE.TUPLE _) = true
+      | isCompoundType _ = false
 
     (* Generate appropriate C and ML versions of the types specified *)
     val mkcpath = prmap $
-    fun mkc (TE.PRIMTYPE tName) = 
+    fun mkCType (TE.PRIMTYPE tName) = 
 	(case tName of
              "none" => $"void"
 	 |   "int" => $"int"
@@ -70,14 +129,14 @@ struct
          |   "string" => $"char*"
          |   "static_string" => $"char*"
          |   "GtkType" => $"int"
-         |   _ => U.shouldntHappen "mkc: unknown primitive type"
+         |   _ => U.shouldntHappen "mkCType: unknown primitive type"
 	)
-      | mkc (TE.OUTPUT t) = mkCType t
-      | mkc (TE.WIDGET (wid,_)) = $"GtkObject"
-      | mkc (TE.POINTER (boxed,_)) = $boxed
-      | mkc (TE.FLAG (fName,_)) = $fName
-      | mkc _ = U.notImplemented "mkCType: not a type name"
-    and mkCType long = mkcpath (get_path long) && mkc (get_texp long)
+      | mkCType (TE.OUTPUT t) = mkCType t
+      | mkCType (tExp as TE.WIDGET ((path, wid),_)) = 
+	mkcpath path && $"GtkObject"
+      | mkCType (tExp as TE.POINTER ((path, boxed),_)) = $(CBoxedName tExp)
+      | mkCType (tExp as TE.FLAG ((path, fName),_)) = $(CFlagName tExp)
+      | mkCType _ = U.notImplemented "mkCTypeType: not a type name"
 
     local
 	datatype toType = ML_TYPE | ML_PRIM_TYPE
@@ -100,39 +159,35 @@ struct
 	     |   _ => U.shouldntHappen "mkType: unknown primitive type"
             )
 	  | mkType nest toType tArg (TE.TUPLE tArgs) = 
-	    prsep ($" * ") (mkLongType true toType tArg) tArgs
+	    prsep ($" * ") (mkType true toType tArg) tArgs
 	  | mkType nest toType tArg (TE.ARROW(tArgs, _, _, tRet)) =
-	    parens nest (prsep ($" -> ") (mkLongType true toType tArg o #1) tArgs
-			&& $" -> " && mkLongType true toType (fn _ => $"base") tRet
+	    parens nest (prsep ($" -> ") (mkType true toType tArg o #1) tArgs
+			&& $" -> " && mkType true toType (fn _ => $"base") tRet
                         )
 	  | mkType nest toType tArg (TE.OPTION t) =
-	    (mkLongType nest toType tArg t) && $" option"
+	    (mkType nest toType tArg t) && $" option"
 	  | mkType nest toType tArg (TE.OUTPUT t) =
-	    mkLongType nest toType tArg t
-          | mkType nest ML_TYPE tArg (TE.WIDGET (wid,_)) =
-	    (fn argTyp => argTyp && $" " && $wid) (tArg ()) 
-          | mkType nest ML_PRIM_TYPE tArg (TE.WIDGET (wid,_)) =
+	    mkType nest toType tArg t
+          | mkType nest ML_TYPE tArg (tExp as TE.WIDGET _) =
+	    (fn argTyp => argTyp && $" " && $(MLWidgetName tExp)) (tArg ()) 
+          | mkType nest ML_PRIM_TYPE tArg (TE.WIDGET _) =
 	    (fn argTyp => $"gtkobj") (tArg ()) 
           | mkType nest toType tArg (TE.LIST t) = 
-	    (mkLongType nest toType tArg t) && $" list"
-          | mkType nest ML_TYPE tArg (TE.FLAG (fName,false)) = 
-	    $$[mlFlagsTypeName fName, " list"]
-          | mkType nest ML_TYPE tArg (TE.FLAG (fName,true)) = 
-	    $(mlFlagsTypeName fName)
-          | mkType nest ML_PRIM_TYPE tArg (TE.FLAG(fName,_)) = 
+	    (mkType nest toType tArg t) && $" list"
+          | mkType nest ML_TYPE tArg (tExp as TE.FLAG (_,false)) = 
+	    $$[MLFlagName tExp, " list"]
+          | mkType nest ML_TYPE tArg (tExp as TE.FLAG (_,true)) = 
+	    $(MLFlagName tExp)
+          | mkType nest ML_PRIM_TYPE tArg (TE.FLAG _) = 
 	    $"int"
-          | mkType nest ML_TYPE tArg (TE.POINTER (boxed,NONE)) = 
-	    $(mlBoxedTypeName boxed)
-          | mkType nest ML_PRIM_TYPE tArg (TE.POINTER (boxed,NONE)) = 
-	    $(mlBoxedTypeName boxed)
-          | mkType nest ML_TYPE tArg (TE.POINTER (boxed,SOME _)) = 
-	    (fn argTyp => argTyp && $" " && $(mlBoxedTypeName boxed)) (tArg())
-          | mkType nest ML_PRIM_TYPE tArg (TE.POINTER (boxed,SOME _)) = 
-	    (fn argTyp => argTyp && $" " && $(mlBoxedTypeName boxed)) (tArg())
-	and mkLongType nest toType tArg long = 
-	       (if compoundType (get_texp long) then Empty
-	        else mkPath (get_path long))
-	    && mkType nest toType tArg (get_texp long)
+          | mkType nest ML_TYPE tArg (tExp as TE.POINTER (_,NONE)) = 
+	    $(MLBoxedName tExp)
+          | mkType nest ML_PRIM_TYPE tArg (tExp as TE.POINTER (_,NONE)) = 
+	    $(MLBoxedName tExp)
+          | mkType nest ML_TYPE tArg (tExp as TE.POINTER (_,SOME _)) = 
+	    (fn argTyp => argTyp && $" " && $(MLBoxedName tExp)) (tArg())
+          | mkType nest ML_PRIM_TYPE tArg (tExp as TE.POINTER (_,SOME _)) = 
+	    (fn argTyp => argTyp && $" " && $(MLBoxedName tExp)) (tArg())
 
 	val index = ref 0
 	fun reset () = index := 0
@@ -143,17 +198,16 @@ struct
 
 	(* would we like versions with explicit type arguments? *)
 	fun mkMLFreshType typExp = 
-	    (reset (); mkLongType false ML_TYPE fresh typExp)
+	    (reset (); mkType false ML_TYPE fresh typExp)
 	fun mkMLType typExp = mkMLFreshType typExp
 
 	fun mkMLPrimFreshType typExp = 
-	    (reset (); mkLongType false ML_PRIM_TYPE fresh typExp)
-	fun mkMLPrimType (TE.LONG(path, TE.ARROW(tArgs, tOuts, tCmp, tRet))) =
+	    (reset (); mkType false ML_PRIM_TYPE fresh typExp)
+	fun mkMLPrimType (TE.ARROW(tArgs, tOuts, tCmp, tRet)) =
 	    if fitsDynApp tArgs (* check if it fits appX *)
-	    then mkMLPrimFreshType (TE.LONG(path, TE.ARROW(tArgs, tOuts, tCmp, tRet)))
+	    then mkMLPrimFreshType (TE.ARROW(tArgs, tOuts, tCmp, tRet))
 	    else mkMLPrimFreshType 
-		      (TE.LONG(path, 
-				TE.ARROW([(TE.LONG([],TE.TUPLE (map #1 tArgs)),"")],tOuts,tCmp,tRet)))
+		      (TE.ARROW([(TE.TUPLE (map #1 tArgs),"")],tOuts,tCmp,tRet))
           | mkMLPrimType t = mkMLPrimFreshType t
 
     end (* local *)
@@ -166,76 +220,72 @@ struct
 
        fromCValue: wrap a c value in appropriate to-ML conversions.
     *)
-    local 
-	(* ugly hack: remove <ctype> *)
-	fun toc long (TE.PRIMTYPE "<ctype>", name) = name
-	  | toc long (TE.PRIMTYPE tName, name) = 
-	    (case tName of
-		"none" => $"Unit_val"
-	     |  "int" => $"Int_val(" && name && $")"
-	     |  "uint" => $"Int_val(" && name && $")"
-             |  "float" => $"Double_val(" && name && $")"
-             |  "bool" => $"Bool_val(" && name && $")"
-             |  "string" => $"String_val(" && name && $")"
-             |  "static_string" => $"String_val(" && name && $")"
-             |   "GtkType" => $"Int_val(" && name && $")"
-	     |  _ => U.shouldntHappen "toCValue: unknown primitive type"
-	    )
-	  | toc long (TE.FLAG (fName,_), name) = $"Int_val(" && name && $")"
-	  | toc long (TE.WIDGET (wid,_), name) = $"GtkObj_val(" && name && $")"
-	  | toc long (TE.POINTER (boxed,_), name) = $boxed && $"_val(" && name && $")"
-	  | toc long (typExp, name) = 
-	    U.notImplemented ("toCValue: not a type name: " ^ TE.toString long)
 
-	(* ugly hack: options *)
-	fun toc' long (TE.OPTION (TE.LONG(_,TE.WIDGET _)), name) =
-	    $"GtkObjOption_nullok(" && name && $")"
-          | toc' long (TE.OPTION (TE.LONG(_,TE.POINTER _)), name) =
-	    $"GtkObjOption_nullok(" && name && $")"
-	  | toc' long (TE.OPTION typExp', name) =
-	    if isString typExp' 
-	    then $"StringOption_nullok(" && name && $")"
-	    else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ TE.toString long ^ ")")
-          | toc' long (TE.LIST (TE.LONG(_,TE.WIDGET _)), name) = 
-	    $"mgtk_smllist_to_glist_object(" && name && $")"
-          | toc' long (TE.LIST typExp, name) = 
-	    if isString typExp 
-	    then $"mgtk_smllist_to_glist_string(" && name && $")"
-	    else U.notImplemented "toCValue: can only handle lists of widgets or strings"
-	  | toc' long (typExp, name) = toc long (typExp, name)
+    (* ugly hack: remove <ctype> *)
+    fun toCValue (TE.PRIMTYPE "<ctype>", name) = name
+      | toCValue (TE.PRIMTYPE tName, name) = 
+	(case tName of
+	     "none" => $"Unit_val"
+	   |  "int" => $"Int_val(" && name && $")"
+	   |  "uint" => $"Int_val(" && name && $")"
+	   |  "float" => $"Double_val(" && name && $")"
+	   |  "bool" => $"Bool_val(" && name && $")"
+	   |  "string" => $"String_val(" && name && $")"
+	   |  "static_string" => $"String_val(" && name && $")"
+	   |   "GtkType" => $"Int_val(" && name && $")"
+	   |  _ => U.shouldntHappen "toCValue: unknown primitive type"
+	)
+      | toCValue (TE.FLAG _, name) = $"Int_val(" && name && $")"
+      | toCValue (TE.WIDGET _, name) = $"GtkObj_val(" && name && $")"
+      | toCValue (tExp as TE.POINTER _, name) = 
+	$(MLBoxedName tExp) && $"_val(" && name && $")"
+      | toCValue (typExp, name) = 
+	U.notImplemented ("toCValue: not a type name: " ^ TE.toString typExp)
 
-	fun fromc long (TE.PRIMTYPE tName, name) = 
-	    (case tName of
-		 "none" => $"Val_unit"
-             |   "int" => $"Val_int(" && name && $")"
-             |   "uint" => $"Val_int(" && name && $")"
-             |   "float" => $"copy_double(" && name && $")"
-             |   "bool" => $"Val_bool(" && name && $")"
-	     |   "string" => $"copy_string(" && name && $")"
-	     |   "static_string" => $"copy_string(" && name && $")"
-             |   "GtkType" => $"Val_int(" && name && $")"
-	     |   _ => U.shouldntHappen "fromCValue: unknown primitive type"
-            )
-	  | fromc long (TE.OUTPUT (widType as (TE.LONG(_, TE.WIDGET _))), name) =
-	    fromCValue (widType, $"&" && name)
-	  | fromc long (TE.OUTPUT (ptrType as (TE.LONG(_, TE.POINTER _))), name) =
-	    fromCValue (ptrType, $"&" && name)
-	  | fromc long (TE.OUTPUT (flagType as (TE.LONG(_,TE.FLAG _))), name) = 
-	    fromCValue (flagType, name)
-	  | fromc long' (TE.OUTPUT (tName as (TE.LONG(_, TE.PRIMTYPE _))), name) = 
-	    fromCValue (tName, name)
-          | fromc long (TE.WIDGET (wid,_), name) = $"Val_GtkObj(" && name && $")"
-          | fromc long (TE.POINTER (boxed,_), name) = $"Val_" && $boxed && $"(" && name && $")"
-	  | fromc long (TE.FLAG (fName,_), name) = $"Val_int(" && name && $")"
-	  | fromc long (typExp, name) = 
-	    U.notImplemented ("fromCValue: neither type name or output type (" ^ TE.toString long ^ ")")
-	    
-	and fromCValue (long, name) = fromc long (get_texp long, name)
+    (* ugly hack: options *)
+    fun toCValue' (TE.OPTION (TE.WIDGET _), name) =
+	$"GtkObjOption_nullok(" && name && $")"
+      | toCValue' (TE.OPTION (TE.POINTER _), name) =
+	$"GtkObjOption_nullok(" && name && $")"
+      | toCValue' (TE.OPTION typExp', name) =
+	if isString typExp' 
+	then $"StringOption_nullok(" && name && $")"
+	else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ TE.toString (TE.OPTION typExp') ^ ")")
+      | toCValue' (TE.LIST (TE.WIDGET _), name) = 
+	$"mgtk_smllist_to_glist_object(" && name && $")"
+      | toCValue' (TE.LIST typExp, name) = 
+	if isString typExp 
+	then $"mgtk_smllist_to_glist_string(" && name && $")"
+	else U.notImplemented "toCValue: can only handle lists of widgets or strings"
+      | toCValue' (typExp, name) = toCValue (typExp, name)
 
-    in  fun toCValue (long, name) = toc long (get_texp long, name)
-	fun toCValue' (long, name) = toc' long (get_texp long, name)
-	val fromCValue = fromCValue
-    end (* local *)
- 
+    fun fromCValue (TE.PRIMTYPE tName, name) = 
+	(case tName of
+	     "none" => $"Val_unit"
+	   |   "int" => $"Val_int(" && name && $")"
+	   |   "uint" => $"Val_int(" && name && $")"
+	   |   "float" => $"copy_double(" && name && $")"
+	   |   "bool" => $"Val_bool(" && name && $")"
+	   |   "string" => $"copy_string(" && name && $")"
+	   |   "static_string" => $"copy_string(" && name && $")"
+	   |   "GtkType" => $"Val_int(" && name && $")"
+	   |   _ => U.shouldntHappen "fromCValue: unknown primitive type"
+	)
+      | fromCValue (TE.OUTPUT (widType as (TE.WIDGET _)), name) =
+	fromCValue (widType, $"&" && name)
+      | fromCValue (TE.OUTPUT (ptrType as (TE.POINTER _)), name) =
+	fromCValue (ptrType, $"&" && name)
+      | fromCValue (TE.OUTPUT (flagType as (TE.FLAG _)), name) = 
+	fromCValue (flagType, name)
+      | fromCValue (TE.OUTPUT (tName as (TE.PRIMTYPE _)), name) = 
+	fromCValue (tName, name)
+      | fromCValue (TE.WIDGET _, name) = 
+	$"Val_GtkObj(" && name && $")"
+      | fromCValue (tExp as TE.POINTER _, name) = 
+	$"Val_" && $(MLBoxedName tExp) && $"(" && name && $")"
+      | fromCValue (TE.FLAG _, name) = 
+	$"Val_int(" && name && $")"
+      | fromCValue (typExp, name) = 
+	U.notImplemented ("fromCValue: neither type name or output type (" ^ TE.toString typExp ^ ")")
 
 end (* structure TypeInfo *)

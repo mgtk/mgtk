@@ -1,34 +1,35 @@
 signature TypeExp =
 sig
 
+    type tname = NameUtil.name
+
     datatype inherits =
 	INH_ROOT (* base of inheritance hierarchy *)
-      | INH_FROM of string (* inherits from string *)
+      | INH_FROM of tname (* inherits from tname *)
 
     datatype texp = 
-	PRIMTYPE of string
-      | TUPLE of long_texp list
-      | ARROW of (long_texp * string) list (* parameters *) 
-               * (long_texp * string) list (* output parameters *) 
-               * (long_texp * string) list (* all parameters *)
-	       * long_texp (* return type *)
-      | OPTION of long_texp
-      | OUTPUT of long_texp
-      | FLAG of string * bool (* is this an enum? *)
-      | WIDGET of string * string option (* parent type *)
-      | POINTER of string * inherits option (* parent type *)
-      | LIST of long_texp
-    and long_texp = LONG of string list (* path to the type *)
-                          * texp (* the type itself *)
+	PRIMTYPE of string (* no path is necessary here *)
+      | TUPLE of texp list
+      | ARROW of (texp * string) list (* parameters *) 
+               * (texp * string) list (* output parameters *) 
+               * (texp * string) list (* all parameters *)
+	       * texp (* return type *)
+      | OPTION of texp
+      | OUTPUT of texp
+      | FLAG of tname * bool (* is this an enum? *)
+      | WIDGET of tname * inherits (* parent type *)
+      | POINTER of tname * inherits option (* parent type *)
+      | LIST of texp
 
-    val toString: long_texp -> string
-    val typeClass: long_texp -> string
+    val toString: texp -> string
+    val typeClass: texp -> string
 
-    val equal_long_texp: long_texp * long_texp -> bool
+    val equal_name: tname * tname -> bool
+    val equal_texp: texp * texp -> bool
 
-    val widgetOf: long_texp -> string
-    val boxedOf: long_texp -> string
-    val flagOf: long_texp -> string
+    val widgetOf: texp -> string
+    val boxedOf: texp -> string
+    val flagOf: texp -> string
 
 end
 

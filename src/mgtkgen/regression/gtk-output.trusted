@@ -16,31 +16,31 @@
 /*                                                                           */
 
 
-#define GdkColor_val(x) ((void*) Field(x, 1))
+#define gdk_color_val(x) ((void*) Field(x, 1))
 
-#define GdkColor_val_nocast(x) (Field(x, 1))
+#define gdk_color_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_color (value val) {
-  gdk_color_free (GdkColor_val(val)); 
+  gdk_color_free (gdk_color_val(val)); 
 }
 
-value Val_GdkColor (void* obj) {
+value Val_gdk_color (void* obj) {
   value res;
   void* copy = gdk_color_copy(obj);
   res = alloc_final (2, ml_finalize_gdk_color, 0, 1);
-  GdkColor_val_nocast(res) = (value) copy;
+  gdk_color_val_nocast(res) = (value) copy;
   return res;
 }
 
 /* ML type: string -> bool * gdk_color */
-EXTERNML value mgdk_color_parse(value name) { /* ML */
+EXTERNML value mgtk_gdk_color_parse(value name) { /* ML */
   value res;
   GdkColor rescolor;
   value rescall = gdk_color_parse(String_val(name), &rescolor);
   Push_roots(r, 1);
   r[0] = alloc_tuple(2);
   Field(r[0], 0) = Val_bool(rescall);
-  Field(r[0], 1) = Val_GdkColor(&rescolor);
+  Field(r[0], 1) = Val_gdk_color(&rescolor);
   res = r[0];
   Pop_roots();
   return res;
@@ -49,13 +49,13 @@ EXTERNML value mgdk_color_parse(value name) { /* ML */
 /* *** Label stuff *** */
 
 /* ML type: gtkobj -> real */
-EXTERNML value mgtk_label_get_value(value wid) { /* ML */
+EXTERNML value mgtk_gtk_label_get_value(value wid) { /* ML */
   return copy_double((GTK_LABEL(GtkObj_val(wid))) -> value);
 }
 
 
 /* ML type: gtkobj -> string */
-EXTERNML value mgtk_label_get(value label) { /* ML */
+EXTERNML value mgtk_gtk_label_get(value label) { /* ML */
   char* resstr;
   gtk_label_get(GtkObj_val(label), &resstr);
   return copy_string(resstr);
@@ -65,7 +65,7 @@ EXTERNML value mgtk_label_get(value label) { /* ML */
 
 
 /* ML type: gtkobj -> int * int * int */
-EXTERNML value mgtk_calendar_get(value cal) { /* ML */
+EXTERNML value mgtk_gtk_calendar_get(value cal) { /* ML */
   value res;
   int resyear;
   int resmonth;
@@ -138,7 +138,7 @@ end
     type gdk_color = gpointer
 
     val gdk_color_parse_: string -> bool * gdk_color
-        = app1(symb"mgdk_color_parse")
+        = app1(symb"mgtk_gdk_color_parse")
     val gdk_color_parse: string -> bool * gdk_color
         = fn name => gdk_color_parse_ name
 
@@ -148,13 +148,13 @@ end
     type 'a GtkLabel = 'a label_t GtkWidget
 
     val label_get_value_: gtkobj -> real
-        = app1(symb"mgtk_label_get_value")
+        = app1(symb"mgtk_gtk_label_get_value")
     val label_get_value: 'a GtkLabel -> real
         = fn OBJ wid => label_get_value_ wid
 
 
     val label_get_: gtkobj -> string
-        = app1(symb"mgtk_label_get")
+        = app1(symb"mgtk_gtk_label_get")
     val label_get: 'a GtkLabel -> string
         = fn OBJ label => label_get_ label
 
@@ -165,7 +165,7 @@ end
 
 
     val calendar_get_: gtkobj -> int * int * int
-        = app1(symb"mgtk_calendar_get")
+        = app1(symb"mgtk_gtk_calendar_get")
     val calendar_get: 'a GtkCalendar -> int * int * int
         = fn OBJ cal => calendar_get_ cal
 

@@ -9,24 +9,27 @@
 structure AST :> AST =
 struct
 
-    type long_texp = TypeExp.long_texp
+    type tname = TypeExp.tname
+    type texp = TypeExp.texp
+
+    type name = NameUtil.name
 
     datatype target = SIG | SML | C
 
-    type constructor = string
-    type parameter = long_texp * string
+    type constructor = name
+    type parameter = texp * string
 
     type pos = int * int
     datatype funtype =
-	FUNTYPE of long_texp  (* ``normal'' parameters *)
-	         * long_texp option (* short paramters *)
+	FUNTYPE of texp  (* ``normal'' parameters *)
+	         * texp option (* short parameters *)
     datatype declaration =
 	MODULE_DECL of pos * bool (* explicit? *) * string list
-      | OBJECT_DECL of pos * long_texp * (parameter list option)
-      | FUNCTION_DECL of pos * string * funtype
-      | FLAGS_DECL of pos * long_texp * constructor list
-      | BOXED_DECL of pos * long_texp * (string list)
-      | SIGNAL_DECL of pos * long_texp * string list * long_texp option
+      | OBJECT_DECL of pos * texp * (parameter list option)
+      | FUNCTION_DECL of pos * name * funtype
+      | FLAGS_DECL of pos * texp * constructor list
+      | BOXED_DECL of pos * texp * string list
+      | SIGNAL_DECL of pos * texp * name * texp option
 
     fun isWidget (OBJECT_DECL _) = true
       | isWidget _ = false
@@ -40,13 +43,11 @@ struct
     fun isSignal (SIGNAL_DECL _) = true
       | isSignal _ = false
 
-    fun signalOf [n] = n
-      | signalOf [p,n] = n
-      | signalOf _ = Util.shouldntHappen "signalOf: not a signal"
+    fun signalOf (path,base) = Util.stringSep "" "" "" (fn s=>s) (path@base)
 
     fun nameOf (MODULE_DECL (_,_,path)) = Util.stringSep "" "" "." (fn s=>s) path
       | nameOf (OBJECT_DECL (_, obj, _)) = TypeExp.widgetOf obj
-      | nameOf (FUNCTION_DECL (_, func, _)) = func
+      | nameOf (FUNCTION_DECL (_, funname, _)) = NameUtil.nameToString funname
       | nameOf (FLAGS_DECL (_, flag, _)) = TypeExp.flagOf flag
       | nameOf (BOXED_DECL (_, pointer, _)) = TypeExp.boxedOf pointer
       | nameOf (SIGNAL_DECL (_, widget, signal, _)) = signalOf signal
@@ -78,7 +79,7 @@ struct
 	fun equal_pair eq ((x1,y1),(x2,y2)) = eq (x1,y1) andalso eq (y1,y2)
 
 	fun equal_par ((typExp1, name1), (typExp2, name2)) = 
-	    TypeExp.equal_long_texp (typExp1, typExp2) andalso name1 = name2
+	    TypeExp.equal_texp (typExp1, typExp2) andalso name1 = name2
 	fun equal_pars (pars1, pars2) = equal_list equal_par (pars1, pars2)
 	fun equal_pars_opt (pars1, pars2) = 
 	    equal_opt (equal_list equal_par) (pars1, pars2)
@@ -87,19 +88,19 @@ struct
 	fun equal (MODULE_DECL (_,exp1,path1), MODULE_DECL(_,exp2,path2)) =
 	    exp1=exp2 andalso equal_list (op=) (path1,path2)
 	  | equal (OBJECT_DECL(_,wid1,fields1), OBJECT_DECL(_,wid2,fields2)) =
-	    TypeExp.equal_long_texp (wid1,wid2) andalso equal_pars_opt (fields1,fields2)
-	  | equal (FUNCTION_DECL(_,func1,funtype1), FUNCTION_DECL(_,func2,funtype2)) =
-	    func1 = func2 andalso equal_funtype (funtype1, funtype2)
+	    TypeExp.equal_texp (wid1,wid2) andalso equal_pars_opt (fields1,fields2)
+	  | equal (FUNCTION_DECL(_,name1,funtype1), FUNCTION_DECL(_,name2,funtype2)) =
+	    TypeExp.equal_name (name1,name2) andalso equal_funtype (funtype1, funtype2)
 	  | equal (FLAGS_DECL(_,flag1,cons1), FLAGS_DECL(_,flag2,cons2)) =
-	    TypeExp.equal_long_texp (flag1,flag2) andalso equal_list (op =) (cons1,cons2)
+	    TypeExp.equal_texp (flag1,flag2) andalso equal_list (op =) (cons1,cons2)
 	  | equal (BOXED_DECL(_,typ1,funcs1), BOXED_DECL(_,typ2,funcs2)) =
-	    TypeExp.equal_long_texp (typ1,typ2) andalso TypeExp.equal_long_texp (typ1,typ2)
+	    TypeExp.equal_texp (typ1,typ2) andalso TypeExp.equal_texp (typ1,typ2)
 	    andalso equal_list (op =) (funcs1, funcs2)
 	  | equal (SIGNAL_DECL(_,wid1,signal1,cbType1), SIGNAL_DECL(_,wid2,signal2,cbType2)) =
-	    TypeExp.equal_long_texp (wid1,wid2) andalso equal_list (op =) (signal1,signal2) andalso equal_opt TypeExp.equal_long_texp (cbType1, cbType2)
+	    TypeExp.equal_texp (wid1,wid2) andalso TypeExp.equal_name (signal1,signal2) andalso equal_opt TypeExp.equal_texp (cbType1, cbType2)
 	  | equal _ = false
 	and equal_funtype (FUNTYPE (long1,short1), FUNTYPE(long2,short2)) =
-	    TypeExp.equal_long_texp (long1,long2) andalso equal_opt TypeExp.equal_long_texp (short1,short2)
+	    TypeExp.equal_texp (long1,long2) andalso equal_opt TypeExp.equal_texp (short1,short2)
     end (* local *)
 
 

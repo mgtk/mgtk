@@ -1,3 +1,44 @@
+2000-07-10  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml (et al): phew! Finished the restructuring
+	necessitated by the restructuring of type names. This turned out
+	to be quite an extensive reworking of many things. Luckily, this
+	actually simplified a large part of mgtkgen.
+
+	Here are more details:
+	+ All type names (and most ordinary names) now consist of a path
+	part and a base part. Functions for converting such `names' to
+	strings representing C and ML functions are in TypeInfo.
+	Unfortunately, I had to make a number of ad-hoc converters in
+	TypeInfo in order not to break too many things---this will
+	hopefully improve. (In the process I also stumbled over
+	documentation on Gtk+ name splitting, and made the code more
+	correct in this respect.)
+	+ Many namings became more consistent and there is now only one
+	place to change them (TypeInfo). Also the code is now divided more
+	clearly into phases.
+	+ A lot of the code is now easier to understand (I hope).
+	
+	Still left todo:
+	+ Apply more clean-up. Some things seems a little in-consistent
+	right now. (At the very least check signals and when the TypeInfo
+	name functions are applied in Translate.) There is also some
+	tension between using strings and using wseq's.
+	+ Add and rewrite documentation.
+	+ Specify precisely the more ad-hoc notions in TypeInfo.
+	+ Actually write the code to make multiple modules; that was the
+	big idea in the first place.
+
+2000-07-03  Henning Niss  <hniss@diku.dk>
+
+	* Parser.sml and ParseUtils.{sig,sml}: separated the construction
+	of abstract syntax into separate files.
+
+2000-06-25  Henning Niss  <hniss@diku.dk>
+
+	* TypExp.sml: moved the long-part of types to the right place; now
+	it is located with the type names.
+
 2000-06-19  Henning Niss  <hniss@diku.dk>
 
 	* Parser.sml: Changed to the parser combinators provided by

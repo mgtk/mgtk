@@ -14,24 +14,9 @@ struct
     open WSeq
     infix &&
 
-    (* mappings between defs strings representing (type) names,
-       and the corresponding ML (type) names *)
-    fun mlWidgetName (TE.LONG(_,TE.WIDGET(name,_))) = NU.removePrefix name
-      | mlWidgetName _ = U.shouldntHappen "mlWidgetName: not a widget"
-    fun mlFunName name = NU.remove_prefix name
-    fun mlSignalName signal = 
-	let fun cnv signal = String.map (fn #"-" => #"_" | ch => ch) signal
-	in  case signal of
-	        [signal] => cnv signal
-              | [prefix,signal] => cnv (prefix ^ "_" ^ signal)
-              | _ => U.shouldntHappen "Not a signal"
-        end
-    fun mlFlagName name = NU.remove_PREFIX name
+    type parlist = (TE.texp * string) list
 
-    type parlist = (TE.long_texp * string) list
-
-    fun mkArrowType (retType, pars) = 
-	TE.LONG([], TE.ARROW(pars, [], pars, retType))
+    fun mkArrowType (retType, pars) = TE.ARROW(pars, [], pars, retType)
 
     (* Helper functions *)
 
@@ -40,17 +25,17 @@ struct
 
     (* check if an expression, determined from the type of the expression,
        allocates in the MosML sense *)
-    fun allocExpression (long as TE.LONG(_, TE.PRIMTYPE tName)) =
-	let val primType = WSeq.flatten (TI.mkMLPrimType long)
+    fun allocExpression (texp as TE.PRIMTYPE tName) =
+	let val primType = WSeq.flatten (TI.mkMLPrimType texp)
 	in  (* choose the safe way out: only base types are few
 	       base types are considered non-allocating:
             *)
 	    not (primType="int" orelse primType="word" orelse primType="bool")
 	end
-      | allocExpression (TE.LONG(_, TE.WIDGET _)) = true
-      | allocExpression (TE.LONG(_, TE.POINTER _)) = true
-      | allocExpression (TE.LONG(_, TE.FLAG _)) = false
-      | allocExpression (TE.LONG(_, TE.OUTPUT tExp)) = allocExpression tExp
+      | allocExpression (TE.WIDGET _) = true
+      | allocExpression (TE.POINTER _) = true
+      | allocExpression (TE.FLAG _) = false
+      | allocExpression (TE.OUTPUT tExp) = allocExpression tExp
       | allocExpression _ = U.shouldntHappen "allocExpression: not a type name"
 
     fun allocTuple name values =
@@ -149,7 +134,7 @@ struct
 
     fun mkCall (name, args: parlist) =
 	let val args' = List.filter (not o TI.isVoidType') args
-	    fun coerce (TE.LONG(_, TE.OUTPUT t), n) = $"&" && mkOutName n
+	    fun coerce (TE.OUTPUT t, n) = $"&" && mkOutName n
 	      | coerce (t, n) = TI.toCValue' (t, $n)
 	in  $name && $"(" && prsep ($", ") coerce args' && $")"
 	end
@@ -175,43 +160,43 @@ struct
       | declareOutParams (retType, outPars) =
 	let fun decl (tName, name) = 
 	        $"  " && TI.mkCType tName && $" " && mkOutName name && $";"
-	in     (if size(TI.get_texp retType) > 1 then $"  value res;" && Nl else Empty)
+	in     (if size retType > 1 then $"  value res;" && Nl else Empty)
             && prsep Nl decl outPars && Nl
 	end
 
     (* for this function remember that the return type has already
        been combined with the output parameters. *)
-    fun mkReturn' cExp (retType as (TE.PRIMTYPE "none"), outPars) =
+    fun mkReturn cExp (retType as (TE.PRIMTYPE "none"), outPars) =
 	   $"  " && cExp && $";" && Nl
-	&& $"  return " && TI.fromCValue (TE.LONG([], retType), $"dummy") && $";" && Nl
+	&& $"  return " && TI.fromCValue (retType, $"dummy") && $";" && Nl
 
-      | mkReturn' cExp (retType as (TE.PRIMTYPE _), []) =
-	   $"  return " && TI.fromCValue (TE.LONG([], retType), cExp) && $";" && Nl
-      | mkReturn' cExp (retType as (TE.PRIMTYPE _), [(tOut,nOut)]) =
-	   $"  " && cExp && $";" && Nl
-	&& $"  return " && TI.fromCValue (tOut, mkOutName nOut) && $";" && Nl
-
-      | mkReturn' cExp (retType as (TE.WIDGET (wid,_)), []) =
-	   $"  return " && TI.fromCValue (TE.LONG([], retType), cExp) && $";" && Nl
-      | mkReturn' cExp (retType as (TE.WIDGET _), [(tOut,nOut)]) =
+      | mkReturn cExp (retType as (TE.PRIMTYPE _), []) =
+	   $"  return " && TI.fromCValue (retType, cExp) && $";" && Nl
+      | mkReturn cExp (retType as (TE.PRIMTYPE _), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TI.fromCValue (tOut, mkOutName nOut) && $";" && Nl
 
-      | mkReturn' cExp (retType as (TE.POINTER _), []) =
-	   $"  return " && TI.fromCValue (TE.LONG([], retType), cExp) && $";" && Nl
-      | mkReturn' cExp (retType as (TE.POINTER _), [(tOut,nOut)]) =
+      | mkReturn cExp (retType as (TE.WIDGET _), []) =
+	   $"  return " && TI.fromCValue (retType, cExp) && $";" && Nl
+      | mkReturn cExp (retType as (TE.WIDGET _), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TI.fromCValue (tOut, mkOutName nOut) && $";" && Nl
 
-      | mkReturn' cExp (retType as (TE.FLAG (fName,_)), []) =
-	   $"  return " && TI.fromCValue (TE.LONG([], retType), cExp) && $";" && Nl
-      | mkReturn' cExp (retType as (TE.FLAG (fName,_)), [(tOut,nOut)]) =
+      | mkReturn cExp (retType as (TE.POINTER _), []) =
+	   $"  return " && TI.fromCValue (retType, cExp) && $";" && Nl
+      | mkReturn cExp (retType as (TE.POINTER _), [(tOut,nOut)]) =
 	   $"  " && cExp && $";" && Nl
 	&& $"  return " && TI.fromCValue (tOut, mkOutName nOut) && $";" && Nl
 
-      | mkReturn' cExp (TE.PRIMTYPE _, _) = 
+      | mkReturn cExp (retType as (TE.FLAG _), []) =
+	   $"  return " && TI.fromCValue (retType, cExp) && $";" && Nl
+      | mkReturn cExp (retType as (TE.FLAG _), [(tOut,nOut)]) =
+	   $"  " && cExp && $";" && Nl
+	&& $"  return " && TI.fromCValue (tOut, mkOutName nOut) && $";" && Nl
+
+      | mkReturn cExp (TE.PRIMTYPE _, _) = 
 	  U.shouldntHappen("mkReturn: multiple output parameters and return type is a type name")
-      | mkReturn' cExp (retType as (TE.TUPLE (tOuts as (t::_)), outPars)) =
+      | mkReturn cExp (retType as (TE.TUPLE (tOuts as (t::_)), outPars)) =
 	if List.length tOuts = List.length outPars (* original return type was none *)
 	then    $"  " && cExp && $";" && Nl
 	     && allocTuple "res" (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) outPars)
@@ -219,17 +204,16 @@ struct
 	else    $"  value rescall = " && cExp && $";" && Nl
              && allocTuple "res" (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) ((t,"call")::outPars))
              && $"  return res;" && Nl
-      | mkReturn' cExp (TE.TUPLE _, _) = 
+      | mkReturn cExp (TE.TUPLE _, _) = 
 	  U.shouldntHappen("mkReturn: return tuple with only one output type")
-      | mkReturn' cExp (TE.OUTPUT typExp, outPars) = mkReturn cExp (typExp, outPars)
-      | mkReturn' cExp (typExp, _) = 
+      | mkReturn cExp (TE.OUTPUT typExp, outPars) = mkReturn cExp (typExp, outPars)
+      | mkReturn cExp (typExp, _) = 
 	  U.shouldntHappen("mkReturn: wrong return type")
-    and mkReturn cExp (TE.LONG(path, typExp), outPars) = mkReturn' cExp (typExp, outPars)
 
-    fun mkFunDecl (name, funType as TE.LONG(_, TE.ARROW(pars,outPars,cmp,retType)), cExp) = 
-	let val dummyPair = (TE.LONG([], TE.PRIMTYPE "none"), "dummy")
+    fun mkFunDecl (name, funType as TE.ARROW(pars,outPars,cmp,retType), cExp) = 
+	let val dummyPair = (TE.PRIMTYPE "none", "dummy")
 	in  $"/* ML type: " && TI.mkMLPrimType funType && $" */" && Nl
-         && $$["EXTERNML ", "value m", name] && paramList pars && $" { /* ML */" && Nl
+         && $$["EXTERNML ", "value mgtk_", name] && paramList pars && $" { /* ML */" && Nl
          && declareOutParams (retType, outPars)
          && (if TI.fitsDynApp pars then Empty else extractParams pars && Nl)
          && mkReturn cExp (retType, outPars)
@@ -257,42 +241,43 @@ struct
              text_insert'_ text chars length
     *)
 
-    fun mkMLFunDecl (name, tExp) =
-	let val name' = mlFunName name
-	in  mkValDecl (name', TI.mkMLType tExp, NONE)
+    fun mkMLFunDecl short (path,base,tExp) =
+	let val name = if short then TI.MLFunNameWithoutOpt (path,base)
+		       else TI.MLFunName (path, base)
+	in  mkValDecl (name, TI.mkMLType tExp, NONE)
 	end
 
-    fun mkArg (TE.LONG(_, TE.WIDGET _), name) = $$["fn OBJ ", name, " => "]
+    fun mkArg (TE.WIDGET _, name) = $$["fn OBJ ", name, " => "]
       | mkArg (typExp, name) = $$["fn ", name, " => "]
 
-    fun unwrapArg (TE.LONG(_, TE.OPTION (TE.LONG(_, TE.WIDGET _))), name) =
+    fun unwrapArg (TE.OPTION (TE.WIDGET _), name) =
 	$$["(unwrapObjOpt ", name, ")"]
-      | unwrapArg (TE.LONG(_, TE.LIST (TE.LONG(_, TE.WIDGET _))), name) =
+      | unwrapArg (TE.LIST (TE.WIDGET _), name) =
 	$$["(map unwrap ", name, ")"]
-      | unwrapArg (TE.LONG(_, TE.FLAG (fName,false)), name) = 
+      | unwrapArg (TE.FLAG (_,false), name) = 
 	$$["(setFlags ", name, ")"]
       | unwrapArg (typExp, name) = $name
-    fun wrapResult (TE.LONG(_, TE.WIDGET _)) res = 
+    fun wrapResult (TE.WIDGET _) res = 
 	$"OBJ(" && res && $")"
-      | wrapResult (TE.LONG(_, TE.FLAG (fName,false))) res =
+      | wrapResult (TE.FLAG (_,false)) res =
 (* see comment on getSet below
 	$"getSet" && $fName && $"(" && res && $")"
 *)
 	$"getFlags(" && res && $")"
       | wrapResult typExp res = res
 
-    fun mkMLFunVal short (name, typ as (TE.LONG(_, TE.ARROW(pars',outPars,_,retTyp')))) =
+    fun mkMLFunVal short (path,base,typ as (TE.ARROW(pars',outPars,_,retTyp'))) =
 	let val no_args = if TI.fitsDynApp pars' then List.length pars' else 1
-	    val name' = mlFunName name
 	    val (c_name,ml_name) = 
-		    if short then (name ^ "_short", name' ^ "'")
-		    else (name, name')
+		    if short then (TI.CFunNameWithoutOpt (path,base), 
+				   TI.MLFunNameWithoutOpt (path, base))
+		    else (TI.CFunName (path,base), TI.MLFunName (path,base))
 	    val primval = 
 		   let val value = $$["app", Int.toString no_args,
-				      "(symb\"m", c_name, "\")"]
+				      "(symb\"mgtk_", c_name, "\")"]
 		   in  mkValDecl (ml_name ^ "_", TI.mkMLPrimType typ, SOME value)
 		   end
-	    val funcval =  mkMLFunDecl (ml_name,typ)
+	    val funcval =  mkMLFunDecl short (path,base,typ)
                         && $$[indent, indent, "= "]
 		        && prmap mkArg pars'
                         && wrapResult retTyp' 
@@ -304,7 +289,7 @@ struct
                        && Nl && Nl
 	in  primval && funcval
 	end
-      | mkMLFunVal short (name, _) =
+      | mkMLFunVal short _ =
 	raise Fail("mkMLFunVal: not a function type")
 
     (* Code to extract fields of a widget 
@@ -329,22 +314,28 @@ struct
                = fn OBJ wid => OBJ(combo_get_entry_ wid)
     *)
 
-    fun getFieldName (name, field) =
-	"gtk_" ^ NU.separateWords #"_" (mlWidgetName name) ^ "_get_" ^ field
+    fun getFieldName (path,base) field = (path, rev (field :: "get" :: rev base))
 
-    fun mkGetField name (typExp, field) = 
-	let val name' = NU.separateWords #"_" (mlWidgetName name)
-	    val macro = $$["GTK_", NU.toUpper name',"("]
-                        && TI.toCValue (name, $"wid") && $")"
+    fun mkGetField wid (typExp, field) = 
+	let val (wid_path, wid_base) = TI.MLName wid
+	    val (fld_path, fld_base) = getFieldName (wid_path,wid_base) field
+	    val name  = TI.CFunName (wid_path, wid_base)
+	    val macro = $(NU.toUpper name) && $"("
+                        && TI.toCValue (wid, $"wid") && $")"
 	    val cExp = $"(" && macro && $")" && $" -> " && $field
-	in  mkFunDecl (getFieldName (name, field), mkArrowType (typExp, [(name,"wid")]), cExp)
+	in  mkFunDecl (TI.CFunName (fld_path, fld_base), 
+		       mkArrowType (typExp, [(wid,"wid")]), cExp)
 	end
 
-    fun mkMLGetFieldDecl name (typExp, field) =
-	mkMLFunDecl (getFieldName(name,field), mkArrowType (typExp,[(name,"wid")]))
+    fun mkMLGetFieldDecl wid (typExp, field) =
+	let val (path, base) = getFieldName (TI.MLName wid) field
+	in  mkMLFunDecl false (path, base, mkArrowType (typExp,[(wid,"wid")]))
+	end
 
-    fun mkMLGetFieldVal name (typExp, field) =
-	mkMLFunVal false (getFieldName(name,field), mkArrowType (typExp, [(name,"wid")]))
+    fun mkMLGetFieldVal wid (typExp, field) =
+	let val (path, base) = getFieldName (TI.MLName wid) field
+	in  mkMLFunVal false (path, base, mkArrowType (typExp, [(wid,"wid")]))
+	end
 
     (* Code to declare a new widget
        ------------------------------------------------------------
@@ -368,23 +359,23 @@ struct
     *)
 
     fun mkWidgetDecl (wid, fields) =
-	   $$["/* *** ", mlWidgetName wid, " stuff *** */"] && Nl && Nl
+	   $$["/* *** ", TI.MLShortWidgetName wid, " stuff *** */"] && Nl && Nl
         && (prsep Nl (mkGetField wid) (case fields of SOME fields => fields | NONE => []))
         && Nl
 
-    fun widgetName (TE.LONG(_, TE.WIDGET(name, _))) = name
-      | widgetName _ = U.shouldntHappen "widgetName: not a widget"
-    fun inheritsFrom (TE.LONG(_, TE.WIDGET(_, SOME inherits))) = inherits
-      | inheritsFrom (TE.LONG(_, TE.WIDGET(_, NONE))) = U.shouldntHappen "inheritsFrom: got GtkObject"
+    fun inheritsFrom (TE.WIDGET(_, TE.INH_FROM inherits)) = inherits
+      | inheritsFrom (TE.WIDGET(_, TE.INH_ROOT)) = 
+	U.shouldntHappen "inheritsFrom: got GtkObject"
       | inheritsFrom _ = U.shouldntHappen "inheritsFrom: not a widget"
     fun mkMLWidgetDecl base wid = 
-	let val name' = mlWidgetName wid
-	    val witness = $$["'a ", NU.toLower name', "_t"]
-	in  mkComment ($$["*** ", name', " ***"]) && Nl
+	let val name = TI.MLWidgetName wid
+	    val short = TI.MLShortWidgetName wid
+	    val witness = $$["'a ", NU.toLower short, "_t"]
+	in  mkComment ($$["*** ", short, " ***"]) && Nl
 
 	 && mkTypeDecl' (witness, base)
-         && mkTypeDecl' ($"'a " && $(widgetName wid), 
-			 SOME(witness && $" " && $(inheritsFrom wid)))
+         && mkTypeDecl' ($"'a " && $name, 
+			 SOME(witness && $" " && $(TI.MLNamePath (inheritsFrom wid))))
          && Nl
 	end
 
@@ -422,15 +413,12 @@ struct
            type gdk_font = gpointer
 
     *)
-
-    fun boxedName (TE.LONG(_, TE.POINTER (box,inh))) = box
-      | boxedName _ = U.shouldntHappen "boxedName: not a pointer"
-    fun boxedInherits (TE.LONG(_, TE.POINTER (box,inh))) = inh
+    fun boxedInherits (TE.POINTER (_,inh)) = inh
       | boxedInherits _ = U.shouldntHappen "boxedInherits: not a pointer"
 
     fun mkBoxedDecl (pointer, funcs) =
-	let val name = boxedName pointer
-	    val name' = TI.mlBoxedTypeName name
+	let val name = TI.MLBoxedName pointer
+	    val name' = name
 	    fun isCopy func =
 		let fun last4 s = 
 		        String.extract(s, Int.max(0,String.size s-4), NONE)
@@ -462,16 +450,27 @@ struct
 	 && $$["}"] && Nl && Nl
 	end
 
-    fun mlBoxedWitness pointer = 
-	NU.toLower (NU.removePrefix (boxedName pointer) ^ "_t")
     fun mkMLBoxedDecl' base pointer = 
 	case boxedInherits pointer of
-	    NONE => mkTypeDecl' (TI.mkMLType pointer, if base = NONE then NONE else SOME ($"gpointer")) && Nl
-        |   SOME (TE.INH_ROOT) => mkTypeDecl' (TI.mkMLType pointer, if base = NONE then NONE else SOME ($"gpointer")) && Nl
-        |   SOME (TE.INH_FROM inherits) =>
-                (  mkTypeDecl' ($"'a " && $(mlBoxedWitness pointer), base)
-  	        && mkTypeDecl' (TI.mkMLType pointer, SOME($"'a " && $(mlBoxedWitness pointer) && $" " && $(TI.mlBoxedTypeName inherits))) && Nl
-                )
+	    NONE => 
+		mkTypeDecl' (TI.mkMLType pointer, if base=NONE then NONE
+						  else SOME ($"gpointer"))
+	     && Nl
+        |   SOME (TE.INH_ROOT) => 
+		mkTypeDecl' (TI.mkMLType pointer, if base=NONE then NONE
+						  else SOME ($"gpointer"))
+	     && Nl
+        |   SOME (TE.INH_FROM inh) =>
+		let val inheritsName = TI.MLFlagName (TE.POINTER(inh,NONE))
+		    (* hack to avoid complications between GdkWindow and
+		       GtkWindow *)
+		    val short = TI.MLWidgetName pointer
+		    val witness = $$["'a ", NU.toLower short, "_t"]
+		in  mkTypeDecl' (witness, base)
+		 && mkTypeDecl' (TI.mkMLType pointer, 
+				 SOME(witness && $" " && $inheritsName))
+		 && Nl
+                end
     fun mkMLBoxedDecl pointer = mkMLBoxedDecl' NONE pointer
     fun mkMLBoxedVal pointer = mkMLBoxedDecl' (SOME ($"base")) pointer
 
@@ -508,19 +507,14 @@ struct
 
     *)
 
-    fun flagName (TE.LONG(_, TE.FLAG(fName,_))) = 
-	NU.separateWords #"_" (NU.removePrefix fName)
-      | flagName _ =
-	U.shouldntHappen "flagName: Not a flag"
-    fun flagRealName (TE.LONG(_, TE.FLAG(fName,_))) = fName
-      | flagRealName _ = U.shouldntHappen "flagReal Name: Not a flag"
     fun mlFlagTupleType constr = 
-	TE.LONG([], TE.TUPLE(map (fn _=> TE.LONG([], TE.PRIMTYPE "int")) constr))
+	TE.TUPLE(map (fn _=> TE.PRIMTYPE "int") constr)
+
     fun mkFlagsDecl (flag, constr) =
 	let val constr' = ListPair.zip (List.tabulate(List.length constr, fn n=>n), constr)
 	    fun prCnstr (n,c) =
-		$$["  Field(res,",Int.toString n,") = Val_int(",c,");"]
-	    val fName = flagName flag
+		$$["  Field(res,",Int.toString n,") = Val_int(",TI.CConstrName c,");"]
+	    val fName = TI.MLFlagName flag
 	    val tupleTyp = mlFlagTupleType constr
 	in  (* why don't we use mkFunDecl above? *)
             $"/* ML type: unit -> " && TI.mkMLPrimType tupleTyp && $" */" && Nl
@@ -532,17 +526,16 @@ struct
          && Nl
 	end
     fun mkMLFlagsDecl (flag, constr) =
-	let val fName = flagName flag
-	    fun prCnstr const = mkValDecl (mlFlagName const, $fName, NONE)
+	let val fName = TI.MLFlagName flag
+	    fun prCnstr const = mkValDecl (TI.MLConstrName const, $fName, NONE)
 	in  mkEqTypeDecl (fName, NONE)
          && prsep Empty prCnstr constr
          && Nl
 	end
     fun mkMLFlagsVal (flag, constr) =
-	let val fName = flagName flag
-	    val fName' = flagRealName flag
+	let val fName = TI.MLFlagName flag
 	    val tupleType = mlFlagTupleType constr
-	    fun cName const = $(mlFlagName const)
+	    fun cName const = $(TI.MLConstrName const)
 	in  mkTypeDecl (fName, SOME ($"int"))
          && $$[indent,"val get_", fName, "_: "]
 	       && $"unit -> " && TI.mkMLPrimType tupleType && Nl
@@ -574,8 +567,7 @@ struct
                 = fn wid => fn cb => unit_connect wid "clicked" cb
     *)
 
-    fun longTName tName = TE.LONG([], TE.PRIMTYPE tName)
-    val unitType = longTName "none"
+    val unitType = TE.PRIMTYPE "none"
     fun mlConnectType (name, NONE) = 
 	mkArrowType (unitType,
 		   [(name,"wid"), (mkArrowType(unitType, [(unitType, "()")]), "cb")])
@@ -583,29 +575,29 @@ struct
 	mkArrowType (unitType, [(name,"wid"),(cb,"cb")])
 
     fun mlConnectFunction NONE = "unit_connect"
-      | mlConnectFunction (SOME(TE.LONG(_,TE.ARROW([(TE.LONG(_, TE.PRIMTYPE "none"),_)], _, _, TE.LONG(_, TE.PRIMTYPE "bool"))))) =
+      | mlConnectFunction (SOME(TE.ARROW([(TE.PRIMTYPE "none",_)], _, _, TE.PRIMTYPE "bool"))) =
         "bool_connect"
       | mlConnectFunction (SOME _) = raise Fail("only know callbacks of type unit -> bool")
 
     (* Generation of C code
        ------------------------------------------------------------
     *)
-    fun getParams (TE.LONG(_, TE.ARROW(_,_,cmp,_))) = cmp
+    fun getParams (TE.ARROW(_,_,cmp,_)) = cmp
       | getParams _ = raise Fail("getParams: not a function type")
-    fun mkCFunction (name, A.FUNTYPE(funType, NONE)) =
-	   mkFunDecl (name, funType, mkCall (name, getParams funType))
-      | mkCFunction (name, A.FUNTYPE(funType, SOME shortFunType)) =
-	let fun mkNULL (TE.LONG(p, TE.OPTION _),n) = (TE.LONG(p,TE.PRIMTYPE "<ctype>"),"NULL")
+    fun mkCFunction (path, base, A.FUNTYPE(funType, NONE)) =
+	   mkFunDecl (TI.CFunName (path, base), funType, mkCall (TI.CFunName (path,base), getParams funType))
+      | mkCFunction (path, base, A.FUNTYPE(funType, SOME shortFunType)) =
+	let fun mkNULL (TE.OPTION _,n) = (TE.PRIMTYPE "<ctype>","NULL")
               | mkNULL (t,n) = (t,n)
-	in  mkFunDecl (name, funType, mkCall (name, getParams funType))
-         && mkFunDecl (name ^ "_short", shortFunType, mkCall (name,map mkNULL (getParams funType)))
+	in  mkFunDecl (TI.CFunName (path,base), funType, mkCall (TI.CFunName (path,base), getParams funType))
+         && mkFunDecl (TI.CFunNameWithoutOpt (path,base), shortFunType, mkCall (TI.CFunName (path,base),map mkNULL (getParams funType)))
 	end
 
     fun mkCdecl (A.MODULE_DECL(pos,exp,path)) = Empty
       | mkCdecl (A.OBJECT_DECL(pos, name, fields)) =
           mkWidgetDecl (name, fields)
-      | mkCdecl (A.FUNCTION_DECL(pos, name, funType)) =
-	  mkCFunction (name, funType)
+      | mkCdecl (A.FUNCTION_DECL(pos, (path, base), funType)) =
+	  mkCFunction (path, base, funType)
       | mkCdecl (A.FLAGS_DECL(pos, name, constr)) =
            mkFlagsDecl (name, constr)
       | mkCdecl (A.BOXED_DECL(pos, name, funcs)) =
@@ -616,25 +608,26 @@ struct
     (* Generation of SML signature
        ------------------------------------------------------------
     *)
-    fun mkMLSigdecl (A.MODULE_DECL(pos,exp,path)) = 
-	Nl
+    fun mkMLSigdecl (A.MODULE_DECL(pos,exp,path)) = Empty
 (*
 	Nl && mkComment ($(U.stringSep "++++ " (if exp then " (explicit) ++++"
 						else " (implicit) ++++")
 			               "." (fn s=>s) path))
 *)
       | mkMLSigdecl (A.OBJECT_DECL(pos, name, fields)) =
-	   mkMLWidgetDecl NONE name
+	   Nl
+        && mkMLWidgetDecl NONE name
         && (prsep Empty (mkMLGetFieldDecl name) (case fields of SOME fields => fields | NONE => []))
         && Nl
-      | mkMLSigdecl (A.FUNCTION_DECL(pos, name, A.FUNTYPE(longType, NONE))) = 
-  	   mkMLFunDecl (name, longType)
-      | mkMLSigdecl (A.FUNCTION_DECL(pos, name, A.FUNTYPE(longType, SOME shortType))) =
-	   mkMLFunDecl (name, longType) && mkMLFunDecl (name^"'", shortType)
+      | mkMLSigdecl (A.FUNCTION_DECL(pos, (path,base), A.FUNTYPE(longType, NONE))) = 
+  	   mkMLFunDecl false (path, base, longType)
+      | mkMLSigdecl (A.FUNCTION_DECL(pos, (path,base), A.FUNTYPE(longType, SOME shortType))) =
+	   mkMLFunDecl false (path,base, longType) 
+	&& mkMLFunDecl true  (path,base, shortType)
       | mkMLSigdecl (A.FLAGS_DECL(pos, name,constr)) =
 	   mkMLFlagsDecl (name, constr)
       | mkMLSigdecl (A.SIGNAL_DECL(pos, name,signal,cbType)) =
-	   mkValDecl ("connect_" ^ mlSignalName signal, 
+	   mkValDecl ("connect_" ^ TI.MLSignalName signal, 
 		      TI.mkMLType(mlConnectType (name, cbType)), NONE)
       | mkMLSigdecl (A.BOXED_DECL(pos, name, _)) =
 	   mkMLBoxedDecl name
@@ -647,15 +640,16 @@ struct
 	   mkMLWidgetDecl (SOME ($"base")) name
         && (prsep Empty (mkMLGetFieldVal name) (case fields of SOME fields => fields | NONE => []))
         && Nl
-      | mkMLStrdecl (A.FUNCTION_DECL(pos, name, A.FUNTYPE(longType,NONE))) = 
-	   mkMLFunVal false (name, longType)
-      | mkMLStrdecl (A.FUNCTION_DECL(pos, name, A.FUNTYPE(longType, SOME shortType))) =
-	   mkMLFunVal false (name, longType) && mkMLFunVal true (name, shortType)
+      | mkMLStrdecl (A.FUNCTION_DECL(pos, (path,base), A.FUNTYPE(longType,NONE))) = 
+	   mkMLFunVal false (path,base, longType)
+      | mkMLStrdecl (A.FUNCTION_DECL(pos, (path,base), A.FUNTYPE(longType, SOME shortType))) =
+	   mkMLFunVal false (path, base, longType) 
+        && mkMLFunVal true  (path, base, shortType)
       | mkMLStrdecl (A.FLAGS_DECL(pos, name,constr)) =
 	   mkMLFlagsVal (name, constr)
       | mkMLStrdecl (A.SIGNAL_DECL(pos, name,signal,cbType)) =
 	   let val cnc_func = mlConnectFunction cbType
-	   in  mkValDecl ("connect_" ^ mlSignalName signal, 
+	   in  mkValDecl ("connect_" ^ TI.MLSignalName signal, 
 			  TI.mkMLType(mlConnectType (name, cbType)),
 			  SOME($$["fn wid => fn cb => ", cnc_func,
 				  " wid \"", A.signalOf signal, "\" cb"]))

@@ -16,30 +16,30 @@
 /*                                                                           */
 
 
-#define GdkFont_val(x) ((void*) Field(x, 1))
+#define gdk_font_val(x) ((void*) Field(x, 1))
 
-#define GdkFont_val_nocast(x) (Field(x, 1))
+#define gdk_font_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_font (value val) {
-  gdk_font_unref (GdkFont_val(val)); 
+  gdk_font_unref (gdk_font_val(val)); 
 }
 
-value Val_GdkFont (void* obj) {
+value Val_gdk_font (void* obj) {
   value res;
   gdk_font_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_font, 0, 1);
-  GdkFont_val_nocast(res) = (value) obj;
+  gdk_font_val_nocast(res) = (value) obj;
   return res;
 }
 
 /* ML type: string -> gdk_font */
-EXTERNML value mgdk_font_load(value name) { /* ML */
-  return Val_GdkFont(gdk_font_load(String_val(name)));
+EXTERNML value mgtk_gdk_font_load(value name) { /* ML */
+  return Val_gdk_font(gdk_font_load(String_val(name)));
 }
 
 /* ML type: string -> gdk_font */
-EXTERNML value mgdk_fontset_load(value name) { /* ML */
-  return Val_GdkFont(gdk_fontset_load(String_val(name)));
+EXTERNML value mgtk_gdk_fontset_load(value name) { /* ML */
+  return Val_gdk_font(gdk_fontset_load(String_val(name)));
 }
 
 ------------------------------------------------------------
@@ -86,12 +86,12 @@ end
     type gdk_font = gpointer
 
     val gdk_font_load_: string -> gdk_font
-        = app1(symb"mgdk_font_load")
+        = app1(symb"mgtk_gdk_font_load")
     val gdk_font_load: string -> gdk_font
         = fn name => gdk_font_load_ name
 
     val gdk_fontset_load_: string -> gdk_font
-        = app1(symb"mgdk_fontset_load")
+        = app1(symb"mgtk_gdk_fontset_load")
     val gdk_fontset_load: string -> gdk_font
         = fn name => gdk_fontset_load_ name
 

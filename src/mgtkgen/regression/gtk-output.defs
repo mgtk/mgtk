@@ -1,3 +1,5 @@
+(define-module Gdk)
+
 (define-boxed GdkColor
   gdk_color_copy
   gdk_color_free
@@ -7,6 +9,8 @@
   bool
   ((string name)
    (GdkColor color (output))))
+
+(define-module Gtk)
 
 (define-object GtkLabel (GtkWidget)
   (fields (float value)))

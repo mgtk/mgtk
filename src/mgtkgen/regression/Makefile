@@ -6,7 +6,7 @@
 TRANSLATE=../mgtkgen
 REMOVE=rm -f
 
-all: quick gtk gtk2
+all: quick gtk
 quick: gtk-adj gtk-fonts gtk-boxed gtk-output gtk-split-words
 
 fresh: clean all
@@ -37,6 +37,9 @@ fresh: clean all
 clean:
 	$(REMOVE) *~
 	$(REMOVE) *.res
+	$(REMOVE) *.c
+	$(REMOVE) *.sig
+	$(REMOVE) *.sml
 
 realclean: clean
 

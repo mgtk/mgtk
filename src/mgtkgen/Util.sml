@@ -4,6 +4,10 @@
 structure Util =
 struct
 
+    (* a useful function *)
+    fun mapOpt f NONE = NONE
+      | mapOpt f (SOME v) = SOME (f v)
+
     (* some useful exceptions *)
     exception NotImplemented of string
     exception ShouldntHappen of string

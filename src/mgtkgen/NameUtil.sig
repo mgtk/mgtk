@@ -4,32 +4,20 @@
 signature NameUtil =
 sig
 
-    val remove: string -> string -> string
+    type name = string list (* path *) * string list (* base type name *)
 
-    val removePrefix: string -> string
-    val remove_prefix: string -> string
-    val remove_PREFIX: string -> string
-
-    val separateWords: char -> string -> string
     val separate_words: char -> string -> string
 
     val toLower: string -> string
     val toUpper: string -> string
 
+    val nameToString: name -> string
+
 end
 
 (*
 
-   [removePrefix s] if s begins with `Gtk' returns s without the
-   prefix, otherwise just returns s.
-
-   [remove_prefix s] if s begins with `gtk_' returns s without the
-   prefix, otherwise just returns s.
-
-   [remove_PREFIX s] if s begins with `GTK_' returns s without the
-   prefix, otherwise just returns s.
-
-   [separateWords sep s] constructs a string from s such that words
+   [separate_words sep s] constructs a string from s such that words
    (delimited by upper case letter; a word can consist of all caps)
    are separated by sep. The returned string is all lower case.
 

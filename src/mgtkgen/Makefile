@@ -4,8 +4,8 @@
 include ../Makefile.inc
 
 OBJS=Parsercomb.uo WSeq.uo Util.uo NameUtil.uo ArgParse.uo \
-     TypeExp.uo TypeInfo.uo Parse.uo Parser.uo AST.uo Translate.uo \
-     Messages.uo Main.uo
+     TypeExp.uo TypeInfo.uo Parse.uo ParseUtils.uo Parser.uo \
+     AST.uo Translate.uo Messages.uo Main.uo
 PROG=mgtkgen
 
 SUBDIRS=regression tools
@@ -41,19 +41,23 @@ depend:
 
 ### EVERYTHING THAT GOES BEYOND THIS COMMENT WILL BE ERASED WITHOUT WARNING
 ### DO NOT DELETE THIS LINE
-Translate.ui: AST.ui 
-TypeInfo.uo: WSeq.ui 
-TypeExp.uo: TypeExp.ui Util.uo 
-WSeq.uo: WSeq.ui 
-ArgParse.uo: ArgParse.ui 
+ParseUtils.ui: AST.ui TypeExp.ui 
+ParseUtils.uo: ParseUtils.ui AST.ui TypeExp.ui Util.uo 
+TypeInfo.ui: TypeExp.ui NameUtil.ui WSeq.ui 
 Parsercomb.uo: Parsercomb.ui 
-Parser.uo: AST.ui NameUtil.ui Util.uo Parsercomb.ui 
-NameUtil.uo: NameUtil.ui 
-Messages.uo: Messages.ui AST.ui WSeq.ui 
+TypeExp.uo: TypeExp.ui Util.uo 
+TypeExp.ui: NameUtil.ui 
+WSeq.uo: WSeq.ui 
+TypeInfo.uo: TypeInfo.ui WSeq.ui Util.uo 
+Translate.uo: Translate.ui WSeq.ui 
+Translate.ui: AST.ui 
+Parser.uo: Parsercomb.ui 
 Parse.uo: Parsercomb.ui 
+NameUtil.uo: NameUtil.ui Util.uo 
+Messages.uo: Messages.ui AST.ui WSeq.ui 
 Messages.ui: AST.ui 
 Main.uo: Parser.uo AST.ui Translate.ui Messages.ui ArgParse.ui Util.uo \
     Parse.uo 
-AST.uo: AST.ui TypeExp.ui Util.uo 
-Translate.uo: Translate.ui WSeq.ui 
-AST.ui: TypeExp.ui 
+AST.uo: AST.ui TypeExp.ui NameUtil.ui Util.uo 
+AST.ui: TypeExp.ui NameUtil.ui 
+ArgParse.uo: ArgParse.ui 

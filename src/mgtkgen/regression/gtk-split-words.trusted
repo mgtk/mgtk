@@ -16,19 +16,19 @@
 /*                                                                           */
 
 
-#define GdkFont_val(x) ((void*) Field(x, 1))
+#define gdk_font_val(x) ((void*) Field(x, 1))
 
-#define GdkFont_val_nocast(x) (Field(x, 1))
+#define gdk_font_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_font (value val) {
-  gdk_font_unref (GdkFont_val(val)); 
+  gdk_font_unref (gdk_font_val(val)); 
 }
 
-value Val_GdkFont (void* obj) {
+value Val_gdk_font (void* obj) {
   value res;
   gdk_font_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_font, 0, 1);
-  GdkFont_val_nocast(res) = (value) obj;
+  gdk_font_val_nocast(res) = (value) obj;
   return res;
 }
 
@@ -60,7 +60,7 @@ EXTERNML value mgtk_get_gdk_im (value dummy) { /* ML */
 }
 
 /* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_clist_drag_pos (value dummy) { /* ML */
+EXTERNML value mgtk_get_gtk_clist_drag_pos (value dummy) { /* ML */
   value res = alloc_tuple(4);
   Field(res,0) = Val_int(GTK_CLIST_DRAG_NONE);
   Field(res,1) = Val_int(GTK_CLIST_DRAG_BEFORE);
@@ -104,11 +104,11 @@ EXTERNML value mgtk_get_clist_drag_pos (value dummy) { /* ML */
     val GDK_PREEDIT_CALLBACKS: gdk_im
     val GDK_PREEDIT_POSITION: gdk_im
 
-    eqtype clist_drag_pos
-    val CLIST_DRAG_NONE: clist_drag_pos
-    val CLIST_DRAG_BEFORE: clist_drag_pos
-    val CLIST_DRAG_INTO: clist_drag_pos
-    val CLIST_DRAG_AFTER: clist_drag_pos
+    eqtype gtk_clist_drag_pos
+    val CLIST_DRAG_NONE: gtk_clist_drag_pos
+    val CLIST_DRAG_BEFORE: gtk_clist_drag_pos
+    val CLIST_DRAG_INTO: gtk_clist_drag_pos
+    val CLIST_DRAG_AFTER: gtk_clist_drag_pos
 
 end
 ------------------------------------------------------------
@@ -149,10 +149,10 @@ end
     val (GDK_PREEDIT_AREA,GDK_PREEDIT_CALLBACKS,GDK_PREEDIT_POSITION)
         = get_gdk_im_ ()
 
-    type clist_drag_pos = int
-    val get_clist_drag_pos_: unit -> int * int * int * int
-        = app1(symb"mgtk_get_clist_drag_pos")
+    type gtk_clist_drag_pos = int
+    val get_gtk_clist_drag_pos_: unit -> int * int * int * int
+        = app1(symb"mgtk_get_gtk_clist_drag_pos")
     val (CLIST_DRAG_NONE,CLIST_DRAG_BEFORE,CLIST_DRAG_INTO,CLIST_DRAG_AFTER)
-        = get_clist_drag_pos_ ()
+        = get_gtk_clist_drag_pos_ ()
 
 end

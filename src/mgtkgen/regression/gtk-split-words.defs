@@ -1,3 +1,5 @@
+(define-module Gdk)
+
 (define-boxed GdkFont
   gdk_font_ref
   gdk_font_unref)
@@ -16,6 +18,8 @@
    (preedit-area GDK_PREEDIT_AREA)
    (preedit-callbacks GDK_PREEDIT_CALLBACKS)
    (preedit-position GDK_PREEDIT_POSITION))
+
+(define-module Gtk)
 
 (define-enum GtkCListDragPos
    (none GTK_CLIST_DRAG_NONE)

@@ -1,4 +1,6 @@
 ; Test of boxed things
+(define-module Gdk)
+
 (define-boxed GdkFont
   gdk_font_ref
   gdk_font_unref)

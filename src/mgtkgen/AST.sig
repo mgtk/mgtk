@@ -4,25 +4,26 @@
 signature AST =
 sig
 
-    type long_texp = TypeExp.long_texp
+    type texp = TypeExp.texp
+    type name = NameUtil.name
 
     datatype target = SIG | SML | C
 
     type pos = int * int
 
-    type constructor = string
-    type parameter = long_texp * string
+    type constructor = name
+    type parameter = texp * string
 
     datatype funtype =
-	FUNTYPE of long_texp (* ``normal'' parameters *)
-	         * long_texp option (* short paramters *)
+	FUNTYPE of texp (* ``normal'' parameters *)
+	         * texp option (* short parameters *)
     datatype declaration =
 	MODULE_DECL of pos * bool (* explicit? *) * string list
-      | OBJECT_DECL of pos * long_texp * (parameter list option)
-      | FUNCTION_DECL of pos * string * funtype
-      | FLAGS_DECL of pos * long_texp * constructor list
-      | BOXED_DECL of pos * long_texp * (string list)
-      | SIGNAL_DECL of pos * long_texp * string list * long_texp option
+      | OBJECT_DECL of pos * texp * (parameter list option)
+      | FUNCTION_DECL of pos * name * funtype
+      | FLAGS_DECL of pos * texp * constructor list
+      | BOXED_DECL of pos * texp * string list (* ref/unref function names *)
+      | SIGNAL_DECL of pos * texp * name * texp option
 
     val isWidget: declaration -> bool
     val isFunction: declaration -> bool
@@ -32,7 +33,7 @@ sig
     val isSignal: declaration -> bool
 
     val nameOf: declaration -> string
-    val signalOf: string list -> string
+    val signalOf: name -> string
     val typeOf: declaration -> string
     val posOf: declaration -> pos
 
@@ -47,7 +48,7 @@ end
    Type [target] is a type for making it possible to make target
    specific functions. It has the obvious interpretation.
 
-   Type [long_texp] is the type of values returned by the parser
+   Type [texp] is the type of values returned by the parser
    for parts of the .defs file corresponding to types.
 
    Type [declaration] (and it's auxiallary types [constructor] and
@@ -56,8 +57,8 @@ end
    [typeClass typExp] returns a string explaining the ``kind'' of the
    type expression typExp.
 
-   [toString texp] returns a string representation of the long
-   type expression texp.
+   [toString texp] returns a string representation of the type
+   expression texp.
 
    [isXXX decl] returns true if decl is an XXX, where XXX can be
    Widget, Function, Enum, Boxed, or Signal.
