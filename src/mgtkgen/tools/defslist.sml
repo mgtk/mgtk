@@ -35,8 +35,8 @@ fun main () =
 			("-n",            ArgParse.Unit useNames),
 			("--sort-on-names", ArgParse.Unit useNames),
 			("-d",            ArgParse.Unit useDecls),
+			("--sort-on-decls", ArgParse.Unit useDecls),
 			("-V",            ArgParse.Unit showVersion),
-			("--sort-on-decls", ArgParse.Unit useNames),
 			("--version",     ArgParse.Unit showVersion)
 		       ] inputFile)
                        handle ArgParse.Bad msg => raise Error msg
