@@ -95,13 +95,15 @@ fun setUpGui() =
             let val filename = getFile OPEN
             in   case filename of
                      NONE => say "No file selected"
-                   | SOME filename => 
+                   | SOME path => 
                      let (* FIXME: check permissions and stuff *)
-                         val dev = TextIO.openIn filename
+                         val {dir, file} = OS.Path.splitDirFile path
+                         val _ = OS.FileSys.chDir dir
+                         val dev = TextIO.openIn file
                          val content = TextIO.inputAll dev before TextIO.closeIn dev
                          val buffer = TextView.get_buffer textView
                      in  TextBuffer.set_text buffer content ~1
-                       ; say (OS.Path.file filename ^ " has " ^ Int.toString (TextBuffer.get_line_count buffer) ^ " lines")
+                       ; say (file ^ " has " ^ Int.toString (TextBuffer.get_line_count buffer) ^ " lines")
                      end
             end
 
@@ -118,7 +120,7 @@ fun setUpGui() =
       ; Container.add w vbox
       ; Widget.show_all w
       ; connectOpen (MenuItem.activate_sig openAction)
-      ; connectClose (MenuItem.activate_sig (fn () => ignore(say "Close 4")))
+      ; connectClose (MenuItem.activate_sig (fn () => say "Close 4"))
     end
 
 fun main () = ( GtkBasis.init(CommandLine.name()::CommandLine.arguments())
