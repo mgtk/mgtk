@@ -202,16 +202,17 @@ EXTERNML value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
 
 /* *** glist stuff *** */
 #define mgtk_isCons(x) (Tag_val(x) != 0)
-#define MGTK_SMLLIST_TO_GLIST(sls,gls,conv)		\
-        {gls = NULL;					\
-	 while (mgtk_isCons(sls))			\
-	 {						\
-	   value elem = Field(sls, 0);			\
-	   gls = g_list_append (gls,conv(elem));	\
-	   sls = Field(sls, 1);				\
-	 }						\
-        }
-
+#define MGTK_SMLLIST_TO_GLIST(sls,gls,conv)				\
+        {value MGTK_SMLLIST_TEMP = sls; 				\
+         gls = NULL;							\
+	 while (mgtk_isCons(MGTK_SMLLIST_TEMP))				\
+	 {								\
+	   value MGTK_SMLLIST_ELEM__TEMP = Field(MGTK_SMLLIST_TEMP, 0);	\
+	   gls = g_list_append (gls,conv(MGTK_SMLLIST_ELEM__TEMP));	\
+	   MGTK_SMLLIST_TEMP = Field(MGTK_SMLLIST_TEMP, 1);		\
+	 }								\
+        }								\
+									
 /* Shows how MGTK_SMLLIST_TO_GLIST can be used */
 GList* mgtk_smllist_to_glist_string(value smllist) {
   GList* glist;
