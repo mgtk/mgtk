@@ -1,3 +1,27 @@
+2000-06-13  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml: Made flags ``real'' flags. Functions with a flag
+	argument expects a list of flags; functions returning a flag
+	returns a list of flags. All flags and enums have been made
+	eqtypes.
+	
+2000-06-11  Henning Niss  <hniss@diku.dk>
+
+	* AST.sig: Made the handling of types more modular. Now
+	all ``major'' types have their own constructor, and most
+	type related stuff are delegated to TypeExp or TypeInfo.
+
+	* AST.sml: ditto.
+
+	* Translate.sml: ditto.
+
+	* Parse.sml: ditto.
+
+2000-06-11  Henning Niss  <hniss@diku.dk>
+
+	* ChangeLog: I have forgotten to update the ChangeLog in a
+	while. I will be more careful.
+	
 2000-05-09  Henning Niss  <hniss@tyr.diku.dk>
 
 	* AST.sig: Prepared for the split into Gdk and Gtk: added a new
