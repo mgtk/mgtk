@@ -11,6 +11,7 @@
 #include <alloc.h>
 #include <memory.h>
 #include <callback.h>
+#include <str.h>
 
 #ifdef WIN32
 #define EXTERNML __declspec(dllexport)
@@ -51,35 +52,80 @@ static inline value Val_GtkObj (void* obj) {
 
 /* *** Basic stuff *** */
 
-/* ML type: string vector -> unit */
+/* ** Working with SML lists ** */
+#define IsCons(x) (Tag_val(x) != 0)  
+#define Nil_list  (Atom(0))
+#define Head(xs)  (Field(xs, 0))
+#define Tail(xs)  (Field(xs, 1))
+
+static inline value make_cons(value elem, value tail) {
+  value result;
+  Push_roots(tmp, 2);
+   tmp[0] = elem;
+   tmp[1] = tail;
+   result       = alloc(2, 1);     /* Allocate a cons cell, tag == 1 */
+   Head(result) = tmp[0];          /* result is just allocated, thus */
+   Tail(result) = tmp[1];          /* we don't need to use modify    */
+  Pop_roots();
+  return result;
+}
+
+
+/* Copy an SML string from the SML heap to the C heap 
+ */
+static inline char* copy_sml_string(value s) {
+  mlsize_t len = string_length(s);    /* Much faster than strlen */
+  char* mlstr  = String_val(s);       /* \0-terminated string    */
+  char* result = stat_alloc(len+1);   /* +1 for the trailing \0  */
+  memcpy(result, mlstr, len);         /* Copy the ML string      */
+  return result;
+}
+
+
+/* Construct an SML string list from a C char* array
+ * TODO: Generalise so that the type becomes:
+        value array_to_list(int n, void** arr, value conv(void*))
+ */
+static inline value string_array_to_list(int n, char** arr) {
+  value result;
+  Push_roots(tmp, 2);
+  tmp[0] = Nil_list;
+  for( ; n > 0; n--) {
+    value ml_str     = copy_string(arr[n-1]);
+    tmp[1]           = make_cons(ml_str, tmp[0]);
+    tmp[0]           = tmp[1];     
+  }
+  result = tmp[0];  
+  Pop_roots();
+  return result;
+}    
+
+
+/* ML type: string vector -> string list */
 EXTERNML value mgtk_init(value args) { /* ML */
   /* PRECONDITION: Wosize_val(args) > 0 */
   int argc, i;
   char** argv;
+  value result;
 
   argc = Wosize_val(args);
   argv = (char**) stat_alloc(sizeof(char*) * argc);
 
-  /* Assumes that gtk_init doesn't change the strings; if it does we should use
-     copy_sml_string (Mosml C Integration tutorial, Sec 4.2) instead of
-     String_val. */
   for (i=0; i<argc; i++) {
-    argv[i] = String_val(Field(args, i)); 
+    argv[i] = copy_sml_string(Field(args, i)); 
   }
 
   gtk_init(&argc, &argv);
 
-  /*
-  value result;
-  result = alloc(argc, 0);
-  for (i=0; i<argc; i++) {
-    Field(result, i) = copy_string(argv[i]);
+  result = string_array_to_list(argc, argv);
+
+  for(; argc > 0; argc--){
+    stat_free(argv[argc-1]);
   }
-  */
 
   stat_free((char *) argv);
 
-  return Val_unit;
+  return result;
 }
 
 
