@@ -4,12 +4,16 @@
 signature NameUtil =
 sig
 
+    type wseq = WSeq.wseq
     type name = string list (* path *) * string list (* base type name *)
 
     val separate_words: char -> string -> string
 
     val toLower: string -> string
     val toUpper: string -> string
+
+    val toLower': wseq -> wseq
+    val toUpper': wseq -> wseq
 
     val nameToString: name -> string
 

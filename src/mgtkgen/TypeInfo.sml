@@ -23,8 +23,8 @@ struct
     fun MLNamePath path name = prsep ($".") $ path && $"." && $name
 new *)
 
-    fun combine path = Util.stringSep "" "" "" (fn s=>s) path
-    fun underscore path = Util.stringSep "" "" "_" (fn s=>s) path
+    fun combine path = $$ path
+    fun underscore path = prsep ($"_") $ path
 
     fun MLNamePath (path, base) = combine (path @ base) 
     fun MLUnderscorePath (path, base) = underscore (path @ base)
@@ -33,6 +33,17 @@ new *)
 
     fun fstPath (path,base) = (path,[])
     fun sndPath (path,base) = ([],base)
+
+    fun addPre  pre name  = $pre && name 
+    fun addSuff suff name = name && $suff
+
+    fun tlPath (path,base) = 
+	case path of 
+	    [] => Util.shouldntHappen "tlPath: Empty path"
+	|   _ => let val (pre,rest) = (hd path, tl path)
+		 in  if NU.toLower pre = "gdk" then (path, base)
+		     else (rest, base)
+		 end
 
     fun MLName (TE.PRIMTYPE tName) = 
 	(case tName of
@@ -56,21 +67,14 @@ new *)
     val MLBoxedName  = MLUnderscorePath o (mapPath NU.toLower) o MLName
     val MLFlagName =   MLUnderscorePath o (mapPath NU.toLower) o MLName
 
-    val removeUnderscores = String.translate (fn #"_" => "" | c => String.str c)
+    val removeUnderscores = 
+	let val remove = String.translate (fn #"_" => "" | c => String.str c)
+	in  $ o remove o flatten
+	end
     val CWidgetName  = removeUnderscores o MLNamePath o MLName
     val CBoxedName   = removeUnderscores o MLNamePath o MLName
     val CFlagName    = removeUnderscores o MLNamePath o MLName
 
-    fun tlPath (path,base) = 
-	case path of 
-	    [] => Util.shouldntHappen "tlPath: Empty path"
-	|   _ => let val (pre,rest) = (hd path, tl path)
-		 in  if NU.toLower pre = "gdk" then (path, base)
-		     else (rest, base)
-		 end
-
-    fun addPre  pre name  = pre ^ name 
-    fun addSuff suff name = name ^ suff
     val MLFunName = MLUnderscorePath o (mapPath NU.toLower) o tlPath
     val MLFunNameWithoutOpt = addSuff "'" o MLFunName
 
@@ -84,7 +88,7 @@ new *)
 
     fun MLSignalName (path,base) = 
 	let val signal = path @ base
-	    fun cnv signal = String.map (fn #"-" => #"_" | ch => ch) signal
+	    fun cnv signal = $(String.map (fn #"-" => #"_" | ch => ch) signal)
 	in  case signal of
 	        [signal] => cnv signal
               | [prefix,signal] => cnv (prefix ^ "_" ^ signal)
@@ -134,8 +138,8 @@ new *)
       | mkCType (TE.OUTPUT t) = mkCType t
       | mkCType (tExp as TE.WIDGET ((path, wid),_)) = 
 	mkcpath path && $"GtkObject"
-      | mkCType (tExp as TE.POINTER ((path, boxed),_)) = $(CBoxedName tExp)
-      | mkCType (tExp as TE.FLAG ((path, fName),_)) = $(CFlagName tExp)
+      | mkCType (tExp as TE.POINTER ((path, boxed),_)) = CBoxedName tExp
+      | mkCType (tExp as TE.FLAG ((path, fName),_)) = CFlagName tExp
       | mkCType _ = U.notImplemented "mkCTypeType: not a type name"
 
     local
@@ -169,25 +173,25 @@ new *)
 	  | mkType nest toType tArg (TE.OUTPUT t) =
 	    mkType nest toType tArg t
           | mkType nest ML_TYPE tArg (tExp as TE.WIDGET _) =
-	    (fn argTyp => argTyp && $" " && $(MLWidgetName tExp)) (tArg ()) 
+	    (fn argTyp => argTyp && $" " && MLWidgetName tExp) (tArg ()) 
           | mkType nest ML_PRIM_TYPE tArg (TE.WIDGET _) =
 	    (fn argTyp => $"gtkobj") (tArg ()) 
           | mkType nest toType tArg (TE.LIST t) = 
 	    (mkType nest toType tArg t) && $" list"
           | mkType nest ML_TYPE tArg (tExp as TE.FLAG (_,false)) = 
-	    $$[MLFlagName tExp, " list"]
+	    MLFlagName tExp && $" list"
           | mkType nest ML_TYPE tArg (tExp as TE.FLAG (_,true)) = 
-	    $(MLFlagName tExp)
+	    MLFlagName tExp
           | mkType nest ML_PRIM_TYPE tArg (TE.FLAG _) = 
 	    $"int"
           | mkType nest ML_TYPE tArg (tExp as TE.POINTER (_,NONE)) = 
-	    $(MLBoxedName tExp)
+	    MLBoxedName tExp
           | mkType nest ML_PRIM_TYPE tArg (tExp as TE.POINTER (_,NONE)) = 
-	    $(MLBoxedName tExp)
+	    MLBoxedName tExp
           | mkType nest ML_TYPE tArg (tExp as TE.POINTER (_,SOME _)) = 
-	    (fn argTyp => argTyp && $" " && $(MLBoxedName tExp)) (tArg())
+	    (fn argTyp => argTyp && $" " && MLBoxedName tExp) (tArg())
           | mkType nest ML_PRIM_TYPE tArg (tExp as TE.POINTER (_,SOME _)) = 
-	    (fn argTyp => argTyp && $" " && $(MLBoxedName tExp)) (tArg())
+	    (fn argTyp => argTyp && $" " && MLBoxedName tExp) (tArg())
 
 	val index = ref 0
 	fun reset () = index := 0
@@ -238,7 +242,7 @@ new *)
       | toCValue (TE.FLAG _, name) = $"Int_val(" && name && $")"
       | toCValue (TE.WIDGET _, name) = $"GtkObj_val(" && name && $")"
       | toCValue (tExp as TE.POINTER _, name) = 
-	$(MLBoxedName tExp) && $"_val(" && name && $")"
+	MLBoxedName tExp && $"_val(" && name && $")"
       | toCValue (typExp, name) = 
 	U.notImplemented ("toCValue: not a type name: " ^ TE.toString typExp)
 
@@ -282,7 +286,7 @@ new *)
       | fromCValue (TE.WIDGET _, name) = 
 	$"Val_GtkObj(" && name && $")"
       | fromCValue (tExp as TE.POINTER _, name) = 
-	$"Val_" && $(MLBoxedName tExp) && $"(" && name && $")"
+	$"Val_" && MLBoxedName tExp && $"(" && name && $")"
       | fromCValue (TE.FLAG _, name) = 
 	$"Val_int(" && name && $")"
       | fromCValue (typExp, name) = 

@@ -1,3 +1,11 @@
+2000-07-12  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml: Cleaned up the mess about where the TypeInfo name
+	functions are applied. 
+
+	* NameUtil.sml: Made all name functions produce wseq's instead of
+	strings.
+ 
 2000-07-11  Henning Niss  <hniss@diku.dk>
 
 	* Changed name from mgtkgen to defs2sml.

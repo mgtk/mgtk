@@ -18,6 +18,10 @@ old*)
     val toLower = (String.map Char.toLower)
     val toUpper = (String.map Char.toUpper)
 
+    open WSeq
+    val toLower' = $ o toLower o flatten
+    val toUpper' = $ o toUpper o flatten
+
     fun takeWhile p xs acc =
 	let fun loop [] acc = (acc,[])
 	      | loop (x::xs) acc = if p x then loop xs (x :: acc) 

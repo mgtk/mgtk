@@ -30,25 +30,25 @@ sig
 
 
     val MLName: texp -> tname
-    val MLNamePath: tname -> string
+    val MLNamePath: tname -> wseq
 
-    val MLWidgetName: texp -> string
-    val MLShortWidgetName: texp -> string
-    val MLBoxedName:  texp -> string
-    val MLFlagName:   texp -> string
+    val MLWidgetName: texp -> wseq
+    val MLShortWidgetName: texp -> wseq
+    val MLBoxedName:  texp -> wseq
+    val MLFlagName:   texp -> wseq
 
-    val MLFunName: name -> string
-    val MLFunNameWithoutOpt: name -> string
-    val MLConstrName: name -> string
+    val MLFunName: name -> wseq
+    val MLFunNameWithoutOpt: name -> wseq
+    val MLConstrName: name -> wseq
 
-    val MLSignalName: name -> string
+    val MLSignalName: name -> wseq
 
-    val CWidgetName: texp -> string
-    val CBoxedName:  texp -> string
-    val CFlagName:   texp -> string
+    val CWidgetName: texp -> wseq
+    val CBoxedName:  texp -> wseq
+    val CFlagName:   texp -> wseq
 
-    val CFunName: name -> string
-    val CFunNameWithoutOpt: name -> string
-    val CConstrName: name -> string
+    val CFunName: name -> wseq
+    val CFunNameWithoutOpt: name -> wseq
+    val CConstrName: name -> wseq
 
 end 
