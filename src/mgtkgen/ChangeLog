@@ -1,3 +1,8 @@
+2001-03-22  Ken Friis Larsen  <kfl@church.al.cl.cam.ac.uk>
+
+	* Translate.sml (Repository): Removed the XXX_val_nocast macro
+	definition.
+
 2000-07-21  Henning Niss  <hniss@diku.dk>
 
 	* ParseUtils.sml, TypeInfo.sml: consolidated functions for modules
