@@ -12,7 +12,10 @@ all:
            cd ..; \
         done
 
-realclean: 
+clean:
+	rm -rf *~
+
+realclean: clean
 	@dirs='$(SUBDIRS)'; for dir in $$dirs; do \
 	   cd $$dir; \
 	   $(MAKE) realclean; \
