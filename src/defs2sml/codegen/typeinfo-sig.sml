@@ -6,17 +6,8 @@ signature TypeInfo = sig
     type name = Name.name
     type 'a ty = (name, 'a) Type.ty
 
-    type info 
-(*
-         = {stype: (unit -> string) -> SMLType.ty, ptype: SMLType.ty,
-	    toc: TinyC.expr -> TinyC.expr,
-	    fromc: TinyC.expr -> TinyC.expr,
-	    super: name option,
-	    fromprim: TinySML.exp->TinySML.exp, toprim: TinySML.exp->TinySML.exp}
-*)
     type typeinfo
-    val build: (name,(name * name option * name list)option,('a,'b ty) AST.api_info) AST.module 
-	       -> typeinfo
+    val build : (name, 'a ty) AST.ast_module -> typeinfo
 
     exception Unbound of name
 

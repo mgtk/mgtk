@@ -171,12 +171,15 @@ structure TinySML :> TinySML = struct
             , ("case", "cas")
 	    , ("end",  "en")
 	    , ("open", "opn")
+	    , ("raise", "rais")
 	    , ("ref", "refe")
             , ("type", "typ")
             , ("val", "valu")
 	    , ("where", "wher")
 	    , ("with",  "wth")
 	    , ("NONE",  "NON")
+	    , ("2BUTTON_PRESS", "TWO_BUTTON_PRESS")
+	    , ("3BUTTON_PRESS", "THREE_BUTTON_PRESS")
             ]
     fun mlify str = H.find trans_table str
 		    handle NotFound => str

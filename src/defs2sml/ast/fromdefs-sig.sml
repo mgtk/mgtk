@@ -3,9 +3,7 @@
 
 signature FromDefs = sig
 
-    type module_info = (string (*name*) * string option (* parent *) * string list (* implements *)) option
-    type member_info = (string, AST.api_type) AST.api_info
-    val fromDefs: string -> Defs.definition list 
-                  -> (string,module_info,member_info) AST.module
+    val fromDefs: string (* toplevel module name *) -> Defs.definition list 
+                  -> (string,AST.api_type) AST.ast_module
 
 end (* signature FromDefs *)

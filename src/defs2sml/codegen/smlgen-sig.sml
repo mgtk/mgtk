@@ -6,6 +6,6 @@ signature GEN_SML = sig
     type ty = (name,name) Type.ty
     type typeinfo
 
-    val translate: typeinfo -> (name,(name*name option*name list)option,(name,ty)AST.api_info) AST.module -> TinySML.topdec
+    val translate: typeinfo -> (name,ty) AST.ast_module -> TinySML.topdec
     val print: string option -> bool -> TextIO.outstream -> TinySML.topdec -> unit
 end

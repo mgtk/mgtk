@@ -4,10 +4,8 @@
 signature ResolveTypes = sig
 
     type 'a ty = ('a,'a) Type.ty
-    type module_info = (string * string option * string list) option
-    type 'a member_info = (string,'a) AST.api_info
 
-    val resolve: (string,module_info,AST.api_type member_info) AST.module 
-                 -> (string,module_info,string ty member_info) AST.module
+    val resolve	: (string,AST.api_type) AST.ast_module 
+               -> (string,string ty) AST.ast_module
 
 end (* signature ResolveTypes *)

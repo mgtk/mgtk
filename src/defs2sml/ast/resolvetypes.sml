@@ -50,8 +50,6 @@ structure ResolveTypes :> ResolveTypes = struct
     end (* structure Parse *)
 
     type 'a ty = ('a,'a) Type.ty
-    type module_info = (string * string option * string list) option
-    type 'a member_info = (string,'a) AST.api_info
 
     fun resTy ty = 
 	case ty of

@@ -54,4 +54,12 @@ struct
 	let val msg = "Internal error: " ^ Int.toString code
 	in  raise Fail msg end
 
+    (* Hash function for strings taken from the SML/NJ Library *)
+    local
+	fun charToWord c = Word.fromInt(Char.ord c)
+	fun hashChar(c,h) = Word.<<(h,0w5) + h + 0w720 + (charToWord c)
+    in
+    fun hashString s = CharVector.foldl hashChar 0w0 s
+    end (* local *)
+
 end (* structure Util *)
