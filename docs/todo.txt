@@ -49,24 +49,13 @@
   was introduced to get load-time warnings about non-existing
   C functions. Perhaps it is safe to remove now?
 
-+ We really should differentiate between enums and flags.  Currently
-  it is not possible to set more than one flag (since flags are
-  treated as enums). A possible idea is to let all flags be
-  represented as lists of the underlying enum. Ken made some code
-  to handle this---use that.
-
 + The specification of signals is *very* ad hoc. In particular only
   unit -> unit and unit -> bool signals are recognized, and the unit
   -> bool requires the signal to be an AFTER-signal.
 
 + a mechanism for handling ~1 a la the solution to null-ok.
 
-+ Make Translate more transparent and modular.
-
-+ Perhaps the lexer and parser could be made more efficient, but this
-  is not a major priority since we need to run them seldomly.
-
 + Error reporting is non-existent.
 
 ----------------------------------------------------------------------
-                                          Henning Niss, April 13, 2000
+                                           Henning Niss, June 21, 2000
