@@ -105,6 +105,29 @@ EXTERNML long mgtk_signal_connect ( Pointer object
 }
 
 
+/* GType's */
+
+/* ML type: cptr -> int -> CString.t */
+EXTERNML char *mgtk_g_type_name (int typ) { /* ML */
+  return g_type_name(typ);
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML int mgtk_g_type_int (void) { /* ML */
+  return G_TYPE_INT;
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML int mgtk_g_type_real (void) { /* ML */
+  return G_TYPE_DOUBLE;
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML int mgtk_g_type_string (void) { /* ML */
+  return G_TYPE_STRING;
+}
+
+
 /* *** Gtk *** */
 /* ML type: unit */
 EXTERNML void mgtk_get_gtk_accel_flags(int* x0, int* x1, int* x2) {

@@ -91,6 +91,59 @@ structure GObject :>
     fun toObject (OBJ ptr) = OBJ ptr
 end
 
+structure GValue :>
+  sig
+    type GValues
+    type GValue
+
+    type 'a setter = GValue -> 'a -> unit
+    val setBool   : bool setter
+    val setInt    : int setter
+    val setChar   : char setter
+    val setReal   : real setter
+
+    type 'a getter = GValues -> int -> 'a
+    val getBool   : bool getter
+    val getInt    : int getter
+    val getChar   : char getter
+    val getReal   : real getter
+  end = struct
+    type GValues = MLton.Pointer.t
+    type GValue = MLton.Pointer.t
+
+    fun curry f x y = f(x,y)
+
+    (* UNSAFE: no error checking in the set and get functions! *)
+    type 'a setter_ = GValue * 'a -> unit
+    type 'a setter = GValue -> 'a -> unit
+    val setBool = _import "g_value_set_boolean" : bool setter_;
+    val setBool = curry setBool
+    val setInt  = _import "g_value_set_long" : int setter_;  
+    val setInt  = curry setInt
+    val setChar = _import "g_value_set_char" : char setter_;
+    val setChar = curry setChar
+    val setReal = _import "g_value_set_double" : real setter_;
+    val setReal = curry setReal
+
+    type 'a getter_ = GValues * int -> 'a
+    type 'a getter = GValues -> int -> 'a
+    val getBool = _import "mgtk_get_pos_bool" : bool getter_;
+    val getBool = curry getBool
+    val getInt  = _import "mgtk_get_pos_int"  : int getter_;
+    val getInt  = curry getInt 
+    val getChar = _import "mgtk_get_pos_char" : char getter_;
+    val getChar = curry getChar
+    val getReal = _import "mgtk_get_pos_real" : real getter_;
+    val getReal = curry getReal
+
+(*
+        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
+        val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
+        val getString : string getter = app2(symb "mgtk_get_pos_string")
+*)
+
+end
+
 structure Signal :> 
   sig
     type state
@@ -131,8 +184,7 @@ structure Signal :>
         structure GO = GObject
         structure CT = Callbacktable
 
-        type GValues = MLton.Pointer.t
-        type GValue = MLton.Pointer.t
+        open GValue
 
         type callback_data = GValue * GValues * int
 	type callback = callback_data -> unit
@@ -175,37 +227,6 @@ structure Signal :>
 	val signal_connect 
 	    = _import "mgtk_signal_connect"
               : GO.cptr * CString.cstring * int * bool -> int;
-
-        fun curry f x y = f(x,y)
-
-        (* UNSAFE: no error checking in the set and get functions! *)
-        type 'a setter_ = GValue * 'a -> unit
-        type 'a setter = GValue -> 'a -> unit
-        val setBool = _import "g_value_set_boolean" : bool setter_;
-        val setBool = curry setBool
-        val setInt  = _import "g_value_set_long" : int setter_;  
-        val setInt  = curry setInt
-	val setChar = _import "g_value_set_char" : char setter_;
-        val setChar = curry setChar
-	val setReal = _import "g_value_set_double" : real setter_;
-	val setReal = curry setReal
-
-        type 'a getter_ = GValues * int -> 'a
-        type 'a getter = GValues -> int -> 'a
-        val getBool = _import "mgtk_get_pos_bool" : bool getter_;
-        val getBool = curry getBool
-        val getInt  = _import "mgtk_get_pos_int"  : int getter_;
-        val getInt  = curry getInt 
-	val getChar = _import "mgtk_get_pos_char" : char getter_;
-	val getChar = curry getChar
-	val getReal = _import "mgtk_get_pos_real" : real getter_;
-        val getReal = curry getReal
-
-(*
-        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
-        val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
-        val getString : string getter = app2(symb "mgtk_get_pos_string")
-*)
     in
     datatype state = S of GValue * GValues * int * int
     type ('a, 'b) trans   = 'a * state -> 'b * state

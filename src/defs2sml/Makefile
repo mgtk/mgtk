@@ -85,33 +85,43 @@ lib/overrides.defs: $(GTKAPIXML) $(GTKMETADATA) tools/metadata2defs.pl
 lib/metadata.defs: lib/overrides.defs
 
 # Generate binding
-DEFSOPTS=$(OPTIONS) --metadata-file lib/metadata.defs --separate-struct -as api/pygtk/gtk.defs > defs.log 2>&1
-DEFSOPTSMOSML=-co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml
-DEFSOPTSMLTON=--mlton -co mgtk-mlton.c -so mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml
+RELDIR=release/mgtk
 
-mgtk.c mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c lib/metadata.defs
+DEFSOPTS=$(OPTIONS) --metadata-file lib/metadata.defs --separate-struct -as api/pygtk/gtk.defs > defs.log 2>&1
+DEFSOPTSMOSML=-co $(RELDIR)/mgtk.c -so $(RELDIR)/mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml
+DEFSOPTSMLTON=--mlton -co $(RELDIR)/mgtk-mlton.c -so $(RELDIR)/mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml
+
+$(RELDIR)/mgtk.c $(RELDIR)/mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c lib/metadata.defs
 	./$(MAIN) $(DEFSOPTSMOSML) $(DEFSOPTS)
 
 mgdk.c mgdk.sml: $(MAIN) api/pygtk/gdk.defs api/pygtk/gdk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c
 	./$(MAIN) -co mgdk.c -so mgdk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gdk.defs
 
-mgtk-mlton.c mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble-mlton.sml lib/preamble-mlton.c
+$(RELDIR)/mgtk-mlton.c $(RELDIR)/mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble-mlton.sml lib/preamble-mlton.c
 	./$(MAIN) $(DEFSOPTSMLTON) $(DEFSOPTS)
 
-mosml: $(MAIN) mgtk.c mgtk.sml
-	mosmlc -toplevel -c mgtk.sml
-	gcc $(CINCLUDE) -c mgtk.c
+mosml: $(RELDIR)/mgtk.so $(RELDIR)/mgtk.uo
+
+$(RELDIR)/mgtk.uo: $(RELDIR)/mgtk.sml
+	mosmlc -toplevel -c $<
+
+$(RELDIR)/mgtk.o: $(RELDIR)/mgtk.c
+	gcc $(CINCLUDE) -o $@ -c $<
+
+$(RELDIR)/mgtk.so: $(RELDIR)/mgtk.o
+	gcc -shared -o $@ $< `pkg-config --libs gtk+-2.0`
 
 MLTONHOME=/usr/lib/mlton
 MLTONINCLUDE=/usr/lib/mlton/include
 MLTONBIN=/usr/bin/
 
-mgtk-mlton.o: mgtk-mlton.c
-	gcc -c -O2 -I$(MLTONINCLUDE) \
-		   `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
+$(RELDIR)/mgtk-mlton.o: $(RELDIR)/mgtk-mlton.c
+	gcc -c -O2 -I$(MLTONINCLUDE) -o $@ `pkg-config --cflags gtk+-2.0` $<
 
-mlton: $(MAIN) mgtk-mlton.sml mgtk-mlton.o
-	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" mgtk-mlton.cm mgtk-mlton.o
+$(RELDIR)/mgtk-mlton.cm: $(shell mlton -stop f $(RELDIR)/mgtk-mlton.cm)
+
+mlton: $(RELDIR)/mgtk-mlton.cm $(RELDIR)/mgtk-mlton.o
+	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" $^
 
 
 # Clean-up

@@ -61,11 +61,55 @@ structure GObject :>
 
 end
 
+structure GValue :>
+  sig
+    type GValues
+    type GValue
+
+    type 'a setter = GValue -> 'a -> unit
+    val setBool   : bool setter
+    val setInt    : int setter
+    val setChar   : char setter
+    val setReal   : real setter
+    val setString : string setter
+
+    type 'a getter = GValues -> int -> 'a
+    val getBool   : bool getter
+    val getInt    : int getter
+    val getChar   : char getter
+    val getReal   : real getter
+    val getString : string getter
+  end = struct
+    open Dynlib
+    val symb = GtkBasis.symb
+
+    prim_type GValues
+    prim_type GValue
+
+    (* UNSAFE: no error checking in the set and get functions! *)
+    type 'a setter = GValue -> 'a -> unit
+    val setBool   : bool setter   = app2(symb "mgtk_set_bool")
+    val setInt    : int setter    = app2(symb "mgtk_set_int")
+    val setChar   : char setter   = app2(symb "mgtk_set_char")
+    val setReal   : real setter   = app2(symb "mgtk_set_real")
+    val setString : string setter = app2(symb "mgtk_set_string")
+
+    type 'a getter = GValues -> int -> 'a
+    val getBool   : bool getter   = app2(symb "mgtk_get_pos_bool")
+    val getInt    : int getter    = app2(symb "mgtk_get_pos_int")
+    val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
+    val getReal   : real getter   = app2(symb "mgtk_get_pos_real")
+    val getString : string getter = app2(symb "mgtk_get_pos_string")
+(*
+        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
+        val getString : string getter = app2(symb "mgtk_get_pos_string")
+*)
+end
+
 structure Signal :>
   sig
     type state
     type 'a t = 'a GObject.t
-
 
     type ('a, 'b) trans   = 'a * state -> 'b * state
     type ('a, 'rest) read = ('a -> 'rest, 'rest) trans
@@ -100,8 +144,7 @@ structure Signal :>
     type 'a t = 'a GObject.t
     local
         structure GO = GObject
-        prim_type GValues
-        prim_type GValue
+        open GValue
 
         type callback_data = GValue * GValues * int
         type callback = callback_data -> unit
@@ -140,25 +183,6 @@ structure Signal :>
         val signal_connect : GO.cptr -> string -> int -> bool -> int
                            = app4(symb"mgtk_signal_connect")
 
-        (* UNSAFE: no error checking in the set and get functions! *)
-        type 'a setter = GValue -> 'a -> unit
-        val setBool   : bool setter   = app2(symb "mgtk_set_bool")
-        val setInt    : int setter    = app2(symb "mgtk_set_int")
-        val setChar   : char setter   = app2(symb "mgtk_set_char")
-        val setReal   : real setter   = app2(symb "mgtk_set_real")
-        val setString : string setter = app2(symb "mgtk_set_string")
-
-
-        type 'a getter = GValues -> int -> 'a
-        val getBool   : bool getter   = app2(symb "mgtk_get_pos_bool")
-        val getInt    : int getter    = app2(symb "mgtk_get_pos_int")
-        val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
-        val getReal   : real getter   = app2(symb "mgtk_get_pos_real")
-        val getString : string getter = app2(symb "mgtk_get_pos_string")
-(*
-        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
-        val getString : string getter = app2(symb "mgtk_get_pos_string")
-*)
     in
     datatype state = S of GValue * GValues * int * int
     type ('a, 'b) trans   = 'a * state -> 'b * state
