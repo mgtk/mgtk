@@ -1849,7 +1849,7 @@
    (float page_size)))
 
 (define-func gtk_adjustment_new
-  GtkObject
+  GtkAdjustment
   ((float valu)
    (float lower)
    (float upper)
@@ -3345,7 +3345,7 @@
 ;;;(define-object GtkSocket (GtkContainerClass))
 
 ;;;(define-func gtk_socket_new
-;;;  GtkWidget
+;;;  GtkSocket
 ;;;  ())
 
 ;;;(define-func gtk_socket_steal
@@ -3839,7 +3839,7 @@
 ;;;(define-object GtkImage (GtkMisc))
 
 ;;;(define-func gtk_image_new
-;;;  GtkWidget
+;;;  GtkImage
 ;;;  ((GdkImage val)
 ;;;   (GdkBitmap mask)))
 
@@ -3860,7 +3860,7 @@
 (define-object GtkPixmap (GtkMisc))
 
 (define-func gtk_pixmap_new
-  GtkWidget
+  GtkPixmap
   ((GdkPixmap pixmap)
    (GdkBitmap mask (null-ok))))
 
@@ -4095,7 +4095,7 @@
 (define-object GtkPreview (GtkWidget))
 
 (define-func gtk_preview_new 
-  GtkWidget
+  GtkPreview
   ((GtkPreviewType typ)))
 
 (define-func gtk_preview_size 
@@ -4829,7 +4829,7 @@
 ;; gtk_ctree_new_with_titles
 
 (define-func gtk_ctree_new
-  GtkWidget
+  GtkCTree
   ((int columns)
    (int tree_column)))
 
