@@ -48,7 +48,25 @@ struct
     end
 
     (* Modules *)
-    val current: string list ref = ref []
+    fun combine sep path = Util.stringSep "" "" sep (fn s=>s) path
+    local 
+	val current: string list ref = ref []
+	val stack: string list list ref = ref []
+    in  fun getCurrentPath () = !current
+	fun declarePath [] = Util.shouldntHappen "declarePath: uh-oh---empty path"
+	  | declarePath (p as [toplevel]) = (current := p; stack := [p])
+          | declarePath path = 
+	    (if not(!current = []) then stack := !current :: !stack else ();
+	     current := path)
+	fun unwindPath () =
+	    let val (newc,news) = case !stack of
+		                      [] => (!current, [])
+				   |  n::rest => (n, rest)
+	    in  stack := news;
+		current := newc
+	    end
+    end (* local *)
+
     fun split namePath = 
 	let val (path',base') = 
 	    let fun loop 0 (_,p') acc = (rev acc,p')
@@ -58,12 +76,11 @@ struct
 		       else (rev acc, p')
 		  | loop d ([], p') acc = (rev acc, p')
 		  | loop d (_, []) acc = raise Fail "split: current path is longer than name"
-	    in  loop 1 (!current, namePath) []
+	    in  loop 2 (getCurrentPath(), namePath) []
 	    end
 	in  (path', base')
 	end
 
-    fun combine sep path = Util.stringSep "" "" sep (fn s=>s) path
     fun splitWords name = 
 	let val name' = NU.separate_words #" " name
 	    val namePath = String.tokens Char.isSpace name'
@@ -75,7 +92,6 @@ struct
 	in  split namePath
 	end	
 
-    fun declareModule path = current := path
     val splitWidgetName = splitWords
     val splitBoxedName  = splitWords
     val splitFlagName   = splitWords
@@ -83,6 +99,15 @@ struct
     val splitFunName    = splitUnderscores
 
     (* Construct abstract syntax *)
+    fun mkWidgetInherits NONE = TE.INH_ROOT
+      | mkWidgetInherits (SOME inh) = TE.INH_FROM (splitWidgetName inh)
+
+    fun mkBoxedInherits NONE = NONE
+      | mkBoxedInherits (SOME(NONE)) = SOME(TE.INH_ROOT)
+      | mkBoxedInherits (SOME(SOME inh)) = 
+	SOME(TE.INH_FROM (splitBoxedName inh))
+
+
     type parlist = (TE.texp * string) list
     fun splitList p l =
 	let fun f (elem, (acc1,acc2)) =
@@ -91,7 +116,8 @@ struct
 	in  List.foldr f ([],[]) l
 	end
     fun separateParams (retType, params: parlist) =
-	let fun mkTuple ([], retType) = retType              | mkTuple (pars, retType) =
+	let fun mkTuple ([], retType) = retType
+              | mkTuple (pars, retType) =
 	        let val tOut = if TI.isVoidType retType then pars
 			       else retType :: pars
 		in  case tOut of
@@ -110,18 +136,22 @@ struct
 	end
 
     fun mkModuleDecl (pos, (name, NONE)) =
-	let val _ = declareModule [name]
+	let val _ = unwindPath()
+	    val _ = declarePath [name]
 	in  AST.MODULE_DECL (pos, true, [name])
         end
       | mkModuleDecl (pos, (name, SOME sub)) =
-	let val _ = declareModule [sub,name]
+	let val _ = unwindPath()
+	    val _ = declarePath [sub,name]
 	in  AST.MODULE_DECL (pos, true, [sub,name])
 	end
 
     fun mkWidgetDecl (pos, ((name, inherits), fields)) = 
-	let val (mPath,mBase) = splitWidgetName name
-	    val _ = declareModule (mPath @ mBase)
-	    val tExp = insertWidget name (mPath,mBase,inherits)
+	let val _ = unwindPath ()
+	    val (mPath,mBase) = splitWidgetName name
+	    val inherits' = mkWidgetInherits inherits
+	    val _ = declarePath (mPath @ mBase)
+	    val tExp = insertWidget name (mPath,mBase,inherits')
 	in  [AST.MODULE_DECL (pos, false, mPath @ mBase),
              AST.OBJECT_DECL (pos, tExp, fields)
             ]
@@ -156,14 +186,6 @@ struct
 	end
     fun mkSignalDecl (pos, ((wid,signal),cbType)) = 
 	(AST.SIGNAL_DECL (pos, wid, signal, cbType))
-
-    fun mkWidgetInherits NONE = TE.INH_ROOT
-      | mkWidgetInherits (SOME inh) = TE.INH_FROM (splitWidgetName inh)
-
-    fun mkBoxedInherits NONE = NONE
-      | mkBoxedInherits (SOME(NONE)) = SOME(TE.INH_ROOT)
-      | mkBoxedInherits (SOME(SOME inh)) = 
-	SOME(TE.INH_FROM (splitBoxedName inh))
 
     fun mkCBType (retType, pars) = TE.ARROW(pars, [], pars, retType)
 

@@ -18,7 +18,7 @@ sig
 
     val mkModuleDecl : pos * (string*string option) 
                      -> declaration list
-    val mkWidgetDecl : pos * ((string*inherits) * (texp*string) list option) 
+    val mkWidgetDecl : pos * ((string*string option) * (texp*string) list option) 
                      -> declaration list
     val mkFunDecl    : pos * ((string*texp) * (texp*string) list) 
                      -> declaration list

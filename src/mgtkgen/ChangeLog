@@ -1,3 +1,8 @@
+2000-07-21  Henning Niss  <hniss@diku.dk>
+
+	* ParseUtils.sml, TypeInfo.sml: consolidated functions for modules
+	stuff.
+
 2000-07-19  Henning Niss  <hniss@diku.dk>
 
 	* State.sml: made a more general and hopefully more intelligent

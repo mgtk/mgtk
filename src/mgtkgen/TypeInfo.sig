@@ -30,8 +30,10 @@ sig
     val fromCValue: texp * wseq -> wseq
     val toCValue: texp * wseq -> wseq
 
+    (* get the type name of a type expression *)
+    val getName: texp -> tname
+
     (* name conversions *)
-    val MLName: texp -> tname
     val MLNamePath: tname -> wseq
 
     val MLWidgetName: texp -> wseq
@@ -90,7 +92,7 @@ end
     representing "type names" (i.e., PRIMTYPE, WIDGET, FLAG, POINTER)
     and optionals and lists.
 
-    [MLName texp] returns the type name (if such exist, otherwise
+    [getName texp] returns the type name (if such exist, otherwise
     raises Util.ShouldntHappen) contained in texp.
 
     [MLNamePath tname] converts a type name tname to a wseq by simply

@@ -322,7 +322,7 @@ struct
     fun getFieldName (path,base) field = (path, rev (field :: "get" :: rev base))
 
     fun mkGetField wid (typExp, field) = 
-	let val widName = TI.MLName wid
+	let val widName = TI.getName wid
 	    val fldName = getFieldName widName field
 	    val name  = TI.CFunName widName
 	    val macro = NU.toUpper' name && $"("
@@ -332,12 +332,12 @@ struct
 	end
 
     fun mkMLGetFieldDecl wid (typExp, field) =
-	let val funname = getFieldName (TI.MLName wid) field
+	let val funname = getFieldName (TI.getName wid) field
 	in  mkMLFunDecl false (funname, mkArrowType (typExp,[(wid,"wid")]))
 	end
 
     fun mkMLGetFieldVal wid (typExp, field) =
-	let val funname = getFieldName (TI.MLName wid) field
+	let val funname = getFieldName (TI.getName wid) field
 	in  mkMLFunVal false (funname, mkArrowType (typExp, [(wid,"wid")]))
 	end
 

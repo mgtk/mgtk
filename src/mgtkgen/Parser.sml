@@ -93,7 +93,7 @@ struct
         )
 
     (* widgets *)
-    val inherits = optional (parens word) >> PU.mkWidgetInherits
+    val inherits = optional (parens word)
     val fieldList = parens (fields #-- repeat1 par) >> op::
     val widDecl = parens' 
 	(   defObj

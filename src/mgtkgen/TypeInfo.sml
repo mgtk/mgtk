@@ -19,33 +19,7 @@ struct
     type name = NU.name
 
 
-(* new
-    fun MLNamePath path name = prsep ($".") $ path && $"." && $name
-new *)
-
-    fun combine path = $$ path
-    fun underscore path = prsep ($"_") $ path
-
-    fun MLNamePath (path, base) = combine (path @ base) 
-    fun MLUnderscorePath (path, base) = underscore (path @ base)
-
-    fun mapPath f (path,base) = (map f path, map f base)
-
-    fun fstPath (path,base) = (path,[])
-    fun sndPath (path,base) = ([],base)
-
-    fun addPre  pre name  = $pre && name 
-    fun addSuff suff name = name && $suff
-
-    fun tlPath (path,base) = 
-	case path of 
-	    [] => Util.shouldntHappen "tlPath: Empty path"
-	|   _ => let val (pre,rest) = (hd path, tl path)
-		 in  if NU.toLower pre = "gdk" then (path, base)
-		     else (rest, base)
-		 end
-
-    fun MLName (TE.PRIMTYPE tName) = 
+    fun getName (TE.PRIMTYPE tName) = 
 	(case tName of
 	     "none" => ([],["unit"])
 	   |   "int" => ([],["int"])
@@ -57,34 +31,69 @@ new *)
 	   |   "GtkType" => (["Gtk"], ["type"])
            |   _ => U.shouldntHappen "MLName: unknown primtive type"
 	)
-      | MLName (TE.WIDGET ((path, wid),_)) = (path, wid)
-      | MLName (TE.POINTER ((path, boxed),_)) = (path, boxed)
-      | MLName (TE.FLAG ((path, fName),_)) = (path, fName)
-      | MLName _ = U.notImplemented "MLName: not a C type"
+      | getName (TE.WIDGET ((path, wid),_)) = (path, wid)
+      | getName (TE.POINTER ((path, boxed),_)) = (path, boxed)
+      | getName (TE.FLAG ((path, fName),_)) = (path, fName)
+      | getName _ = U.notImplemented "MLName: not a C type"
 
-    val MLWidgetName = MLNamePath o MLName
-    val MLShortWidgetName = MLNamePath o sndPath o MLName
-    val MLBoxedName  = MLUnderscorePath o (mapPath NU.toLower) o MLName
-    val MLFlagName =   MLUnderscorePath o (mapPath NU.toLower) o MLName
+    (* name converters *)
+(* old style, one file, no modules *)
+    fun ml_path path = $$ path
+    fun ml_base base = $$ base
+    fun ml_underscore path = prsep ($"_") $ path
+    val sep = Empty
+    val underscore_sep = $"_"
+(* new style, with modules
+    fun ml_path path = prsep ($".") $ (map NU.capitalize path)
+    fun ml_base base = $$ base
+    fun ml_underscore path = prsep ($"_") $ path
+    val sep = Empty
+    val underscore_sep = $"."
+*)
 
-    val removeUnderscores = 
-	let val remove = String.translate (fn #"_" => "" | c => String.str c)
-	in  $ o remove o flatten
-	end
-    val CWidgetName  = removeUnderscores o MLNamePath o MLName
-    val CBoxedName   = removeUnderscores o MLNamePath o MLName
-    val CFlagName    = removeUnderscores o MLNamePath o MLName
+    fun MLNamePath (path, base) = ml_path path && sep && ml_base base
+    fun MLUnderscorePath ([], base) = ml_underscore base
+      | MLUnderscorePath (path, base) = 
+	ml_path path && underscore_sep && ml_underscore base
+
+    (* C name converters; remember that C names should remain the same *)
+    fun c_combine path = $$ path
+    fun c_underscore path = prsep ($"_") $ path
+
+    fun CNamePath (path, base) = c_combine path && c_combine base
+    fun CUnderscorePath (path, base) = c_underscore (path @ base)
+
+    fun mapPath f (path,base) = (map f path, map f base)
+
+    fun fstPath (path,base) = (path,[])
+    fun sndPath (path,base) = ([],base)
+
+    fun addPre  pre name  = $pre && name 
+    fun addSuff suff name = name && $suff
+
+(* old style, one file, no modules *)
+    fun tlPath (path,base) = 
+	case path of 
+	    [] => Util.shouldntHappen "tlPath: Empty path"
+	|   _ => let val (pre,rest) = (hd path, tl path)
+		 in  if NU.toLower pre = "gdk" then (path, base)
+		     else (rest, base)
+		 end
+(* new style, with modules
+    val tlPath = fn x => x
+*)
+
+    (* These should all be invariant under which generation scheme that
+       has been chosen. *)
+    val MLWidgetName = MLNamePath o getName
+    val MLShortWidgetName = MLNamePath o sndPath o getName
+    val MLBoxedName  = MLUnderscorePath o (mapPath NU.toLower) o getName
+    val MLFlagName =   MLUnderscorePath o (mapPath NU.toLower) o getName
 
     val MLFunName = MLUnderscorePath o (mapPath NU.toLower) o tlPath
     val MLFunNameWithoutOpt = addSuff "'" o MLFunName
 
     val MLConstrName = MLUnderscorePath o (mapPath NU.toUpper) o tlPath
-
-    val CFunName = MLUnderscorePath o (mapPath NU.toLower)
-    val CFunNameWithoutOpt = addSuff "_short" o CFunName
-
-    val CConstrName = MLUnderscorePath o (mapPath NU.toUpper)
-
 
     fun MLSignalName (path,base) = 
 	let val signal = path @ base
@@ -95,7 +104,23 @@ new *)
               | _ => U.shouldntHappen "Not a signal"
         end
 
-    fun CSignalName (path,base) = prmap $ (path@base)
+
+    val removeUnderscores = 
+	let val remove = String.translate (fn #"_" => "" | c => String.str c)
+	in  $ o remove o flatten
+	end
+    val CWidgetName  = removeUnderscores o CNamePath o getName
+    val CBoxedName   = removeUnderscores o CNamePath o getName
+    val CFlagName    = removeUnderscores o CNamePath o getName
+
+    val CFunName = CUnderscorePath o (mapPath NU.toLower)
+    val CFunNameWithoutOpt = addSuff "_short" o CFunName
+
+    val CConstrName = CUnderscorePath o (mapPath NU.toUpper)
+
+    fun CSignalName (path,base) = prmap $ base (* I used to have path@base
+						  but that seems wrong! *)
+
 
     (* 5 is this is the largest X, such that Dynlib.appX exists *)
     fun fitsDynApp params = List.length params <= 5
