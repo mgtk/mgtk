@@ -1,22 +1,26 @@
-structure Gtk :> Gtk = struct
-
+structure Gtk = struct
     signature Object = sig
 
         type base
         type 'a object_t
         type 'a t = 'a object_t GObject.t
 
+
+
+
+
         val inherit : 'a -> GObject.constructor -> 'a t
 
     end
     structure Object :> Object = struct
 
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
         type base = unit
         type 'a object_t = unit
         type 'a t = 'a object_t GObject.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
 
         fun inherit w con = GObject.inherit () con
         fun makeObject ptr = GObject.inherit () (fn () => repr ptr)
@@ -26,6 +30,10 @@ structure Gtk :> Gtk = struct
         type base
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
+
+
+
+
 
         val inherit : 'a -> GObject.constructor -> 'a t
 
@@ -38,12 +46,13 @@ structure Gtk :> Gtk = struct
     end
     structure Widget :> Widget = struct
 
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
         type base = unit
         type 'a widget_t = unit
         type 'a t = 'a widget_t Object.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
 
         fun inherit w con = Object.inherit () con
         fun makeWidget ptr = Object.inherit () (fn () => repr ptr)
@@ -78,6 +87,10 @@ structure Gtk :> Gtk = struct
         type 'a container_t
         type 'a t = 'a container_t Widget.t
 
+
+
+
+
         val inherit : 'a -> GObject.constructor -> 'a t
 
         val set_border_width : 'a Container.t -> int -> unit
@@ -87,12 +100,13 @@ structure Gtk :> Gtk = struct
     end
     structure Container :> Container = struct
 
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
         type base = unit
         type 'a container_t = unit
         type 'a t = 'a container_t Widget.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
 
         fun inherit w con = Widget.inherit () con
         fun makeContainer ptr = Widget.inherit () (fn () => repr ptr)
@@ -119,17 +133,22 @@ structure Gtk :> Gtk = struct
         type 'a bin_t
         type 'a t = 'a bin_t Container.t
 
+
+
+
+
         val inherit : 'a -> GObject.constructor -> 'a t
 
     end
     structure Bin :> Bin = struct
 
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
         type base = unit
         type 'a bin_t = unit
         type 'a t = 'a bin_t Container.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
 
         fun inherit w con = Container.inherit () con
         fun makeBin ptr = Container.inherit () (fn () => repr ptr)
@@ -140,31 +159,40 @@ structure Gtk :> Gtk = struct
         type 'a window_t
         type 'a t = 'a window_t Bin.t
 
+
+
+
+
         val inherit : 'a -> GObject.constructor -> 'a t
 
         val new : WindowType -> 'a Widget.t
     end
     structure Window :> Window = struct
 
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
         type base = unit
         type 'a window_t = unit
         type 'a t = 'a window_t Bin.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
 
         fun inherit w con = Bin.inherit () con
         fun makeWindow ptr = Bin.inherit () (fn () => repr ptr)
         val new_ : int -> cptr
             = app1 (symb"mgtk_gtk_window_new")
         val new : WindowType -> 'a Widget.t
-            = fn type => new_ (repr type)
+            = fn wtype => new_ (repr wtype)
     end
     signature Button = sig
 
         type base
         type 'a button_t
         type 'a t = 'a button_t Bin.t
+
+
+
+
 
         val inherit : 'a -> GObject.constructor -> 'a t
 
@@ -176,12 +204,13 @@ structure Gtk :> Gtk = struct
     end
     structure Button :> Button = struct
 
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
         type base = unit
         type 'a button_t = unit
         type 'a t = 'a button_t Bin.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
 
         fun inherit w con = Bin.inherit () con
         fun makeButton ptr = Bin.inherit () (fn () => repr ptr)
@@ -289,8 +318,8 @@ EXTERNML value mgtk_gtk_container_remove(value self, value widget) { /* ML */
 
 /* *** Window *** */
 /* ML type: int -> cptr */
-EXTERNML value mgtk_gtk_window_new(value type) { /* ML */
-    return Val_GtkObj(gtk_window_new(Int_val(type)));
+EXTERNML value mgtk_gtk_window_new(value wtype) { /* ML */
+    return Val_GtkObj(gtk_window_new(Int_val(wtype)));
 }
 
 
@@ -319,7 +348,7 @@ EXTERNML value mgtk_gtk_button_set_label(value self, value label) { /* ML */
 
 /* ML type: cptr -> string */
 EXTERNML value mgtk_gtk_button_get_label(value self) { /* ML */
-    return copy_string(gtk_button_get_label(GtkObj_val(self)));
+    return my_copy_string(gtk_button_get_label(GtkObj_val(self)));
 }
 
 /* ML type: unit */

@@ -124,7 +124,7 @@
   (is-constructor-of "GtkWindow")
   (return-type "GtkWidget*")
   (parameters
-    '("GtkWindowType" "type")
+    '("GtkWindowType" "wtype")
   )
 )
 
