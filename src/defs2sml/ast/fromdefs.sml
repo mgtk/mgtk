@@ -60,13 +60,22 @@ structure FromDefs :> FromDefs = struct
 				  ; top)
 			      else module
 			  end
+		       val isConst = 
+			   (getConstructor def; true)
+			   handle AttribNotFound _ =>
+		              let open Substring in
+				  not(isEmpty(#2(position "_new_" (all name))))
+			      end
+		       val rt = if not(md = top) andalso isConst 
+				then SOME md
+				else NONE
 		       val mem = Member{name=name,
-					info=A.Method(functype NONE def)}
+					info=A.Method(functype NONE rt def)}
 		   in  insert map md mem end
 	      | Method => 
 		   let val md = getObject def
 		       val mem = Member{name=name,
-					info=A.Method(functype (SOME md) def)}
+					info=A.Method(functype (SOME md) NONE def)}
 		   in  insert map md mem end
 	      | Enum =>
 		   let val md = getModule def
@@ -75,7 +84,7 @@ structure FromDefs :> FromDefs = struct
 	      | Signal =>
 		   let val md = getObject def
 		       val mem = Member{name=name,
-					info=A.Signal(functype NONE def)}
+					info=A.Signal(functype NONE NONE def)}
 		   in  insert map md mem end
 	      | Boxed => 
 		   let val md = getModule def
@@ -85,12 +94,13 @@ structure FromDefs :> FromDefs = struct
 		       val mem = Member{name=name,info=A.Boxed copyrel}
 		   in  insert map md mem end
 	end
-    and functype self def =
+    and functype self rettype def =
 	let fun addself ps = case self of NONE => ps
 					| SOME s => ("self",A.ApiTy s) :: ps
 	    fun nonempty [] = [("dummy",A.ApiTy "void")]
 	      | nonempty ps = ps
-	    val return = A.ApiTy(getReturnType def)
+	    val return = A.ApiTy(case rettype of NONE => getReturnType def
+					       | SOME rt => rt)
 	    val params = map (fn(n,t)=>(n,A.ApiTy t)) 
 			     (getParameters def handle AttribNotFound _ => [])
 	in  A.ArrowTy(nonempty(addself params), return) end
