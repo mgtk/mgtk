@@ -106,12 +106,16 @@ struct
     fun mkPrimTypeDecl tName = mkPrimTypeDecl' ($tName)
 
     (* ML type specification *)
-    fun mkTypeDecl' (tName, NONE) =
-	$indent && $"type " && tName && Nl
-      | mkTypeDecl' (tName, SOME tExp) =
-	$indent && $"type " && tName && $" = " && tExp && Nl
-
-    fun mkTypeDecl (tName, tExpOpt) = mkTypeDecl' ($tName, tExpOpt)
+    local 
+	fun mktypedecl typ (tName, NONE) =
+	    $indent && typ && tName && Nl
+	  | mktypedecl typ (tName, SOME tExp) =
+	    $indent && typ && tName && $" = " && tExp && Nl
+    in  
+	val mkTypeDecl' = mktypedecl ($"type ")
+	fun mkTypeDecl (tName, tExpOpt) = mkTypeDecl' ($tName, tExpOpt)
+	fun mkEqTypeDecl (tName, tExpOpt) = mktypedecl ($"eqtype ") ($tName, tExpOpt)
+    end
 
     (* ML value specification *)
     fun mkValDecl' (vName, tExp, NONE) =
@@ -550,7 +554,7 @@ struct
     fun mkMLFlagsDecl (flag, constr) =
 	let val fName = flagName flag
 	    fun prCnstr const = mkValDecl (mlEnumName const, $fName, NONE)
-	in  mkTypeDecl (fName, NONE)
+	in  mkEqTypeDecl (fName, NONE)
          && prsep Empty prCnstr constr
          && Nl
 	end
@@ -559,7 +563,7 @@ struct
 	    val fName' = flagRealName flag
 	    val tupleType = mlFlagTupleType constr
 	    fun cName const = $(mlEnumName const)
-	in  $indent && $"type " && $fName && $" = int" && Nl
+	in  mkEqTypeDecl (fName, SOME ($"int"))
          && $$[indent,"val get_", fName, "_: "]
 	       && $"unit -> " && TypeInfo.mkMLPrimType tupleType && Nl
 	       && $$[indent, indent, "= app1(symb\"mgtk_get_",fName,"\")"] && Nl

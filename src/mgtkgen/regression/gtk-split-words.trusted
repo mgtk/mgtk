@@ -89,22 +89,22 @@ EXTERNML value mgtk_get_clist_drag_pos (value dummy) { /* ML */
 
     type gdk_font
 
-    type gdk_im_style
+    eqtype gdk_im_style
     val GDK_IM_PREEDIT_AREA: gdk_im_style
     val GDK_IM_PREEDIT_CALLBACKS: gdk_im_style
     val GDK_IM_PREEDIT_POSITION: gdk_im_style
 
-    type gdk_ic_attributes_type
+    eqtype gdk_ic_attributes_type
     val GDK_IC_STYLE: gdk_ic_attributes_type
     val GDK_IC_CLIENT_WINDOW: gdk_ic_attributes_type
     val GDK_IC_FOCUS_WINDOW: gdk_ic_attributes_type
 
-    type gdk_im
+    eqtype gdk_im
     val GDK_PREEDIT_AREA: gdk_im
     val GDK_PREEDIT_CALLBACKS: gdk_im
     val GDK_PREEDIT_POSITION: gdk_im
 
-    type clist_drag_pos
+    eqtype clist_drag_pos
     val CLIST_DRAG_NONE: clist_drag_pos
     val CLIST_DRAG_BEFORE: clist_drag_pos
     val CLIST_DRAG_INTO: clist_drag_pos
@@ -131,25 +131,25 @@ end
 
     type gdk_font = gpointer
 
-    type gdk_im_style = int
+    eqtype gdk_im_style = int
     val get_gdk_im_style_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_im_style")
     val (GDK_IM_PREEDIT_AREA,GDK_IM_PREEDIT_CALLBACKS,GDK_IM_PREEDIT_POSITION)
         = get_gdk_im_style_ ()
 
-    type gdk_ic_attributes_type = int
+    eqtype gdk_ic_attributes_type = int
     val get_gdk_ic_attributes_type_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_ic_attributes_type")
     val (GDK_IC_STYLE,GDK_IC_CLIENT_WINDOW,GDK_IC_FOCUS_WINDOW)
         = get_gdk_ic_attributes_type_ ()
 
-    type gdk_im = int
+    eqtype gdk_im = int
     val get_gdk_im_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_im")
     val (GDK_PREEDIT_AREA,GDK_PREEDIT_CALLBACKS,GDK_PREEDIT_POSITION)
         = get_gdk_im_ ()
 
-    type clist_drag_pos = int
+    eqtype clist_drag_pos = int
     val get_clist_drag_pos_: unit -> int * int * int * int
         = app1(symb"mgtk_get_clist_drag_pos")
     val (CLIST_DRAG_NONE,CLIST_DRAG_BEFORE,CLIST_DRAG_INTO,CLIST_DRAG_AFTER)

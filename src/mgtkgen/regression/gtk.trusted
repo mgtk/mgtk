@@ -6537,56 +6537,56 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
     val check_version: word -> word -> word -> string
     val exit: int -> unit
-    type accel_flags
+    eqtype accel_flags
     val ACCEL_VISIBLE: accel_flags
     val ACCEL_SIGNAL_VISIBLE: accel_flags
     val ACCEL_LOCKED: accel_flags
     val ACCEL_MASK: accel_flags
 
-    type calendar_display_options
+    eqtype calendar_display_options
     val CALENDAR_SHOW_HEADING: calendar_display_options
     val CALENDAR_SHOW_DAY_NAMES: calendar_display_options
     val CALENDAR_NO_MONTH_CHANGE: calendar_display_options
     val CALENDAR_SHOW_WEEK_NUMBERS: calendar_display_options
     val CALENDAR_WEEK_START_MONDAY: calendar_display_options
 
-    type cell_type
+    eqtype cell_type
     val CELL_EMPTY: cell_type
     val CELL_TEXT: cell_type
     val CELL_PIXMAP: cell_type
     val CELL_PIXTEXT: cell_type
     val CELL_WIDGET: cell_type
 
-    type clist_drag_pos
+    eqtype clist_drag_pos
     val CLIST_DRAG_NONE: clist_drag_pos
     val CLIST_DRAG_BEFORE: clist_drag_pos
     val CLIST_DRAG_INTO: clist_drag_pos
     val CLIST_DRAG_AFTER: clist_drag_pos
 
-    type button_action
+    eqtype button_action
     val BUTTON_IGNORED: button_action
     val BUTTON_SELECTS: button_action
     val BUTTON_DRAGS: button_action
     val BUTTON_EXPANDS: button_action
 
-    type ctree_pos
+    eqtype ctree_pos
     val CTREE_POS_BEFORE: ctree_pos
     val CTREE_POS_AS_CHILD: ctree_pos
     val CTREE_POS_AFTER: ctree_pos
 
-    type ctree_line_style
+    eqtype ctree_line_style
     val CTREE_LINES_NONE: ctree_line_style
     val CTREE_LINES_SOLID: ctree_line_style
     val CTREE_LINES_DOTTED: ctree_line_style
     val CTREE_LINES_TABBED: ctree_line_style
 
-    type ctree_expander_style
+    eqtype ctree_expander_style
     val CTREE_EXPANDER_NONE: ctree_expander_style
     val CTREE_EXPANDER_SQUARE: ctree_expander_style
     val CTREE_EXPANDER_TRIANGLE: ctree_expander_style
     val CTREE_EXPANDER_CIRCULAR: ctree_expander_style
 
-    type ctree_expansion_type
+    eqtype ctree_expansion_type
     val CTREE_EXPANSION_EXPAND: ctree_expansion_type
     val CTREE_EXPANSION_EXPAND_RECURSIVE: ctree_expansion_type
     val CTREE_EXPANSION_COLLAPSE: ctree_expansion_type
@@ -6594,46 +6594,46 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val CTREE_EXPANSION_TOGGLE: ctree_expansion_type
     val CTREE_EXPANSION_TOGGLE_RECURSIVE: ctree_expansion_type
 
-    type debug_flag
+    eqtype debug_flag
     val DEBUG_OBJECTS: debug_flag
     val DEBUG_MISC: debug_flag
     val DEBUG_SIGNALS: debug_flag
     val DEBUG_DND: debug_flag
 
-    type dest_defaults
+    eqtype dest_defaults
     val DEST_DEFAULT_MOTION: dest_defaults
     val DEST_DEFAULT_HIGHLIGHT: dest_defaults
     val DEST_DEFAULT_DROP: dest_defaults
     val DEST_DEFAULT_ALL: dest_defaults
 
-    type target_flags
+    eqtype target_flags
     val TARGET_SAME_APP: target_flags
     val TARGET_SAME_WIDGET: target_flags
 
-    type arrow_type
+    eqtype arrow_type
     val ARROW_UP: arrow_type
     val ARROW_DOWN: arrow_type
     val ARROW_LEFT: arrow_type
     val ARROW_RIGHT: arrow_type
 
-    type attach_options
+    eqtype attach_options
     val EXPAND: attach_options
     val SHRINK: attach_options
     val FILL: attach_options
 
-    type button_box_style
+    eqtype button_box_style
     val BUTTONBOX_DEFAULT_STYLE: button_box_style
     val BUTTONBOX_SPREAD: button_box_style
     val BUTTONBOX_EDGE: button_box_style
     val BUTTONBOX_START: button_box_style
     val BUTTONBOX_END: button_box_style
 
-    type curve_type
+    eqtype curve_type
     val CURVE_TYPE_LINEAR: curve_type
     val CURVE_TYPE_SPLINE: curve_type
     val CURVE_TYPE_FREE: curve_type
 
-    type direction_type
+    eqtype direction_type
     val DIR_TAB_FORWARD: direction_type
     val DIR_TAB_BACKWARD: direction_type
     val DIR_UP: direction_type
@@ -6641,13 +6641,13 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val DIR_LEFT: direction_type
     val DIR_RIGHT: direction_type
 
-    type justification
+    eqtype justification
     val JUSTIFY_LEFT: justification
     val JUSTIFY_RIGHT: justification
     val JUSTIFY_CENTER: justification
     val JUSTIFY_FILL: justification
 
-    type match_type
+    eqtype match_type
     val MATCH_ALL: match_type
     val MATCH_ALL_TAIL: match_type
     val MATCH_HEAD: match_type
@@ -6655,37 +6655,37 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val MATCH_EXACT: match_type
     val MATCH_LAST: match_type
 
-    type menu_direction_type
+    eqtype menu_direction_type
     val MENU_DIR_PARENT: menu_direction_type
     val MENU_DIR_CHILD: menu_direction_type
     val MENU_DIR_NEXT: menu_direction_type
     val MENU_DIR_PREV: menu_direction_type
 
-    type menu_factory_type
+    eqtype menu_factory_type
     val MENU_FACTORY_MENU: menu_factory_type
     val MENU_FACTORY_MENU_BAR: menu_factory_type
     val MENU_FACTORY_OPTION_MENU: menu_factory_type
 
-    type metric_type
+    eqtype metric_type
     val PIXELS: metric_type
     val INCHES: metric_type
     val CENTIMETERS: metric_type
 
-    type orientation
+    eqtype orientation
     val ORIENTATION_HORIZONTAL: orientation
     val ORIENTATION_VERTICAL: orientation
 
-    type corner_type
+    eqtype corner_type
     val CORNER_TOP_LEFT: corner_type
     val CORNER_BOTTOM_LEFT: corner_type
     val CORNER_TOP_RIGHT: corner_type
     val CORNER_BOTTOM_RIGHT: corner_type
 
-    type pack_type
+    eqtype pack_type
     val PACK_START: pack_type
     val PACK_END: pack_type
 
-    type path_priority_type
+    eqtype path_priority_type
     val PATH_PRIO_LOWEST: path_priority_type
     val PATH_PRIO_GTK: path_priority_type
     val PATH_PRIO_APPLICATION: path_priority_type
@@ -6693,37 +6693,37 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val PATH_PRIO_HIGHEST: path_priority_type
     val PATH_PRIO_MASK: path_priority_type
 
-    type path_type
+    eqtype path_type
     val PATH_WIDGET: path_type
     val PATH_WIDGET_CLASS: path_type
     val PATH_CLASS: path_type
 
-    type policy_type
+    eqtype policy_type
     val POLICY_ALWAYS: policy_type
     val POLICY_AUTOMATIC: policy_type
     val POLICY_NEVER: policy_type
 
-    type position_type
+    eqtype position_type
     val POS_LEFT: position_type
     val POS_RIGHT: position_type
     val POS_TOP: position_type
     val POS_BOTTOM: position_type
 
-    type preview_type
+    eqtype preview_type
     val PREVIEW_COLOR: preview_type
     val PREVIEW_GRAYSCALE: preview_type
 
-    type relief_style
+    eqtype relief_style
     val RELIEF_NORMAL: relief_style
     val RELIEF_HALF: relief_style
     val RELIEF_NONE: relief_style
 
-    type resize_mode
+    eqtype resize_mode
     val RESIZE_PARENT: resize_mode
     val RESIZE_QUEUE: resize_mode
     val RESIZE_IMMEDIATE: resize_mode
 
-    type signal_run_type
+    eqtype signal_run_type
     val RUN_FIRST: signal_run_type
     val RUN_LAST: signal_run_type
     val RUN_BOTH: signal_run_type
@@ -6731,7 +6731,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val RUN_ACTION: signal_run_type
     val RUN_NO_HOOKS: signal_run_type
 
-    type scroll_type
+    eqtype scroll_type
     val SCROLL_NONE: scroll_type
     val SCROLL_STEP_BACKWARD: scroll_type
     val SCROLL_STEP_FORWARD: scroll_type
@@ -6739,90 +6739,90 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val SCROLL_PAGE_FORWARD: scroll_type
     val SCROLL_JUMP: scroll_type
 
-    type selection_mode
+    eqtype selection_mode
     val SELECTION_SINGLE: selection_mode
     val SELECTION_BROWSE: selection_mode
     val SELECTION_MULTIPLE: selection_mode
     val SELECTION_EXTENDED: selection_mode
 
-    type shadow_type
+    eqtype shadow_type
     val SHADOW_NONE: shadow_type
     val SHADOW_IN: shadow_type
     val SHADOW_OUT: shadow_type
     val SHADOW_ETCHED_IN: shadow_type
     val SHADOW_ETCHED_OUT: shadow_type
 
-    type state_type
+    eqtype state_type
     val STATE_NORMAL: state_type
     val STATE_ACTIVE: state_type
     val STATE_PRELIGHT: state_type
     val STATE_SELECTED: state_type
     val STATE_INSENSITIVE: state_type
 
-    type submenu_direction
+    eqtype submenu_direction
     val DIRECTION_LEFT: submenu_direction
     val DIRECTION_RIGHT: submenu_direction
 
-    type submenu_placement
+    eqtype submenu_placement
     val TOP_BOTTOM: submenu_placement
     val LEFT_RIGHT: submenu_placement
 
-    type toolbar_style
+    eqtype toolbar_style
     val TOOLBAR_ICONS: toolbar_style
     val TOOLBAR_TEXT: toolbar_style
     val TOOLBAR_BOTH: toolbar_style
 
-    type trough_type
+    eqtype trough_type
     val TROUGH_NONE: trough_type
     val TROUGH_START: trough_type
     val TROUGH_END: trough_type
     val TROUGH_JUMP: trough_type
 
-    type update_type
+    eqtype update_type
     val UPDATE_CONTINUOUS: update_type
     val UPDATE_DISCONTINUOUS: update_type
     val UPDATE_DELAYED: update_type
 
-    type visibility
+    eqtype visibility
     val VISIBILITY_NONE: visibility
     val VISIBILITY_PARTIAL: visibility
     val VISIBILITY_FULL: visibility
 
-    type window_position
+    eqtype window_position
     val WIN_POS_NONE: window_position
     val WIN_POS_CENTER: window_position
     val WIN_POS_MOUSE: window_position
 
-    type window_type
+    eqtype window_type
     val WINDOW_TOPLEVEL: window_type
     val WINDOW_DIALOG: window_type
     val WINDOW_POPUP: window_type
 
-    type sort_type
+    eqtype sort_type
     val SORT_ASCENDING: sort_type
     val SORT_DESCENDING: sort_type
 
-    type font_metric_type
+    eqtype font_metric_type
     val FONT_METRIC_PIXELS: font_metric_type
     val FONT_METRIC_POINTS: font_metric_type
 
-    type font_type
+    eqtype font_type
     val FONT_BITMAP: font_type
     val FONT_SCALABLE: font_type
     val FONT_SCALABLE_BITMAP: font_type
     val FONT_ALL: font_type
 
-    type font_filter_type
+    eqtype font_filter_type
     val FONT_FILTER_BASE: font_filter_type
     val FONT_FILTER_USER: font_filter_type
 
-    type object_flags
+    eqtype object_flags
     val DESTROYED: object_flags
     val FLOATING: object_flags
     val CONNECTED: object_flags
     val CONSTRUCTED: object_flags
 
-    type arg_flags
+    eqtype arg_flags
     val ARG_READABLE: arg_flags
     val ARG_WRITABLE: arg_flags
     val ARG_CONSTRUCT: arg_flags
@@ -6831,18 +6831,18 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val ARG_MASK: arg_flags
     val ARG_READWRITE: arg_flags
 
-    type packer_options
+    eqtype packer_options
     val PACK_EXPAND: packer_options
     val FILL_X: packer_options
     val FILL_Y: packer_options
 
-    type side_type
+    eqtype side_type
     val SIDE_TOP: side_type
     val SIDE_BOTTOM: side_type
     val SIDE_LEFT: side_type
     val SIDE_RIGHT: side_type
 
-    type anchor_type
+    eqtype anchor_type
     val ANCHOR_CENTER: anchor_type
     val ANCHOR_NORTH: anchor_type
     val ANCHOR_NORTH_WEST: anchor_type
@@ -6861,23 +6861,23 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val ANCHOR_W: anchor_type
     val ANCHOR_E: anchor_type
 
-    type progress_bar_style
+    eqtype progress_bar_style
     val PROGRESS_CONTINUOUS: progress_bar_style
     val PROGRESS_DISCRETE: progress_bar_style
 
-    type progress_bar_orientation
+    eqtype progress_bar_orientation
     val PROGRESS_LEFT_TO_RIGHT: progress_bar_orientation
     val PROGRESS_RIGHT_TO_LEFT: progress_bar_orientation
     val PROGRESS_BOTTOM_TO_TOP: progress_bar_orientation
     val PROGRESS_TOP_TO_BOTTOM: progress_bar_orientation
 
-    type rc_flags
+    eqtype rc_flags
     val RC_FG: rc_flags
     val RC_BG: rc_flags
     val RC_TEXT: rc_flags
     val RC_BASE: rc_flags
 
-    type rc_token_type
+    eqtype rc_token_type
     val RC_TOKEN_INVALID: rc_token_type
     val RC_TOKEN_INCLUDE: rc_token_type
     val RC_TOKEN_NORMAL: rc_token_type
@@ -6908,11 +6908,11 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val RC_TOKEN_MODULE_PATH: rc_token_type
     val RC_TOKEN_LAST: rc_token_type
 
-    type spin_button_update_policy
+    eqtype spin_button_update_policy
     val UPDATE_ALWAYS: spin_button_update_policy
     val UPDATE_IF_VALID: spin_button_update_policy
 
-    type spin_type
+    eqtype spin_type
     val SPIN_STEP_FORWARD: spin_type
     val SPIN_STEP_BACKWARD: spin_type
     val SPIN_PAGE_FORWARD: spin_type
@@ -6921,22 +6921,22 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val SPIN_END: spin_type
     val SPIN_USER_DEFINED: spin_type
 
-    type toolbar_child_type
+    eqtype toolbar_child_type
     val TOOLBAR_CHILD_SPACE: toolbar_child_type
     val TOOLBAR_CHILD_BUTTON: toolbar_child_type
     val TOOLBAR_CHILD_TOGGLEBUTTON: toolbar_child_type
     val TOOLBAR_CHILD_RADIOBUTTON: toolbar_child_type
     val TOOLBAR_CHILD_WIDGET: toolbar_child_type
 
-    type toolbar_space_style
+    eqtype toolbar_space_style
     val TOOLBAR_SPACE_EMPTY: toolbar_space_style
     val TOOLBAR_SPACE_LINE: toolbar_space_style
 
-    type tree_view_mode
+    eqtype tree_view_mode
     val TREE_VIEW_LINE: tree_view_mode
     val TREE_VIEW_ITEM: tree_view_mode
 
-    type fundamental_type
+    eqtype fundamental_type
     val TYPE_INVALID: fundamental_type
     val TYPE_NONE: fundamental_type
     val TYPE_CHAR: fundamental_type
@@ -6960,7 +6960,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val TYPE_FOREIGN: fundamental_type
     val TYPE_OBJECT: fundamental_type
 
-    type widget_flags
+    eqtype widget_flags
     val TOPLEVEL: widget_flags
     val NO_WINDOW: widget_flags
     val REALIZED: widget_flags
@@ -6978,7 +6978,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val NO_REPARENT: widget_flags
     val APP_PAINTABLE: widget_flags
 
-    type gdk_window_type
+    eqtype gdk_window_type
     val GDK_WINDOW_ROOT: gdk_window_type
     val GDK_WINDOW_TOPLEVEL: gdk_window_type
     val GDK_WINDOW_CHILD: gdk_window_type
@@ -6987,16 +6987,16 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_WINDOW_PIXMAP: gdk_window_type
     val GDK_WINDOW_FOREIGN: gdk_window_type
 
-    type gdk_window_class
+    eqtype gdk_window_class
     val GDK_INPUT_OUTPUT: gdk_window_class
     val GDK_INPUT_ONLY: gdk_window_class
 
-    type gdk_image_type
+    eqtype gdk_image_type
     val GDK_IMAGE_NORMAL: gdk_image_type
     val GDK_IMAGE_SHARED: gdk_image_type
     val GDK_IMAGE_FASTEST: gdk_image_type
 
-    type gdk_visual_type
+    eqtype gdk_visual_type
     val GDK_VISUAL_STATIC_GRAY: gdk_visual_type
     val GDK_VISUAL_GRAYSCALE: gdk_visual_type
     val GDK_VISUAL_STATIC_COLOR: gdk_visual_type
@@ -7004,11 +7004,11 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_VISUAL_TRUE_COLOR: gdk_visual_type
     val GDK_VISUAL_DIRECT_COLOR: gdk_visual_type
 
-    type gdk_font_type
+    eqtype gdk_font_type
     val GDK_FONT_FONT: gdk_font_type
     val GDK_FONT_FONTSET: gdk_font_type
 
-    type gdk_window_attributes_type
+    eqtype gdk_window_attributes_type
     val GDK_WA_TITLE: gdk_window_attributes_type
     val GDK_WA_X: gdk_window_attributes_type
     val GDK_WA_Y: gdk_window_attributes_type
@@ -7018,7 +7018,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_WA_WMCLASS: gdk_window_attributes_type
     val GDK_WA_NOREDIR: gdk_window_attributes_type
 
-    type gdk_window_hints
+    eqtype gdk_window_hints
     val GDK_HINT_POS: gdk_window_hints
     val GDK_HINT_MIN_SIZE: gdk_window_hints
     val GDK_HINT_MAX_SIZE: gdk_window_hints
@@ -7026,7 +7026,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_HINT_ASPECT: gdk_window_hints
     val GDK_HINT_RESIZE_INC: gdk_window_hints
 
-    type gdk_function
+    eqtype gdk_function
     val GDK_COPY: gdk_function
     val GDK_INVERT: gdk_function
     val GDK_XOR: gdk_function
@@ -7043,33 +7043,33 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_NAND: gdk_function
     val GDK_SET: gdk_function
 
-    type gdk_fill
+    eqtype gdk_fill
     val GDK_SOLID: gdk_fill
     val GDK_TILED: gdk_fill
     val GDK_STIPPLED: gdk_fill
     val GDK_OPAQUE_STIPPLED: gdk_fill
 
-    type gdk_fill_rule
+    eqtype gdk_fill_rule
     val GDK_EVEN_ODD_RULE: gdk_fill_rule
     val GDK_WINDING_RULE: gdk_fill_rule
 
-    type gdk_line_style
+    eqtype gdk_line_style
     val GDK_LINE_SOLID: gdk_line_style
     val GDK_LINE_ON_OFF_DASH: gdk_line_style
     val GDK_LINE_DOUBLE_DASH: gdk_line_style
 
-    type gdk_cap_style
+    eqtype gdk_cap_style
     val GDK_CAP_NOT_LAST: gdk_cap_style
     val GDK_CAP_BUTT: gdk_cap_style
     val GDK_CAP_ROUND: gdk_cap_style
     val GDK_CAP_PROJECTING: gdk_cap_style
 
-    type gdk_join_style
+    eqtype gdk_join_style
     val GDK_JOIN_MITER: gdk_join_style
     val GDK_JOIN_ROUND: gdk_join_style
     val GDK_JOIN_BEVEL: gdk_join_style
 
-    type gdk_cursor_type
+    eqtype gdk_cursor_type
     val GDK_NUM_GLYPHS: gdk_cursor_type
     val GDK_X_CURSOR: gdk_cursor_type
     val GDK_ARROW: gdk_cursor_type
@@ -7151,17 +7151,17 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_LAST_CURSOR: gdk_cursor_type
     val GDK_CURSOR_IS_PIXMAP: gdk_cursor_type
 
-    type gdk_filter_return
+    eqtype gdk_filter_return
     val GDK_FILTER_CONTINUE: gdk_filter_return
     val GDK_FILTER_TRANSLATE: gdk_filter_return
     val GDK_FILTER_REMOVE: gdk_filter_return
 
-    type gdk_visibility_state
+    eqtype gdk_visibility_state
     val GDK_VISIBILITY_UNOBSCURED: gdk_visibility_state
     val GDK_VISIBILITY_PARTIAL: gdk_visibility_state
     val GDK_VISIBILITY_FULLY_OBSCURED: gdk_visibility_state
 
-    type gdk_event_type
+    eqtype gdk_event_type
     val GDK_NOTHING: gdk_event_type
     val GDK_DELETE: gdk_event_type
     val GDK_DESTROY: gdk_event_type
@@ -7195,7 +7195,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_VISIBILITY_NOTIFY: gdk_event_type
     val GDK_NO_EXPOSE: gdk_event_type
 
-    type gdk_event_mask
+    eqtype gdk_event_mask
     val GDK_EXPOSURE_MASK: gdk_event_mask
     val GDK_POINTER_MOTION_MASK: gdk_event_mask
     val GDK_POINTER_MOTION_HINT_MASK: gdk_event_mask
@@ -7218,7 +7218,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_SUBSTRUCTURE_MASK: gdk_event_mask
     val GDK_ALL_EVENTS_MASK: gdk_event_mask
 
-    type gdk_notify_type
+    eqtype gdk_notify_type
     val GDK_NOTIFY_ANCESTOR: gdk_notify_type
     val GDK_NOTIFY_VIRTUAL: gdk_notify_type
     val GDK_NOTIFY_INFERIOR: gdk_notify_type
@@ -7226,12 +7226,12 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_NOTIFY_NONLINEAR_VIRTUAL: gdk_notify_type
     val GDK_NOTIFY_UNKNOWN: gdk_notify_type
 
-    type gdk_crossing_mode
+    eqtype gdk_crossing_mode
     val GDK_CROSSING_NORMAL: gdk_crossing_mode
     val GDK_CROSSING_GRAB: gdk_crossing_mode
     val GDK_CROSSING_UNGRAB: gdk_crossing_mode
 
-    type gdk_modifier_type
+    eqtype gdk_modifier_type
     val GDK_SHIFT_MASK: gdk_modifier_type
     val GDK_LOCK_MASK: gdk_modifier_type
     val GDK_CONTROL_MASK: gdk_modifier_type
@@ -7248,27 +7248,27 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_RELEASE_MASK: gdk_modifier_type
     val GDK_MODIFIER_MASK: gdk_modifier_type
 
-    type gdk_subwindow_mode
+    eqtype gdk_subwindow_mode
     val GDK_CLIP_BY_CHILDREN: gdk_subwindow_mode
     val GDK_INCLUDE_INFERIORS: gdk_subwindow_mode
 
-    type gdk_input_condition
+    eqtype gdk_input_condition
     val GDK_INPUT_READ: gdk_input_condition
     val GDK_INPUT_WRITE: gdk_input_condition
     val GDK_INPUT_EXCEPTION: gdk_input_condition
 
-    type gdk_status
+    eqtype gdk_status
     val GDK_OK: gdk_status
     val GDK_ERROR: gdk_status
     val GDK_ERROR_PARAM: gdk_status
     val GDK_ERROR_FILE: gdk_status
     val GDK_ERROR_MEM: gdk_status
 
-    type gdk_byte_order
+    eqtype gdk_byte_order
     val GDK_LSB_FIRST: gdk_byte_order
     val GDK_MSB_FIRST: gdk_byte_order
 
-    type gdk_gc_values_mask
+    eqtype gdk_gc_values_mask
     val GDK_GC_FOREGROUND: gdk_gc_values_mask
     val GDK_GC_BACKGROUND: gdk_gc_values_mask
     val GDK_GC_FONT: gdk_gc_values_mask
@@ -7288,31 +7288,31 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_GC_CAP_STYLE: gdk_gc_values_mask
     val GDK_GC_JOIN_STYLE: gdk_gc_values_mask
 
-    type gdk_selection
+    eqtype gdk_selection
     val GDK_SELECTION_PRIMARY: gdk_selection
     val GDK_SELECTION_SECONDARY: gdk_selection
 
-    type gdk_property_state
+    eqtype gdk_property_state
     val GDK_PROPERTY_NEW_VALUE: gdk_property_state
     val GDK_PROPERTY_DELETE: gdk_property_state
 
-    type gdk_prop_mode
+    eqtype gdk_prop_mode
     val GDK_PROP_MODE_REPLACE: gdk_prop_mode
     val GDK_PROP_MODE_PREPEND: gdk_prop_mode
     val GDK_PROP_MODE_APPEND: gdk_prop_mode
 
-    type gdk_input_source
+    eqtype gdk_input_source
     val GDK_SOURCE_MOUSE: gdk_input_source
     val GDK_SOURCE_PEN: gdk_input_source
     val GDK_SOURCE_ERASER: gdk_input_source
     val GDK_SOURCE_CURSOR: gdk_input_source
 
-    type gdk_input_mode
+    eqtype gdk_input_mode
     val GDK_MODE_DISABLED: gdk_input_mode
     val GDK_MODE_SCREEN: gdk_input_mode
     val GDK_MODE_WINDOW: gdk_input_mode
 
-    type gdk_axis_use
+    eqtype gdk_axis_use
     val GDK_AXIS_IGNORE: gdk_axis_use
     val GDK_AXIS_X: gdk_axis_use
     val GDK_AXIS_Y: gdk_axis_use
@@ -7321,14 +7321,14 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_AXIS_YTILT: gdk_axis_use
     val GDK_AXIS_LAST: gdk_axis_use
 
-    type gdk_target
+    eqtype gdk_target
     val GDK_TARGET_BITMAP: gdk_target
     val GDK_TARGET_COLORMAP: gdk_target
     val GDK_TARGET_DRAWABLE: gdk_target
     val GDK_TARGET_PIXMAP: gdk_target
     val GDK_TARGET_STRING: gdk_target
 
-    type gdk_selection_type
+    eqtype gdk_selection_type
     val GDK_SELECTION_TYPE_ATOM: gdk_selection_type
     val GDK_SELECTION_TYPE_BITMAP: gdk_selection_type
     val GDK_SELECTION_TYPE_COLORMAP: gdk_selection_type
@@ -7338,12 +7338,12 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_SELECTION_TYPE_WINDOW: gdk_selection_type
     val GDK_SELECTION_TYPE_STRING: gdk_selection_type
 
-    type gdk_extension_mode
+    eqtype gdk_extension_mode
     val GDK_EXTENSION_EVENTS_NONE: gdk_extension_mode
     val GDK_EXTENSION_EVENTS_ALL: gdk_extension_mode
     val GDK_EXTENSION_EVENTS_CURSOR: gdk_extension_mode
 
-    type gdk_im_style
+    eqtype gdk_im_style
     val GDK_IM_PREEDIT_AREA: gdk_im_style
     val GDK_IM_PREEDIT_CALLBACKS: gdk_im_style
     val GDK_IM_PREEDIT_POSITION: gdk_im_style
@@ -7356,7 +7356,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_IM_STATUS_NONE: gdk_im_style
     val GDK_IM_STATUS_MASK: gdk_im_style
 
-    type gdk_ic_attributes_type
+    eqtype gdk_ic_attributes_type
     val GDK_IC_STYLE: gdk_ic_attributes_type
     val GDK_IC_CLIENT_WINDOW: gdk_ic_attributes_type
     val GDK_IC_FOCUS_WINDOW: gdk_ic_attributes_type
@@ -7382,7 +7382,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_IC_PREEDIT_AREA_REQ: gdk_ic_attributes_type
     val GDK_IC_PREEDIT_POSITION_REQ: gdk_ic_attributes_type
 
-    type gdk_wm_decoration
+    eqtype gdk_wm_decoration
     val GDK_DECOR_ALL: gdk_wm_decoration
     val GDK_DECOR_BORDER: gdk_wm_decoration
     val GDK_DECOR_RESIZEH: gdk_wm_decoration
@@ -7391,7 +7391,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_DECOR_MINIMIZE: gdk_wm_decoration
     val GDK_DECOR_MAXIMIZE: gdk_wm_decoration
 
-    type gdk_wm_function
+    eqtype gdk_wm_function
     val GDK_FUNC_ALL: gdk_wm_function
     val GDK_FUNC_RESIZE: gdk_wm_function
     val GDK_FUNC_MOVE: gdk_wm_function
@@ -7399,7 +7399,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_FUNC_MAXIMIZE: gdk_wm_function
     val GDK_FUNC_CLOSE: gdk_wm_function
 
-    type gdk_color_context_mode
+    eqtype gdk_color_context_mode
     val GDK_CC_MODE_UNDEFINED: gdk_color_context_mode
     val GDK_CC_MODE_BW: gdk_color_context_mode
     val GDK_CC_MODE_STD_CMAP: gdk_color_context_mode
@@ -7407,12 +7407,12 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_CC_MODE_MY_GRAY: gdk_color_context_mode
     val GDK_CC_MODE_PALETTE: gdk_color_context_mode
 
-    type gdk_overlap_type
+    eqtype gdk_overlap_type
     val GDK_OVERLAP_RECTANGLE_IN: gdk_overlap_type
     val GDK_OVERLAP_RECTANGLE_OUT: gdk_overlap_type
     val GDK_OVERLAP_RECTANGLE_PART: gdk_overlap_type
 
-    type gdk_drag_action
+    eqtype gdk_drag_action
     val GDK_ACTION_DEFAULT: gdk_drag_action
     val GDK_ACTION_COPY: gdk_drag_action
     val GDK_ACTION_MOVE: gdk_drag_action
@@ -7420,12 +7420,12 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val GDK_ACTION_PRIVATE: gdk_drag_action
     val GDK_ACTION_ASK: gdk_drag_action
 
-    type gdk_drag_protocol
+    eqtype gdk_drag_protocol
     val GDK_DRAG_PROTO_MOTIF: gdk_drag_protocol
     val GDK_DRAG_PROTO_XDND: gdk_drag_protocol
     val GDK_DRAG_PROTO_ROOTWIN: gdk_drag_protocol
 
-    type gdk_rgb_dither
+    eqtype gdk_rgb_dither
     val GDK_RGB_DITHER_NONE: gdk_rgb_dither
     val GDK_RGB_DITHER_NORMAL: gdk_rgb_dither
     val GDK_RGB_DITHER_MAX: gdk_rgb_dither
@@ -8978,655 +8978,655 @@ end
     val exit: int -> unit
         = fn error_code => exit_ error_code
 
-    type accel_flags = int
+    eqtype accel_flags = int
     val get_accel_flags_: unit -> int * int * int * int
         = app1(symb"mgtk_get_accel_flags")
     val (ACCEL_VISIBLE,ACCEL_SIGNAL_VISIBLE,ACCEL_LOCKED,ACCEL_MASK)
         = get_accel_flags_ ()
 
-    type calendar_display_options = int
+    eqtype calendar_display_options = int
     val get_calendar_display_options_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_calendar_display_options")
     val (CALENDAR_SHOW_HEADING,CALENDAR_SHOW_DAY_NAMES,CALENDAR_NO_MONTH_CHANGE,CALENDAR_SHOW_WEEK_NUMBERS,CALENDAR_WEEK_START_MONDAY)
         = get_calendar_display_options_ ()
 
-    type cell_type = int
+    eqtype cell_type = int
     val get_cell_type_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_cell_type")
     val (CELL_EMPTY,CELL_TEXT,CELL_PIXMAP,CELL_PIXTEXT,CELL_WIDGET)
         = get_cell_type_ ()
 
-    type clist_drag_pos = int
+    eqtype clist_drag_pos = int
     val get_clist_drag_pos_: unit -> int * int * int * int
         = app1(symb"mgtk_get_clist_drag_pos")
     val (CLIST_DRAG_NONE,CLIST_DRAG_BEFORE,CLIST_DRAG_INTO,CLIST_DRAG_AFTER)
         = get_clist_drag_pos_ ()
 
-    type button_action = int
+    eqtype button_action = int
     val get_button_action_: unit -> int * int * int * int
         = app1(symb"mgtk_get_button_action")
     val (BUTTON_IGNORED,BUTTON_SELECTS,BUTTON_DRAGS,BUTTON_EXPANDS)
         = get_button_action_ ()
 
-    type ctree_pos = int
+    eqtype ctree_pos = int
     val get_ctree_pos_: unit -> int * int * int
         = app1(symb"mgtk_get_ctree_pos")
     val (CTREE_POS_BEFORE,CTREE_POS_AS_CHILD,CTREE_POS_AFTER)
         = get_ctree_pos_ ()
 
-    type ctree_line_style = int
+    eqtype ctree_line_style = int
     val get_ctree_line_style_: unit -> int * int * int * int
         = app1(symb"mgtk_get_ctree_line_style")
     val (CTREE_LINES_NONE,CTREE_LINES_SOLID,CTREE_LINES_DOTTED,CTREE_LINES_TABBED)
         = get_ctree_line_style_ ()
 
-    type ctree_expander_style = int
+    eqtype ctree_expander_style = int
     val get_ctree_expander_style_: unit -> int * int * int * int
         = app1(symb"mgtk_get_ctree_expander_style")
     val (CTREE_EXPANDER_NONE,CTREE_EXPANDER_SQUARE,CTREE_EXPANDER_TRIANGLE,CTREE_EXPANDER_CIRCULAR)
         = get_ctree_expander_style_ ()
 
-    type ctree_expansion_type = int
+    eqtype ctree_expansion_type = int
     val get_ctree_expansion_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_ctree_expansion_type")
     val (CTREE_EXPANSION_EXPAND,CTREE_EXPANSION_EXPAND_RECURSIVE,CTREE_EXPANSION_COLLAPSE,CTREE_EXPANSION_COLLAPSE_RECURSIVE,CTREE_EXPANSION_TOGGLE,CTREE_EXPANSION_TOGGLE_RECURSIVE)
         = get_ctree_expansion_type_ ()
 
-    type debug_flag = int
+    eqtype debug_flag = int
     val get_debug_flag_: unit -> int * int * int * int
         = app1(symb"mgtk_get_debug_flag")
     val (DEBUG_OBJECTS,DEBUG_MISC,DEBUG_SIGNALS,DEBUG_DND)
         = get_debug_flag_ ()
 
-    type dest_defaults = int
+    eqtype dest_defaults = int
     val get_dest_defaults_: unit -> int * int * int * int
         = app1(symb"mgtk_get_dest_defaults")
     val (DEST_DEFAULT_MOTION,DEST_DEFAULT_HIGHLIGHT,DEST_DEFAULT_DROP,DEST_DEFAULT_ALL)
         = get_dest_defaults_ ()
 
-    type target_flags = int
+    eqtype target_flags = int
     val get_target_flags_: unit -> int * int
         = app1(symb"mgtk_get_target_flags")
     val (TARGET_SAME_APP,TARGET_SAME_WIDGET)
         = get_target_flags_ ()
 
-    type arrow_type = int
+    eqtype arrow_type = int
     val get_arrow_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_arrow_type")
     val (ARROW_UP,ARROW_DOWN,ARROW_LEFT,ARROW_RIGHT)
         = get_arrow_type_ ()
 
-    type attach_options = int
+    eqtype attach_options = int
     val get_attach_options_: unit -> int * int * int
         = app1(symb"mgtk_get_attach_options")
     val (EXPAND,SHRINK,FILL)
         = get_attach_options_ ()
 
-    type button_box_style = int
+    eqtype button_box_style = int
     val get_button_box_style_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_button_box_style")
     val (BUTTONBOX_DEFAULT_STYLE,BUTTONBOX_SPREAD,BUTTONBOX_EDGE,BUTTONBOX_START,BUTTONBOX_END)
         = get_button_box_style_ ()
 
-    type curve_type = int
+    eqtype curve_type = int
     val get_curve_type_: unit -> int * int * int
         = app1(symb"mgtk_get_curve_type")
     val (CURVE_TYPE_LINEAR,CURVE_TYPE_SPLINE,CURVE_TYPE_FREE)
         = get_curve_type_ ()
 
-    type direction_type = int
+    eqtype direction_type = int
     val get_direction_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_direction_type")
     val (DIR_TAB_FORWARD,DIR_TAB_BACKWARD,DIR_UP,DIR_DOWN,DIR_LEFT,DIR_RIGHT)
         = get_direction_type_ ()
 
-    type justification = int
+    eqtype justification = int
     val get_justification_: unit -> int * int * int * int
         = app1(symb"mgtk_get_justification")
     val (JUSTIFY_LEFT,JUSTIFY_RIGHT,JUSTIFY_CENTER,JUSTIFY_FILL)
         = get_justification_ ()
 
-    type match_type = int
+    eqtype match_type = int
     val get_match_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_match_type")
     val (MATCH_ALL,MATCH_ALL_TAIL,MATCH_HEAD,MATCH_TAIL,MATCH_EXACT,MATCH_LAST)
         = get_match_type_ ()
 
-    type menu_direction_type = int
+    eqtype menu_direction_type = int
     val get_menu_direction_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_menu_direction_type")
     val (MENU_DIR_PARENT,MENU_DIR_CHILD,MENU_DIR_NEXT,MENU_DIR_PREV)
         = get_menu_direction_type_ ()
 
-    type menu_factory_type = int
+    eqtype menu_factory_type = int
     val get_menu_factory_type_: unit -> int * int * int
         = app1(symb"mgtk_get_menu_factory_type")
     val (MENU_FACTORY_MENU,MENU_FACTORY_MENU_BAR,MENU_FACTORY_OPTION_MENU)
         = get_menu_factory_type_ ()
 
-    type metric_type = int
+    eqtype metric_type = int
     val get_metric_type_: unit -> int * int * int
         = app1(symb"mgtk_get_metric_type")
     val (PIXELS,INCHES,CENTIMETERS)
         = get_metric_type_ ()
 
-    type orientation = int
+    eqtype orientation = int
     val get_orientation_: unit -> int * int
         = app1(symb"mgtk_get_orientation")
     val (ORIENTATION_HORIZONTAL,ORIENTATION_VERTICAL)
         = get_orientation_ ()
 
-    type corner_type = int
+    eqtype corner_type = int
     val get_corner_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_corner_type")
     val (CORNER_TOP_LEFT,CORNER_BOTTOM_LEFT,CORNER_TOP_RIGHT,CORNER_BOTTOM_RIGHT)
         = get_corner_type_ ()
 
-    type pack_type = int
+    eqtype pack_type = int
     val get_pack_type_: unit -> int * int
         = app1(symb"mgtk_get_pack_type")
     val (PACK_START,PACK_END)
         = get_pack_type_ ()
 
-    type path_priority_type = int
+    eqtype path_priority_type = int
     val get_path_priority_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_path_priority_type")
     val (PATH_PRIO_LOWEST,PATH_PRIO_GTK,PATH_PRIO_APPLICATION,PATH_PRIO_RC,PATH_PRIO_HIGHEST,PATH_PRIO_MASK)
         = get_path_priority_type_ ()
 
-    type path_type = int
+    eqtype path_type = int
     val get_path_type_: unit -> int * int * int
         = app1(symb"mgtk_get_path_type")
     val (PATH_WIDGET,PATH_WIDGET_CLASS,PATH_CLASS)
         = get_path_type_ ()
 
-    type policy_type = int
+    eqtype policy_type = int
     val get_policy_type_: unit -> int * int * int
         = app1(symb"mgtk_get_policy_type")
     val (POLICY_ALWAYS,POLICY_AUTOMATIC,POLICY_NEVER)
         = get_policy_type_ ()
 
-    type position_type = int
+    eqtype position_type = int
     val get_position_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_position_type")
     val (POS_LEFT,POS_RIGHT,POS_TOP,POS_BOTTOM)
         = get_position_type_ ()
 
-    type preview_type = int
+    eqtype preview_type = int
     val get_preview_type_: unit -> int * int
         = app1(symb"mgtk_get_preview_type")
     val (PREVIEW_COLOR,PREVIEW_GRAYSCALE)
         = get_preview_type_ ()
 
-    type relief_style = int
+    eqtype relief_style = int
     val get_relief_style_: unit -> int * int * int
         = app1(symb"mgtk_get_relief_style")
     val (RELIEF_NORMAL,RELIEF_HALF,RELIEF_NONE)
         = get_relief_style_ ()
 
-    type resize_mode = int
+    eqtype resize_mode = int
     val get_resize_mode_: unit -> int * int * int
         = app1(symb"mgtk_get_resize_mode")
     val (RESIZE_PARENT,RESIZE_QUEUE,RESIZE_IMMEDIATE)
         = get_resize_mode_ ()
 
-    type signal_run_type = int
+    eqtype signal_run_type = int
     val get_signal_run_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_signal_run_type")
     val (RUN_FIRST,RUN_LAST,RUN_BOTH,RUN_NO_RECURSE,RUN_ACTION,RUN_NO_HOOKS)
         = get_signal_run_type_ ()
 
-    type scroll_type = int
+    eqtype scroll_type = int
     val get_scroll_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_scroll_type")
     val (SCROLL_NONE,SCROLL_STEP_BACKWARD,SCROLL_STEP_FORWARD,SCROLL_PAGE_BACKWARD,SCROLL_PAGE_FORWARD,SCROLL_JUMP)
         = get_scroll_type_ ()
 
-    type selection_mode = int
+    eqtype selection_mode = int
     val get_selection_mode_: unit -> int * int * int * int
         = app1(symb"mgtk_get_selection_mode")
     val (SELECTION_SINGLE,SELECTION_BROWSE,SELECTION_MULTIPLE,SELECTION_EXTENDED)
         = get_selection_mode_ ()
 
-    type shadow_type = int
+    eqtype shadow_type = int
     val get_shadow_type_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_shadow_type")
     val (SHADOW_NONE,SHADOW_IN,SHADOW_OUT,SHADOW_ETCHED_IN,SHADOW_ETCHED_OUT)
         = get_shadow_type_ ()
 
-    type state_type = int
+    eqtype state_type = int
     val get_state_type_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_state_type")
     val (STATE_NORMAL,STATE_ACTIVE,STATE_PRELIGHT,STATE_SELECTED,STATE_INSENSITIVE)
         = get_state_type_ ()
 
-    type submenu_direction = int
+    eqtype submenu_direction = int
     val get_submenu_direction_: unit -> int * int
         = app1(symb"mgtk_get_submenu_direction")
     val (DIRECTION_LEFT,DIRECTION_RIGHT)
         = get_submenu_direction_ ()
 
-    type submenu_placement = int
+    eqtype submenu_placement = int
     val get_submenu_placement_: unit -> int * int
         = app1(symb"mgtk_get_submenu_placement")
     val (TOP_BOTTOM,LEFT_RIGHT)
         = get_submenu_placement_ ()
 
-    type toolbar_style = int
+    eqtype toolbar_style = int
     val get_toolbar_style_: unit -> int * int * int
         = app1(symb"mgtk_get_toolbar_style")
     val (TOOLBAR_ICONS,TOOLBAR_TEXT,TOOLBAR_BOTH)
         = get_toolbar_style_ ()
 
-    type trough_type = int
+    eqtype trough_type = int
     val get_trough_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_trough_type")
     val (TROUGH_NONE,TROUGH_START,TROUGH_END,TROUGH_JUMP)
         = get_trough_type_ ()
 
-    type update_type = int
+    eqtype update_type = int
     val get_update_type_: unit -> int * int * int
         = app1(symb"mgtk_get_update_type")
     val (UPDATE_CONTINUOUS,UPDATE_DISCONTINUOUS,UPDATE_DELAYED)
         = get_update_type_ ()
 
-    type visibility = int
+    eqtype visibility = int
     val get_visibility_: unit -> int * int * int
         = app1(symb"mgtk_get_visibility")
     val (VISIBILITY_NONE,VISIBILITY_PARTIAL,VISIBILITY_FULL)
         = get_visibility_ ()
 
-    type window_position = int
+    eqtype window_position = int
     val get_window_position_: unit -> int * int * int
         = app1(symb"mgtk_get_window_position")
     val (WIN_POS_NONE,WIN_POS_CENTER,WIN_POS_MOUSE)
         = get_window_position_ ()
 
-    type window_type = int
+    eqtype window_type = int
     val get_window_type_: unit -> int * int * int
         = app1(symb"mgtk_get_window_type")
     val (WINDOW_TOPLEVEL,WINDOW_DIALOG,WINDOW_POPUP)
         = get_window_type_ ()
 
-    type sort_type = int
+    eqtype sort_type = int
     val get_sort_type_: unit -> int * int
         = app1(symb"mgtk_get_sort_type")
     val (SORT_ASCENDING,SORT_DESCENDING)
         = get_sort_type_ ()
 
-    type font_metric_type = int
+    eqtype font_metric_type = int
     val get_font_metric_type_: unit -> int * int
         = app1(symb"mgtk_get_font_metric_type")
     val (FONT_METRIC_PIXELS,FONT_METRIC_POINTS)
         = get_font_metric_type_ ()
 
-    type font_type = int
+    eqtype font_type = int
     val get_font_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_font_type")
     val (FONT_BITMAP,FONT_SCALABLE,FONT_SCALABLE_BITMAP,FONT_ALL)
         = get_font_type_ ()
 
-    type font_filter_type = int
+    eqtype font_filter_type = int
     val get_font_filter_type_: unit -> int * int
         = app1(symb"mgtk_get_font_filter_type")
     val (FONT_FILTER_BASE,FONT_FILTER_USER)
         = get_font_filter_type_ ()
 
-    type object_flags = int
+    eqtype object_flags = int
     val get_object_flags_: unit -> int * int * int * int
         = app1(symb"mgtk_get_object_flags")
     val (DESTROYED,FLOATING,CONNECTED,CONSTRUCTED)
         = get_object_flags_ ()
 
-    type arg_flags = int
+    eqtype arg_flags = int
     val get_arg_flags_: unit -> int * int * int * int * int * int * int
         = app1(symb"mgtk_get_arg_flags")
     val (ARG_READABLE,ARG_WRITABLE,ARG_CONSTRUCT,ARG_CONSTRUCT_ONLY,ARG_CHILD_ARG,ARG_MASK,ARG_READWRITE)
         = get_arg_flags_ ()
 
-    type packer_options = int
+    eqtype packer_options = int
     val get_packer_options_: unit -> int * int * int
         = app1(symb"mgtk_get_packer_options")
     val (PACK_EXPAND,FILL_X,FILL_Y)
         = get_packer_options_ ()
 
-    type side_type = int
+    eqtype side_type = int
     val get_side_type_: unit -> int * int * int * int
         = app1(symb"mgtk_get_side_type")
     val (SIDE_TOP,SIDE_BOTTOM,SIDE_LEFT,SIDE_RIGHT)
         = get_side_type_ ()
 
-    type anchor_type = int
+    eqtype anchor_type = int
     val get_anchor_type_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_anchor_type")
     val (ANCHOR_CENTER,ANCHOR_NORTH,ANCHOR_NORTH_WEST,ANCHOR_NORTH_EAST,ANCHOR_SOUTH,ANCHOR_SOUTH_WEST,ANCHOR_SOUTH_EAST,ANCHOR_WEST,ANCHOR_EAST,ANCHOR_N,ANCHOR_NW,ANCHOR_NE,ANCHOR_S,ANCHOR_SW,ANCHOR_SE,ANCHOR_W,ANCHOR_E)
         = get_anchor_type_ ()
 
-    type progress_bar_style = int
+    eqtype progress_bar_style = int
     val get_progress_bar_style_: unit -> int * int
         = app1(symb"mgtk_get_progress_bar_style")
     val (PROGRESS_CONTINUOUS,PROGRESS_DISCRETE)
         = get_progress_bar_style_ ()
 
-    type progress_bar_orientation = int
+    eqtype progress_bar_orientation = int
     val get_progress_bar_orientation_: unit -> int * int * int * int
         = app1(symb"mgtk_get_progress_bar_orientation")
     val (PROGRESS_LEFT_TO_RIGHT,PROGRESS_RIGHT_TO_LEFT,PROGRESS_BOTTOM_TO_TOP,PROGRESS_TOP_TO_BOTTOM)
         = get_progress_bar_orientation_ ()
 
-    type rc_flags = int
+    eqtype rc_flags = int
     val get_rc_flags_: unit -> int * int * int * int
         = app1(symb"mgtk_get_rc_flags")
     val (RC_FG,RC_BG,RC_TEXT,RC_BASE)
         = get_rc_flags_ ()
 
-    type rc_token_type = int
+    eqtype rc_token_type = int
     val get_rc_token_type_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_rc_token_type")
     val (RC_TOKEN_INVALID,RC_TOKEN_INCLUDE,RC_TOKEN_NORMAL,RC_TOKEN_ACTIVE,RC_TOKEN_PRELIGHT,RC_TOKEN_SELECTED,RC_TOKEN_INSENSITIVE,RC_TOKEN_FG,RC_TOKEN_BG,RC_TOKEN_BASE,RC_TOKEN_TEXT,RC_TOKEN_FONT,RC_TOKEN_FONTSET,RC_TOKEN_BG_PIXMAP,RC_TOKEN_PIXMAP_PATH,RC_TOKEN_STYLE,RC_TOKEN_BINDING,RC_TOKEN_BIND,RC_TOKEN_WIDGET,RC_TOKEN_WIDGET_CLASS,RC_TOKEN_CLASS,RC_TOKEN_LOWEST,RC_TOKEN_GTK,RC_TOKEN_APPLICATION,RC_TOKEN_RC,RC_TOKEN_HIGHEST,RC_TOKEN_ENGINE,RC_TOKEN_MODULE_PATH,RC_TOKEN_LAST)
         = get_rc_token_type_ ()
 
-    type spin_button_update_policy = int
+    eqtype spin_button_update_policy = int
     val get_spin_button_update_policy_: unit -> int * int
         = app1(symb"mgtk_get_spin_button_update_policy")
     val (UPDATE_ALWAYS,UPDATE_IF_VALID)
         = get_spin_button_update_policy_ ()
 
-    type spin_type = int
+    eqtype spin_type = int
     val get_spin_type_: unit -> int * int * int * int * int * int * int
         = app1(symb"mgtk_get_spin_type")
     val (SPIN_STEP_FORWARD,SPIN_STEP_BACKWARD,SPIN_PAGE_FORWARD,SPIN_PAGE_BACKWARD,SPIN_HOME,SPIN_END,SPIN_USER_DEFINED)
         = get_spin_type_ ()
 
-    type toolbar_child_type = int
+    eqtype toolbar_child_type = int
     val get_toolbar_child_type_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_toolbar_child_type")
     val (TOOLBAR_CHILD_SPACE,TOOLBAR_CHILD_BUTTON,TOOLBAR_CHILD_TOGGLEBUTTON,TOOLBAR_CHILD_RADIOBUTTON,TOOLBAR_CHILD_WIDGET)
         = get_toolbar_child_type_ ()
 
-    type toolbar_space_style = int
+    eqtype toolbar_space_style = int
     val get_toolbar_space_style_: unit -> int * int
         = app1(symb"mgtk_get_toolbar_space_style")
     val (TOOLBAR_SPACE_EMPTY,TOOLBAR_SPACE_LINE)
         = get_toolbar_space_style_ ()
 
-    type tree_view_mode = int
+    eqtype tree_view_mode = int
     val get_tree_view_mode_: unit -> int * int
         = app1(symb"mgtk_get_tree_view_mode")
     val (TREE_VIEW_LINE,TREE_VIEW_ITEM)
         = get_tree_view_mode_ ()
 
-    type fundamental_type = int
+    eqtype fundamental_type = int
     val get_fundamental_type_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_fundamental_type")
     val (TYPE_INVALID,TYPE_NONE,TYPE_CHAR,TYPE_UCHAR,TYPE_BOOL,TYPE_INT,TYPE_UINT,TYPE_LONG,TYPE_ULONG,TYPE_FLOAT,TYPE_DOUBLE,TYPE_STRING,TYPE_ENUM,TYPE_FLAGS,TYPE_BOXED,TYPE_POINTER,TYPE_SIGNAL,TYPE_ARGS,TYPE_CALLBACK,TYPE_C_CALLBACK,TYPE_FOREIGN,TYPE_OBJECT)
         = get_fundamental_type_ ()
 
-    type widget_flags = int
+    eqtype widget_flags = int
     val get_widget_flags_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_widget_flags")
     val (TOPLEVEL,NO_WINDOW,REALIZED,MAPPED,VISIBLE,SENSITIVE,PARENT_SENSITIVE,CAN_FOCUS,HAS_FOCUS,CAN_DEFAULT,HAS_DEFAULT,HAS_GRAB,RC_STYLE,COMPOSITE_CHILD,NO_REPARENT,APP_PAINTABLE)
         = get_widget_flags_ ()
 
-    type gdk_window_type = int
+    eqtype gdk_window_type = int
     val get_gdk_window_type_: unit -> int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_window_type")
     val (GDK_WINDOW_ROOT,GDK_WINDOW_TOPLEVEL,GDK_WINDOW_CHILD,GDK_WINDOW_DIALOG,GDK_WINDOW_TEMP,GDK_WINDOW_PIXMAP,GDK_WINDOW_FOREIGN)
         = get_gdk_window_type_ ()
 
-    type gdk_window_class = int
+    eqtype gdk_window_class = int
     val get_gdk_window_class_: unit -> int * int
         = app1(symb"mgtk_get_gdk_window_class")
     val (GDK_INPUT_OUTPUT,GDK_INPUT_ONLY)
         = get_gdk_window_class_ ()
 
-    type gdk_image_type = int
+    eqtype gdk_image_type = int
     val get_gdk_image_type_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_image_type")
     val (GDK_IMAGE_NORMAL,GDK_IMAGE_SHARED,GDK_IMAGE_FASTEST)
         = get_gdk_image_type_ ()
 
-    type gdk_visual_type = int
+    eqtype gdk_visual_type = int
     val get_gdk_visual_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_visual_type")
     val (GDK_VISUAL_STATIC_GRAY,GDK_VISUAL_GRAYSCALE,GDK_VISUAL_STATIC_COLOR,GDK_VISUAL_PSEUDO_COLOR,GDK_VISUAL_TRUE_COLOR,GDK_VISUAL_DIRECT_COLOR)
         = get_gdk_visual_type_ ()
 
-    type gdk_font_type = int
+    eqtype gdk_font_type = int
     val get_gdk_font_type_: unit -> int * int
         = app1(symb"mgtk_get_gdk_font_type")
     val (GDK_FONT_FONT,GDK_FONT_FONTSET)
         = get_gdk_font_type_ ()
 
-    type gdk_window_attributes_type = int
+    eqtype gdk_window_attributes_type = int
     val get_gdk_window_attributes_type_: unit -> int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_window_attributes_type")
     val (GDK_WA_TITLE,GDK_WA_X,GDK_WA_Y,GDK_WA_CURSOR,GDK_WA_COLORMAP,GDK_WA_VISUAL,GDK_WA_WMCLASS,GDK_WA_NOREDIR)
         = get_gdk_window_attributes_type_ ()
 
-    type gdk_window_hints = int
+    eqtype gdk_window_hints = int
     val get_gdk_window_hints_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_window_hints")
     val (GDK_HINT_POS,GDK_HINT_MIN_SIZE,GDK_HINT_MAX_SIZE,GDK_HINT_BASE_SIZE,GDK_HINT_ASPECT,GDK_HINT_RESIZE_INC)
         = get_gdk_window_hints_ ()
 
-    type gdk_function = int
+    eqtype gdk_function = int
     val get_gdk_function_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_function")
     val (GDK_COPY,GDK_INVERT,GDK_XOR,GDK_CLEAR,GDK_AND,GDK_AND_REVERSE,GDK_AND_INVERT,GDK_NOOP,GDK_OR,GDK_EQUIV,GDK_OR_REVERSE,GDK_COPY_INVERT,GDK_OR_INVERT,GDK_NAND,GDK_SET)
         = get_gdk_function_ ()
 
-    type gdk_fill = int
+    eqtype gdk_fill = int
     val get_gdk_fill_: unit -> int * int * int * int
         = app1(symb"mgtk_get_gdk_fill")
     val (GDK_SOLID,GDK_TILED,GDK_STIPPLED,GDK_OPAQUE_STIPPLED)
         = get_gdk_fill_ ()
 
-    type gdk_fill_rule = int
+    eqtype gdk_fill_rule = int
     val get_gdk_fill_rule_: unit -> int * int
         = app1(symb"mgtk_get_gdk_fill_rule")
     val (GDK_EVEN_ODD_RULE,GDK_WINDING_RULE)
         = get_gdk_fill_rule_ ()
 
-    type gdk_line_style = int
+    eqtype gdk_line_style = int
     val get_gdk_line_style_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_line_style")
     val (GDK_LINE_SOLID,GDK_LINE_ON_OFF_DASH,GDK_LINE_DOUBLE_DASH)
         = get_gdk_line_style_ ()
 
-    type gdk_cap_style = int
+    eqtype gdk_cap_style = int
     val get_gdk_cap_style_: unit -> int * int * int * int
         = app1(symb"mgtk_get_gdk_cap_style")
     val (GDK_CAP_NOT_LAST,GDK_CAP_BUTT,GDK_CAP_ROUND,GDK_CAP_PROJECTING)
         = get_gdk_cap_style_ ()
 
-    type gdk_join_style = int
+    eqtype gdk_join_style = int
     val get_gdk_join_style_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_join_style")
     val (GDK_JOIN_MITER,GDK_JOIN_ROUND,GDK_JOIN_BEVEL)
         = get_gdk_join_style_ ()
 
-    type gdk_cursor_type = int
+    eqtype gdk_cursor_type = int
     val get_gdk_cursor_type_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_cursor_type")
     val (GDK_NUM_GLYPHS,GDK_X_CURSOR,GDK_ARROW,GDK_BASED_ARROW_DOWN,GDK_BASED_ARROW_UP,GDK_BOAT,GDK_BOGOSITY,GDK_BOTTOM_LEFT_CORNER,GDK_BOTTOM_RIGHT_CORNER,GDK_BOTTOM_SIDE,GDK_BOTTOM_TEE,GDK_BOX_SPIRAL,GDK_CENTER_PTR,GDK_CIRCLE,GDK_CLOCK,GDK_COFFEE_MUG,GDK_CROSS,GDK_CROSS_REVERSE,GDK_CROSSHAIR,GDK_DIAMOND_CROSS,GDK_DOT,GDK_DOTBOX,GDK_DOUBLE_ARROW,GDK_DRAFT_LARGE,GDK_DRAFT_SMALL,GDK_DRAPED_BOX,GDK_EXCHANGE,GDK_FLEUR,GDK_GOBBLER,GDK_GUMBY,GDK_HAND1,GDK_HAND2,GDK_HEART,GDK_ICON,GDK_IRON_CROSS,GDK_LEFT_PTR,GDK_LEFT_SIDE,GDK_LEFT_TEE,GDK_LEFTBUTTON,GDK_LL_ANGLE,GDK_LR_ANGLE,GDK_MAN,GDK_MIDDLEBUTTON,GDK_MOUSE,GDK_PENCIL,GDK_PIRATE,GDK_PLUS,GDK_QUESTION_ARROW,GDK_RIGHT_PTR,GDK_RIGHT_SIDE,GDK_RIGHT_TEE,GDK_RIGHTBUTTON,GDK_RTL_LOGO,GDK_SAILBOAT,GDK_SB_DOWN_ARROW,GDK_SB_H_DOUBLE_ARROW,GDK_SB_LEFT_ARROW,GDK_SB_RIGHT_ARROW,GDK_SB_UP_ARROW,GDK_SB_V_DOUBLE_ARROW,GDK_SHUTTLE,GDK_SIZING,GDK_SPIDER,GDK_SPRAYCAN,GDK_STAR,GDK_TARGET,GDK_TCROSS,GDK_TOP_LEFT_ARROW,GDK_TOP_LEFT_CORNER,GDK_TOP_RIGHT_CORNER,GDK_TOP_SIDE,GDK_TOP_TEE,GDK_TREK,GDK_UL_ANGLE,GDK_UMBRELLA,GDK_UR_ANGLE,GDK_WATCH,GDK_XTERM,GDK_LAST_CURSOR,GDK_CURSOR_IS_PIXMAP)
         = get_gdk_cursor_type_ ()
 
-    type gdk_filter_return = int
+    eqtype gdk_filter_return = int
     val get_gdk_filter_return_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_filter_return")
     val (GDK_FILTER_CONTINUE,GDK_FILTER_TRANSLATE,GDK_FILTER_REMOVE)
         = get_gdk_filter_return_ ()
 
-    type gdk_visibility_state = int
+    eqtype gdk_visibility_state = int
     val get_gdk_visibility_state_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_visibility_state")
     val (GDK_VISIBILITY_UNOBSCURED,GDK_VISIBILITY_PARTIAL,GDK_VISIBILITY_FULLY_OBSCURED)
         = get_gdk_visibility_state_ ()
 
-    type gdk_event_type = int
+    eqtype gdk_event_type = int
     val get_gdk_event_type_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_event_type")
     val (GDK_NOTHING,GDK_DELETE,GDK_DESTROY,GDK_EXPOSE,GDK_MOTION_NOTIFY,GDK_BUTTON_PRESS,GDK_2BUTTON_PRESS,GDK_3BUTTON_PRESS,GDK_BUTTON_RELEASE,GDK_KEY_PRESS,GDK_KEY_RELEASE,GDK_ENTER_NOTIFY,GDK_LEAVE_NOTIFY,GDK_FOCUS_CHANGE,GDK_CONFIGURE,GDK_MAP,GDK_UNMAP,GDK_PROPERTY_NOTIFY,GDK_SELECTION_CLEAR,GDK_SELECTION_REQUEST,GDK_SELECTION_NOTIFY,GDK_PROXIMITY_IN,GDK_PROXIMITY_OUT,GDK_DRAG_ENTER,GDK_DRAG_LEAVE,GDK_DRAG_MOTION,GDK_DRAG_STATUS,GDK_DROP_START,GDK_DROP_FINISHED,GDK_CLIENT_EVENT,GDK_VISIBILITY_NOTIFY,GDK_NO_EXPOSE)
         = get_gdk_event_type_ ()
 
-    type gdk_event_mask = int
+    eqtype gdk_event_mask = int
     val get_gdk_event_mask_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_event_mask")
     val (GDK_EXPOSURE_MASK,GDK_POINTER_MOTION_MASK,GDK_POINTER_MOTION_HINT_MASK,GDK_BUTTON_MOTION_MASK,GDK_BUTTON1_MOTION_MASK,GDK_BUTTON2_MOTION_MASK,GDK_BUTTON3_MOTION_MASK,GDK_BUTTON_PRESS_MASK,GDK_BUTTON_RELEASE_MASK,GDK_KEY_PRESS_MASK,GDK_KEY_RELEASE_MASK,GDK_ENTER_NOTIFY_MASK,GDK_LEAVE_NOTIFY_MASK,GDK_FOCUS_CHANGE_MASK,GDK_STRUCTURE_MASK,GDK_PROPERTY_CHANGE_MASK,GDK_VISIBILITY_NOTIFY_MASK,GDK_PROXIMITY_IN_MASK,GDK_PROXIMITY_OUT_MASK,GDK_SUBSTRUCTURE_MASK,GDK_ALL_EVENTS_MASK)
         = get_gdk_event_mask_ ()
 
-    type gdk_notify_type = int
+    eqtype gdk_notify_type = int
     val get_gdk_notify_type_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_notify_type")
     val (GDK_NOTIFY_ANCESTOR,GDK_NOTIFY_VIRTUAL,GDK_NOTIFY_INFERIOR,GDK_NOTIFY_NONLINEAR,GDK_NOTIFY_NONLINEAR_VIRTUAL,GDK_NOTIFY_UNKNOWN)
         = get_gdk_notify_type_ ()
 
-    type gdk_crossing_mode = int
+    eqtype gdk_crossing_mode = int
     val get_gdk_crossing_mode_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_crossing_mode")
     val (GDK_CROSSING_NORMAL,GDK_CROSSING_GRAB,GDK_CROSSING_UNGRAB)
         = get_gdk_crossing_mode_ ()
 
-    type gdk_modifier_type = int
+    eqtype gdk_modifier_type = int
     val get_gdk_modifier_type_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_modifier_type")
     val (GDK_SHIFT_MASK,GDK_LOCK_MASK,GDK_CONTROL_MASK,GDK_MOD1_MASK,GDK_MOD2_MASK,GDK_MOD3_MASK,GDK_MOD4_MASK,GDK_MOD5_MASK,GDK_BUTTON1_MASK,GDK_BUTTON2_MASK,GDK_BUTTON3_MASK,GDK_BUTTON4_MASK,GDK_BUTTON5_MASK,GDK_RELEASE_MASK,GDK_MODIFIER_MASK)
         = get_gdk_modifier_type_ ()
 
-    type gdk_subwindow_mode = int
+    eqtype gdk_subwindow_mode = int
     val get_gdk_subwindow_mode_: unit -> int * int
         = app1(symb"mgtk_get_gdk_subwindow_mode")
     val (GDK_CLIP_BY_CHILDREN,GDK_INCLUDE_INFERIORS)
         = get_gdk_subwindow_mode_ ()
 
-    type gdk_input_condition = int
+    eqtype gdk_input_condition = int
     val get_gdk_input_condition_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_input_condition")
     val (GDK_INPUT_READ,GDK_INPUT_WRITE,GDK_INPUT_EXCEPTION)
         = get_gdk_input_condition_ ()
 
-    type gdk_status = int
+    eqtype gdk_status = int
     val get_gdk_status_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_gdk_status")
     val (GDK_OK,GDK_ERROR,GDK_ERROR_PARAM,GDK_ERROR_FILE,GDK_ERROR_MEM)
         = get_gdk_status_ ()
 
-    type gdk_byte_order = int
+    eqtype gdk_byte_order = int
     val get_gdk_byte_order_: unit -> int * int
         = app1(symb"mgtk_get_gdk_byte_order")
     val (GDK_LSB_FIRST,GDK_MSB_FIRST)
         = get_gdk_byte_order_ ()
 
-    type gdk_gc_values_mask = int
+    eqtype gdk_gc_values_mask = int
     val get_gdk_gc_values_mask_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_gc_values_mask")
     val (GDK_GC_FOREGROUND,GDK_GC_BACKGROUND,GDK_GC_FONT,GDK_GC_FUNCTION,GDK_GC_FILL,GDK_GC_TILE,GDK_GC_STIPPLE,GDK_GC_CLIP_MASK,GDK_GC_SUBWINDOW,GDK_GC_TS_X_ORIGIN,GDK_GC_TS_Y_ORIGIN,GDK_GC_CLIP_X_ORIGIN,GDK_GC_CLIP_Y_ORIGIN,GDK_GC_EXPOSURES,GDK_GC_LINE_WIDTH,GDK_GC_LINE_STYLE,GDK_GC_CAP_STYLE,GDK_GC_JOIN_STYLE)
         = get_gdk_gc_values_mask_ ()
 
-    type gdk_selection = int
+    eqtype gdk_selection = int
     val get_gdk_selection_: unit -> int * int
         = app1(symb"mgtk_get_gdk_selection")
     val (GDK_SELECTION_PRIMARY,GDK_SELECTION_SECONDARY)
         = get_gdk_selection_ ()
 
-    type gdk_property_state = int
+    eqtype gdk_property_state = int
     val get_gdk_property_state_: unit -> int * int
         = app1(symb"mgtk_get_gdk_property_state")
     val (GDK_PROPERTY_NEW_VALUE,GDK_PROPERTY_DELETE)
         = get_gdk_property_state_ ()
 
-    type gdk_prop_mode = int
+    eqtype gdk_prop_mode = int
     val get_gdk_prop_mode_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_prop_mode")
     val (GDK_PROP_MODE_REPLACE,GDK_PROP_MODE_PREPEND,GDK_PROP_MODE_APPEND)
         = get_gdk_prop_mode_ ()
 
-    type gdk_input_source = int
+    eqtype gdk_input_source = int
     val get_gdk_input_source_: unit -> int * int * int * int
         = app1(symb"mgtk_get_gdk_input_source")
     val (GDK_SOURCE_MOUSE,GDK_SOURCE_PEN,GDK_SOURCE_ERASER,GDK_SOURCE_CURSOR)
         = get_gdk_input_source_ ()
 
-    type gdk_input_mode = int
+    eqtype gdk_input_mode = int
     val get_gdk_input_mode_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_input_mode")
     val (GDK_MODE_DISABLED,GDK_MODE_SCREEN,GDK_MODE_WINDOW)
         = get_gdk_input_mode_ ()
 
-    type gdk_axis_use = int
+    eqtype gdk_axis_use = int
     val get_gdk_axis_use_: unit -> int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_axis_use")
     val (GDK_AXIS_IGNORE,GDK_AXIS_X,GDK_AXIS_Y,GDK_AXIS_PRESSURE,GDK_AXIS_XTILT,GDK_AXIS_YTILT,GDK_AXIS_LAST)
         = get_gdk_axis_use_ ()
 
-    type gdk_target = int
+    eqtype gdk_target = int
     val get_gdk_target_: unit -> int * int * int * int * int
         = app1(symb"mgtk_get_gdk_target")
     val (GDK_TARGET_BITMAP,GDK_TARGET_COLORMAP,GDK_TARGET_DRAWABLE,GDK_TARGET_PIXMAP,GDK_TARGET_STRING)
         = get_gdk_target_ ()
 
-    type gdk_selection_type = int
+    eqtype gdk_selection_type = int
     val get_gdk_selection_type_: unit -> int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_selection_type")
     val (GDK_SELECTION_TYPE_ATOM,GDK_SELECTION_TYPE_BITMAP,GDK_SELECTION_TYPE_COLORMAP,GDK_SELECTION_TYPE_DRAWABLE,GDK_SELECTION_TYPE_INTEGER,GDK_SELECTION_TYPE_PIXMAP,GDK_SELECTION_TYPE_WINDOW,GDK_SELECTION_TYPE_STRING)
         = get_gdk_selection_type_ ()
 
-    type gdk_extension_mode = int
+    eqtype gdk_extension_mode = int
     val get_gdk_extension_mode_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_extension_mode")
     val (GDK_EXTENSION_EVENTS_NONE,GDK_EXTENSION_EVENTS_ALL,GDK_EXTENSION_EVENTS_CURSOR)
         = get_gdk_extension_mode_ ()
 
-    type gdk_im_style = int
+    eqtype gdk_im_style = int
     val get_gdk_im_style_: unit -> int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_im_style")
     val (GDK_IM_PREEDIT_AREA,GDK_IM_PREEDIT_CALLBACKS,GDK_IM_PREEDIT_POSITION,GDK_IM_PREEDIT_NOTHING,GDK_IM_PREEDIT_NONE,GDK_IM_PREEDIT_MASK,GDK_IM_STATUS_AREA,GDK_IM_STATUS_CALLBACKS,GDK_IM_STATUS_NOTHING,GDK_IM_STATUS_NONE,GDK_IM_STATUS_MASK)
         = get_gdk_im_style_ ()
 
-    type gdk_ic_attributes_type = int
+    eqtype gdk_ic_attributes_type = int
     val get_gdk_ic_attributes_type_: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_ic_attributes_type")
     val (GDK_IC_STYLE,GDK_IC_CLIENT_WINDOW,GDK_IC_FOCUS_WINDOW,GDK_IC_FILTER_EVENTS,GDK_IC_SPOT_LOCATION,GDK_IC_LINE_SPACING,GDK_IC_CURSOR,GDK_IC_PREEDIT_FONTSET,GDK_IC_PREEDIT_AREA,GDK_IC_PREEDIT_AREA_NEEDED,GDK_IC_PREEDIT_FOREGROUND,GDK_IC_PREEDIT_BACKGROUND,GDK_IC_PREEDIT_PIXMAP,GDK_IC_PREEDIT_COLORMAP,GDK_IC_STATUS_FONTSET,GDK_IC_STATUS_AREA,GDK_IC_STATUS_AREA_NEEDED,GDK_IC_STATUS_FOREGROUND,GDK_IC_STATUS_BACKGROUND,GDK_IC_STATUS_PIXMAP,GDK_IC_STATUS_COLORMAP,GDK_IC_ALL_REQ,GDK_IC_PREEDIT_AREA_REQ,GDK_IC_PREEDIT_POSITION_REQ)
         = get_gdk_ic_attributes_type_ ()
 
-    type gdk_wm_decoration = int
+    eqtype gdk_wm_decoration = int
     val get_gdk_wm_decoration_: unit -> int * int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_wm_decoration")
     val (GDK_DECOR_ALL,GDK_DECOR_BORDER,GDK_DECOR_RESIZEH,GDK_DECOR_TITLE,GDK_DECOR_MENU,GDK_DECOR_MINIMIZE,GDK_DECOR_MAXIMIZE)
         = get_gdk_wm_decoration_ ()
 
-    type gdk_wm_function = int
+    eqtype gdk_wm_function = int
     val get_gdk_wm_function_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_wm_function")
     val (GDK_FUNC_ALL,GDK_FUNC_RESIZE,GDK_FUNC_MOVE,GDK_FUNC_MINIMIZE,GDK_FUNC_MAXIMIZE,GDK_FUNC_CLOSE)
         = get_gdk_wm_function_ ()
 
-    type gdk_color_context_mode = int
+    eqtype gdk_color_context_mode = int
     val get_gdk_color_context_mode_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_color_context_mode")
     val (GDK_CC_MODE_UNDEFINED,GDK_CC_MODE_BW,GDK_CC_MODE_STD_CMAP,GDK_CC_MODE_TRUE,GDK_CC_MODE_MY_GRAY,GDK_CC_MODE_PALETTE)
         = get_gdk_color_context_mode_ ()
 
-    type gdk_overlap_type = int
+    eqtype gdk_overlap_type = int
     val get_gdk_overlap_type_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_overlap_type")
     val (GDK_OVERLAP_RECTANGLE_IN,GDK_OVERLAP_RECTANGLE_OUT,GDK_OVERLAP_RECTANGLE_PART)
         = get_gdk_overlap_type_ ()
 
-    type gdk_drag_action = int
+    eqtype gdk_drag_action = int
     val get_gdk_drag_action_: unit -> int * int * int * int * int * int
         = app1(symb"mgtk_get_gdk_drag_action")
     val (GDK_ACTION_DEFAULT,GDK_ACTION_COPY,GDK_ACTION_MOVE,GDK_ACTION_LINK,GDK_ACTION_PRIVATE,GDK_ACTION_ASK)
         = get_gdk_drag_action_ ()
 
-    type gdk_drag_protocol = int
+    eqtype gdk_drag_protocol = int
     val get_gdk_drag_protocol_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_drag_protocol")
     val (GDK_DRAG_PROTO_MOTIF,GDK_DRAG_PROTO_XDND,GDK_DRAG_PROTO_ROOTWIN)
         = get_gdk_drag_protocol_ ()
 
-    type gdk_rgb_dither = int
+    eqtype gdk_rgb_dither = int
     val get_gdk_rgb_dither_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_rgb_dither")
     val (GDK_RGB_DITHER_NONE,GDK_RGB_DITHER_NORMAL,GDK_RGB_DITHER_MAX)
