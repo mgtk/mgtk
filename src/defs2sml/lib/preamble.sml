@@ -66,6 +66,10 @@ structure GValue :>
     type GValues
     type GValue
 
+    val int    : int    -> GValue
+    val string : string -> GValue
+    val real   : real   -> GValue
+
     type 'a setter = GValue -> 'a -> unit
     val setBool   : bool setter
     val setInt    : int setter
@@ -85,6 +89,10 @@ structure GValue :>
 
     prim_type GValues
     prim_type GValue
+
+    val int    : int    -> GValue = app1(symb "mgtk_g_value_set_int")
+    val string : string -> GValue = app1(symb "mgtk_g_value_set_string")
+    val real   : real   -> GValue = app1(symb "mgtk_g_value_set_real")
 
     (* UNSAFE: no error checking in the set and get functions! *)
     type 'a setter = GValue -> 'a -> unit

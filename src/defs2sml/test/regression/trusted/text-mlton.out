@@ -16,7 +16,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a textbuffer_t = unit
 	type 'a t = 'a textbuffer_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTextBuffer obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))

@@ -19,7 +19,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a object_t = unit
 	type 'a t = 'a object_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
@@ -38,7 +38,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a widget_t = unit
 	type 'a t = 'a widget_t Object.t
-	fun inherit w con = Object.inherit witness con
+	fun inherit w con = Object.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj = inherit () (fn () => repr obj)
     end
@@ -57,7 +57,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a container_t = unit
 	type 'a t = 'a container_t Widget.t
-	fun inherit w con = Widget.inherit witness con
+	fun inherit w con = Widget.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toContainer obj = inherit () (fn () => repr obj)
     end
@@ -76,7 +76,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a treemodel_t = unit
 	type 'a t = 'a treemodel_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreeModel obj = inherit () (fn () => repr obj)
     end
@@ -98,7 +98,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a treeview_t = unit
 	type 'a t = 'a treeview_t Container.t
-	fun inherit w con = Container.inherit witness con
+	fun inherit w con = Container.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreeView obj = inherit () (fn () => repr obj)
 	val get_model_ : cptr -> cptr

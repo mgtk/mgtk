@@ -43,7 +43,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a settings_t = unit
 	type 'a t = 'a settings_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toSettings obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
@@ -60,7 +60,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a style_t = unit
 	type 'a t = 'a style_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toStyle obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
@@ -79,7 +79,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a rcstyle_t = unit
 	type 'a t = 'a rcstyle_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toRcStyle obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
@@ -113,7 +113,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a object_t = unit
 	type 'a t = 'a object_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
@@ -131,7 +131,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a widget_t = unit
 	type 'a t = 'a widget_t Object.t
-	fun inherit w con = Object.inherit witness con
+	fun inherit w con = Object.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
@@ -165,7 +165,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a calendar_t = unit
 	type 'a t = 'a calendar_t Widget.t
-	fun inherit w con = Widget.inherit witness con
+	fun inherit w con = Widget.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toCalendar obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))

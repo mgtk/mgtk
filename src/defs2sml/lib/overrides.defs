@@ -261,6 +261,7 @@
   (of-object GtkTreeStore)
   (parameters
     ("GtkTreeIter*" "iter" (output))
+    ("GtkTreeIter*" "parent" (null-ok))
   )
 )
 (override-parameters gtk_tree_store_insert

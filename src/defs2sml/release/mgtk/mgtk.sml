@@ -67,6 +67,10 @@ structure Gtk  = struct
         type GValues
         type GValue
     
+        val int    : int    -> GValue
+        val string : string -> GValue
+        val real   : real   -> GValue
+    
         type 'a setter = GValue -> 'a -> unit
         val setBool   : bool setter
         val setInt    : int setter
@@ -86,6 +90,10 @@ structure Gtk  = struct
     
         prim_type GValues
         prim_type GValue
+    
+        val int    : int    -> GValue = app1(symb "mgtk_g_value_set_int")
+        val string : string -> GValue = app1(symb "mgtk_g_value_set_string")
+        val real   : real   -> GValue = app1(symb "mgtk_g_value_set_real")
     
         (* UNSAFE: no error checking in the set and get functions! *)
         type 'a setter = GValue -> 'a -> unit
@@ -1059,6 +1067,7 @@ structure Gtk  = struct
 	val push_composite_child : unit -> unit
 	val pop_composite_child : unit -> unit
 	val pop_colormap : unit -> unit
+	val style_get_property : 'a t -> string -> GValue.GValue -> unit
 	val style_get : 'a t -> string -> unit
 	val get_default_style : unit -> base t
 	val set_direction : 'a t -> text_direction -> unit
@@ -1478,6 +1487,11 @@ structure Gtk  = struct
 	val pop_colormap_ : unit -> unit
 	    = app1 (symb"mgtk_gtk_widget_pop_colormap")
 	val pop_colormap : unit -> unit = fn dummy => pop_colormap_ dummy
+	val style_get_property_ : cptr -> string -> GValue.GValue -> unit
+	    = app3 (symb"mgtk_gtk_widget_style_get_property")
+	val style_get_property : 'a t -> string -> GValue.GValue -> unit
+	    = fn self => fn property_name => fn value =>
+		 style_get_property_ (repr self) property_name value
 	val style_get_ : cptr -> string -> unit
 	    = app2 (symb"mgtk_gtk_widget_style_get")
 	val style_get : 'a t -> string -> unit
@@ -3087,6 +3101,8 @@ structure Gtk  = struct
 	val getiter_root : 'a t -> treeiter -> bool
 	val getiter_first : 'a t -> bool * treeiter
 	val get_path : 'a t -> treeiter -> tree_path
+	val get_value : 'a t -> treeiter -> int -> GValue.GValue
+			-> GValue.GValue
 	val iter_next : 'a t -> treeiter -> bool * treeiter
 	val iter_children : 'a t -> treeiter option -> bool * treeiter
 	val iter_children' : 'a t -> treeiter -> bool * treeiter
@@ -3162,6 +3178,14 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_treemodel_get_path")
 	val get_path : 'a t -> treeiter -> tree_path
 	    = fn self => fn iter => get_path_ (repr self) iter
+	val get_value_ : cptr -> cptr -> int -> GValue.GValue ref -> unit
+	    = app4 (symb"mgtk_gtk_treemodel_get_value")
+	val get_value : 'a t -> treeiter -> int -> GValue.GValue
+			-> GValue.GValue
+	    = fn self => fn iter => fn column => fn value =>
+		 let val value = ref value
+		     val ret = get_value_ (repr self) iter column value
+		 in !value end
 	val iter_next_ : cptr -> cptr ref -> bool
 	    = app2 (symb"mgtk_gtk_treemodel_iter_next")
 	val iter_next : 'a t -> treeiter -> bool * treeiter
@@ -3374,6 +3398,7 @@ structure Gtk  = struct
 	val new : int -> base t
 	val newv : int -> GType.t list -> base t
 	val set_column_types : 'a t -> int -> GType.t list -> unit
+	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
 	val set : 'a t -> treeiter -> unit
 	val remove : 'a t -> treeiter -> treeiter
 	val insert : 'a t -> int -> treeiter
@@ -3409,6 +3434,11 @@ structure Gtk  = struct
 	val set_column_types : 'a t -> int -> GType.t list -> unit
 	    = fn self => fn n_columns => fn types =>
 		 set_column_types_ (repr self) n_columns types
+	val set_value_ : cptr -> cptr -> int -> GValue.GValue -> unit
+	    = app4 (symb"mgtk_gtk_list_store_set_value")
+	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
+	    = fn self => fn iter => fn column => fn value =>
+		 set_value_ (repr self) iter column value
 	val set_ : cptr -> cptr -> unit = app2 (symb"mgtk_gtk_list_store_set")
 	val set : 'a t -> treeiter -> unit
 	    = fn self => fn iter => set_ (repr self) iter
@@ -3641,13 +3671,15 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val new : int -> base t
 	val newv : int -> GType.t list -> base t
+	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
 	val set : 'a t -> treeiter -> unit
 	val remove : 'a t -> treeiter -> treeiter
 	val insert : 'a t -> treeiter -> int -> treeiter
 	val insert_before : 'a t -> treeiter -> treeiter -> treeiter
 	val insert_after : 'a t -> treeiter -> treeiter -> treeiter
 	val prepend : 'a t -> treeiter -> treeiter
-	val append : 'a t -> treeiter -> treeiter
+	val append : 'a t -> treeiter option -> treeiter
+	val append' : 'a t -> treeiter -> treeiter
 	val is_ancestor : 'a t -> treeiter -> treeiter -> bool
 	val storeiter_depth : 'a t -> treeiter -> int
 	val clear : 'a t -> unit
@@ -3676,6 +3708,11 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_tree_store_newv")
 	val newv : int -> GType.t list -> base t
 	    = fn n_columns => fn types => make (newv_ n_columns types)
+	val set_value_ : cptr -> cptr -> int -> GValue.GValue -> unit
+	    = app4 (symb"mgtk_gtk_tree_store_set_value")
+	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
+	    = fn self => fn iter => fn column => fn value =>
+		 set_value_ (repr self) iter column value
 	val set_ : cptr -> cptr -> unit = app2 (symb"mgtk_gtk_tree_store_set")
 	val set : 'a t -> treeiter -> unit
 	    = fn self => fn iter => set_ (repr self) iter
@@ -3715,10 +3752,16 @@ structure Gtk  = struct
 		 in !iter end
 	val append_ : cptr -> cptr ref -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_tree_store_append")
-	val append : 'a t -> treeiter -> treeiter
+	val append : 'a t -> treeiter option -> treeiter
 	    = fn self => fn parent =>
 		 let val iter = ref GObject.null
-		     val ret = append_ (repr self) iter parent
+		     val ret = append_ (repr self) iter
+				       (getOpt (parent, GObject.null))
+		 in !iter end
+	val append' : 'a t -> treeiter -> treeiter
+	    = fn self => fn iter =>
+		 let val iter = ref GObject.null
+		     val ret = append_ (repr self) iter GObject.null
 		 in !iter end
 	val is_ancestor_ : cptr -> cptr -> cptr -> bool
 	    = app3 (symb"mgtk_gtk_tree_store_is_ancestor")
@@ -5604,6 +5647,10 @@ structure Gtk  = struct
 	val add_with_properties : 'a t -> 'b Widget.t -> string -> unit
 	val child_set : 'a t -> 'b Widget.t -> string -> unit
 	val child_get : 'a t -> 'b Widget.t -> string -> unit
+	val child_set_property
+	  : 'a t -> 'b Widget.t -> string -> GValue.GValue -> unit
+	val child_get_property
+	  : 'a t -> 'b Widget.t -> string -> GValue.GValue -> unit
 	val add_sig : (unit -> unit) -> 'a t Signal.signal
 	val remove_sig : (unit -> unit) -> 'a t Signal.signal
 	val check_resize_sig : (unit -> unit) -> 'a t Signal.signal
@@ -5705,6 +5752,22 @@ structure Gtk  = struct
 	val child_get : 'a t -> 'b Widget.t -> string -> unit
 	    = fn self => fn child => fn first_prop_name =>
 		 child_get_ (repr self) (repr child) first_prop_name
+	val child_set_property_
+	  : cptr -> cptr -> string -> GValue.GValue -> unit
+	    = app4 (symb"mgtk_gtk_container_child_set_property")
+	val child_set_property
+	  : 'a t -> 'b Widget.t -> string -> GValue.GValue -> unit
+	    = fn self => fn child => fn property_name => fn value =>
+		 child_set_property_
+		   (repr self) (repr child) property_name value
+	val child_get_property_
+	  : cptr -> cptr -> string -> GValue.GValue -> unit
+	    = app4 (symb"mgtk_gtk_container_child_get_property")
+	val child_get_property
+	  : 'a t -> 'b Widget.t -> string -> GValue.GValue -> unit
+	    = fn self => fn child => fn property_name => fn value =>
+		 child_get_property_
+		   (repr self) (repr child) property_name value
 	local open Signal
 	      infixr -->
 	in val add_sig : (unit -> unit) -> 'a t Signal.signal

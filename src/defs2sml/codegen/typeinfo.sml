@@ -119,6 +119,9 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
         ,("GtkType",   (fn _ => SMLType.TyApp([],["GType","t"]),
 			SMLType.TyApp([],["GType","t"]),
 		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
+        ,("GValue",    (fn _ => SMLType.TyApp([],["GValue","GValue"]),
+			SMLType.TyApp([],["GValue","GValue"]),
+			"GValue_val", "make_GValue", TinyC.TStar(TinyC.TTyName "GValue"),NONE,Const""))
         ]
 
     fun init () = 
@@ -262,6 +265,8 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    Type.Ptr(Type.Base n) => 
 	       if Name.asType n = "char" then Prim.stringTy negative
 	       else SMLType.TyApp([],["cptr"])
+	  | Type.Ptr(ty as Type.Tname n) => 
+	       toPrimType negative tinfo ty (* FIXME: true? *)
 	  | Type.Void => SMLType.UnitTy
 	  | Type.WithDefault(ty,default) => toPrimType negative tinfo ty
 	  | Type.Base n => 

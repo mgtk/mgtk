@@ -34,7 +34,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a object_t = unit
 	type 'a t = 'a object_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
@@ -54,7 +54,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a textbuffer_t = unit
 	type 'a t = 'a textbuffer_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTextBuffer obj = inherit () (fn () => repr obj)
 	val getiter_at_line_offset_ : cptr -> cptr ref -> int -> int -> unit
@@ -81,7 +81,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a treemodel_t = unit
 	type 'a t = 'a treemodel_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreeModel obj = inherit () (fn () => repr obj)
     end
@@ -101,7 +101,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a treeselection_t = unit
 	type 'a t = 'a treeselection_t Object.t
-	fun inherit w con = Object.inherit witness con
+	fun inherit w con = Object.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreeSelection obj = inherit () (fn () => repr obj)
 	val get_selected_ : cptr -> cptr ref -> cptr -> bool

@@ -21,7 +21,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a liststore_t = unit
 	type 'a t = 'a liststore_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toListStore obj = inherit () (fn () => repr obj)
 	val newv_ : int -> GType.t list -> cptr

@@ -13,7 +13,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a object_t = unit
 	type 'a t = 'a object_t GObject.t
-	fun inherit w con = GObject.inherit witness con
+	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
@@ -34,7 +34,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a adjustment_t = unit
 	type 'a t = 'a adjustment_t Object.t
-	fun inherit w con = Object.inherit witness con
+	fun inherit w con = Object.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toAdjustment obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
@@ -67,7 +67,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a widget_t = unit
 	type 'a t = 'a widget_t Object.t
-	fun inherit w con = Object.inherit witness con
+	fun inherit w con = Object.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))

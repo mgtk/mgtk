@@ -216,18 +216,50 @@ EXTERNML value mgtk_get_null(value dummy) { /* ML */
    abtract values.
 */
 
-#define GValue_val(arg) ( Field(arg, 0) )
+#define GValue_val(arg) ( (GValue*) Field(arg, 0) )
+#define GValue_val_nocast(arg) ( Field(arg, 0) )
+
+static void ml_finalize_gvalue (value val) {
+  g_value_unset ((GValue*) &Field(val,1)); 
+}
+
+static inline value create_GValue (GType type) { 
+  value res; 
+  res = alloc_final (2, ml_finalize_gvalue, 0, 1);
+  GValue_val_nocast(res) = (value) malloc(sizeof(GValue));
+  memset(GValue_val(res), 0, sizeof(GValue));
+  g_value_init(GValue_val(res), type);
+  return res; 
+}
+
+EXTERNML value mgtk_g_value_set_int (value i){
+  value res = create_GValue(G_TYPE_INT);
+  g_value_set_int(GValue_val(res), Int_val(i));
+  return res;
+}
+
+EXTERNML value mgtk_g_value_set_real (value r){
+  value res = create_GValue(G_TYPE_DOUBLE);
+  g_value_set_double(GValue_val(res), Double_val(r));
+  return res;
+}
+
+EXTERNML value mgtk_g_value_set_string (value s){
+  value res = create_GValue(G_TYPE_STRING);
+  g_value_set_string(GValue_val(res), String_val(s));
+  return res;
+}
 
 static inline value make_GValue(const GValue* val) {
   value res = alloc(1, Abstract_tag);
-  GValue_val(res) = (value) val;
+  GValue_val_nocast(res) = (value) val;
   return res;
 }
 
 
 #define MGTK_MakeSetter(name, gval_setter, mlconv)              \
 EXTERNML value name (value gvalue, value mlvalue) {  /* ML */   \
-  GValue* val = (GValue*) GValue_val(gvalue);                   \
+  GValue* val = GValue_val(gvalue);                             \
   gval_setter(val, mlconv(mlvalue));                            \
   return Val_unit;                                              \
 }
@@ -236,7 +268,7 @@ EXTERNML value name (value gvalue, value mlvalue) {  /* ML */   \
 #define MGTK_MakeGetter(name, gval_getter, convml)      \
 EXTERNML value name (value vargs, value pos) { /* ML */ \
   long p = Long_val(pos);                               \
-  GValue* args = (GValue*) GValue_val(vargs);           \
+  GValue* args = GValue_val(vargs);                     \
   return convml(gval_getter(&args[p]));                 \
 }
 
@@ -265,6 +297,7 @@ MGTK_MakeGetter(mgtk_get_pos_float, GTK_VALUE_FLOAT, copy_double)
 MGTK_MakeGetter(mgtk_get_pos_double, GTK_VALUE_DOUBLE, copy_double)
 MGTK_MakeGetter(mgtk_get_pos_string, GTK_VALUE_STRING, copy_string)
 */
+
 
 static inline GList* GList_val (value list, gpointer (*conv_val)(value)) {
   if (!IsCons(list)) {

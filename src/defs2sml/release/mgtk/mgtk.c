@@ -216,18 +216,50 @@ EXTERNML value mgtk_get_null(value dummy) { /* ML */
    abtract values.
 */
 
-#define GValue_val(arg) ( Field(arg, 0) )
+#define GValue_val(arg) ( (GValue*) Field(arg, 0) )
+#define GValue_val_nocast(arg) ( Field(arg, 0) )
+
+static void ml_finalize_gvalue (value val) {
+  g_value_unset ((GValue*) &Field(val,1)); 
+}
+
+static inline value create_GValue (GType type) { 
+  value res; 
+  res = alloc_final (2, ml_finalize_gvalue, 0, 1);
+  GValue_val_nocast(res) = (value) malloc(sizeof(GValue));
+  memset(GValue_val(res), 0, sizeof(GValue));
+  g_value_init(GValue_val(res), type);
+  return res; 
+}
+
+EXTERNML value mgtk_g_value_set_int (value i){
+  value res = create_GValue(G_TYPE_INT);
+  g_value_set_int(GValue_val(res), Int_val(i));
+  return res;
+}
+
+EXTERNML value mgtk_g_value_set_real (value r){
+  value res = create_GValue(G_TYPE_DOUBLE);
+  g_value_set_double(GValue_val(res), Double_val(r));
+  return res;
+}
+
+EXTERNML value mgtk_g_value_set_string (value s){
+  value res = create_GValue(G_TYPE_STRING);
+  g_value_set_string(GValue_val(res), String_val(s));
+  return res;
+}
 
 static inline value make_GValue(const GValue* val) {
   value res = alloc(1, Abstract_tag);
-  GValue_val(res) = (value) val;
+  GValue_val_nocast(res) = (value) val;
   return res;
 }
 
 
 #define MGTK_MakeSetter(name, gval_setter, mlconv)              \
 EXTERNML value name (value gvalue, value mlvalue) {  /* ML */   \
-  GValue* val = (GValue*) GValue_val(gvalue);                   \
+  GValue* val = GValue_val(gvalue);                             \
   gval_setter(val, mlconv(mlvalue));                            \
   return Val_unit;                                              \
 }
@@ -236,7 +268,7 @@ EXTERNML value name (value gvalue, value mlvalue) {  /* ML */   \
 #define MGTK_MakeGetter(name, gval_getter, convml)      \
 EXTERNML value name (value vargs, value pos) { /* ML */ \
   long p = Long_val(pos);                               \
-  GValue* args = (GValue*) GValue_val(vargs);           \
+  GValue* args = GValue_val(vargs);                     \
   return convml(gval_getter(&args[p]));                 \
 }
 
@@ -265,6 +297,7 @@ MGTK_MakeGetter(mgtk_get_pos_float, GTK_VALUE_FLOAT, copy_double)
 MGTK_MakeGetter(mgtk_get_pos_double, GTK_VALUE_DOUBLE, copy_double)
 MGTK_MakeGetter(mgtk_get_pos_string, GTK_VALUE_STRING, copy_string)
 */
+
 
 static inline GList* GList_val (value list, gpointer (*conv_val)(value)) {
   if (!IsCons(list)) {
@@ -1941,6 +1974,12 @@ EXTERNML value mgtk_gtk_widget_pop_colormap(value dummy) { /* ML */
     return Val_unit;
 }
 
+/* ML type: cptr -> string -> GValue.GValue -> unit */
+EXTERNML value mgtk_gtk_widget_style_get_property(value self, value property_name, value valu) { /* ML */
+    gtk_widget_style_get_property(GtkObj_val(self), String_val(property_name), GValue_val(valu));
+    return Val_unit;
+}
+
 /* ML type: cptr -> string -> unit */
 EXTERNML value mgtk_gtk_widget_style_get(value self, value first_property_name) { /* ML */
     gtk_widget_style_get(GtkObj_val(self), String_val(first_property_name));
@@ -3066,6 +3105,14 @@ EXTERNML value mgtk_gtk_treemodel_get_path(value self, value iter) { /* ML */
     return Val_GtkTreePath(gtk_tree_model_get_path(GtkObj_val(self), GtkTreeIter_val(iter)));
 }
 
+/* ML type: cptr -> cptr -> int -> GValue.GValue ref -> unit */
+EXTERNML value mgtk_gtk_treemodel_get_value(value self, value iter, value column, value valu_ref) { /* ML */
+    GValue* valu = GValue_val(GetRefVal(valu_ref));
+    gtk_tree_model_get_value(GtkObj_val(self), GtkTreeIter_val(iter), Int_val(column), &(valu));
+    SetRefVal(valu_ref, make_GValue(valu));
+    return Val_unit;
+}
+
 /* ML type: cptr -> cptr ref -> bool */
 EXTERNML value mgtk_gtk_treemodel_iter_next(value self, value iter_ref) { /* ML */
     GtkTreeIter* iter = GtkTreeIter_val(GetRefVal(iter_ref));
@@ -3236,6 +3283,12 @@ EXTERNML value mgtk_gtk_list_store_set_column_types(value self, value n_columns,
     return Val_unit;
 }
 
+/* ML type: cptr -> cptr -> int -> GValue.GValue -> unit */
+EXTERNML value mgtk_gtk_list_store_set_value(value self, value iter, value column, value valu) { /* ML */
+    gtk_list_store_set_value(GtkObj_val(self), GtkTreeIter_val(iter), Int_val(column), GValue_val(valu));
+    return Val_unit;
+}
+
 /* ML type: cptr -> cptr -> unit */
 EXTERNML value mgtk_gtk_list_store_set(value self, value iter) { /* ML */
     gtk_list_store_set(GtkObj_val(self), GtkTreeIter_val(iter));
@@ -3284,9 +3337,9 @@ EXTERNML value mgtk_gtk_list_store_prepend(value self, value iter_ref) { /* ML *
 
 /* ML type: cptr -> cptr ref -> unit */
 EXTERNML value mgtk_gtk_list_store_append(value self, value iter_ref) { /* ML */
-    GtkTreeIter* iter = GtkTreeIter_val(GetRefVal(iter_ref));
-    gtk_list_store_append(GtkObj_val(self), (iter));
-    SetRefVal(iter_ref, Val_GtkTreeIter(iter));
+    GtkTreeIter iter;
+    gtk_list_store_append(GtkObj_val(self), &iter);
+    SetRefVal(iter_ref, Val_GtkTreeIter(&iter));
     return Val_unit;
 }
 
@@ -3453,6 +3506,12 @@ EXTERNML value mgtk_gtk_tree_store_newv(value n_columns, value types_arr) { /* M
     GType* types;
     list_to_array(GType, types, Int_val, types_arr);
     return Val_GtkObj(gtk_tree_store_newv(Int_val(n_columns), (types)));
+}
+
+/* ML type: cptr -> cptr -> int -> GValue.GValue -> unit */
+EXTERNML value mgtk_gtk_tree_store_set_value(value self, value iter, value column, value valu) { /* ML */
+    gtk_tree_store_set_value(GtkObj_val(self), GtkTreeIter_val(iter), Int_val(column), GValue_val(valu));
+    return Val_unit;
 }
 
 /* ML type: cptr -> cptr -> unit */
@@ -5052,6 +5111,18 @@ EXTERNML value mgtk_gtk_container_child_set(value self, value child, value first
 /* ML type: cptr -> cptr -> string -> unit */
 EXTERNML value mgtk_gtk_container_child_get(value self, value child, value first_prop_name) { /* ML */
     gtk_container_child_get(GtkObj_val(self), GtkObj_val(child), String_val(first_prop_name));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> string -> GValue.GValue -> unit */
+EXTERNML value mgtk_gtk_container_child_set_property(value self, value child, value property_name, value valu) { /* ML */
+    gtk_container_child_set_property(GtkObj_val(self), GtkObj_val(child), String_val(property_name), GValue_val(valu));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> string -> GValue.GValue -> unit */
+EXTERNML value mgtk_gtk_container_child_get_property(value self, value child, value property_name, value valu) { /* ML */
+    gtk_container_child_get_property(GtkObj_val(self), GtkObj_val(child), String_val(property_name), GValue_val(valu));
     return Val_unit;
 }
 
