@@ -339,7 +339,7 @@ That is, !foo! takes any object which is a subclass of
 \end{SMLcode}
 The convention in \gtk is that constructors are named !new!.
 \end{description}
-And then we wrap all parts of an encoding of a class into structure of
+Then we wrap all parts of an encoding of a class into structure of
 its own.  That is, for the class \classname{SubClassB} in
 Figure~\ref{fig:class-hierarchy} the \sml signatures is:
 \begin{SMLcode}
@@ -348,11 +348,15 @@ Figure~\ref{fig:class-hierarchy} the \sml signatures is:
     type 'path sub_class_b_t
     type 'path sub_class_b = 
            'path sub_class_b_t Super.super
+    val new : unit 
+              -> GtkBasis.base sub_class_b 
     val toString : 'path sub_class_b 
                                  -> string
   end
 \end{SMLcode}
-
+We see that this signature relies on two other structures:  The
+structure !Super! for the class \classname{Super} and !GtkBasis! for
+the dummy class !base!.
 
  
 Now, continuing our running example the two widgets
@@ -371,10 +375,11 @@ and
            {\tWitness{widget}})}
      {\tName{t}}
 \end{displaymath}
-(parenthesized here for readability). This tells us, reading from left
-to right, that \textit{window} is a Window widget that extends the
-Container widget, which in turn extends the Widget widget; similarly
-for \textit{button}. It also tells us that \textit{window} and
+(parenthesized here for readability and all structure prefixes
+elided).  This type tells us, reading from left to right, that
+\textit{window} is a Window widget that extends the Container widget,
+which in turn extends the Widget widget; similarly for
+\textit{button}. It also tells us that \textit{window} and
 \textit{button} have a common ancestor, namely the Container widget.
 In particular, therefore, we can use both the window and the button in
 all contexts expecting a Container.
