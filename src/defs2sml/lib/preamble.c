@@ -247,7 +247,7 @@ EXTERNML value mgtk_g_value_set_string (value s){
 }
 
 static inline value make_GValue(const GValue* val) {
-  value res = alloc(1, Abstract_tag);
+  value res = alloc(2, Abstract_tag); // Hack: assume that C owns the GValue 
   GValue_val_nocast(res) = (value) val;
   return res;
 }
