@@ -17,6 +17,9 @@ old*)
     (* Utility functions - handling strings *)
     val toLower = (String.map Char.toLower)
     val toUpper = (String.map Char.toUpper)
+    fun capitalize "" = ""
+      | capitalize s  = 
+	String.str(Char.toUpper (String.sub (s,0))) ^ String.extract(s,1,NONE)
 
     fun combine sep (path,base) = 
 	Util.stringSep "" "" sep (fn s => s) (path@base)

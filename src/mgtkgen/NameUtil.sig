@@ -11,6 +11,7 @@ sig
 
     val toLower: string -> string
     val toUpper: string -> string
+    val capitalize: string -> string
 
     val toLower': wseq -> wseq
     val toUpper': wseq -> wseq
@@ -39,6 +40,8 @@ end
 
    [toLower s] converts s to all lower case.
    [toUpper s] converts s to all upper case.
+
+   [capitalize s] upper cases first letter of string.
 
    [toLower' wseq] converts the sequence wseq to all lower case.
    [toUpper wseq] converts the sequence wseq to all lower case.
