@@ -12,7 +12,8 @@ LIBS=$(ADDRUNLIBS) `$(GTKCONFIG) --libs`
 # Files
 MGTKFILES=Gtk.sig Gtk.sml mgtk.c
 MGTKOBJS=Gtk.ui Gtk.uo mgtk.so
-
+CFILES=mgtk.c
+COBJS=mgtk.o
 
 all: $(MGTKOBJS)
 
