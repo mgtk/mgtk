@@ -168,12 +168,6 @@ struct
     val typeNameList = repeat0 typeName
     
     (* Objects and boxed types *)
-    fun ensureParent attribs =
-	let fun hasParent (Parent _) = true
-	      | hasParent _ = false
-	in  if List.exists hasParent attribs then attribs
-	    else Parent "GtkWidget" :: attribs
-	end
     val objAttrib =
         (   parens ("in-module" &-- word)           >> (SOME o Module)
         ||  parens ("parent" &-- word)              >> (SOME o Parent)
@@ -182,7 +176,7 @@ struct
         ||  parens ("fields" &-- typeNameList)      >> (SOME o Fields)
 	||  parens ("implements" &-- word)          >> (SOME o Implements)
         )
-    val objAttribs = repeat1 objAttrib >> (ensureParent o (List.mapPartial id o (op::)))
+    val objAttribs = repeat1 objAttrib >> (List.mapPartial id o (op::))
     val object = parens ( (&"define-object" || &"define-interface") 
                           #-- defWord -- objAttribs) 
                  >> tagFn Object

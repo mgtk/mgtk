@@ -64,7 +64,7 @@ structure Gtk  = struct
     signature TreeModel = sig
 	type base
 	type 'a treemodel_t
-	type 'a t = 'a treemodel_t Widget.t
+	type 'a t = 'a treemodel_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTreeModel : 'a t -> base t
     end
@@ -72,11 +72,11 @@ structure Gtk  = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a treemodel_t = unit
-	type 'a t = 'a treemodel_t Widget.t
+	type 'a t = 'a treemodel_t GObject.t
 	fun inherit w con = let val con = let val ptr = con ()
 					  in fn () => ptr end
 				val witness = ()
-			    in Widget.inherit witness con end
+			    in GObject.inherit witness con end
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreeModel obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))

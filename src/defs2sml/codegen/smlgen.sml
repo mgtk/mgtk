@@ -219,28 +219,18 @@ struct
 		    val (pars,tys) = ListPair.unzip parsty
 		    fun ubnd n =
 			raise Skip("Unbound type name: "^Name.toString' n)
-		    fun isWidgetType (Type.Tname n) = (* FIXME *)
-			(case Name.getFullPath n of "Gtk"::_ => true | _ => false)
-		      | isWidgetType (Type.Ptr t) = isWidgetType t
-		      | isWidgetType _ = false
+
 		    fun var (par,ty) = (Var par, ty)
-(*
-		    fun default (par,t as Type.WithDefault(ty, v)) = 
-			(App(Var"getOpt", [Tup[par, transCValue tinfo (ty,v)]]), t)
-		      | default (par,ty) = (par, ty)
-*)
 		    fun wrap (par,ty) =
 			(if TypeInfo.isWrapped tinfo ty
 			 then (Prims.unWrap (ty,par),ty)
-(* now handled by callStub
-			 else if TypeInfo.isString tinfo ty
-			 then (Prims.toPrimString (par),ty)
-*)
 			 else (par, ty))
 			handle TypeInfo.Unbound n => ubnd n
 		    fun trans (par, ty) = 
 			(par, Type.mapiv (fn (ty,n)=>n) (transCValue tinfo) ty)
+
 		    val pars' = List.map (trans o wrap o var) parsty
+
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 
 			fromtype' ty handle TypeInfo.Unbound n => ubnd n
@@ -376,7 +366,9 @@ struct
 		    SOME (n,parent,impl) => 
 		       (Name.asType n,
 			case parent of SOME(p) => p
-		                     | _ => raise Skip("No parent"),
+				     (* assume that objects without a parent
+				        derives from GObject *)
+		                     | _ => Name.fromString "GObject",
 			impl
                        )
 		  | _ => raise Skip("No type information")
