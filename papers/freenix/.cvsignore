@@ -1,9 +1,12 @@
+.log
 auto
 example-class-diagram.log
 example-class-diagram.mp
 example-class-diagram.mps
 example-class-diagram.mpx
 example-class-diagram.tex
+mgtk-freenix.tar.gz
+mgtk-larsen-niss
 mgtk-larsen-niss-for-html.4ct
 mgtk-larsen-niss-for-html.4tc
 mgtk-larsen-niss-for-html.aux
@@ -35,6 +38,8 @@ mgtk-larsen-niss.ps
 mgtk-larsen-niss.tmp
 mgtk-larsen-niss.xref
 mgtk-larsen-niss0x.gif
+q.log
+stack.sml
 texput.log
 widget-class-diagram-405.png
 widget-class-diagram-450.png
