@@ -31,11 +31,8 @@ structure Gtk  = struct
 	val insert_ : cptr -> cptr -> string -> int -> unit
 	    = app4 (symb"mgtk_gtk_textbuffer_insert")
 	val insert : 'a t -> textiter -> string -> int option -> unit
-	    = fn self =>
-		 fn iter =>
-		    fn text =>
-		       fn len =>
-			  insert_ (repr self) iter text (getOpt (len, ~1))
+	    = fn self => fn iter => fn text => fn len =>
+		 insert_ (repr self) iter text (getOpt (len, ~1))
 	val insert' : 'a t -> textiter -> string -> unit
 	    = fn self => fn iter => fn text => insert_ (repr self) iter text ~1
     end

@@ -55,17 +55,11 @@ structure Gtk  = struct
 	val new : real option -> real option -> real option -> real option 
 	       -> real option -> real option
 		  -> base t
-	    = fn value =>
-		 fn lower =>
-		    fn upper => fn step_incr =>
-				   fn page_incr =>
-				      fn page_size =>
-					 make (new_ (getOpt (value, 0.0), 
-						     getOpt (lower, 0.0), 
-						     getOpt (upper, 0.0), 
-						     getOpt (step_incr, 0.0), 
-						     getOpt (page_incr, 0.0), 
-						     getOpt (page_size, 0.0)))
+	    = fn value => fn lower => fn upper => fn step_incr => 
+	      fn page_incr => fn page_size =>
+		 make (new_ (getOpt (value, 0.0), getOpt (lower, 0.0), 
+			     getOpt (upper, 0.0), getOpt (step_incr, 0.0), 
+			     getOpt (page_incr, 0.0), getOpt (page_size, 0.0)))
 	val new' : unit -> base t
 	    = fn dummy => make (new_ (0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     end
@@ -97,13 +91,11 @@ structure Gtk  = struct
 	    = app3 (symb"mgtk_gtk_widget_set_scroll_adjustments")
 	val set_scroll_adjustments
 	  : 'a t -> 'b Adjustment.t option -> 'c Adjustment.t option -> bool
-	    = fn self =>
-		 fn hadjustment =>
-		    fn vadjustment =>
-		       set_scroll_adjustments_
-			 (repr self)
-			 (getOpt (Option.map repr hadjustment, GObject.null))
-			 (getOpt (Option.map repr vadjustment, GObject.null))
+	    = fn self => fn hadjustment => fn vadjustment =>
+		 set_scroll_adjustments_
+		   (repr self)
+		   (getOpt (Option.map repr hadjustment, GObject.null))
+		   (getOpt (Option.map repr vadjustment, GObject.null))
 	val set_scroll_adjustments' : 'a t -> bool
 	    = fn self => set_scroll_adjustments_
 			   (repr self) GObject.null GObject.null

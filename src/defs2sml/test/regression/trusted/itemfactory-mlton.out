@@ -64,28 +64,24 @@ structure Gtk  = struct
 	    = _import "gtk_item_factory_get_item"
 		      : cptr * CString.cstring -> cptr;
 	val get_item : 'a t -> string -> base Widget.t
-	    = fn self =>
-		 fn path =>
-		    Widget.inherit
-		      ()
-		      (fn () => GObject.withPtr
-				  (self, 
-				   fn self =>
-				      get_item_
-					(self, CString.fromString path)))
+	    = fn self => fn path =>
+		 Widget.inherit
+		   ()
+		   (fn () => GObject.withPtr
+			       (self, 
+				fn self =>
+				   get_item_ (self, CString.fromString path)))
 	val get_widget_ : cptr * CString.cstring -> cptr
 	    = _import "gtk_item_factory_get_widget"
 		      : cptr * CString.cstring -> cptr;
 	val get_widget : 'a t -> string -> base Widget.t
-	    = fn self =>
-		 fn path =>
-		    Widget.inherit
-		      ()
-		      (fn () => GObject.withPtr
-				  (self, 
-				   fn self =>
-				      get_widget_
-					(self, CString.fromString path)))
+	    = fn self => fn path =>
+		 Widget.inherit
+		   ()
+		   (fn () => GObject.withPtr
+			       (self, 
+				fn self => get_widget_
+					     (self, CString.fromString path)))
     end
 end
 

@@ -102,10 +102,9 @@ structure Gtk  = struct
 	val set_border_width_ : cptr * int -> unit
 	    = _import "gtk_container_set_border_width" : cptr * int -> unit;
 	val set_border_width : 'a t -> int -> unit
-	    = fn self =>
-		 fn border_width =>
-		    GObject.withPtr
-		      (self, fn self => set_border_width_ (self, border_width))
+	    = fn self => fn border_width =>
+		 GObject.withPtr
+		   (self, fn self => set_border_width_ (self, border_width))
 	val get_border_width_ : cptr -> int
 	    = _import "gtk_container_get_border_width" : cptr -> int;
 	val get_border_width : 'a t -> int
@@ -114,22 +113,19 @@ structure Gtk  = struct
 	val add_ : cptr * cptr -> unit
 	    = _import "gtk_container_add" : cptr * cptr -> unit;
 	val add : 'a t -> 'b Widget.t -> unit
-	    = fn self =>
-		 fn widget =>
-		    GObject.withPtr
-		      (self, 
-		       fn self => GObject.withPtr
-				    (widget, fn widget => add_ (self, widget)))
+	    = fn self => fn widget =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => GObject.withPtr
+				 (widget, fn widget => add_ (self, widget)))
 	val remove_ : cptr * cptr -> unit
 	    = _import "gtk_container_remove" : cptr * cptr -> unit;
 	val remove : 'a t -> 'b Widget.t -> unit
 	    = fn self => fn widget =>
-			    GObject.withPtr
-			      (self, 
-			       fn self => GObject.withPtr
-					    (widget, 
-					     fn widget =>
-						remove_ (self, widget)))
+		 GObject.withPtr
+		   (self, 
+		    fn self => GObject.withPtr
+				 (widget, fn widget => remove_ (self, widget)))
     end
     signature Bin = sig type base
 			type 'a bin_t
@@ -221,10 +217,9 @@ structure Gtk  = struct
 	    = _import "gtk_button_set_label" : cptr * CString.cstring -> unit;
 	val set_label : 'a t -> string -> unit
 	    = fn self => fn label =>
-			    GObject.withPtr
-			      (self, 
-			       fn self => set_label_
-					    (self, CString.fromString label))
+		 GObject.withPtr
+		   (self, 
+		    fn self => set_label_ (self, CString.fromString label))
 	val get_label_ : cptr -> CString.t
 	    = _import "gtk_button_get_label" : cptr -> CString.t;
 	val get_label : 'a t -> string
@@ -260,14 +255,12 @@ structure Gtk  = struct
 	val get_chars_ : cptr * int * int -> CString.t
 	    = _import "gtk_editable_get_chars" : cptr * int * int -> CString.t;
 	val get_chars : 'a t -> int -> int -> string
-	    = fn self =>
-		 fn start_pos =>
-		    fn end_pos =>
-		       GObject.withPtr
-			 (self, 
-			  fn self => let val t = get_chars_
-						   (self, start_pos, end_pos)
-				     in CString.toString t end)
+	    = fn self => fn start_pos => fn end_pos =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => let val t = get_chars_
+					     (self, start_pos, end_pos)
+			       in CString.toString t end)
     end
     signature CellEditable = sig
 	type base

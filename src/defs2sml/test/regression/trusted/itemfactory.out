@@ -72,14 +72,13 @@ structure Gtk  = struct
 	val get_item_ : cptr -> string -> cptr
 	    = app2 (symb"mgtk_gtk_item_factory_get_item")
 	val get_item : 'a t -> string -> base Widget.t
-	    = fn self => fn path => Widget.inherit
-				      () (fn () => get_item_ (repr self) path)
+	    = fn self => fn path =>
+		 Widget.inherit () (fn () => get_item_ (repr self) path)
 	val get_widget_ : cptr -> string -> cptr
 	    = app2 (symb"mgtk_gtk_item_factory_get_widget")
 	val get_widget : 'a t -> string -> base Widget.t
-	    = fn self =>
-		 fn path => Widget.inherit
-			      () (fn () => get_widget_ (repr self) path)
+	    = fn self => fn path =>
+		 Widget.inherit () (fn () => get_widget_ (repr self) path)
     end
 end
 

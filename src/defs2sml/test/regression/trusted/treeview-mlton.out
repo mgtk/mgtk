@@ -109,13 +109,11 @@ structure Gtk  = struct
 	val set_model_ : cptr * cptr -> unit
 	    = _import "gtk_tree_view_set_model" : cptr * cptr -> unit;
 	val set_model : 'a t -> 'b TreeModel.t option -> unit
-	    = fn self =>
-		 fn model =>
-		    GObject.withPtr
-		      (self, 
-		       fn self =>
-			  GObject.withOpt
-			    (model, fn model => set_model_ (self, model)))
+	    = fn self => fn model =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => GObject.withOpt
+				 (model, fn model => set_model_ (self, model)))
 	val set_model' : 'a t -> unit
 	    = fn self => GObject.withPtr
 			   (self, fn self => set_model_ (self, GObject.null))

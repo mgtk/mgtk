@@ -49,10 +49,8 @@ structure Gtk  = struct
 		      : cptr * int * int -> unit;
 	val set_fixed_size : 'a t -> int -> int -> unit
 	    = fn self => fn width => fn height =>
-					GObject.withPtr
-					  (self, 
-					   fn self => set_fixed_size_
-							(self, width, height))
+		 GObject.withPtr
+		   (self, fn self => set_fixed_size_ (self, width, height))
     end
 end
 

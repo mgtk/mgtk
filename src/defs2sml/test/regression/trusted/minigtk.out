@@ -102,7 +102,7 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_container_set_border_width")
 	val set_border_width : 'a t -> int -> unit
 	    = fn self => fn border_width =>
-			    set_border_width_ (repr self) border_width
+		 set_border_width_ (repr self) border_width
 	val get_border_width_ : cptr -> int
 	    = app1 (symb"mgtk_gtk_container_get_border_width")
 	val get_border_width : 'a t -> int
@@ -242,9 +242,8 @@ structure Gtk  = struct
 	val get_chars_ : cptr -> int -> int -> string
 	    = app3 (symb"mgtk_gtk_editable_get_chars")
 	val get_chars : 'a t -> int -> int -> string
-	    = fn self => fn start_pos =>
-			    fn end_pos =>
-			       get_chars_ (repr self) start_pos end_pos
+	    = fn self => fn start_pos => fn end_pos =>
+		 get_chars_ (repr self) start_pos end_pos
     end
     signature CellEditable = sig
 	type base

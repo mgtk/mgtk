@@ -225,7 +225,7 @@ structure TinySML :> TinySML = struct
 		      end
 		  | App(e,es) =>
 		      parens 2 level
-                         ( ppexp 3 e ++ makelist (true, " ") (map (ppexp 4) es) )
+                         ( ppexp 3 e ++ ilist "# " (ppexp 4) es)
 		  | Tup [] => ppString "()"
 		  | Tup [e] => ppexp level e
 		  | Tup es => pperoundlist es

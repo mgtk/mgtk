@@ -54,8 +54,8 @@ structure Gtk  = struct
 	val set_fixed_size_ : cptr -> int -> int -> unit
 	    = app3 (symb"mgtk_gtk_cellrenderer_set_fixed_size")
 	val set_fixed_size : 'a t -> int -> int -> unit
-	    = fn self => fn width => fn height => set_fixed_size_
-						    (repr self) width height
+	    = fn self => fn width => fn height =>
+		 set_fixed_size_ (repr self) width height
     end
 end
 

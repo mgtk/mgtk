@@ -120,9 +120,8 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_treeview_set_model")
 	val set_model : 'a t -> 'b TreeModel.t option -> unit
 	    = fn self => fn model =>
-			    set_model_ (repr self)
-				       (getOpt (Option.map repr model, 
-						GObject.null))
+		 set_model_ (repr self)
+			    (getOpt (Option.map repr model, GObject.null))
 	val set_model' : 'a t -> unit
 	    = fn self => set_model_ (repr self) GObject.null
     end
