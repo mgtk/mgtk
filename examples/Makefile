@@ -30,7 +30,7 @@ mgtk-mlton.o: $(MGTKHOME)/mgtk-mlton.c
 	gcc -c -O2 -I$(MLTONINCLUDE) `pkg-config --cflags gtk+-2.0` $<
 #%-mlton: %-mlton.cm mgtk-mlton.o \
 #                      $(shell mlton -stop f %-mlton.cm)
-%-mlton: %-mlton.cm mgtk-mlton.o 
+%-mlton: %.sml %-mlton.cm mgtk-mlton.o 
 	$(MLTONBIN)/mlton -output $*-mlton \
 			  -link-opt "`pkg-config --libs-only-l gtk+-2.0`" \
 	                  $*-mlton.cm mgtk-mlton.o

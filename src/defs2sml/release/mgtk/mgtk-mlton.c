@@ -39,6 +39,31 @@ MGTK_MakeGetter(mgtk_get_pos_char, char, g_value_get_char)
 MGTK_MakeGetter(mgtk_get_pos_real, double, g_value_get_double)
 
 
+static inline GValue* create_GValue (GType type) {
+  GValue *res = (GValue*) malloc(sizeof(GValue));
+  memset(res, 0, sizeof(GValue));
+  g_value_init(res, type);
+  return res;
+}
+
+EXTERNML GValue* mgtk_g_value_set_int (int i){
+  GValue* res = create_GValue(G_TYPE_INT);
+  g_value_set_int(res, i);
+  return res;
+}
+
+EXTERNML GValue* mgtk_g_value_set_real (double r){
+  GValue* res = create_GValue(G_TYPE_DOUBLE);
+  g_value_set_double(res, r);
+  return res;
+}
+
+EXTERNML GValue* mgtk_g_value_set_string (char *s){
+  GValue *res = create_GValue(G_TYPE_STRING);
+  g_value_set_string(res, s);
+  return res;
+}
+
 /* *** Signal stuff *** */
 static void mgtk_callback_dispatch (GClosure *closure,
                                     GValue *return_value,
@@ -129,6 +154,21 @@ EXTERNML int mgtk_g_type_string (void) { /* ML */
 
 
 /* *** Gtk *** */
+EXTERNML GtkSelectionData* alloc_GtkSelectionData() {
+  GtkSelectionData res;
+  return gtk_selection_data_copy(&res);
+}
+
+EXTERNML GtkTextIter* alloc_GtkTextIter() {
+  GtkTextIter res;
+  return gtk_text_iter_copy(&res);
+}
+
+EXTERNML GtkTreeIter* alloc_GtkTreeIter() {
+  GtkTreeIter res;
+  return gtk_tree_iter_copy(&res);
+}
+
 /* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_accel_flags(int* x0, int* x1, int* x2) {
   *x2 = GTK_ACCEL_MASK;
