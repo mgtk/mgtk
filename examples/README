@@ -2,7 +2,7 @@
 TRYING THE EXAMPLE PROGRAMS
 
 This directory contains a few example programs to get you started with
-mGtk.  In order to try the example programs, issue the following
+mGTK.  In order to try the example programs, issue the following
 commands
 
 (1) Build mgtk as described in ../src/README
@@ -28,11 +28,11 @@ helloworld.sml	 | A port of helloworld.c from the gtk+ tutorial
 helloworld2.sml	 | How to have more than one widget in a window
 entrylabel.sml	 | How to use entries
 valuta.sml	 | A port of a Peter Sestoft Java example 
-twowindows.sml	 | How to more than one window
+twowindows.sml	 | How to have more than one window
 fileview.sml	 | A very simple file viewer, uses the text widget
 fileedit.sml	 | An extremely simple file editor, uses a ScrolledWindow
 fileedit2.sml	 | A very simple file editor, better layout than fileedit
-counter.sml	 | A first attempt to more some of the event loop to SML,
+counter.sml	 | A first attempt to move some of the event loop to SML,
                  | uses the FunInput stuff.
 calendar.sml     | Shows how to use the calendar widget
 drawing.sml      | Shows how to use the drawing area widget, including
@@ -48,4 +48,4 @@ moside/          | A larger example providing a small GUI for MosML
 Enjoy!
 
 ----------------------------------------------------------------------
-                                          Henning Niss, April 12, 2000
+			Henning Niss and Ken Friis Larsen, April, 2000
