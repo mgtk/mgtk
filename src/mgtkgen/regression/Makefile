@@ -1,7 +1,11 @@
+# mgtkgen --- generate wrapper code from .defs file.
+# (c) Ken Friis Larsen and Henning Niss 1999, 2000.
+
 .SILENT:
 .PRECIOUS: %.res
 
 TRANSLATE=../mgtkgen
+REMOVE=rm -f
 
 all: gtk-adj gtk-fonts gtk-boxed gtk-output gtk-split-words gtk
 
@@ -17,7 +21,7 @@ fresh: clean all
 	$(TRANSLATE) -sml --no-header -o $@ $< > /dev/null 2>&1 
 
 %.res: %.c %.sig %.sml
-	rm -f $@; \
+	$(REMOVE) $@; \
 	files='$^'; for file in $$files; do \
 	  echo "------------------------------------------------------------" >> $@; \
 	  cat $$file >> $@; \
@@ -31,5 +35,6 @@ fresh: clean all
 	fi
 
 clean:
-	rm -f *~
-	rm -f *.res
+	$(REMOVE) *~
+	$(REMOVE) *.res
+
