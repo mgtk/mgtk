@@ -15,13 +15,19 @@ structure TypeInfo :> TypeInfo = struct
     type info = {stype: (unit -> string) -> SMLType.ty, ptype: SMLType.ty,
 		 toc: TinyC.expr -> TinyC.expr,
 		 fromc: TinyC.expr -> TinyC.expr,
-		 super: name option}
+		 super: name option,
+		 fromprim: TinySML.exp -> TinySML.exp,
+		 toprim: TinySML.exp -> TinySML.exp
+		}
     type typeinfo = (Name.name, info) Splaymap.dict
     exception NotFound = Splaymap.NotFound
     exception Unbound of Name.name
     val add = Splaymap.insert
     fun lookup table name = Splaymap.find(table,name)
 
+    fun id x = x
+    fun make e = TinySML.App(TinySML.Var("make"), [e])
+    fun repr e = TinySML.App(TinySML.Var("repr"), [e])
     fun ccall name = fn e => TinyC.Call(name,NONE,[e])
     val basic =
 	[("int",       (fn _ => SMLType.IntTy,SMLType.IntTy,
@@ -50,11 +56,11 @@ structure TypeInfo :> TypeInfo = struct
     fun init () = 
 	let fun a ((n,i),t)=
 		add(t,Name.fromPaths([],[],[n]),
-		    {stype= #1 i,ptype= #2 i,toc= #3 i,
+		    {stype= #1 i,ptype= #2 i,toc= #3 i, 
+		     toprim = id, fromprim = id,
 		     fromc= #4 i,super= #5 i})
 	in  List.foldl a (Splaymap.mkDict Name.compare) basic
 	end
-
 
     fun build module =
 	let fun bmod (AST.Module{name,members,info=SOME(n,parent)},table) = 
@@ -80,11 +86,13 @@ structure TypeInfo :> TypeInfo = struct
 		    val name' = Name.fromPaths(Name.getFullPath name@nb,
 					       Name.getPath name,
 					       nb)
+		    val _  = TextIO.print("Binding " ^ Name.toString' name ^ "\n")
 		    val info = {toc=ccall"GtkObj_val",fromc=ccall"Val_GtkObj",
 				ptype=SMLType.TyApp([],["cptr"]),
+				fromprim = make, toprim = repr,
 				stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
 				super=NONE}
-		in  add(table',name',info)  end
+		in  add(table',name,info)  end
 	      | bmod (AST.Module{name,members,info=NONE},table) = 
 		List.foldl bmem table members
 	    and bmem (AST.Sub module,table) = bmod(module,table)
@@ -94,6 +102,7 @@ structure TypeInfo :> TypeInfo = struct
 		    (TextIO.print("Binding " ^ Name.toString' name ^ "\n");
 		        add(table,name,
 			    {toc=ccall"Int_val", fromc=ccall"Val_int",
+			     fromprim=id, toprim=id,
 			     ptype=SMLType.IntTy, super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asEnum name])})
                     )
@@ -102,6 +111,7 @@ structure TypeInfo :> TypeInfo = struct
 		        add(table,name,
 			    {toc=ccall(Name.asCBoxed name^"_val"), 
 			     fromc=ccall("Val_"^Name.asCBoxed name),
+			     fromprim=id, toprim=id,
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
                     )
@@ -120,7 +130,7 @@ structure TypeInfo :> TypeInfo = struct
 	end
 
     fun show os table =
-	let fun sinfo {stype,ptype,toc,fromc,super} = 
+	let fun sinfo {stype,ptype,toc,fromc,super,fromprim,toprim} = 
 		(SMLType.show ptype) ^ " x "  ^
 		(SMLType.show (stype (nextgen())))
 	in  List.app (fn (n,i) => 
@@ -214,6 +224,37 @@ structure TypeInfo :> TypeInfo = struct
 
 
     fun call func arg = TinyC.Call(func, NONE, [arg])
+
+    fun fromPrimValue tinfo ty =
+	case ty of
+	    Type.Base n =>
+	       (let val info: info = lookup tinfo n
+		in  #fromprim info
+		end
+		    handle NotFound => raise Unbound n
+	       )
+	  | Type.Tname n =>
+	       (let val info: info = lookup tinfo n
+		in  #fromprim info
+		end
+		    handle NotFound => raise Unbound n
+	       )
+	  | _ => id
+    fun toPrimValue tinfo ty =
+	case ty of
+	    Type.Base n =>
+	       (let val info: info = lookup tinfo n
+		in  #toprim info
+		end
+		    handle NotFound => raise Unbound n
+	       )
+	  | Type.Tname n =>
+	       (let val info: info = lookup tinfo n
+		in  #toprim info
+		end
+		    handle NotFound => raise Unbound n
+	       )
+	  | _ => id
 
     fun toCValue tinfo ty =
 	case ty of

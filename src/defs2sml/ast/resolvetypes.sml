@@ -49,12 +49,11 @@ structure ResolveTypes :> ResolveTypes = struct
 
     end (* structure Parse *)
 
-    type module_info = (AST.api_type * AST.api_type option) option
-    type member_info = AST.api_type AST.api_info
+    type 'a ty = 'a Type.ty
+    type 'a module_info = ('a * 'a option) option
+    type 'a member_info = (string,'a) AST.api_info
 
-    type ty = Name.name Type.ty
-    type module_info' = (Name.name * Name.name option) option
-    type member_info' = ty AST.api_info
+(* old stuff
 
     fun deModularize name (Tname _, tyname) = (* FIXME *)
 	let val context = Name.getFullPath name @ Name.getBase name
@@ -105,49 +104,40 @@ structure ResolveTypes :> ResolveTypes = struct
 	end
       | deModularize name (Base _ , tyname) = Name.fromPaths([],[],[tyname])
       | deModularize name _ = raise Fail("deModularize: shouldn't happen")
+old stuff *)
 
-    fun resTy (module, ty) = 
+    fun resTy ty = 
 	case ty of
-	    AST.ApiTy str => 
-	    let val typ = (Parse.toType str)
-			  handle exn => (TextIO.print("Error for " ^ Name.toString module); raise exn)
-	    in  mapi (deModularize module) typ
-	    end
+	    AST.ApiTy str => Parse.toType str
           | AST.ArrowTy(pars, ret) =>
-		Func(List.map (fn (n,t) => (n,resTy(module, t))) pars, 
-		     resTy(module, ret))
-    fun resTy' (module, ty) = 
-	let fun detypename (Tname n) = n
-	      | detypename _ = raise Fail("retTy': not a type name")
-	in  case ty of 
-		NONE => NONE
-	      | SOME(ty,parent) => 
-		SOME(detypename(resTy(module,ty)),
-		     Option.map(fn ty => detypename(resTy(module,ty))) parent)
-	end
+		Func(List.map (fn (n,t) => (n,resTy t)) pars,  resTy ret)
+    fun resTy' ty = 
+	case ty of 
+	    NONE => NONE
+	  | SOME(ty,parent) => 
+	    SOME(resTy ty, Option.map resTy parent)
 
-    fun resMember inm member =
+    fun resMember member =
 	case member of
-	    AST.Method ty => AST.Method(resTy(inm, ty))
-          | AST.Field ty => AST.Field(resTy(inm, ty))
+	    AST.Method ty => AST.Method(resTy ty)
+          | AST.Field ty => AST.Field(resTy ty)
           | AST.Enum mems => AST.Enum(mems)
-          | AST.Signal ty => AST.Signal(resTy(inm, ty))
+          | AST.Signal ty => AST.Signal(resTy ty)
 	  | AST.Boxed funcs => AST.Boxed funcs
 
-    fun resolve inm (AST.Module{name=n,members=m,info=i}) =
-	AST.Module{name=n,members=List.map (resolve' n) m,info=resTy'(n,i)}
-    and resolve' inm mem =
+    fun resolve (AST.Module{name=n,members=m,info=i}) =
+	AST.Module{name=n,members=List.map resolve' m,info=resTy' i}
+    and resolve' mem =
 	case mem of
-	    AST.Sub(module) => AST.Sub(resolve inm module)
-	  | AST.Member{name=n,info=i} => AST.Member{name=n,info=resMember inm i}
-    val resolve = fn module => resolve (Name.fromPaths ([""],[""],[])) module
+	    AST.Sub(module) => AST.Sub(resolve module)
+	  | AST.Member{name=n,info=i} => AST.Member{name=n,info=resMember i}
 
     (* For debugging: *)
     val resolve = fn module => 
-        let fun pptype ty = Type.show(Name.toString') ty
+        let fun pptype ty = Type.show (fn s => s) ty
 	    fun ppmodi (SOME(ty, parent)) = 
-		": " ^ Name.asType ty ^
-		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.asType ty)
+		": " ^ pptype ty ^
+		   (case parent of NONE => "" | SOME ty => " extends " ^ pptype ty)
 	      | ppmodi NONE = ""
 	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
 	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty
@@ -159,7 +149,7 @@ structure ResolveTypes :> ResolveTypes = struct
 	    val module' = resolve module
 	in  if Debug.included "ResolveTypes.debug_resolve_types" then
 		( print("After resolving types:\n")
-		; AST.ppName (ppmodi, ppmemi) print module' )
+		; AST.ppString (ppmodi, ppmemi) print module' )
 	    else ()
           ; module'
         end

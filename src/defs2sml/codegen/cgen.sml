@@ -4,7 +4,7 @@
 structure GenC :> sig
         type topdecl
 	type typeexp = Name.name Type.ty
-        type 'a module  = (Name.name, 'a, typeexp AST.api_info) AST.module
+        type 'a module  = (Name.name, 'a, (Name.name,typeexp) AST.api_info) AST.module
         type 'a module' = (Name.name, 'a, (topdecl*typeexp option) list) AST.module
         val generate: TypeInfo.typeinfo -> 'a module -> 'a module'
         val print: TypeInfo.typeinfo -> TextIO.outstream -> 'a module' -> unit
@@ -14,7 +14,7 @@ struct
     open TinyC
 
     type typeexp = Name.name Type.ty
-    type 'a module  = (Name.name, 'a, typeexp AST.api_info) AST.module
+    type 'a module  = (Name.name, 'a, (Name.name,typeexp) AST.api_info) AST.module
     type 'a module' = (Name.name, 'a, (topdecl*typeexp option) list) AST.module
 
 
@@ -82,14 +82,14 @@ struct
 		      SOME ty)]
 		end
 	  | AST.Enum enums =>
-	        let val construct = List.foldl (fn (e,(c,i)) => (Ass(Call("Field", NONE, [Var "res", Int i]),TInt,Call("Val_int",NONE,[Var e]))::c,i+1)) ([],0) enums
+	        let val construct = List.foldl (fn (e,(c,i)) => (Ass(Call("Field", NONE, [Var "res", Int i]),TInt,Call("Val_int",NONE,[Var (Name.asCEnumConst e)]))::c,i+1)) ([],0) enums
 		    val body = 
 			Block(NONE,[VDecl("res",TValue,SOME(Call("alloc_tuple",NONE,[Int(List.length enums)])))],
 			  Comment "ML" ::
 			  rev(#1 construct) @
 			  [Return(Var "res")]
                         )
-		in  [(Fun(Proto(SOME"EXTERNML",Name.asCStub name, [("dummy",TValue)], TValue),
+		in  [(Fun(Proto(SOME"EXTERNML",Name.asCGetEnum name, [("dummy",TValue)], TValue),
 			  body),
 		      SOME Type.Void)]
 		end

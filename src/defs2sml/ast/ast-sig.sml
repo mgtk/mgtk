@@ -25,11 +25,11 @@ sig
               * ( ('n * 'i2) * 'a -> 'a )
                 -> 'a -> ('n,'i1,'i2) module -> 'a
 
-    datatype 't api_info =
+    datatype ('n,'t) api_info =
 	Method of 't
       | Field of 't
       | Boxed of {copy: string, release: string} option
-      | Enum of string list
+      | Enum of 'n list
       | Signal of 't
     and api_type =
         ApiTy of string

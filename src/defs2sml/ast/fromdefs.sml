@@ -9,7 +9,7 @@ structure FromDefs :> FromDefs = struct
     structure A = AST
 
     type module_info = (AST.api_type * AST.api_type option) option
-    type member_info = AST.api_type AST.api_info
+    type member_info = (string,AST.api_type) AST.api_info
 
     datatype module = 
 	Module of {name: string, members: member list ref, info: module_info}

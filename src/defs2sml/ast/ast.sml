@@ -100,11 +100,11 @@ struct
         val ppString = fn (ppModI, ppMemI) => pp (ppMod ppModI, ppMem ppMemI)
     end
 
-    datatype 't api_info =
+    datatype ('n,'t) api_info =
 	Method of 't
       | Field of 't
       | Boxed of {copy:string, release:string} option
-      | Enum of string list
+      | Enum of 'n list
       | Signal of 't
     and api_type =
         ApiTy of string

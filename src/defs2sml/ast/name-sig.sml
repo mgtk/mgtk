@@ -23,6 +23,7 @@ signature NAME = sig
 
     val asModule: name -> string
     val asEnum: name -> string
+    val asEnumConst: name -> string
     val asBoxed: name -> string
     val asField: name -> string
     val asMethod: name -> string
@@ -30,8 +31,10 @@ signature NAME = sig
     val asType: name -> string
 
     val asCEnum: name -> string
+    val asCEnumConst: name -> string
     val asCBoxed: name -> string
     val asCFunc: name -> string
     val asCStub: name -> string
+    val asCGetEnum: name -> string
 
 end (* signature Name *)

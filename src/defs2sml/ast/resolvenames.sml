@@ -1,20 +1,40 @@
-structure ResolveNames =
+structure ResolveNames :> ResolveNames =
 struct
 
     val toLower = String.map Char.toLower
 
     fun toName split current name = 
 	let val splits = split name
+(*
+	    fun return full [] = (rev full,[],[])
+	      | return full [p] = (rev full,[],[p])
+	      | return full path =
+		let val reversed = rev path
+		in (rev full, rev(tl reversed), [hd reversed]) end
 	    fun loop (e::p,e'::p') acc = 
 		if toLower e = toLower e' then loop (p,p') acc
 		else (rev acc, e'::p')
 	      | loop ([], p') acc = (rev acc, p')
 	      | loop (_, []) acc = ([],rev acc) (* FIXME *)
-	    val (path,base) = loop (current, splits) []
-        in  (path,base)
+*)
+	    fun  return full path = (rev full, [], path)
+	    fun loop (e::p, e'::p') full = 
+		if Name.toLower e = Name.toLower e' then loop (p,p') (e::full)
+		else return full (e'::p')
+	      | loop ([], p') full = return full p'
+	      | loop (p, []) full = return (p@full) []
+	    val (full,path,base) = loop (current, splits) []
+        in  (full,path,base)
 	end
 
     open AST
+
+    type 'a ty = 'a Type.ty
+    type name = Name.name
+
+    type 'a module_info = ('a * 'a option) option
+    type 'a member_info = ('a, 'a ty) AST.api_info
+
     fun resolve module =
 	let 
 	    val show_path = Util.stringSep "{" "}" "-" (fn s => s)
@@ -29,32 +49,49 @@ struct
 	    fun resMod current m =
 	        case m of
 		    Module{name,members,info} =>
-			let val (path,base) = toName Name.separateWords current name
-(*
-			    val _ = Util.debug("module: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ show_path path ^ ":" ^ show_path base ^ "\n")
-*)
+			let val (full,path,base) = toName Name.separateWords current name
 			    val current' = Name.separateWords name
-			in  Module{name=Name.fromPaths(current,path,base),
+			    val name' = Name.fromPaths(full,path,base)
+			    val _ = MsgUtil.debug("  module: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ Name.toString' name' ^"\n")
+			in  Module{name=name',
 				   members=List.map (resMem current') members,
-				   info=info}
+				   info=resType' current info}
 			end
 	    and resMem current m =
 		case m of
 		    Sub m => Sub(resMod current m)
 	          | Member{name,info} => 
-			let val (path,base) = toName (splitfcn info) current name
-(*
-			    val _ = TextIO.print("member: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ show_path path ^ ":" ^ show_path base ^ "\n")
-*)
-			in  Member{name=Name.fromPaths(current,path,base),
+			let val (full,path,base) = toName (splitfcn info) current name
+			    val name' = Name.fromPaths(full,path,base)
+			    val _ = MsgUtil.debug("  member: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ Name.toString' name')
+			in  Member{name=name',
 				   info= resMemInfo current info}
 			end
 	    and resMemInfo current (Enum enums) =
 		let fun res e = 
-			let val (p,b) = toName (Name.separateUnderscores) current e
-			in  Util.stringSep "" "" "_" (fn s=>s) b end
+			let val (f,p,b) = toName (Name.separateUnderscores) current e
+			in  Name.fromPaths(f,p,b) end
 		in  Enum(List.map res enums) end
-	      | resMemInfo current info = info
+	      | resMemInfo current (Method ty) = Method(resType current ty)
+	      | resMemInfo current (Field ty) = Field(resType current ty)
+	      | resMemInfo current (Signal ty) = Signal(resType current ty)
+	      | resMemInfo current (Boxed funcs) = Boxed funcs
+	    and resType current ty =
+		let fun demod (Type.Tname _, tyname) = 
+			let val (f,p,b) = toName Name.separateWords current tyname
+			in  Name.fromPaths(f,p,b) end
+		      | demod (Type.Base _, tyname) = Name.fromPaths([],[],[tyname])
+		      | demod (_,_) = raise Fail("resType: shouldn't happen")
+		in  Type.mapi demod ty end
+	    and resType' current ty =
+		let fun detypename (Type.Tname n) = n
+		      | detypename _ = raise Fail("retTy': not a type name")
+		in  case ty of
+			NONE => NONE
+		      | SOME(ty,parent) =>
+			SOME(detypename(resType current ty),
+			     Option.map(detypename o resType current) parent)
+		end
 	in  resMod [] module
 	end
 
@@ -75,12 +112,24 @@ struct
 
     (* For debugging: *)
     val resolve = fn module => 
-        let val print = TextIO.print
+        let val module' = resolve module
 
-	    val module' = resolve module
+	    fun pptype ty = Type.show Name.toString' ty
+	    fun ppmodi (SOME(ty, parent)) = 
+		": " ^ Name.toString' ty ^
+		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)
+	      | ppmodi NONE = ""
+	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
+	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty
+	      | ppmemi (AST.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " Name.toString' ss
+	      | ppmemi (AST.Signal ty) = ": signal " ^ pptype ty
+	      | ppmemi (AST.Boxed func) = ": boxed"
+
+	    val print = TextIO.print
+	    
 	in  if Debug.included "ResolveNames.debug_resolve_names" then
 		( print("After resolving names:\n")
-		; AST.ppName (fn _ =>"", fn _=>"") print module')
+		; AST.ppName (ppmodi, ppmemi) print module')
 	    else ()
           ; module'
         end

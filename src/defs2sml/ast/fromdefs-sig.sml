@@ -4,7 +4,7 @@
 signature FromDefs = sig
 
     type module_info = (AST.api_type * AST.api_type option) option
-    type member_info = AST.api_type AST.api_info
+    type member_info = (string, AST.api_type) AST.api_info
     val fromDefs: string -> Defs.definition list 
                   -> (string,module_info,member_info) AST.module
 

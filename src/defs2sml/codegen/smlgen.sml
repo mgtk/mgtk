@@ -5,58 +5,21 @@ structure GenSML :>
     sig
 	type name = Name.name
 	type typeexp = name Type.ty
-	type sml_type = SMLType.ty
 
 	type sml_info
 	type 'a incl
 	type module_info
 
-	val max_curried : int
-
-	val generate: TypeInfo.typeinfo -> (name,(name*name option)option,typeexp AST.api_info) AST.module -> 
+	val generate: TypeInfo.typeinfo -> (name,(name*name option)option,(name,typeexp) AST.api_info) AST.module -> 
 		      (name,module_info,sml_info incl) AST.module
 	val print: string option -> TextIO.outstream -> (name,module_info,sml_info incl) AST.module 
                    -> unit
     end =
 struct
 
-    val max_curried = 5
-
-    datatype exp =
-	Unit 
-      | Var of string
-      | Long of Name.name
-      | Str of string
-      | Fn of string * exp
-      | App of exp * exp list
-      | Tup of exp list
-    infix ==>
-    fun x ==> e = Fn(x,e)
-
-    datatype pat =
-        VarPat of string
-      | TupPat of pat list
-
-    type sml_type = SMLType.ty
-    type sml_tyvar = SMLType.tyvar
-    type sml_tyname = SMLType.tyname
-
-    datatype 'a incl =
-        None
-      | StrOnly of 'a
-      | SigOnly of 'a
-      | Some of 'a
-	     
-    datatype sml_info =
-	ValDecl of pat * sml_type incl * exp
-      | FunDecl of string * pat list * sml_type incl * exp
-      | TypeDecl of (sml_tyvar list * sml_tyname) * sml_type incl
-      | SeqDecl of sml_info incl list
-      | EmptyDecl
-      | Comment of string option (* an empty comment prints as newline *)
-      | Open of string list
-
     (* convenience *)
+    open TinySML
+
     infix ++
     fun d1 ++ d2 = Some(SeqDecl[d1,d2])
 
@@ -73,6 +36,9 @@ struct
 	end
 
     (* print *)
+    type 'a incl = 'a TinySML.incl
+    type sml_info = TinySML.decl
+
     datatype module_info = STRUCTURE of string * string option (* sig? *)
 			 | SIGNATURE of string
     fun isStrMode (STRUCTURE _) = true
@@ -85,82 +51,7 @@ struct
     fun showModBegin (STRUCTURE _) = "struct"
       | showModBegin (SIGNATURE _) = "sig"
 
-    fun toString mode indent info =
-	let fun parens safe level s = if level > safe then "(" ^ s ^ ")"
-				      else s
-	    fun show_exp level exp =
-		case exp of
-		    Unit => "()"
-		  | Var x => x
-		  | Long n => Name.toString n
-		  | Str s => "\"" ^ s ^ "\""
-		  | Fn(x,e) => parens 1 level ("fn " ^ x ^ " => " ^ show_exp 1 e)
-		  | App(Var "symb",[Str s]) => "(symb\""^s^"\")"
-		  | App(e,es) => parens 2 level 
-				    (show_exp 3 e ^ 
-				     Util.stringSep " " "" " " (show_exp 3) es)
-		  | Tup [] => "()"
-		  | Tup [e] => show_exp level e
-		  | Tup es => Util.stringSep "(" ")" "," (show_exp 1) es
-	    val show_exp = fn exp => show_exp 1 exp
-	    fun show_pat pat =
-		case pat of
-		    VarPat x => x
-		  | TupPat ps => Util.stringSep "(" ")" "," show_pat ps
-	    fun show_type_incl sep None = "" 
-	      | show_type_incl sep (Some ty) = sep ^ SMLType.toString ty
-	      | show_type_incl sep (StrOnly ty) = 
-		if isStrMode mode then sep ^ SMLType.toString ty else ""
-	      | show_type_incl sep (SigOnly ty) = 
-		if isSigMode mode then sep ^ SMLType.toString ty else ""
-
-	    fun printing s =
-		List.exists (not o Char.isSpace) (String.explode s)
-	    local
-		fun str _ nil _ _ = ""
-		  | str p (h::t) sep needSep =
-		    let val ph = p h
-			val ns = printing ph
-			val s = p h ^ (str p t sep ns)
-		    in  if needSep then sep ^ s else s
-		    end
-	    in
-	    fun stringSep start finish sep p l = 
-		start ^ (str p l sep false) ^ finish
-	    end (* local *)
-
-	    fun show decl =
-		case decl of
-		    ValDecl(pat,ty,exp) =>
-		       if isStrMode mode then
-			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
-			   ^ (if printing (show_type_incl " : " ty) then "\n" ^ indent ^ "    = " else " = ") ^ show_exp exp
-		       else
-			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
-		  | FunDecl(name,pars,ty,exp) =>
-		       if isStrMode mode then
-			   indent ^ "fun " ^ name ^ Util.stringSep " " "" " " show_pat pars
-			   ^ " = " ^ show_exp exp
-		       else
-			   indent ^ "val " ^ name ^ show_type_incl " : " ty
-		  | TypeDecl((tvs,tname),ty) =>
-		       indent ^ "type " 
-		     ^ SMLType.toString(TyApp(map TyVar tvs,tname))
-		     ^ show_type_incl " = " ty
-		  | SeqDecl decs =>
-		       stringSep "" "" "\n" show' decs
-		  | EmptyDecl => ""
-		  | Comment NONE => ""
-		  | Comment(SOME c) => "(*" ^ c ^ "*)"
-		  | Open strs => indent ^ Util.stringSep "open " "" " " (fn s=>s) strs
-	    and show' (None) = ""
-	      | show' (Some decl) = show decl
-	      | show' (StrOnly decl) = if isStrMode mode then show decl else ""
-	      | show' (SigOnly decl) = if isSigMode mode then show decl else ""
-
-	in  show' info ^ "\n"
-	end
-	    
+    val toString = TinySML.toString (isStrMode, isSigMode)	    
     fun print preamble os module =
 	let fun dump s = TextIO.output(os, s)
 	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
@@ -213,18 +104,18 @@ struct
 		    val name = Name.asMethod name
 		    val parsty = Type.getParams ty
 		    val (pars,tys) = ListPair.unzip parsty
+		    fun ubnd n =
+			raise Skip("Unbound type name: "^Name.toString' n)
 		    fun isWidgetType (Type.Tname n) = (* FIXME *)
 			(case Name.getFullPath n of "Gtk"::_ => true | _ => false)
 		      | isWidgetType (Type.Ptr t) = isWidgetType t
 		      | isWidgetType _ = false
-		    fun wrap (par,ty) = if isWidgetType ty 
-					then App (Var"repr",[Var par])
-					else Var par
+		    fun wrap (par,ty) = 
+			TypeInfo.toPrimValue tinfo ty (Var par)
+			handle TypeInfo.Unbound n => ubnd n
 		    val pars' = if List.length pars > max_curried
 				then [Tup(List.map wrap parsty)]
 				else List.map wrap parsty
-		    fun ubnd n =
-			raise Skip("Unbound type name: "^Name.toString' n)
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 
 			fromtype' ty handle TypeInfo.Unbound n => ubnd n
@@ -236,17 +127,15 @@ struct
 		    val params' = List.map (fromtype o #2) params
 		    val ret'    = TypeInfo.toSMLType tinfo (fn _ => "base") ret
 				  handle TypeInfo.Unbound n => ubnd n
-				  
-		    fun make e = 
-			(* FIXME *)
-			if isWidgetType ret then App(Var("make"), [e])
-			else e
+		    fun fromprim ty e =
+			TypeInfo.fromPrimValue tinfo ty e
+			handle TypeInfo.Unbound n => ubnd n
 		in  StrOnly(
                        ValDecl(VarPat(name^"_"), Some(primtypeFromType ty), 
 			       ccall cname (List.length pars)))
                  ++ Some(
                        ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),
-			       List.foldr Fn (make(App(Var(name^"_"), pars')))
+			       List.foldr Fn (fromprim ret (App(Var(name^"_"), pars')))
 					  pars))
 		end
 
@@ -267,7 +156,7 @@ struct
 		in  Some(TypeDecl(([],[name]), StrOnly IntTy))
                  ++ StrOnly(ValDecl(VarPat("get_" ^ name ^ "_"), Some(UnitTy --> TupTy tup),
 			    ccall ("mgtk_get_"^cname) 1))
-		 ++ StrOnly(ValDecl(TupPat(List.map VarPat consts), None,
+		 ++ StrOnly(ValDecl(TupPat(List.map (VarPat o Name.asEnumConst) consts), None,
 			    App(Var("get_" ^ name ^ "_"), [Unit])))
 		end
 

@@ -89,7 +89,15 @@ structure Name :> NAME = struct
 
     (* FIXME *)
 *)
+(*
     fun compare (n1, n2) = Util.listCmp String.compare (#base n1, #base n2)
+*)
+
+    fun compare (n1, n2) = 
+	let fun tos ns = Util.stringSep "" "" "" (fn s=>s) ns
+	in  String.compare(tos (#fullpath n1 @ #base n1), 
+			   tos (#fullpath n2 @ #base n2))
+	end
 
     fun fromString base = (* FIXME *)
 	{path=[],fullpath=[],base=separateWords base}
@@ -130,12 +138,17 @@ structure Name :> NAME = struct
 	let val (path,base) = prune (getPath name, getBase name)
 	in  combine "." (dotSep path, toLower(undSep base))
 	end
-
     fun asModule name =
 	let val (path,base) = prune (getPath name, getBase name)
 	in  combine "" (noSep path, noSep(map capitalize base))
 	end
+    fun asSMLName sep trans name =
+	let val (path,base) = prune (getPath name, getBase name)
+	in  combine sep (trans(separate sep path), trans(separate sep base))
+	end
+
     val asEnum = underscored o mlify
+    val asEnumConst = asSMLName "_" toUpper
     val asBoxed = underscored
     val asMethod = underscored
     val asField = underscored
@@ -159,6 +172,8 @@ structure Name :> NAME = struct
     val asCEnum = asCName "_" toLower
     val asCBoxed = asCName "" (fn s=>s)
     val asCFunc = asCName "_" toLower
+    val asCEnumConst = asCName "_" toUpper
     fun asCStub name = "mgtk_" ^ asCName "_" toLower name
+    fun asCGetEnum name = "mgtk_get_" ^ asCName "_" toLower name
 
 end (* structure Name *)

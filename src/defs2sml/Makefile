@@ -22,7 +22,7 @@ regression: $(MAIN)
 	echo "Regression test results ... "; \
         for file in $$files ; do \
 	      base=`basename $$file .defs`; \
-              ./$(MAIN) $$file -o $(REGRESSIONDIR)/output/$$base.out ; \
+              ./$(MAIN) -q $$file -o $(REGRESSIONDIR)/output/$$base.out ; \
 	      diff -Naur $(REGRESSIONDIR)/trusted/$$base.out $(REGRESSIONDIR)/output/$$base.out ; \
         done
 
@@ -37,10 +37,18 @@ test-compile: $(MAIN)
         done
 
 
-test-%: $(MAIN)
+testgen-%: $(MAIN)
 	./$(MAIN) $(OPTIONS) test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
+
+testcomp-%: testgen-%
 	mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$*.sml
 	gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$*.c
+
+reggen-%: $(MAIN)
+	./$(MAIN) -q $(OPTIONS) -o $(REGRESSIONDIR)/output/$*.out test/regression/input/$*.defs
+
+regcomp-%: reggen-%
+	diff -Naur $(REGRESSIONDIR)/trusted/$*.out $(REGRESSIONDIR)/output/$*.out
 
 mgtk.c: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
 	./$(MAIN) -co mgtk.c -so mGtk.sml -cp lib/preamble.c api/pygtk/gtk.defs 

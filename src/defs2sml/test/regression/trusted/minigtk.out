@@ -161,7 +161,7 @@ structure Gtk = struct
         type type_t
 
 
-        val new : Type.type_t -> base t
+        val new : type_t -> base t
     end
     structure Window :> Window = struct
         type base = unit
@@ -180,8 +180,8 @@ structure Gtk = struct
         val (TOPLEVEL,POPUP) = get_type_t_ ()
         val new_ : int -> cptr
             = app1 (symb"mgtk_gtk_window_new")
-        val new : Type.type_t -> base t
-            = fn wtype => make (new_ (repr wtype))
+        val new : type_t -> base t
+            = fn wtype => make (new_ wtype)
     end
     signature Button = sig
         type base
@@ -311,10 +311,10 @@ EXTERNML value mgtk_gtk_container_remove(value self, value widget) { /* ML */
 
 /* *** Window *** */
 /* ML type: unit */
-EXTERNML value mgtk_gtk_window_type(value dummy) { /* ML */
+EXTERNML value mgtk_get_gtk_window_type(value dummy) { /* ML */
     value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(TOPLEVEL);
-    Field(res, 1) = Val_int(POPUP);
+    Field(res, 0) = Val_int(GTK_WINDOW_TOPLEVEL);
+    Field(res, 1) = Val_int(GTK_WINDOW_POPUP);
     return res;
 }
 

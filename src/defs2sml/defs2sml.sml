@@ -4,6 +4,8 @@
 fun main () =
     let 
 
+	fun inc r () = r := !r + 1
+
 	(* file ops *)
 	fun ext f e = OS.Path.joinBaseExt {base=f,ext=SOME e}
 	fun getExt f = #ext(OS.Path.splitBaseExt f)
@@ -50,17 +52,26 @@ fun main () =
 		NONE => (fn () => TextIO.stdOut, fn () => ())
 	      | SOME f => let val os = TextIO.openAppend f
 			  in (fn () => os, fn () => TextIO.closeOut os) end
-		
-	val args = [("-I",  ArgParse.String DefsParse.addPath),
-		    ("-so", ArgParse.String setSMLOutFile),
-		    ("-o",  ArgParse.String setOutFileBase),
-		    ("-co", ArgParse.String setCOutFile),
-		    ("-bo", ArgParse.String setOutFileBase),
-		    ("-cp", ArgParse.String setCPreamble),
-		    ("-sp", ArgParse.String setSMLPreamble)
+
+	val verbosity = ref 0
+
+	val args = [ ("-I",  ArgParse.String DefsParse.addPath)
+		   , ("-so", ArgParse.String setSMLOutFile)
+		   , ("-o",  ArgParse.String setOutFileBase)
+		   , ("-co", ArgParse.String setCOutFile)
+		   , ("-bo", ArgParse.String setOutFileBase)
+		   , ("-cp", ArgParse.String setCPreamble)
+		   , ("-sp", ArgParse.String setSMLPreamble)
+		   , ("-q",  ArgParse.Unit   MsgUtil.quiet)
+		   , ("-v",  ArgParse.Unit   (inc verbosity))
                    ] @ Debug.argparse ()
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
+	val _ = case !verbosity of
+		    0 => MsgUtil.quiet()
+		  | 1 => MsgUtil.verbose()
+		  | 2 => MsgUtil.Verbose()
+		  | _ => MsgUtil.Debug()
 
         (* 1. Parse *)
 	val defs = (MsgUtil.print "Parsing (defs)..."; 
@@ -109,11 +120,29 @@ fun main () =
 	    end
 	val api = order api
 
+	val debug = fn module => 
+        let fun pptype ty = Type.show (Name.toString') ty
+	    fun ppmodi (SOME(ty, parent)) = 
+		": " ^ Name.toString' ty ^
+		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)
+	      | ppmodi NONE = ""
+	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
+	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty
+	      | ppmemi (AST.Enum ss) = ": enum" ^ Util.stringSep "{" "}" ", " Name.toString' ss
+	      | ppmemi (AST.Signal ty) = ": signal " ^ pptype ty
+	      | ppmemi (AST.Boxed func) = ": boxed"
+	    val print = TextIO.print
+	in  if Debug.included "ResolveTypes.debug_resolve_types" then
+		( print("After resolving types:\n")
+		; AST.ppName (ppmodi, ppmemi) print module )
+	    else ()
+        end
+
         (* 4. Resolve types and names *)
-	val api = ResolveTypes.resolve (ResolveNames.resolve api)
-
-
+	val api = ResolveNames.resolve (ResolveTypes.resolve api)
+	val _ = debug api
 	val typeinfo = TypeInfo.build api
+
 	val (modules,values) = AST.fold (fn (mn,(m,v)) => (m+1,v), fn (mn,(m,v)) => (m,v+1)) (0,0) api
 	val _ = MsgUtil.close ("  corresponding to " ^ Int.toString modules ^ "(sub)modules with " ^ Int.toString values ^ " values\n")
 
