@@ -133,7 +133,7 @@ structure FromDefs :> FromDefs = struct
 	    val print = TextIO.print
 
 	    val module' = fromDefs top defs
-	in  print("After resolving types:\n")
+	in  print("After building defs:\n")
           ; AST.ppString (ppmodi, ppmemi) print module'
           ; module'
         end

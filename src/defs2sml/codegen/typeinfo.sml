@@ -59,8 +59,15 @@ structure TypeInfo :> TypeInfo = struct
     fun build module =
 	let fun bmod (AST.Module{name,members,info=SOME(n,parent)},table) = 
 		let val table' = List.foldl bmem table members
-		    val md = case Name.getBase name of [md] => md
-						     | _ => raise Fail("build")
+(*
+		    val md = Util.stringSep "" "" "" (fn s=>s) (Name.getBase name)
+(*
+			case Name.getBase name of 
+			    [md] => md
+			  | bs => raise Fail("build: " ^ Util.stringSep "" "" "." (fn s=>s) bs)
+*)
+*)
+		    val nb = Name.getBase name
 (*		    val name' = Name.fromPaths(Name.getFullPath name@[md],
 					       Name.getPath name,
 					       [Name.toLower md^"_t"])
@@ -70,9 +77,9 @@ structure TypeInfo :> TypeInfo = struct
 					       Name.getPath name,
 					       [Name.toLower md^"_t"])
 *)
-		    val name' = Name.fromPaths(Name.getFullPath name@[md],
+		    val name' = Name.fromPaths(Name.getFullPath name@nb,
 					       Name.getPath name,
-					       [md])
+					       nb)
 		    val info = {toc=ccall"GtkObj_val",fromc=ccall"Val_GtkObj",
 				ptype=SMLType.TyApp([],["cptr"]),
 				stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),

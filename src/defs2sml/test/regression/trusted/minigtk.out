@@ -23,7 +23,7 @@ structure Gtk = struct
         val symb = GtkBasis.symb
 
         fun inherit w con = GObject.inherit () con
-        fun make ptr = GObject.inherit () (fn () => repr ptr)
+        fun make ptr = GObject.inherit () (fn () => ptr)
     end
     signature Widget = sig
 
@@ -55,7 +55,7 @@ structure Gtk = struct
         val symb = GtkBasis.symb
 
         fun inherit w con = Object.inherit () con
-        fun make ptr = Object.inherit () (fn () => repr ptr)
+        fun make ptr = Object.inherit () (fn () => ptr)
         val destroy_ : cptr -> unit
             = app1 (symb"mgtk_gtk_widget_destroy")
         val destroy : 'a t -> unit
@@ -109,7 +109,7 @@ structure Gtk = struct
         val symb = GtkBasis.symb
 
         fun inherit w con = Widget.inherit () con
-        fun make ptr = Widget.inherit () (fn () => repr ptr)
+        fun make ptr = Widget.inherit () (fn () => ptr)
         val set_border_width_ : cptr -> int -> unit
             = app2 (symb"mgtk_gtk_container_set_border_width")
         val set_border_width : 'a t -> int -> unit
@@ -151,7 +151,7 @@ structure Gtk = struct
         val symb = GtkBasis.symb
 
         fun inherit w con = Container.inherit () con
-        fun make ptr = Container.inherit () (fn () => repr ptr)
+        fun make ptr = Container.inherit () (fn () => ptr)
     end
     signature Window = sig
 
@@ -165,7 +165,7 @@ structure Gtk = struct
 
         val inherit : 'a -> GObject.constructor -> 'a t
 
-        val new : WindowType -> base t
+        val new : WindowType.WindowType -> base t
     end
     structure Window :> Window = struct
 
@@ -178,10 +178,10 @@ structure Gtk = struct
         val symb = GtkBasis.symb
 
         fun inherit w con = Bin.inherit () con
-        fun make ptr = Bin.inherit () (fn () => repr ptr)
+        fun make ptr = Bin.inherit () (fn () => ptr)
         val new_ : int -> cptr
             = app1 (symb"mgtk_gtk_window_new")
-        val new : WindowType -> base t
+        val new : WindowType.WindowType -> base t
             = fn wtype => make (new_ (repr wtype))
     end
     signature Button = sig
@@ -213,11 +213,11 @@ structure Gtk = struct
         val symb = GtkBasis.symb
 
         fun inherit w con = Bin.inherit () con
-        fun make ptr = Bin.inherit () (fn () => repr ptr)
+        fun make ptr = Bin.inherit () (fn () => ptr)
         val get_type_ : unit -> int
             = app1 (symb"mgtk_gtk_button_get_type")
         val get_type : unit -> int
-            = fn dummy => make (get_type_ dummy)
+            = fn dummy => get_type_ dummy
         val new_ : unit -> cptr
             = app1 (symb"mgtk_gtk_button_new")
         val new : unit -> base t

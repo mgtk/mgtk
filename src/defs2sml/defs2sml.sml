@@ -70,28 +70,26 @@ fun main () =
 
 
 	val api = FromDefs.fromDefs "Gtk" defs
-	val exclude = Splayset.addList(Splayset.empty String.compare,
-				       ["gtk_accel_group_connect",
-					"gtk_accel_group_connect_by_path",
-					"gtk_accel_group_disconnect",
-					"_gtk_accel_group_attach",
-					"_gtk_accel_group_detach",
-					"_gtk_accel_group_reconnect",
-					"_gtk_accel_map_init",
-					"_gtk_accel_map_add_group",
-					"_gtk_accel_map_remove_group",
-					"_gtk_accel_path_is_valid",
-					"gtk_accel_group_from_accel_closure",
-					"_gtk_button_box_child_requisition",
-					"_gtk_bindings_activate_event",
-					"__gtk_binding_reset_parsed",
-					"_gtk_scale_format_value",
-
-					 "gtk_accel_group_find"
-                                       , "PrivateFlags"
-				       ])
+	val exclude = 
+	    let fun read file =
+		    let val is = TextIO.openIn file
+		    in  TextIO.inputAll is
+			before TextIO.closeIn is
+		    end
+		val contents = read "excludes.txt"
+		val excludes = Splayset.addList
+		       (Splayset.empty String.compare,
+			String.tokens Char.isSpace contents)
+	    in  excludes
+	    end
+(*
+	val _ = TextIO.print("Excluding: " ^ Util.stringSep "{" "}\n" ", " (fn s=>s) (Splayset.listItems exclude))
+*)
 	fun member set elem = Splayset.member(set,elem)
-	val api = AST.filteri (not o member exclude o #1) api
+	fun filter (name,info) = not(member exclude name)
+        (* Since the toplevel module will be Gtk, and this is presumably
+           not filter away, valOf below should always work. *)
+	val api = Option.valOf(AST.filteri (filter,filter) api)
 
 	val api = ResolveTypes.resolve (ResolveNames.resolve api)
 

@@ -59,24 +59,49 @@ structure ResolveTypes :> ResolveTypes = struct
     fun deModularize name (Tname _, tyname) = (* FIXME *)
 	let val context = Name.getFullPath name @ Name.getBase name
 	    val (path,base) = ResolveNames.toName Name.separateWords context tyname
-(*	    val _ = 
+	    val _ = 
 		( TextIO.print  ("deModularizing: " ^ tyname ^ 
 			       " (in " ^ Util.stringSep "" "" "." (fn s=>s) context ^")" ^
 			       " -> " ^
 			       Util.stringSep "" "!" "." (fn s=>s) path ^
 			       Util.stringSep "" "" "-" (fn s=>s) base ^ "\n")
                 )
-*)
-(*
-	    val base = if length base = 0 then [hd(rev context)]
-		       else base
-*)
 	    val base = 
 		if length base = 0 then [hd(rev context)]
 		else base
         in  Name.fromPaths (context,path,base)
 	end
-      | deModularize name (_ , tyname) = Name.fromPaths([],[],[tyname])
+      | deModularize name (Base _ , tyname) = Name.fromPaths([],[],[tyname])
+      | deModularize name _ = raise Fail("deModularize: shouldn't happen")
+
+    fun deModularize name (Tname _, tyname) = (* FIXME *)
+	let val context = Name.getFullPath name @ Name.getBase name
+	    val splits = Name.separateWords tyname
+	    fun return full [] = (rev full,[],Name.getBase name)
+	      | return full [p] = (rev full,[p],[p])
+	      | return full path =
+		let val reversed = rev path
+		in (rev full, rev(tl reversed), [hd reversed]) end
+	    fun loop (e::p, e'::p') full = 
+		if Name.toLower e = Name.toLower e' then loop (p,p') (e::full)
+		else return full (e'::p')
+	      | loop ([], p') full = return full p'
+	      | loop (p, []) full = return (p@full) []
+
+	    val (full,path,base) = loop (context, splits) []
+	    val name = Name.fromPaths (full,path,base)
+(*
+	    val _ = 
+		( TextIO.print  ("deModularizing: " ^ tyname ^ 
+			       " (in " ^ Util.stringSep "" "" "." (fn s=>s) context ^")" ^
+			       " -> " ^
+			       Name.toString' name^"\n")
+                )
+*)
+        in  name
+	end
+      | deModularize name (Base _ , tyname) = Name.fromPaths([],[],[tyname])
+      | deModularize name _ = raise Fail("deModularize: shouldn't happen")
 
     fun resTy (module, ty) = 
 	case ty of
@@ -114,6 +139,7 @@ structure ResolveTypes :> ResolveTypes = struct
 	  | AST.Member{name=n,info=i} => AST.Member{name=n,info=resMember inm i}
     val resolve = fn module => resolve (Name.fromPaths ([""],[""],[])) module
 
+(*
     (* For debugging: *)
     val resolve = fn module => 
         let fun pptype ty = Type.show(Name.toString') ty
@@ -133,5 +159,5 @@ structure ResolveTypes :> ResolveTypes = struct
           ; AST.ppName (ppmodi, ppmemi) print module'
           ; module'
         end
-
+*)
 end (* structure ResolveTypes *)

@@ -21,12 +21,16 @@ struct
 
     fun map (f,g) = mapi (fn (_,i1) => f i1, fn (_,i2) => g i2)
 
-    fun filteri f (Module{name,members,info}) =
-	Module{name=name, members=List.mapPartial (filteri_member f) members, 
-	       info=info}
-    and filteri_member f (Sub module) = SOME(Sub(filteri f module))
-      | filteri_member f (m as Member{name,info}) = 
-	if f(name,info) then SOME m else NONE
+    fun filteri (f,g) (Module{name,members,info}) =
+	if f(name,info) then 
+	    SOME(Module{name=name, 
+			members=List.mapPartial (filteri_member (f,g)) members,
+			info=info})
+	else NONE
+    and filteri_member (f,g) (Sub module) = 
+	Option.map Sub (filteri (f,g) module)
+      | filteri_member (f,g) (m as Member{name,info}) = 
+	if g(name,info) then SOME m else NONE
 	
     exception Zip
 (*

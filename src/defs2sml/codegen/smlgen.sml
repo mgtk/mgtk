@@ -226,6 +226,7 @@ struct
 		    val ret    = Type.getRetType ty
 		    val params' = List.map (fromtype o #2) params
 		    val ret'    = TypeInfo.toSMLType tinfo (fn _ => "base") ret
+				  handle TypeInfo.Unbound n => ubnd n
 				  
 		    fun make e = 
 			(* FIXME *)
@@ -307,7 +308,7 @@ struct
 		    SigOnly([TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"])),
 		    App(Var(pRef "inherit"),[Unit,Var "con"])))
 	 ++ StrOnly(FunDecl("make"(*^Name.asModule name*),[VarPat"ptr"],None,
-		    App(Var(pRef "inherit"),[Unit,Fn("()",App(Var "repr",[Var"ptr"]))])))
+		    App(Var(pRef "inherit"),[Unit,Fn("()",Var"ptr")])))
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)
 

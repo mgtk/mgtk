@@ -68,15 +68,15 @@ structure Name :> NAME = struct
         ^ Util.stringSep "[" "]" "." (fn s=>s) (#fullpath name)
         ^ Util.stringSep "<" ">" "." (fn s=>s) (#base name)
 
+(*
     fun compare (n1, n2) =
 	case Util.listCmp String.compare (#path n1, #path n2) of
 	    EQUAL => Util.listCmp String.compare(#base n1, #base n2)
 	  | order => order
 
-(*
     (* FIXME *)
-    fun compare (n1, n2) = Util.listCmp String.compare (#base n1, #base n2)
 *)
+    fun compare (n1, n2) = Util.listCmp String.compare (#base n1, #base n2)
 
     fun fromString base = (* FIXME *)
 	{path=[],fullpath=[],base=separateWords base}
@@ -99,13 +99,19 @@ structure Name :> NAME = struct
     fun combine sep (path,base) = if String.size path = 0 then base
 				  else path ^ sep ^ base
 	
+    fun prune (path,base) =
+	case (path,base) of (* FIXME big time! *)
+	    (p::prest,b::brest) => if p = b then ([],base)
+				   else (path,base)
+	  | _ => (path,base)
+
     fun underscored name = 
-	let val (path,base) = (getPath name, getBase name)
+	let val (path,base) = prune (getPath name, getBase name)
 	in  combine "." (dotSep path, toLower(undSep base))
 	end
 
     fun asModule name =
-	let val (path,base) = (getPath name, getBase name)
+	let val (path,base) = prune (getPath name, getBase name)
 	in  combine "" (noSep path, noSep(map capitalize base))
 	end
     val asEnum = underscored
@@ -114,12 +120,12 @@ structure Name :> NAME = struct
     val asField = underscored
     val asSignal = underscored
     fun asType name =
-	let val (path,base) = (getPath name, getBase name)
+	let val (path,base) = prune (getPath name, getBase name)
 	in  noSep(map toLower base)
 	end
 
     fun asCName sep trans name =
-	let val (path,base) = (getFullPath name, getBase name)
+	let val (path,base) = prune (getFullPath name, getBase name)
 	in  combine sep (trans(separate sep path), trans(separate sep base))
 	end
 

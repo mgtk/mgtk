@@ -14,7 +14,8 @@ sig
     val mapi: (('n*'i1 -> 'i1') * ('n*'i2 -> 'i2'))
                -> ('n,'i1,'i2) module -> ('n,'i1','i2') module
 
-    val filteri: ('n*'i2 -> bool) -> ('n,'i1,'i2) module -> ('n,'i1,'i2) module
+    val filteri: (('n*'i1 -> bool) * ('n*'i2 -> bool)) -> ('n,'i1,'i2) module
+                 -> ('n,'i1,'i2) module option
 
 (*
     val zip: (''n,'i1) module * (''n,'i2) module -> (''n, 'i1*'i2) module
