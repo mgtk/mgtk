@@ -108,8 +108,8 @@ fun inputFile  fName     =
     ( chat ("  input file is: " ^ fName ^ "\n")
     ; inFile := fName)
 fun showVersion () =
-    ( say ("mgtk generator (Feb 25). ")
-    ; say ("(C) Henning Niss and Ken Friis-Larsen\n")
+    ( say ("mgtk generator (Apr 3). ")
+    ; say ("(c) Henning Niss and Ken Friis-Larsen\n")
     ; raise Error("")
     )
 
