@@ -44,15 +44,15 @@
 \DefineShortVerb{\!}
 
 \begin{abstract}
-  We describe \mgtk a language binding that makes the graphical
-  toolkit \gtk, written in C, accessible from programs written in the
-  programming language Standard~ML (\sml).  This is not a trivial task
-  because \gtk is based on an object-oriented widget hierarchy and
-  \sml is a functional language with a non--object-oriented type
-  system.  In this paper we describe how it is possible to encode a
-  single-inheritance class-hierarchy using \sml's type system and we
-  describe how we machine-generate most of the binding to best utilize
-  the limited man-power of the project.
+  We describe \mgtk, a Standard ML language binding for the \gtk
+  toolkit.  \gtk is a graphical toolkit for the X Window System, and
+  provides an object-oriented C language API.  Since Standard~ML is a
+  mostly-functional language without object types, constructing a
+  binding to \gtk is not a trivial task.  This paper describes
+  how it is possible to encode a single-inheritance class-hierarchy
+  using \sml's type system. And we describe how we machine-generate
+  most of the binding to best utilize the limited man-power of the
+  project.
 \end{abstract}
 
 
@@ -87,18 +87,19 @@ Scheme, which are \emph{dynamically typed}, \sml is \emph{statically
   typed} (like Java and C++) which means that type errors are detected
 at \emph{compile time} rather than at \emph{run time}.  Despite \sml
 being statically typed, it is not necessary for the programmer to
-explicitly provide type annotations in the program, because \sml
-features \emph{type inference} which means that the compiler
-reconstructs type annotations as needed.
+explicitly provide type annotations in the program. \sml features
+\emph{type inference} which means that the compiler reconstructs type
+annotations as needed.
 
 \sml is one of the few languages with a formal definition
 \cite{Milner:1997:Definition}.  The definition defines \sml in 93
-pages of mathematical notation and English prose.  The book is not
-meant as tutorial for the language, its existence is rather to provide
-an implementation-independent formulation of \sml.  This formal
+pages of mathematical notation (a "big step" structured operational
+semantics, plus type inference rules) and English prose.  The book is
+not meant as tutorial for the language. Rather, it provides an
+implementation-independent formulation of \sml.  This formal
 definition means that it is possible to write substantial applications
-in \sml which are not dependent on a specific compiler, also there
-are several mature \sml implementations with widely different
+in \sml that are not dependent on a specific compiler.  There are also
+several mature \sml implementations with widely different
 implementation strategies ranging from byte-code interpreters with
 interactive \emph{read--eval--print--loops} (REPLs) to aggressively
 optimizing whole-program compilers targeting native code.
@@ -186,8 +187,78 @@ Figure~\ref{fig:stack-lib} show a small stack library implemented in
 SML.  This examples shows most of the important features of SML.  The
 library consists of two parts: an interface description, which is
 called a \emph{signature} in SML (Figure~\ref{fig:stack-sig}), and an
-implementation, which is called a \emph{structure} in SML
-(Figure~\ref{fig:stack-struct}).
+module implementation, which is called a \emph{structure} in SML
+(Figure~\ref{fig:stack-struct}).  Informally speaking, a
+signature is the type of a structure. It specifies the
+declarations of the structure that is to be visible from the outside.
+
+
+The signature is named !STACK!, its extent is delimited by
+\texttt{sig} \ldots\ \texttt{end}, and it contains five
+specifications: one type specification, one exception sprcification,
+and three value specifications.  The type specification 
+!type 'a stack! states that a module that satisfy (implements) the signature
+!STACK! must declare a parameterized type named !stack! and that this
+type is parameterized.  The !'a! is a \emph{type variable} and this is
+what makes the type parameterized.  Type variables can be instansiated
+to other types.  Thus, the type of a stack of intergers is 
+!int stack!, the type of a stack of integer stacks is !int stack stack!,
+and so on. Type variables are the core of \emph{parametric
+  polymorphism} (which is also knows as generics in, for example, C++
+and Java.  See \cite{garcia03:generics} for a comparison of
+programming languages with support for parametric polymorphism).  The
+type specification does not say anything about how a stack must be
+implemented.  The exception specification just states that an
+exception named !EmptyStack! must be declared.  The first value
+specification said that a constant named !empty! must be declared and
+that this constant must have type !'a stack!.  That is, !empty! is a
+\emph{polymophic} value, it can be used in contexts where an
+\texttt{int stack} is needed or in contexts where a !string stack! is
+needed.  The next value specification states that a function named
+!push! must be implemented, and that this function takes two
+arguments: an element and a stack, and returns a stack.  Again, we see
+how type variables a used to specify that !push! must work with stacks
+where the elements can have any type.  The last value specification
+states that a function named !pop! must be implemented, and that !pop!
+takes a stack as argument and returs an element and a new stack.
+
+Figure~\ref{fig:stack-struct} show code of the implemtation, that is a
+structure declaration.  The declarations states
+that the structure is named !Stack!, that !Stack! satisfy the
+signature !STACK!, and that !Stack! does not reveal any implementation
+details not revealed by !STACK! (that is what the !:>! means).  The
+extend of a structure is delimited by \texttt{struct} \ldots\ 
+\texttt{end}.  The parameterized type !stack! is implemented by an
+algebraic data type, that is, the !datatype! declaration.  This
+declaration says that an !'a stack! is either: the constant !Empty! or
+constructed by applying the constructor !Stack! to an element and a
+stack (constants declared by a !datatype! declaration, such as !Empty!
+is sometimes called unit constructors or just constructors).  The
+exception declaration !exception EmptyStack! just declares an
+exception.  The next declaration just state that !empty! is bound to
+!Empty!.  The function !push! just applies the constructor !Stack! to
+its argumets.  The function !pop! is more interesting, it takes a
+stack as argument (here we have reused the name !stack! as types and
+values uses different namespaces, thus the same name can be used for
+both a type and a value) and the uses a !case! expression to analyse
+its argument.  If the argument is the empty stack (the constant
+!Empty!) then the exception !EmptyStack! is raised (thrown);
+otherwise, if the argument has been constructed with !Stack! applied
+to the arguments !top! and !rest! then a pair consisting of !top! and
+!rest! is returned.  Now, users of this library can call functions
+from the structure !Stack! by using ``dot-notation'', fx !Stack.pop mystack!.
+
+
+
+This small example illustrate one of the cornerstones in functional
+programming, namely that new values are constructed by analyzing,
+composing, and sharing old values, in contrast to imperative and
+object-oriented programming where values are copied and modified
+(although, a new trend in object-oriented programming is to simulate a
+functional style, see for example \cite[Item 13 and
+14]{bloch01:effective-java}.
+
+
 
 
 
@@ -198,30 +269,21 @@ implementation, which is called a \emph{structure} in SML
 %it is outside the scope of this paper to introduce all these features,
 %instead 
 
-\begin{ednote}{Ken}
-  Skulle vi have et lille fac og fib eksempel?
-  (drop for extended abstract)
-\end{ednote}
-
-\begin{ednote}{Ken}
-  Introduce modules.  Just signatures and (nested) structures.
-  (måske drop for extended abstract)
-\end{ednote}
 
 
 
 
-\section{Running Example}
+\section{``Hello World'' in \mgtk}
 \label{sec:example}
 
-Figure~\ref{fig:hello-world} shows a deliberately simple Hello World
+Figure~\ref{fig:hello-world} shows a deliberately simple ``Hello World''
 example using \mgtk. It illustrates (1) how to get the toolkit
 initialized using \texttt{GtkBasis.init} (from a module containing
 basic \gtk functionality not related to specific widgets), (2) how to
 construct new widgets (using module \texttt{Window} for the Window
 widget, and \texttt{Button} for the Button widget), and (3) how to
 connect signals to widgets (using module \texttt{Signal}).
-\begin{figure*}[htbp]
+\begin{figure*}[htp]
 \begin{centering}
 \begin{verbatim}
 structure HelloWorld = struct
@@ -246,16 +308,8 @@ val _ = HelloWorld.main()
 \end{centering}
 \end{figure*}
 
-In the figure we use the following \sml constructs (see a textbook on
-\sml for further examples; \cite{Hansen-Rischel:1999,Paulson:1996} for
-example). All definitions are collected into the module (or
-\emph{structure}) \texttt{HelloWorld} whose extent is delimited by
-\texttt{struct} \ldots\ \texttt{end}. Informally speaking, a
-\emph{signature} is the type of a structure. It specifies the
-declarations of the structure that is to be visible from the outside.
-The construct \texttt{fun} \textit{foo} \textit{x} \texttt{=}
-\textit{exp} declares a function \textit{foo} that has one formal
-parameter \textit{x} and function body \textit{exp}; \texttt{fn}
+In the figure we use the following \sml constructs not explained
+earlier: \texttt{fn}
 \textit{x} \texttt{=>} \textit{exp} denotes a similar \emph{anonymous}
 function. If one does not care about the parameter, one can use the
 \emph{wildcard} \texttt{\_}. The construct \texttt{let}~\texttt{val}
@@ -266,17 +320,15 @@ one can again use the wildcard \texttt{\_}. Expressions evaluated for
 their side effects only can also be sequentialized using \texttt{;}.
 The value \texttt{()}, ``unit'', can be used as is and is also used as
 the return value of purely side-effecting functions.  Finally,
-\textit{Foo}\texttt{.}\textit{bar} denotes the value bound to the
-identifier \textit{bar} in module \textit{Foo}, and \texttt{::}
-denotes the cons operation on lists as in
+\texttt{::} denotes the cons operation on lists as in
 \textit{hd}\texttt{::}\textit{tl}.
 
-Example base types are {\tUnit} for the unit value \texttt{()},
-{\tInt} for integer values, and {\tBool} for boolean values. The type
-of a list of integers is \tList{\tInt}. The type of a function
-expecting an integer list argument and returning an integer result is
-\tArrow{(\tList\tInt)}{\tInt}; the \textit{length} function on lists
-would have such a type, for example. 
+%% Example base types are {\tUnit} for the unit value \texttt{()},
+%% {\tInt} for integer values, and {\tBool} for boolean values. The type
+%% of a list of integers is \tList{\tInt}. The type of a function
+%% expecting an integer list argument and returning an integer result is
+%% \tArrow{(\tList\tInt)}{\tInt}; the \textit{length} function on lists
+%% would have such a type, for example. 
 
 %% Some functions never need to
 %% ``inspect'' (sub)parts of supplied arguments values; such functions
@@ -300,30 +352,30 @@ would have such a type, for example.
 %% \tArrow\tInt\tInt. The function is said to be (parametric) polymorphic
 %% because we can apply it to arguments of many shapes.
 
-Some functions never need to
-``inspect'' (sub)parts of supplied arguments values; such functions
-are called \emph{parametric polymorphic}. For example, the 
-function \textit{length} that computes the length of a list is polymorphic. We
-indicate the parts of the values that are not inspected by using type
-variables $\alpha, \beta, \ldots$ at the corresponding locations in
-the type. Then the type of \textit{length} is
- $\tArrow{\tList\alpha}{\tInt}$
-because, regardless of the type of elements in the list (here denoted
-by $\alpha$), the function can compute the length of the list. Such type
-variables are \emph{instantiated} to (more) specific types when we
-apply the polymorphic function. For \textit{length}, when we
-apply it to a list of booleans we instantiate $\alpha$
-to {\tBool} giving this occurrence of the function the type
-\tArrow{\tList\tBool}\tInt; when we apply it to a list of
-integers  we similarly instantiate
-$\alpha$ to {\tInt}.
+%% Some functions never need to
+%% ``inspect'' (sub)parts of supplied arguments values; such functions
+%% are called \emph{parametric polymorphic}. For example, the 
+%% function \textit{length} that computes the length of a list is polymorphic. We
+%% indicate the parts of the values that are not inspected by using type
+%% variables $\alpha, \beta, \ldots$ at the corresponding locations in
+%% the type. Then the type of \textit{length} is
+%%  $\tArrow{\tList\alpha}{\tInt}$
+%% because, regardless of the type of elements in the list (here denoted
+%% by $\alpha$), the function can compute the length of the list. Such type
+%% variables are \emph{instantiated} to (more) specific types when we
+%% apply the polymorphic function. For \textit{length}, when we
+%% apply it to a list of booleans we instantiate $\alpha$
+%% to {\tBool} giving this occurrence of the function the type
+%% \tArrow{\tList\tBool}\tInt; when we apply it to a list of
+%% integers  we similarly instantiate
+%% $\alpha$ to {\tInt}.
 
-\section{Encoding of classes}
+\section{Encoding of Classes}
 \label{sec:encoding-classes}
 
 As described in Section~\ref{sec:intr-backgr}, \sml in is a functional
 language without object-oriented features and \gtk is designed as an
-object-oriented library.  Thus, it is not trivially clear how to make an \sml
+object-oriented library.  Thus, it is not easy to see how to make an \sml
 interface to \gtk.  The most difficult problem is how to present the
 subtype relations defined by a class hierarchy in \sml's type system.
 That is, in this section we are only interested in how to present a
@@ -336,18 +388,19 @@ type error (at compile-time).
 Fortunately, we are able to take advantage of two properties of \gtk
 and \sml.  First, \gtk implements a class system with only
 single-inheritance.  Second, \sml's type system is expressive enough
-to express the subtype-relations of single-inheritance class
+to express the subtype relations of single-inheritance class
 hierarchies.
 
-In type theoretical jargon, the trick is to use \emph{parametric
-  polymorphism} and \emph{existential types} to encode inheritance
+In type theoretical jargon, the trick is to use parametric
+polymorphism and \emph{existential types} to encode inheritance
 subtyping.  In particular we use \emph{phantom types} to encode the
 inheritance path.
 
 
-\begin{figure}
+\begin{figure}[htp]
   \centering
- \includegraphics[width=.8\linewidth]{example-class-diagram.eps}
+% \includegraphics[width=.8\linewidth]{example-class-diagram.eps}
+  \includegraphics[width=.8\linewidth]{filedecr-class-diagram.eps}
   \caption{Small example class hierarchy}
   \label{fig:class-hierarchy}
 \end{figure}
@@ -365,9 +418,10 @@ shall go through the different parts of the encoding of a class.
 \begin{SMLcode}
 type 'path super
 \end{SMLcode}
-(we follow the \sml convention and spell type-names in lower-case with
-underscores if needed).  The type variable !'path! will be used to
-hold the inheritance path for subclasses.
+(we follow a the convention suggested by the \smlbasis and spell
+type-names in lower-case with underscores if needed).  The type
+variable !'path! will be used to hold the inheritance path for
+subclasses.
 
 \item[Subtyping/Inheritance] For a subclass like \classname{SubClassA}
   we need to declare two new \sml types: an abstract parameterized
@@ -612,7 +666,7 @@ of a signal on buttons.
 %%   MLton og Moscow ML (SML.NET med Gtk\#?)
 %% \end{ednote}
 
-\section{The \mgtk binding}
+\section{The \mgtk Binding}
 \label{sec:mgtk-binding}
 
 The \mgtk binding is available at SourceForge \texttt{http://mgtk.sf.net/}
@@ -646,7 +700,7 @@ binding apart from other \gtk bindings for \sml (notably, the
 \cite{SML-Gtk-webpage:2003}).
 
 
-\section{Related work}
+\section{Related Work}
 \label{sec:related-work}
 
 The list of language bindings for \gtk shows a plethora of different
