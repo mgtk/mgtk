@@ -86,7 +86,7 @@ mgtk.c mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/exclude
 mgdk.c mgdk.sml: $(MAIN) api/pygtk/gdk.defs api/pygtk/gdk-types.defs lib/excludes.txt lib/preamble.sml lib/preamble.c
 	./$(MAIN) -co mgdk.c -so mgdk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gdk.defs
 
-mgtk-mlton.c mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
+mgtk-mlton.c mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt lib/preamble-mlton.sml lib/preamble-mlton.c
 	./$(MAIN) $(DEFSOPTSMLTON) $(DEFSOPTS)
 
 mosml: $(MAIN) mgtk.c mgtk.sml

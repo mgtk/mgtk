@@ -38,7 +38,8 @@ structure GtkBasis :>
     fun init args = 
 	let val args =
 	        case args of
-		    [] => (print "mGTK Warning: Gtk.init called with empty list\n";
+		    [] => (print "mGTK Warning: Gtk.init called\
+                                  \ with empty list\n";
 			   [CommandLine.name()])
 		  | _  => args
             val argv = Array.fromList(List.map CString.fromString args)
@@ -146,7 +147,8 @@ structure Signal :>
 	local
 	    val intern = ref 0;
 	in
-	    val localId = fn f => f (!intern before intern := !intern + 1)
+	    val localId
+		= fn f => f (!intern before intern := !intern + 1)
 	end
 
 	val dispatch : callback_id * GValue * GValues * int -> unit =
@@ -156,9 +158,10 @@ structure Signal :>
               (* FIXME: we need a handle here, but what 
                         should it do 
                *)
-	      | NONE   => (print ("mgtk: Unknown callback function (id: "^
-				     Int.toString id^")\n")
-                          ; TextIO.flushOut TextIO.stdOut)
+	      | NONE   => 
+		  ( print ("mgtk: Unknown callback function (id: "^
+			         Int.toString id^")\n")
+                  ; TextIO.flushOut TextIO.stdOut)
 
 	val _ = _export "mgtk_callback_dispatch_smlside" 
                         : callback_id * GValue * GValues * int -> unit;
@@ -169,10 +172,9 @@ structure Signal :>
 		
 
 	fun register f = localId(fn id => (add (id, f); id))
-	val signal_connect = _import "mgtk_signal_connect"
-                           : GO.cptr * CString.cstring * int * bool -> int;
-
-
+	val signal_connect 
+	    = _import "mgtk_signal_connect"
+              : GO.cptr * CString.cstring * int * bool -> int;
 
         fun curry f x y = f(x,y)
 
@@ -216,8 +218,8 @@ structure Signal :>
     fun wrap conv f (ret, arg, max) = ignore(conv(state f ret arg max)) 
 
     fun getter get (f, S(ret, arg, max, next)) = 
-        if next < max  (* FIXME: it should be < but that gives problems with
-                                  return_unit.  Currently unsafe! *)
+        if next < max  (* FIXME: it should be < but that gives problems
+                          with return_unit.  Currently unsafe! *)
         then (f (get arg next), S(ret, arg, max, next+1))
         else raise Subscript
 
@@ -244,7 +246,8 @@ structure Signal :>
     
     (* FIXME: convince Ken that this correct *)
     fun void (f, state) = (f(), state)
-    fun return_void (f, S(ret, arg, max, next)) = (f, S(ret, arg,max+1,next))
+    fun return_void (f, S(ret, arg, max, next)) = 
+	(f, S(ret, arg,max+1,next))
 
     fun unit x        = getter (fn _ => fn _ => ()) x
     fun return_unit x =  x
@@ -262,7 +265,7 @@ structure Signal :>
     fun connect wid (Sig(sign, after, wrap)) =
         let val id    = register wrap
             val csign = CString.fromString sign
-        in  GO.withPtr(wid, fn wid => signal_connect (wid, csign, id, after))
+        in  GO.withPtr(wid, fn wid=>signal_connect(wid,csign,id,after))
         end
 
     end	
@@ -317,7 +320,8 @@ structure Flags :>
 	in  loop 0w1 []
 	end
 
-    fun areTheseSet flags flag = ((W(set flags)) andb (W flag)) <> 0w0
+    fun areTheseSet flags flag = 
+	((W(set flags)) andb (W flag)) <> 0w0
 end
 
 structure GType :>
@@ -341,7 +345,8 @@ structure GType :>
     val string = string ()
 
     val toInt = fn t => t
-    val toString : t -> CString.t = _import "mgtk_g_type_name" : int -> CString.t;
+    val toString : t -> CString.t 
+        = _import "mgtk_g_type_name" : int -> CString.t;
     val toString = CString.toString o toString
 
 end
