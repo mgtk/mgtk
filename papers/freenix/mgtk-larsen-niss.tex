@@ -54,11 +54,12 @@
   most of the binding to best utilize the limited man-power of the
   project.  
 
-  \begin{ednote}{Bart}
-    You will also want to add a few sentences, describing the
-  rest of the paper contents, and describing impacts and contributions
-  of the work.
-  \end{ednote}
+%% FIXME
+%%   \begin{ednote}{Bart}
+%%     You will also want to add a few sentences, describing the
+%%   rest of the paper contents, and describing impacts and contributions
+%%   of the work.
+%%   \end{ednote}
 
 \end{abstract}
 
@@ -70,30 +71,27 @@
 This section gives a brief introduction to \sml and \gtk, and presents
 an overview of the rest of the paper.
 
-\textit{[Note to PC: We decided to remove some motivation and background
-  in favor of an introduction to \sml; in the final version we expect
-  to start out with motivation and background.]}
+Making a good Standard~ML (\sml) binding to \gtk is an advantage for
+both the \sml community and for the \gtk community.  For the \sml
+community the two main advantages are: First, \sml programmers get
+access to a good general-purpose graphical user interface (GUI)
+library with a large range of modern widgets, and the \sml community
+is sorely missing such a library.  Second, on a long term basis, when
+we have wrapped the whole GNOME platform, it is possible for \sml
+programmers to make real applications without having to invent add-hoc
+solutions to many standard problems, like as database access, for
+instance.  To the \gtk community the two main advantages of an \sml
+binding are: First, that such a binding can help open up the small,
+but important, marked of teaching languages.  Second, as \sml is a
+radically different language than C, an \sml binding will test the
+``interfaceability'' of \gtk which is an important design goal for the
+\gtk developers.
 
-\begin{ednote}{Ken}
-  We need to motivate and explain why it is interesting with a GUI lib
-  for SML.  That should be easy:  Because there currently isn't (a
-  standard industrial strenght) one.  On a long term basis,
-  when we have wrapped the whole GNOME platform, it is possible to SML
-  to make real applications without inventing the weel to many times.
-
-  Second we need to explain why an SML binding is interestinf from a 
-  GTK point-of-view: Opens up the small, but important, marked of
-  teaching languages; tests the interfacability of GTK, as SML is
-  radically different than C (and most other mainstream languages). 
-\end{ednote}
 
 \subsection{Standard ML}
 
-\begin{ednote}{Ken}
-  Take one.  It is crap but is it here
-\end{ednote}
 
-Standard ML (\sml) is a functional language with imperative features
+\sml is a functional language with imperative features
 widely used for teaching and in research.  It is roughly on the same
 level of abstraction as Python or Scheme. In contrast to Python and
 Scheme, which are \emph{dynamically typed}, \sml is \emph{statically
@@ -123,25 +121,71 @@ optimizing whole-program compilers targeting native code.
 \subsection{\gtk}
 \label{sec:gtk}
 
+
 \gtk (The GIMP Toolkit) \cite{Gtk-webpage:2004} is an LGPL-licensed
-\cite{LGPL:1999} graphical toolkit for the X Window System. It
-provides facilities for programmers to create graphical user
-interfaces.  \gtk is implemented in C with an object-oriented
-hierarchy of user interface elements (``widgets''), but from the
-beginning the \gtk developers have paid attention to making it
-feasible and practical to develop ``bindings'' or ``wrappers'' for
+\cite{LGPL:1999} library for creating graphical
+user interfaces.  It works on many UNIX-like platforms, Windows, and
+on Linux framebuffer devices.  \gtk is the graphical toolkit used in
+the \gnome platform. \gtk is implemented in C with an object-oriented
+hierarchy of user interface elements (``widgets''), but from the beginning
+the \gtk developers have paid attention to making it feasible and
+practical to develop ``bindings'' or ``wrappers'' for
 other programming languages than C.  Such bindings allows \gtk to be
 used in programs written in those languages. See
 \cite{Gtk-bindings-webpage:2004} for a current list of bindings.
 
-\begin{ednote}{Bart}
-     "It is the graphical toolkit used in the GNOME platform."  Add more
-   sentences to this to make a paragraph with a brief history of
-   GIMP/GNOME/Gtk/Gtk+.
-\end{ednote}
+\gtk itself only contains GUI widgets, the main libraries it is on top
+of are \cite{gtk-reference-manual}: 
+\begin{description}
+\item[Glib] A general-purpose utility library, not specific to
+  graphical user interfaces. GLib provides many useful data types,
+  macros, type conversions, string utilities, file utilities, and so
+  on.
 
-%\subsection{Overview of this paper}
-%\label{sec:overview-this-paper}
+\item[Pango] A library for internationalized text handling. It
+  provides the rendering engine for the widgets in \gtk that displays
+  text.
+
+\item[ATK] The Accessibility Toolkit. It provides a set of generic
+  interfaces allowing accessibility technologies to interact with a
+  graphical user interface.  \gtk widgets have built-in support for
+  accessibility using the ATK framework.
+
+\item[GDK] The abstraction layer that allows GTK+ to support multiple
+  windowing systems.
+\end{description}
+However, in this article we are consentrating on the GUI widgets.
+
+
+
+%% FIXME
+%% \begin{ednote}{Bart}
+%%      "It is the graphical toolkit used in the GNOME platform."  Add more
+%%    sentences to this to make a paragraph with a brief history of
+%%    GIMP/GNOME/Gtk/Gtk+.
+%% \end{ednote}
+
+%% \begin{ednote}{Bart}
+%%      "...than C."  Should section 4 material move here to
+%%    describe the gtk.defs file?
+%% \end{ednote}
+
+
+
+\subsection{Overview of this paper}
+\label{sec:overview-this-paper}
+
+The rest of this paper is organised as follows.
+Section~\ref{sec:brief-intr-sml} gives a brief introduction to \sml.
+Section~\ref{sec:example} shows a ``Hello World'' example using
+\mgtk.  Section~\ref{sec:encoding-classes} explains how a
+single-inheritance class-hierarchy, in particular \gtk's, can be
+encoded in \sml's type system, while retaining type safety.
+Section~\ref{sec:process} describes the woking process we have used to make
+the \mgtk library.  Section~\ref{sec:mgtk-binding} describes practical
+matters of \mgtk, such as which \sml compilers are supported.
+Finally, Section~\ref{sec:related-work} lists related work and
+Section~\ref{sec:conclusion} concludes.
 
 
 
@@ -149,15 +193,22 @@ used in programs written in those languages. See
 \label{sec:brief-intr-sml}
 
 This section gives a breif overview of some of the main features of
-\sml{}.  It is not enough to use the language in anger, but it should
-be sufficient to get an understanding of the examples in the rest of
-the paper.  We refer the interested reader to one of the fine textbooks
-\cite{Hansen-Rischel:1999,Paulson:1996} for more information about \sml{}.
+\sml{}.  It is not enough to use the language to make real programs,
+but it should be sufficient to get an understanding of the examples in
+the rest of the paper.  We refer the interested reader to one of the
+fine textbooks \cite{Hansen-Rischel:1999,Paulson:1996} for more
+information about \sml{}.
 
-\begin{ednote}{HN}
-I don't like the sentence ``\ldots use the language in anger'' (what
-does this ``anger''-thing mean?).
-\end{ednote}
+%% \begin{ednote}{HN}
+%% I don't like the sentence ``\ldots use the language in anger'' (what
+%% does this ``anger''-thing mean?).
+%% \end{ednote}
+
+%% \begin{ednote}{Ken}
+%%   It mean something like ``use it for real work''.  See fx 
+%%   http://homepages.inf.ed.ac.uk/wadler/papers/sigplan-angry/sigplan-angry.ps
+%%   for a good explaination.
+%% \end{ednote}
 
 \sml{} is a two-level language, it consists of a \emph{core language}
 for programming in the small (that is, functions, data structures and
@@ -312,12 +363,13 @@ functional style, see for example \cite[Item 13 and
 \label{sec:example}
 
 Figure~\ref{fig:hello-world} shows a deliberately simple ``Hello World''
-example using \mgtk. It illustrates (1) how to get the toolkit
+example using \mgtk. It illustrates (1)~how to get the toolkit
 initialized using \texttt{GtkBasis.init} (from a module containing
-basic \gtk functionality not related to specific widgets), (2) how to
+basic \gtk functionality not related to specific widgets), (2)~how to
 construct new widgets (using module \texttt{Window} for the Window
-widget, and \texttt{Button} for the Button widget), and (3) how to
+widget, and \texttt{Button} for the Button widget), and (3)~how to
 connect signals to widgets (using module \texttt{Signal}).
+
 \begin{figure*}[htp]
 \begin{centering}
 \begin{verbatim}
@@ -343,39 +395,40 @@ val _ = HelloWorld.main()
 \end{centering}
 \end{figure*}
 
-In the figure we use the following \sml constructs not explained
-earlier: \texttt{fn}
-\textit{x} \texttt{=>} \textit{exp} denotes a similar \emph{anonymous}
-function. If one does not care about the parameter, one can use the
-\emph{wildcard} \texttt{\_}. The construct \texttt{let}~\texttt{val}
+Even from this small example we see some of the main advantages of
+\sml combined with \gtk.  First of all, there are no type-annotations
+in the program source, still the program is statically type-checked by
+the compiler and type errors are found and reported at compile-time
+rather than at runtime.  Second, in the figure we use a \sml construct
+not explained earlier: the expression !fn _ => false!  denotes an
+\emph{anonymous function} that returns !false! regardless of what
+argument is given (you can use the \emph{wildcard pattern} !_!
+(underscore) if you do not care about the arguments to a function).
+Anonymous functions are often really handy for small semi-trivial
+callback, such as this one.  The construct \texttt{let}~\texttt{val}
 \textit{x} \texttt{=} \textit{exp} declares the identifier \textit{x}
-to be bound to the value obtained by evaluating \textit{exp}. If the
-only reason for evaluating \textit{exp} is any potential side effect,
-one can again use the wildcard \texttt{\_}. Expressions evaluated for
-their side effects only can also be sequentialized using \texttt{;}.
-The value \texttt{()}, ``unit'', can be used as is and is also used as
-the return value of purely side-effecting functions.  Finally,
-\texttt{::} denotes the cons operation on lists as in
-\textit{hd}\texttt{::}\textit{tl}.
+to be bound to the value obtained by evaluating the expression
+\textit{exp}.  If the only reason for evaluating \textit{exp} is any
+potential side effect, one can again use the wildcard pattern.
+Expressions evaluated for their side effects only can also be
+sequentialized using \texttt{;}.  The value \texttt{()}, the nullary
+tuple of type \texttt{unit}, can be used as the return value of purely
+side-effecting functions.  Finally, in \sml double-colon, \texttt{::},
+denotes the cons operation on lists.  That is, to add an element $x$
+to the begining of a list $\mathit{xs}$ we write $x \texttt{::}
+\mathit{xs}$. (in contrast to C++ where double-colon is the module operator).
 
-
-\begin{ednote}{Bart}
-     Give the anonymous lambda a name, so that you don't have to explain
-   => and so it's obvious what it does.  The non-SML reader can probably
-   most easily (and fairly harmlessly) think of the unit value as the
-   nullary tuple.  Note that :: is the module operator in C++ and
-   friends; you might want to mention that things are different here.
-
-   Explicitly say at some point that "The type of an object in
-   a programming language is defined by the set of values it
-   can contain."  This makes the par on base types clearer in
-   my opinion.
-
-   Give examples of building up derived types from base types:
-   in particular, you need to talk about type definitions
-   explicitly sometime before section 3.
-
-\end{ednote}
+%% FIXME
+%% \begin{ednote}{Bart}
+%%    Explicitly say at some point that "The type of an object in
+%%    a programming language is defined by the set of values it
+%%    can contain."  This makes the par on base types clearer in
+%%    my opinion.
+%%
+%%    Give examples of building up derived types from base types:
+%%    in particular, you need to talk about type definitions
+%%    explicitly sometime before section 3.
+%% \end{ednote}
 
 
 %% Example base types are {\tUnit} for the unit value \texttt{()},
@@ -440,25 +493,26 @@ makes a type-error when using the \gtk library, calling a undefined
 method on object, for instance, then the \sml compiler should give an
 type error (at compile-time).
 
-
-\begin{ednote}{Bart}
-  Explain in a few sentences why OO class hierarchies can be
-  thought of as having a subtype relationship.  Believe it or
-  not, this won't be obvious to everyone.
-\end{ednote}
+Throughout we shall think of class-hierarchies mainly as definitions
+of subtype relationship.  This ``confusion'' of classes and types is
+intentional, as this is right level of abstraction for the paper.
 
 Fortunately, we are able to take advantage of two properties of \gtk
 and \sml.  First, \gtk implements a class system with only
 single-inheritance.  Second, \sml's type system is expressive enough
 to express the subtype relations of single-inheritance class
-hierarchies.  
-
-
-
-In type theoretical jargon, the trick is to use parametric
-polymorphism and \emph{existential types} to encode inheritance
-subtyping.  In particular we use \emph{phantom types} to encode the
-inheritance path.
+hierarchies.  Thus, we present a general method of taking a given
+object oriented class hierarchy and encoding and encoding it in \sml
+type system.  The properties of the resulting encoding are that: each
+class type has a corresponding \sml type; the encoding is
+\emph{complete}, meaning that all that is allowed by the class
+hierarchy is also allowed by the encoding; and the encoding is
+\emph{sound}, meaning that all that is disallowed by the class
+hierarch is also disallowed by the encoding.  The last property is
+also called type-safety.  In type-theoretical jargon, the trick is to
+use parametric polymorphism and \emph{existential types} to encode
+inheritance subtyping.  In particular we use \emph{phantom types} to
+encode the inheritance path.
 
 
 \begin{figure}[htp]
@@ -473,25 +527,27 @@ inheritance path.
 Figure~\ref{fig:class-hierarchy} shows a small class hierarchy with
 just four classes. \classname{Label} and \classname{Container} are
 subclasses of the class \classname{Widget} and \classname{Window} is a
-subclass of \classname{Container}.  We shall go through the different
-parts of the encoding of a class.  For the specific class hierarchy i
-Figure~\ref{fig:class-hierarchy}, the properties we want from our
-type encoding into \sml's type system to enforce is that we should be
+subclass of \classname{Container}.  For the specific class hierarchy
+in Figure~\ref{fig:class-hierarchy}, the properties we want to enforce
+with our type encoding into \sml's type system are: that we should be
 allowed to call the !show! method on all kinds of arguments whether
 they are of class type \classname{Widget}, \classname{Label},
-\classname{Container}, or \classname{Window}; we should be allowed to
-call the !add! method on \classname{Container}s and
+\classname{Container}, or \classname{Window}; that we should be
+allowed to call the !add! method on \classname{Container}s and
 \classname{Window}s, but not \classname{Widget}s and
-\classname{Label}s; we should only be allowed to call !set_title! on
-\classname{Window}s; and so on. 
+\classname{Label}s; that we should only be allowed to call !set_title!
+on \classname{Window}s; and so on.
 
+We now go through the different parts of the encoding of a class.
+Throughout this description we only present the \sml specifications.
+That is, the parts that go into the signatures.
 
 \begin{description}
 \item[Class types] A base class like \classname{Widget} in
   Figure~\ref{fig:class-hierarchy} is encoded as an abstract
   parameterized type:
 \begin{SMLcode}
-type 'path super
+type 'path widget
 \end{SMLcode}
 (we follow the convention suggested by the \smlbasis and spell
 type-names in lower-case with underscores if needed).  The type
@@ -499,49 +555,43 @@ variable !'path! will be used to hold the inheritance path for
 subclasses.
 
 
-\item[Subtyping/Inheritance] 
-
-  \begin{ednote}{Bart}
-      Subtyping/Inheritance: The first sentence has grammar
-  issues.  Break it into multiple simpler sentences.
-
-  \end{ednote}
-
-  For a subclass like \classname{Label}
-  we need to declare two new \sml types: an abstract parameterized
-  type, which we shall call a \emph{witness type}; and a type
-  abbreviation specifying the inheritance:
+\item[Subtyping/Inheritance] For a subclass like \classname{Label} we
+  need to encode two things: that the class (type) exists and the
+  subtype relation to the parent class.  To do this, we declare two
+  new \sml types: an abstract parameterized type; and a type
+  abbreviation specifying for specifying the inheritance:
 \begin{SMLcode}
 type 'path label_t
 type 'path label = 
         'path label_t widget
 \end{SMLcode}
-where !label_t! is the witness type and !label! is the
-type specifying the inheritance.  In the declaration of !label!
-we see that the type variable !'path! in the declaration of the type
-!widget! has been instantiated with the type expression 
-!'path label_t!, which contains an new type variable (also named
-!'path!).
+We call the abstract type (here !label_t!) the \emph{witness type}
+because it witness that the class exists.  Similar, the type !label!
+is the type abbrivation that specifies that \classname{Label} inherits
+from \classname{Widget}.  In the declaration of !label!  we see that
+the type variable !'path! in the declaration of the type !widget!  has
+been instantiated with the type expression !'path label_t!, which
+contains an new type variable (also named !'path!).
 
 In the rest of the paper we shall use the convention that witness
 types ends with !_t!.
 
-\begin{ednote}{Bart}
-    Give some intuition, and preferably lots, about why *witness
-  types* are necessary and are introduced.  All the magic is
-  introduced right here: this section and the previous on
-  class types should be expanded by about 0.5-1 page to
-  explain clearly and thoroughly what's going on with the type
-  system at this spot.  
-  
-  Note in particular that typing the running example into ML will
-  result in an error, since type specifications are available only in
-  signatures.  This is a bit confusing to even a knowledgeable reader
-  (e.g. me :-).
-\end{ednote}
+This is the juicy bits of the encoding, because this is really what
+makes it possible to encode single-inheritance class hierarchies in
+\sml.  Unfortunately, this is also the hardest part of the encoding to
+understand.  Our experience is that you have to work a bit with some
+code to realy comprehend the trick.
+
+
+%% \begin{ednote}{Bart}
+%%   Note in particular that typing the running example into ML will
+%%   result in an error, since type specifications are available only in
+%%   signatures.  This is a bit confusing to even a knowledgeable reader
+%%   (e.g. me :-).
+%% \end{ednote}
 
 \item[Methods] Because \sml is not an object-oriented language we shall
-  model methods with ordinary functions, and use the usual convention
+  model methods with ordinary functions and use the usual convention
   that the first argument is the object on which the method is called.
   (\gtk also uses this convention).
   
@@ -562,13 +612,6 @@ val set_title : 'path window -> string
 That is, !foo! takes two arguments: an object of type 
 \classname{Window} and a string, and returns !unit!.
 
-\begin{ednote}{Bart}
-  
-Why curry the methods rather than accepting argument tuples?
-I can think of at least one good reason (detachable
-methods): OTOH, the C is not curryable...
-
-\end{ednote}
 
 \item[Constructors] We have to be a bit careful with constructors.  If
   we were to return a value with a polymorphic type-variable !'path!
@@ -579,16 +622,10 @@ methods): OTOH, the C is not curryable...
   type variable.  Thus, the type of the constructor for
   \classname{Label} is:
 \begin{SMLcode}
+type base
 val new : unit -> base label
 \end{SMLcode}
 The convention in \gtk is that constructors are named !new!.
-
-\begin{ednote}{Bart}
-  Explicitly show the introduction of "base",
-via
-   type base
-\end{ednote}
-
 
 \item[Fields] We are not able to handle fields directly, because we
   keep the representation of objects completely opaque.  Thus, all
@@ -613,98 +650,80 @@ sig
                                  -> unit
 end
 \end{SMLcode}
-We see that this signature relies on two other structures:  The
-structure !Super! for the class \classname{Widget} and !GtkBasis! for
-the dummy type !base!.  In addition to the signature !Window! we also
-need a structure called !Window! that implements the actual calling of
-the relevant \gtk C functions.
+We see that this signature relies on two structures: The structure
+!Super! for the class \classname{Widget} and !GtkBasis! for the dummy
+type !base!.  In addition to the signature !Window! we also need a
+structure called !Window! that implements the actual calling of the
+relevant \gtk C functions.
 
-\begin{ednote}{Bart}
-  
-signatures vs structures --- make this clear.  I had to work
-a bunch of SML example---attached---on my own to figure out
-what's happening here.  Did I get the attached code right?
-
-\end{ednote}
-
-Continuing our running example from Section~\ref{sec:example}, the
-widgets \texttt{window} and \texttt{button} (in the real \gtk
-hierarchy) get the following types:
+Now, does this encoding really allows all the things that the class
+hierarchy allows?  Yes, for example, the function
+\texttt{Container.add} has type:
 \begin{SMLcode}
-val window : 
-     base window_t container_t widget_t t
-val button : 
-     base button_t container_t widget_t t
+val add : 'path1 container -> 'path2 widget 
+                                    -> unit
 \end{SMLcode}
-(where !t! is represents the top of the hierarchy e.g. !Widget!, and all
-structure prefixes have been omitted).  The types tell us, reading from
-left to right, that \texttt{window} is a Window widget that extends
-the Container widget, which in turn extends the Widget widget;
-similarly for \texttt{button}. They also tell us that \texttt{window}
-and \texttt{button} have a common ancestor, namely the Container
-widget.  In particular, therefore, we can use both the window and the
-button in all contexts expecting a Container.
-
-\begin{ednote}{Bart}
-  window and button types: they would normally be declared as
-  val window : base window
-  val button : base button
-correct?  If so, try to show the type equivalence between
-this and what is currently there.  Also, you may want to put
-the structure names in, no?
-\end{ednote}
-
-
-For example, the function \texttt{Container.add} has type
-\begin{SMLcode}
-val add : 'path1 container_t widget_t t
-             -> 'path2 widget_t t -> unit
-\end{SMLcode}
-from which we conclude that \texttt{Container.add} expects two arguments:
-one which has to be a sub-widget of Container, and one which has to be
-a sub-widget of Widget; the function returns the unit value. Considering
-the types of \texttt{window} and \texttt{button} above, we see that
+From this type we can see that, if !lab! is a value of type 
+%
+!base label! 
+% 
+and !win! is a value of type !base window! then
 the application
 %
-``!Container.add window button!''
+!Container.add window label!
 %
-is well-typed because \texttt{window} is indeed a sub-widget of 
-Container, and \texttt{button} is indeed a sub-widget of Widget.
+is well-typed because: (1)~the type of !lab! is just a abrivation for 
+%
+!base window_t container!,
+%
+thus, the type variable !'path1! can be instantiated to 
+%
+!base window_t!,
+% 
+and (2)~the type of !win! is just an abbreviation of 
+%
+!base label_t widget!,
+%
+thus, the type variable !'path2! can be instantiated to 
+%
+!base label_t!.
 
-Consider now another function that only works on Buttons, \texttt{Button.set\_label}, with type
+Consider now the function !set_title! that only works on \classname{Window}s:
 \begin{SMLcode}
-val set_label :
-    'path button_t container_t widget_t t
-                        -> string -> unit
+val set_title : 'path window -> string 
+                               -> unit
 \end{SMLcode}
-Thus \texttt{Button.set\_label} expects a sub-widget of Button and a string and returns unit.
-If we were to apply this function to the \texttt{window} widget as in
+If we, by mistake, attemt to use this function to set the text of the
+label \texttt{lab} (with type !base label!) as in expression
 %
-``!Button.set_label window!'',
+!Window.set_title lab "New text"!, 
 %
-we would get a (compile-time) type error saying (essentially) that
-a Window widget is not a subclass of a Button widget because the
-inheritance paths do not match. Here is the concrete message output
-by the Moscow ML compiler
+we get a (compile-time) type error saying (essentially) that a
+\classname{Label} widget is not a subclass of a \classname{Window}
+widget because the inheritance paths do not match.  Here is the
+concrete error message given by the Moscow ML compiler:
 \begin{verbatim}
-- Button.set_label window "New label";
+- Window.set_title lab "New text";
 ! Toplevel input:
-! Button.set_label window "New label";
-!                  ^^^^^^
+! Window.set_title lab "New text";
+!                  ^^^
 ! Type clash: expression of type
-!   base window_t container_t widget_t t
+!   base label_t widget
 ! cannot have type
-!   'a button_t container_t widget_t t
+!   'a window_t container_t widget
 \end{verbatim}
 
-\begin{ednote}{Ken}
-  Explain the cool signal thing.
-  (drop for extended abstract)
-\end{ednote}
+Hence, we have demonstrated that our encoding (in these concrete
+examples) is both sound and complete.
 
-\begin{ednote}{Ken}
-  How about the implementation of the binding with finalizers and all?
-\end{ednote}
+%% \begin{ednote}{Ken}
+%%   Explain the cool signal thing.
+%%   (drop for extended abstract)
+%% \end{ednote}
+
+%% \begin{ednote}{Ken}
+%%   How about the implementation of the binding with finalizers and all?
+%% \end{ednote}
 
 
 \section{Process}
