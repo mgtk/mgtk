@@ -8,7 +8,7 @@ MOSMLHOME=/usr/lib/mosml
 MOSMLRUNTIME=$(MOSMLHOME)/include
 MOSMLBIN=/usr/bin
 
-all: helloworld-new helloworld-flat mgtk.so
+all: helloworld-new helloworld-flat mgtk.so mosml-interf
 
 MiniGtk.uo MiniGtk.ui: MiniGtk.sml
 	$(MOSMLBIN)/mosmlc -c -toplevel MiniGtk.sml
@@ -22,8 +22,11 @@ Gtk.uo: Gtk.ui Gtk.sml
 helloworld-flat: Gtk.uo helloworld-flat.sml
 	$(MOSMLBIN)/mosmlc -o helloworld-flat helloworld-flat.sml
 
-helloworld-new: Gtk.uo helloworld-new.sml MiniGtk.ui MiniGtk.uo
+helloworld-new: helloworld-new.sml MiniGtk.ui MiniGtk.uo
 	$(MOSMLBIN)/mosmlc -o helloworld-new MiniGtk.ui helloworld-new.sml
+
+mosml-interf: mosml-interf.sml MiniGtk.ui MiniGtk.uo
+	$(MOSMLBIN)/mosmlc -o mosml-interf MiniGtk.ui mosml-interf.sml
 
 
 mgtk.so: mgtk.o

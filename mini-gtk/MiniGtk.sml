@@ -382,3 +382,124 @@ struct
         = fn dummy => makeWin(new_ 0) (* FIXME: HACK ALERT!!!!!*)
 
 end
+
+signature Editable =
+sig
+    type 'a editable_t
+    type 'a t = 'a editable_t Widget.t
+
+    val inherit : 'a -> GtkBasis.constructor -> 'a t
+end
+
+structure Editable :> Editable =
+struct
+    type 'a editable_t = unit
+    type 'a t = 'a editable_t Widget.t
+
+    open Dynlib
+    type cptr = GtkBasis.cptr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
+
+    fun inherit w con = Widget.inherit () con
+end
+
+signature Entry =
+sig
+
+    type 'a entry_t
+    type 'a t = 'a entry_t Editable.t
+    type base
+
+    val new: unit -> base t
+    val get_text : 'a t -> string
+    val activate_sig : (unit -> unit) -> 'a t Signal.signal
+end
+
+
+structure Entry :> Entry =
+struct
+    type 'a entry_t = unit
+    type 'a t = 'a entry_t Editable.t
+    type base = unit
+
+    open Dynlib
+    type cptr = GtkBasis.cptr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
+
+    fun inherit w con = Editable.inherit () con
+    fun makeEnt ptr = Editable.inherit () (fn() => ptr)
+
+    val new_: unit -> cptr
+        = app1(symb"mgtk_gtk_entry_new")
+    val new: unit -> base t
+        = fn dummy => makeEnt(new_ ()) 
+
+    val get_text_: cptr -> string
+        = app1(symb"mgtk_gtk_entry_get_text")
+    val get_text: 'a t -> string
+        = fn entry => get_text_ (repr entry)
+
+    local open Signal infix --> in
+    fun activate_sig f = 
+        signal "activate" false (void --> return_void) f
+    end
+end
+
+signature Box =
+sig
+    type 'a box_t
+    type 'a t = 'a box_t Container.t
+
+    val inherit : 'a -> GtkBasis.constructor -> 'a t
+    val pack_start: 'a t -> 'b Widget.t -> unit
+end
+
+structure Box :> Box =
+struct
+    type 'a box_t = unit
+    type 'a t = 'a box_t Container.t
+
+    open Dynlib
+    type cptr = GtkBasis.cptr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
+
+    fun inherit w con = Container.inherit () con
+    val pack_start_: cptr -> cptr -> unit
+        = app2(symb"mgtk_gtk_box_pack_start")
+    val pack_start: 'a t -> 'b Widget.t -> unit
+        = fn box => fn widget => pack_start_ (repr box) (repr widget)
+end
+
+signature VBox =
+sig
+
+    type 'a vbox_t
+    type 'a t = 'a vbox_t Box.t
+    type base
+
+    val new: unit -> base t
+end
+
+
+structure VBox :> VBox =
+struct
+    type 'a vbox_t = unit
+    type 'a t = 'a vbox_t Box.t
+    type base = unit
+
+    open Dynlib
+    type cptr = GtkBasis.cptr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
+
+    fun inherit w con = Box.inherit () con
+    fun make ptr = Box.inherit () (fn() => ptr)
+
+    val new_: bool -> int -> cptr
+        = app2(symb"mgtk_gtk_vbox_new")
+    val new: unit -> base t
+        = fn dummy => make(new_ false 10) 
+end

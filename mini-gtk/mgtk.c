@@ -335,3 +335,26 @@ EXTERNML value mgtk_gtk_button_new_with_label(value label) { /* ML */
 EXTERNML value mgtk_gtk_window_new(value typ) { /* ML */
   return Val_GtkObj(gtk_window_new(Int_val(typ)));
 }
+
+
+/* ML type: int -> cptr */
+EXTERNML value mgtk_gtk_entry_new(value unit) { /* ML */
+  return Val_GtkObj(gtk_entry_new());
+}
+
+/* ML type: gtkobj -> string */
+EXTERNML value mgtk_gtk_entry_get_text(value entry) { /* ML */
+  return copy_string(gtk_entry_get_text(GtkObj_val(entry)));
+}
+
+
+/* ML type: gtkobj -> gtkobj -> unit */
+EXTERNML value mgtk_gtk_box_pack_start(value box, value child) { /* ML */
+  gtk_box_pack_start_defaults(GtkObj_val(box), GtkObj_val(child));
+  return Val_unit;
+}
+
+/* ML type: bool -> int -> gtkobj */
+EXTERNML value mgtk_gtk_vbox_new(value homogeneous, value spacing) { /* ML */
+  return Val_GtkObj(gtk_vbox_new(Bool_val(homogeneous), Int_val(spacing)));
+}
