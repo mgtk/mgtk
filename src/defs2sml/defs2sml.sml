@@ -7,6 +7,8 @@ fun main () =
 	(* file ops *)
 	fun ext f e = OS.Path.joinBaseExt {base=f,ext=SOME e}
 	fun getExt f = #ext(OS.Path.splitBaseExt f)
+	fun isFile f = OS.FileSys.fileSize f > 0 
+		       handle SysErr _ => false
 	fun unlink f = OS.FileSys.remove f 
 	               handle SysErr(m,_) => TextIO.output(TextIO.stdErr, "Couldn't unlink " ^ f ^ "("^m^")\n")
 	fun copyFile os file =
@@ -28,10 +30,12 @@ fun main () =
 	fun getFile () = case !file of NONE=>raise Fail "no file" | SOME f=>f
 
 	val smlOutFile = ref NONE
-	fun setSMLOutFile f = ( unlink f ; smlOutFile := SOME f )
+	fun setSMLOutFile f = ( if isFile f then unlink f else ()
+		              ; smlOutFile := SOME f )
 
 	val cOutFile = ref NONE
-	fun setCOutFile f = ( unlink f ; cOutFile := SOME f )
+	fun setCOutFile f = ( if isFile f then unlink f else ()
+                            ; cOutFile := SOME f )
 
 	fun setOutFileBase f = 
 	    case getExt f of
@@ -80,7 +84,8 @@ fun main () =
 					"__gtk_binding_reset_parsed",
 					"_gtk_scale_format_value",
 
-					"gtk_accel_group_find"
+					 "gtk_accel_group_find"
+                                       , "PrivateFlags"
 				       ])
 	fun member set elem = Splayset.member(set,elem)
 	val api = AST.filteri (not o member exclude o #1) api

@@ -5,7 +5,7 @@ structure GenC :> sig
         type topdecl
 	type typeexp = Name.name Type.ty
         type 'a module  = (Name.name, 'a, typeexp AST.api_info) AST.module
-        type 'a module' = (Name.name, 'a, (topdecl*typeexp) option) AST.module
+        type 'a module' = (Name.name, 'a, (topdecl*typeexp option) list) AST.module
         val generate: TypeInfo.typeinfo -> 'a module -> 'a module'
         val print: TypeInfo.typeinfo -> TextIO.outstream -> 'a module' -> unit
     end =
@@ -15,7 +15,7 @@ struct
 
     type typeexp = Name.name Type.ty
     type 'a module  = (Name.name, 'a, typeexp AST.api_info) AST.module
-    type 'a module' = (Name.name, 'a, (topdecl*typeexp) option) AST.module
+    type 'a module' = (Name.name, 'a, (topdecl*typeexp option) list) AST.module
 
 
     fun print tinfo os module =
@@ -23,6 +23,13 @@ struct
 	    fun dump s = TextIO.output(os, s)
 	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
 
+	    fun print1 indent (decl, SOME ty) =
+              ( dump ("/* ML type: "^
+		           (SMLType.show (TypeInfo.toPrimType tinfo ty)
+			    handle TypeInfo.Unbound _ => "") ^" */\n")
+              ; dump (toString (spaces indent) decl)
+              )
+	      | print1 indent (decl, NONE) = dump(toString(spaces indent) decl)
 	    fun print_module indent module =
 		case module of
 		    AST.Module{name,members,info} =>
@@ -32,11 +39,7 @@ struct
 	    and print_member indent member =
 		case member of 
 		    AST.Sub(module) => print_module indent module
-		  | AST.Member{name,info=SOME(decl,ty)} => 
-		    ( dump ("/* ML type: "^SMLType.show (TypeInfo.toPrimType tinfo ty) ^" */\n")
-                    ; dump (toString (spaces indent) decl)
-                    )
-		  | AST.Member{name,info=NONE} => ()
+		  | AST.Member{name,info} => List.app (print1 indent) info
 	in  print_module 0 module
 	end
 
@@ -53,18 +56,20 @@ struct
 		    val args = if List.length parsty > 5
 			       then [("mgtk_params", Type.Tname(Name.fromPaths([],[],["int"])))]
 			       else parsty
+		    fun ubnd n =
+			raise Skip("Unbound type name: "^Name.toString n)
 		    fun f (par,Type.Void) = NONE
 		      | f (par,ty) = SOME(TypeInfo.toCValue typeinfo ty (Var par))
-				     handle Fail m => raise Skip m
+				     handle TypeInfo.Unbound n => ubnd n
 		    val parsty' = List.mapPartial f parsty
 		    val ret = Type.getRetType ty
 
-		    fun f ((par,ty),i) = VDecl(par,TValue,SOME(Call("Field", NONE, [Var "mgtk_params", Int(Int.toString i)])))
+		    fun f ((par,ty),i) = VDecl(par,TValue,SOME(Call("Field", NONE, [Var "mgtk_params", Int i])))
 		    val extract = if List.length parsty > 5 
 				  then List.map f (ListPair.zip(parsty,List.tabulate(List.length parsty, fn i=>i)))
 				  else []
 		    val call = TypeInfo.fromCValue typeinfo ret (Call(Name.asCFunc name, NONE, parsty'))
-			       handle Fail m => raise Skip m
+			       handle TypeInfo.Unbound n => ubnd n
 		    val body = 
 			Block(NONE,extract, 
 			  Comment "ML" ::
@@ -72,28 +77,71 @@ struct
 			   else [Return(call)])
                         )
 		    fun f (par,ty) = (par,TValue)
-		in  SOME(Fun(Proto(SOME"EXTERNML",Name.asCStub name, map f args, TValue), 
-			     body),
-			 ty)
+		in  [(Fun(Proto(SOME"EXTERNML",Name.asCStub name, map f args, TValue), 
+			  body),
+		      SOME ty)]
 		end
 	  | AST.Enum enums =>
-	        let val construct = List.foldl (fn (e,(c,i)) => (Ass(Call("Field", NONE, [Var "res", Int(Int.toString i)]),TInt,Call("Val_int",NONE,[Var e]))::c,i+1)) ([],0) enums
+	        let val construct = List.foldl (fn (e,(c,i)) => (Ass(Call("Field", NONE, [Var "res", Int i]),TInt,Call("Val_int",NONE,[Var e]))::c,i+1)) ([],0) enums
 		    val body = 
-			Block(NONE,[VDecl("res",TValue,SOME(Call("alloc_tuple",NONE,[Int(Int.toString(List.length enums))])))],
+			Block(NONE,[VDecl("res",TValue,SOME(Call("alloc_tuple",NONE,[Int(List.length enums)])))],
 			  Comment "ML" ::
 			  rev(#1 construct) @
 			  [Return(Var "res")]
                         )
-		in  SOME(Fun(Proto(SOME"EXTERNML",Name.asCStub name, [("dummy",TValue)], TValue),
-			     body),
-			 Type.Void)
+		in  [(Fun(Proto(SOME"EXTERNML",Name.asCStub name, [("dummy",TValue)], TValue),
+			  body),
+		      SOME Type.Void)]
 		end
-	  | _ => NONE
+	  | AST.Boxed(SOME{copy,release}) =>
+	        let val name = Name.asCBoxed name
+		in  [(Define(name^"_val(x)", "(((void*) Field(x, 1)))"),NONE),
+		     (Fun(Proto(SOME"static","ml_finalize_"^name,[("val",TValue)],TVoid),
+			  Block(NONE,[],[Exp(Call(release,NONE,[Call(name^"_val",NONE,[Var"val"])]))])),
+		      NONE),
+                     (Fun(Proto(NONE,"Val_"^name,[("obj",TStar TVoid)],TValue),
+			  Block(NONE,[VDecl("res",TValue,NONE)],
+			     Ass(Var"res", TValue, Call("alloc_final",NONE,[Int 2,Var("ml_finalize_"^name),Int 0, Int 1]))::
+			     Ass(Call(name^"_val",NONE,[Var"res"]),TValue,
+				 Call(copy,NONE,[Var"obj"]))::
+			     [Return(Var"res")]
+                          )),
+		      NONE)]
+		end
+	  | AST.Boxed NONE =>
+	        let val name = Name.asCBoxed name
+		in  [(Define(name^"_val(x)", "(((void*) Field(x, 1)))"),NONE),
+		     (Fun(Proto(SOME"static","ml_finalize_"^name,[("val",TValue)],TVoid),
+			 Block(NONE,[],[Comment"Empty"])),
+		      NONE),
+                     (Fun(Proto(NONE,"Val_"^name,[("obj",TStar TVoid)],TValue),
+			  Block(NONE,[VDecl("res",TValue,NONE)],
+			     Ass(Var"res", TValue, Call("alloc_final",NONE,[Int 2,Var("ml_finalize_"^name),Int 0, Int 1]))::
+			     Ass(Call(name^"_val",NONE,[Var"res"]),TValue,Var"obj")::
+			     [Return(Var"res")]
+                          )),
+		      NONE)]
+		end
+
+(*
+static void ml_finalize_gdk_font (value val) {
+  gdk_font_unref (gdk_font_val(val)); 
+}
+
+value Val_gdk_font (void* obj) {
+  value res;
+  gdk_font_ref(obj);
+  res = alloc_final (2, ml_finalize_gdk_font, 0, 1);
+  gdk_font_val(res) = obj;
+  return res;
+}
+*)
+	  | _ => []
 
     val trans = fn tinfo => fn (name, member) => trans tinfo (name, member)
 		   handle Skip msg => ( TextIO.output(TextIO.stdErr,
 		       "Error translating " ^ Name.toString name ^ ": " ^msg^"\n")
-                     ; NONE)
+                     ; [])
     fun generate typeinfo module = 
 	AST.mapi (fn (module,info) => info, trans typeinfo) module
 

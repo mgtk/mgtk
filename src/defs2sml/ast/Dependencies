@@ -1,6 +1,6 @@
 name: + /util/util
 ast: name + /util/
-fromdefs: name /defs/defs ast + /util/util
+fromdefs: name /defs/defs ast + /util/util /util/msgutil
 resolvenames: ast name + /util/
 type: + /util/util
 resolvetypes: ast name type /util/ resolvenames

@@ -9,19 +9,20 @@ struct
     datatype ctype =
              TInt
 	   | TValue
+	   | TVoid
+	   | TStar of ctype
 (*
 	   | TFloat
 	   | TChar
 	   | TWord
-	   | TStar of ctype
 	   | TStruct of string
 	   | TFunc of ctype list * ctype
 *)
 
     datatype expr =
 	     Var of var
-	   | Int of string
-	   | Float of string
+	   | Int of int
+	   | Float of real
 (*
 	   | Null 
 	   | Op of operator * expr * expr
@@ -60,34 +61,39 @@ struct
 	     Proto of specifiers option * var * (var * ctype) list * ctype
     datatype topdecl = 
 	     Fun of prototype * stmt
+	   | Define of string * string
 
     fun toString indent topdecl =
 	let fun showTy ty =
 		case ty of 
 		    TInt => "int"
 		  | TValue => "value"
+		  | TVoid => "void"
+		  | TStar ty => showTy ty ^ "*"
 	    fun showExp exp =
 		case exp of
 		    Var x => x
-		  | Int i => i
-		  | Float f => f
+		  | Int i => Int.toString i
+		  | Float f => Real.toString f
 		  | VerbExp e => e
 		  | Call(f,cast,args) => 
 		       f ^ Util.stringSep "(" ")" ", " showExp args
 	    fun showDecl (VDecl(x,ty,e)) =
-		indent^showTy ty ^" "^ x ^" = "^
-		(case e of NONE => "" | SOME e => showExp e)^";\n"
+		indent^showTy ty ^" "^ x ^
+		(case e of NONE => "" | SOME e => " = " ^ showExp e)^";\n"
 	    fun showStmt stmt =
 		case stmt of
 		    Empty => ""
 		  | Exp e => indent^showExp e ^ ";\n"
-		  | Ass(l,_,r) => indent^showExp l ^ " = " ^ showExp r ^ ";\n"
+		  | Ass(l,ty,r) => 
+		       indent^showExp l ^ " = " ^ showExp r ^ ";\n"
 		  | Block(label,decls, Comment c :: stmts) =>
 		       ("{ /* "^c^" */\n") 
 		       ^ Util.stringSep "" "" "" showDecl decls
 		       ^ Util.stringSep "" "}\n" "" showStmt stmts
 		  | Block(label,decls, stmts) =>
-		       Util.stringSep "{\n" "}\n" "" showStmt stmts
+		       Util.stringSep "{\n" "" "" showDecl decls
+		       ^ Util.stringSep "" "}\n" "" showStmt stmts
 		  | Return e => indent^"return " ^ showExp e ^ ";\n"
 		  | Comment c => indent^"/* " ^ c ^ " */\n"
 		  | Verbatim s => s
@@ -97,6 +103,7 @@ struct
 		       (case spec of NONE => "" | SOME s => s^" ") ^ 
                        showTy ret ^ " " ^ f ^ Util.stringSep "(" ")" ", " (fn (p,t) => showTy t ^ " " ^ p) pars ^ " "
                     ^  showStmt stmt ^ "\n"
+		  | Define(s1,s2) => "#define " ^s1^ " " ^s2^"\n\n"
 	in  showTop topdecl end
 
 end

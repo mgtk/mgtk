@@ -18,7 +18,8 @@ structure FromDefs :> FromDefs = struct
       | Member of {name: string, info: member_info}
     type map = (string, member list) Map.dict
 
-    val empty = Map.mkDict String.compare
+    fun pairmap f (x,y) = (f x, f y)
+    val empty = Map.mkDict (String.compare o pairmap Name.toLower) (* FIXME *)
     fun new map name r = Map.insert(map, name, r)
     fun insert map name mem = 
 	case Map.peek (map, name) of
@@ -41,23 +42,23 @@ structure FromDefs :> FromDefs = struct
 		       (getConstructor def)
 		       handle AttribNotFound _ => 
 			  (* okay, so this isn't a constructor; special-case
-                             some functions
-                                XXX_get_type
-                                XXX_new_YYY
-			     that need to go in the XXX module as well.
+                             functions beginning with xxx_yyy_zzz_... when
+			     XxxYyyZzz is a known module
                           *)
-			  let val n = Substring.all name
-			      val (gt_md,gt) = Substring.position "_get_type" n
-			      val (nw_md,nw) = Substring.position "_new_" n
-			      fun asM ss =
-				  Name.asModule(Name.fromPaths([],[], 
-                                    Name.separateUnderscores(
-				      Substring.string ss)))
-			  in  if not(Substring.isEmpty gt) then (* XXX_get_type *)
-				  asM gt_md
-			      else if not(Substring.isEmpty nw) then (* XXX_new_YYY *)
-				  asM nw_md
-			      else top
+			  let val words = Name.separateUnderscores name
+			      fun loop [] acc = top
+				| loop (ith::rest) acc = 
+				  let val ith = Name.capitalize ith
+				      val probable = String.concat(rev(ith::acc))
+				  in  if Map.peek(map,probable) = NONE then
+					  loop rest (ith::acc)
+				      else probable
+				  end
+			      val module = loop (tl words) [Name.capitalize(hd words)]
+			  in  if module = top then
+				  ( MsgUtil.warning("Demoting "^name^" to top-level module " ^top)
+				  ; top)
+			      else module
 			  end
 		       val mem = Member{name=name,
 					info=A.Method(functype NONE def)}
@@ -78,12 +79,10 @@ structure FromDefs :> FromDefs = struct
 		   in  insert map md mem end
 	      | Boxed => 
 		   let val md = getModule def
-		       val copy = SOME(getCopyFunc def)
-			          handle AttribNotFound _ => NONE
-		       val rel =  SOME(getReleaseFunc def)
-			          handle AttribNotFound _ => NONE
-		       val mem = Member{name=name,
-					info=A.Boxed{copy=copy,release=rel}}
+		       val copyrel =
+			   SOME({copy=getCopyFunc def,release=getReleaseFunc def})
+			   handle AttribNotFound _ => NONE
+		       val mem = Member{name=name,info=A.Boxed copyrel}
 		   in  insert map md mem end
 	end
     and functype self def =

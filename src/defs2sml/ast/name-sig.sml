@@ -13,6 +13,7 @@ signature NAME = sig
     val compare: name * name -> order
 
     val toString: name -> string
+    val toString': name -> string
     val fromString: string -> name
     val fromPaths: string list * string list * string list -> name
 

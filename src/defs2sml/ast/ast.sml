@@ -99,7 +99,7 @@ struct
     datatype 't api_info =
 	Method of 't
       | Field of 't
-      | Boxed of {copy:string option, release:string option}
+      | Boxed of {copy:string, release:string} option
       | Enum of string list
       | Signal of 't
     and api_type =

@@ -191,11 +191,15 @@ struct
 					then App (Var"repr",[Var par])
 					else Var par
 		    val pars' = List.map wrap parsty
+		    fun ubnd n =
+			raise Skip("Unbound type name: " ^ Name.toString n)
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
-		    fun fromtype ty = fromtype' ty
-				      handle Fail m => raise Skip m
-		    fun primtypeFromType ty = TypeInfo.toPrimType tinfo ty
-					      handle Fail m => raise Skip m
+		    fun fromtype ty = 
+			fromtype' ty
+			handle TypeInfo.Unbound n => ubnd n
+		    fun primtypeFromType ty = 
+			TypeInfo.toPrimType tinfo ty
+			handle TypeInfo.Unbound n => ubnd n
 		in  StrOnly(
                        ValDecl(VarPat(name^"_"), Some(primtypeFromType ty), 
 			       ccall cname (List.length pars)))
