@@ -39,7 +39,7 @@
 
 \begin{slide}{\mgtk}
 
-\mgtk is a Standard ML \textit{language binding} for
+\mgtk is a Standard ML \textit{language binding} of
 the graphical toolkit \gtk.
 
 \begin{itemize}
@@ -51,21 +51,31 @@ the graphical toolkit \gtk.
 
 \medskip
 
-Motivation:
+Goals:
 \begin{itemize}
 \item \sml access to a good, general-purpose graphical toolkit;
 
-\item binding not restricted to one \sml system;
+\item direct binding of the underlying C library; 
 
-\item test interfaceability of \gtk;
+\item compiler-neutral binding (currently for Moscow ML and MLton);
 
-\item providing compile-time type checking.
+\item compile-time type safety.
 \end{itemize}
 
 \end{slide}
 
+\begin{slide}{Overview}
 
-\begin{slide}{Type checking}
+\begin{itemize}
+\item motivation (compile-time type safety);
+\item \sml introduction;
+\item encoding single-inheritance class hierarchies;
+\item conclusion.
+\end{itemize}
+
+\end{slide}
+
+\begin{slide}{Example: Type checking}
 
 \begin{itemize}
 \item
@@ -76,10 +86,10 @@ Example incorrect C program fragment:
   gtk_window_set_title(GTK_WINDOW(label), "New text");
 \end{Verbatim}
 \smallskip
-Unfortunately \emph{no} type error (because of the cast).
+Unfortunately \emph{no} type error at compile-time (because of the cast).
 
 \item
-The corresponding \sml program \emph{does} give a type error:
+The corresponding \sml program \emph{does} give a compile-time type error:
 \begin{Verbatim}
   - val lab = Label.new();
   > ...
@@ -96,6 +106,39 @@ The corresponding \sml program \emph{does} give a type error:
 
 \end{slide}
 
+\overlays{2}{%
+\begin{slide}{Why compile-time type errors?}
+
+So
+\begin{itemize}
+\item \gtk gives \emph{runtime} type errors (dynamically typed);
+\item \mgtk gives \emph{compile-time} type errors (statically typed).
+\end{itemize}
+
+\medskip
+
+Why do we prefer to catch errors at compile-time?
+
+\FromSlide{2}
+\medskip
+\emph{Finding bugs early!}
+\begin{itemize}
+\item better and cheaper to detect and fix bugs at compile time;
+\item types can act as documentation;
+\item compiler may utilize types to generate better code;
+\item (but may sometimes reject working programs).
+\end{itemize}
+
+\medskip
+
+Writing type annotations can be boring.
+\begin{itemize}
+\item \emph{type inference} can recover most type annotations;
+\item mix and match explicit and implicit type annotations.
+\end{itemize}
+\end{slide}}
+
+\part{\sml}
 
 \begin{slide}{\sml introduction}
 
@@ -105,23 +148,28 @@ The corresponding \sml program \emph{does} give a type error:
 
 Core language:
 \begin{itemize}
-\item functions as the main abstraction;
-\item computation by constructing new values;
-\item static type system and type inference;
-\item polymorphism and parametrized types.
+\item \emph{functions} as the main abstraction;
+\item computation by constructing \emph{new values};
+\item \emph{static} type system and \emph{type inference};
+\item \emph{polymorphism} and parameterized types.
 \end{itemize}
 
 \medskip
 
 Module language:
 \begin{itemize}
-\item \emph{signatures} (interface description) specifie the contents of
-   modules;
+\item \emph{signatures} (interface descriptions) specify module contents;
 
-\item \emph{structures} (implementation module) give the implementation
-   of modules.
+\item \emph{structures} (implementation modules) give module implementations.
 \end{itemize}
 
+\medskip
+
+Multiple \sml implementations:
+\begin{itemize}
+\item Moscow ML (byte-code interpreter with \emph{read--eval--print--loop});
+\item MLton (aggressive whole-program optimizing native code compiler).
+\end{itemize}
 \end{slide}
 
 \begin{SaveVerbatim}{Hello}
@@ -149,21 +197,24 @@ val _ = main(CommandLine.name()::CommandLine.arguments())
 
 \UseVerbatim{Hello}
 \onlySlide*{2}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,6.5)(11.5,7)}
-\onlySlide*{3}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,5.8)(11.5,6.3)}
+\onlySlide*{3}{%
+\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,5.8)(11.5,6.3)%
+\psframe[fillstyle=none,linestyle=dashed,linecolor=ITUred](-.3,5.77)(11.5,1.3)%
+}
 \onlySlide*{4}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,4.6)(11.5,5.1)}
 \onlySlide*{5}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,3.9)(11.5,4.7)}
 \onlySlide*{6}{%
-\psframe[fillstyle=none,linestyle=dotted,linecolor=ITUred](-.3,3.9)(11.5,4.7)%
+\psframe[fillstyle=none,linestyle=dashed,linecolor=ITUred](-.3,3.9)(11.5,4.7)%
 \psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](7,3.9)(10.5,4.4)%
 }
 \onlySlide*{7}{\psframe[fillstyle=none,linestyle=solid,linecolor=ITUred](-.3,2.7)(11.5,3.2)}
 \end{slide}}
 
-\begin{slide}{Polymorphism and parametrized types}
+\begin{slide}{Polymorphism and parameterized types}
 
 \sml allows \emph{polymorphic} types:
 \begin{itemize}
-\item specify a datastructure ¡list¡ with elements of any type
+\item specify a data structure ¡list¡ with elements of any type
 \begin{Verbatim}
   type 'a list
 \end{Verbatim}
@@ -177,7 +228,7 @@ val _ = main(CommandLine.name()::CommandLine.arguments())
 \begin{Verbatim}
   val length : 'a list -> int
 \end{Verbatim}
-\item (like generics in C++ and Java).
+\item (like generics in C\# and Java, and templates in C++).
 \end{itemize}
 
 \end{slide}
@@ -187,13 +238,13 @@ val _ = main(CommandLine.name()::CommandLine.arguments())
 
 Idea: use type constraints to enforce invariants.
 \begin{itemize}
-\item a \emph{phantom type} is a parametrized type where the type
+\item a \emph{phantom type} is a parameterized type where the type
   parameter only occurs on the left-hand side.
 
-\item a \emph{witness type} ia type that is used to instantiate the
+\item a \emph{witness type} is type that is used to instantiate the
   type parameters of phantom types.
 
-\item phantom types are widely used (socket libraries for SML,
+\item phantom types are widely used (socket libraries for \sml,
   embedded languages, valid XHTML, \ldots).
   
 \item this talk: use phantom types to encode single-inheritance object
@@ -209,7 +260,7 @@ signature FileDsr = sig
      type             access
      val READ   :      access
      val WRITE  :       access
-     val openFd : string ->      access ->      fd
+     val open   : string ->      access ->      fd
      val read   :      fd -> char
      val write  :       fd -> char -> unit
      val close  :             fd -> unit
@@ -224,7 +275,7 @@ signature FileDsr = sig
      type \textbf{'capability} access
      val READ   : \textbf{read} access
      val WRITE  : \textbf{write} access
-     val openFd : string -> \textbf{'cap} access -> \textbf{'cap} fd
+     val open   : string -> \textbf{'cap} access -> \textbf{'cap} fd
      val read   : \textbf{read} fd -> char
      val write  : \textbf{write} fd -> char -> unit
      val close  : \textbf{'capability} fd -> unit
@@ -238,15 +289,17 @@ end
 \end{slide}}
 
 
+\part{Encoding \gtk in \sml}
+
 \begin{slide}{Encoding a single-inheritance class hierarchy (1)}
 
 Structure of the encoding:
 \begin{itemize}
-\item Class represented by an \sml signature/structure.
+\item Class represented by an \sml signature and a structure.
 
 \item Class type represented by an \sml type.
 
-\item Methods represented by functions.
+\item Methods and constructors represented by functions.
 
 \item Objects instances represented by values of the class type.
 \end{itemize}
@@ -259,10 +312,11 @@ Example:
       ...
       type 'path widget
       val show: 'p widget -> unit
+      ...
   end
 
   structure Widget :> Widget = struct
-      ...
+      (* calls to C functions *)
   end
 \end{Verbatim}
 
@@ -297,7 +351,8 @@ Has to encode two facts:
   \begin{itemize}
   \item use a type abbrev.\ and an explicit
      rep.\ of the inheritance path\\
-     \texttt{type 'p label = 'p label\_t widget}
+     \texttt{type 'p label = 'p label\_t widget}\\
+     \texttt{type 'p win = 'p win\_t container\_t widget}
   \end{itemize}
 \end{enumerate}
 
@@ -320,7 +375,6 @@ Encoding \emph{methods}:
   \item include an explicit ¡self¡/¡this¡ parameter
 \begin{Verbatim}
   val add: 'p1 container -> 'p2 widget -> unit
-
   val set_title: 'p window -> string -> unit
 \end{Verbatim}
 
@@ -345,9 +399,10 @@ and ¡base widget¡ for ¡'p2¡.
 
 Encoding \emph{constructors}:
 \begin{itemize}
+\item use the technique for methods;
 \item have to be careful with subclasses:
 \begin{itemize}
-\item for example the \classname{Container} constructor
+\item for example, for the \classname{Container} constructor
 \begin{Verbatim}
   val new_doesnt_work : unit -> 'p container
 \end{Verbatim}
@@ -404,7 +459,9 @@ Wrapping it up:
 
 \medskip
 
-Example: Let
+Example:
+\begin{itemize}
+\item Let
 \begin{Verbatim}
   val lab : base label
   val win : base window
@@ -413,16 +470,22 @@ and consider ¡Container.add¡ with type
 \begin{Verbatim}
   val add : 'p1 container -> 'p2 widget -> unit
 \end{Verbatim}
-Recall: \begin{tabular}[t]{@{}ll@{}}
-1.&¡base window¡ abbreviates ¡base window_t container¡\\
-2.&¡base label¡ abbreviates ¡base label_t widget¡
-\end{tabular}
-so using ¡base window_t¡ for ¡'p1¡ and
+
+\item
+Recall:
+\begin{itemize}
+\item  ¡base window¡ abbreviates ¡base window_t container¡
+\item  ¡base label¡ abbreviates ¡base label_t widget¡
+\end{itemize}
+
+\item 
+So using ¡base window_t¡ for ¡'p1¡ and
 ¡base label_t¡ for ¡'p2¡ allows us to type
 \begin{Verbatim}
   Container.add win lab
 \end{Verbatim}
 as desired.
+\end{itemize}
 
 \medskip
 
@@ -436,13 +499,14 @@ This is known as \emph{completeness} of the encoding.
 
 \medskip
 
-Example: Consider ¡Window.set_title¡ with type
+Example: 
+\begin{itemize}
+\item Consider ¡Window.set_title¡ with type
 \begin{Verbatim}
   set_title : 'p window -> string -> unit
 \end{Verbatim}
 
-\medskip
-
+\item
 Should we accidentally try to apply that to a label
 \begin{Verbatim}
   - Window.set_title lab "New text";
@@ -457,11 +521,68 @@ we get a type error:
   ! cannot have type
   !   'a window_t container_t widget
 \end{Verbatim}
+\end{itemize}
 
 \medskip
 
 This is known as \emph{soundness} of the encoding.
 \end{slide}
+
+\begin{slide}{Autogeneration}
+
+\begin{tabular}{@{}ll@{}}
+\begin{minipage}[t]{.65\textwidth}
+\mgtk is autogenerated:
+\begin{itemize}
+\item the \gtk developers maintain a ``specification'' of the toolkit;
+\item known as the ¡gtk.defs¡ file;
+\item an \mgtk-tool generates code from such specifications;
+\item (other bindings do this as well: Py\gtk and Gtkmm.)
+\end{itemize}
+
+\medskip
+
+Process:
+\begin{itemize}
+\item design and implement a very small binding (``Mini \mgtk'');
+\item code generator mimics this for the complete toolkit.
+\end{itemize}
+
+\end{minipage}
+&
+\begin{minipage}[t]{.4\textwidth}
+\fontsize{6}{6.5pt}\selectfont
+\begin{verbatim}
+(define-object Container
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkContainer")
+  (gtype-id "GTK_TYPE_CONTAINER")
+)
+
+(define-method gtk_container_add
+  (of-object "GtkContainer")
+  (c-name "gtk_container_add")
+  (return-type "none")
+  (parameters
+    '("GtkWidget*" "widget")
+  )
+)
+
+(define-signal delete-event
+  (of-object "GtkWidget")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GdkEventAny*" "p0")
+  )
+)
+\end{verbatim}
+\end{minipage}
+\end{tabular}
+\end{slide}
+
+\part{Conclusion}
 
 \begin{slide}{Contributions}
 
@@ -476,7 +597,7 @@ Using programming language technology for better bindings.
 
 \item Bringing graphical toolkits to \sml.
 
-\item Bringing SML to \gtk.
+\item Bringing \sml to \gtk.
 \end{itemize}
 
 \end{slide}
@@ -489,7 +610,7 @@ selection of \sml systems.
 \begin{itemize}
 \item More \sml compilers: 
    \begin{itemize}
-   \item SML.NET (with \gtksharp);
+   \item SML.NET and Moscow.NET (with \gtksharp);
    \item The ML Kit.
    \end{itemize}
 
@@ -502,10 +623,20 @@ selection of \sml systems.
 
 \item More autogenerated bindings:
    \begin{itemize}
-   \item Generalize the code generator.
+   \item generalize the code generator.
    \end{itemize}
 
 \end{itemize}
+
+\end{slide}
+
+\begin{slide}{Thank you!}
+
+\mgtk can be found at
+\medskip
+\begin{center}
+http://mgtk.sourceforge.net/
+\end{center}
 
 \end{slide}
 

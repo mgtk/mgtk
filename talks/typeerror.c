@@ -2,10 +2,10 @@
 
 int main(int argc, char *argv[]) 
 {
-  GtkWidget* window;
+  GtkLabel* window;
   gtk_init (&argc, &argv);
 
   /* window = gtk_window_new (GTK_WINDOW_TOPLEVEL); */
-  window = gtk_label_new("Text");
-  gtk_window_set_title(GTK_WINDOW(window), "New text");
+  window = GTK_LABEL(gtk_label_new("Text"));
+  gtk_window_set_title(window, "New text");
 }
