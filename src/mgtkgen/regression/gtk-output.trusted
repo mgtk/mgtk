@@ -48,6 +48,11 @@ EXTERNML value mgdk_color_parse(value name) { /* ML */
 
 /* *** Label stuff *** */
 
+/* ML type: gtkobj -> real */
+EXTERNML value mgtk_label_get_value(value wid) { /* ML */
+  return copy_double((GTK_LABEL(GtkObj_val(wid))) -> value);
+}
+
 
 /* ML type: gtkobj -> string */
 EXTERNML value mgtk_label_get(value label) { /* ML */
@@ -100,6 +105,7 @@ EXTERNML value mgtk_calendar_get(value cal) { /* ML */
     type 'a label_t
     type 'a GtkLabel = 'a label_t GtkWidget
 
+    val label_get_value: 'a GtkLabel -> real
 
     val label_get: 'a GtkLabel -> string
 
@@ -140,6 +146,11 @@ end
 
     type 'a label_t = base
     type 'a GtkLabel = 'a label_t GtkWidget
+
+    val label_get_value_: gtkobj -> real
+        = app1(symb"mgtk_label_get_value")
+    val label_get_value: 'a GtkLabel -> real
+        = fn OBJ wid => label_get_value_ wid
 
 
     val label_get_: gtkobj -> string

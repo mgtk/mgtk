@@ -1,3 +1,4 @@
+; Test of boxed things
 (define-boxed GdkFont
   gdk_font_ref
   gdk_font_unref)
@@ -5,11 +6,14 @@
 (define-boxed GdkColor
   gdk_color_copy
   gdk_color_free
-  "sizeof(GdkColor)")
+  "sizeof(GdkColor)"         ; Hopefully we can also handle size clauses
+)
 
-(define-boxed GdkDrawable ()
-  gdk_window_ref
-  gdk_window_unref)
+(define-boxed GdkDrawable ; How about a comment here
+                          ( ) 
+  gdk_window_ref   
+  gdk_window_unref 
+)
 
 (define-boxed GdkWindow (GdkDrawable)
   gdk_window_ref
