@@ -9,19 +9,17 @@ functor GenCMLton(structure TypeInfo : TypeInfo)
 
     type ty = (Name.name,Name.name) Type.ty
     type 'a module  = (Name.name, 'a, (Name.name,ty) AST.api_info) AST.module
-    type 'a module' = (Name.name, 'a, (topdecl*ty option) list) AST.module
+    type 'a module' = (Name.name, 'a, (topdecl*SMLType.ty option) list) AST.module
 
     type typeinfo = TypeInfo.typeinfo
 
-    fun print tinfo os module =
+    fun print os module =
 	let 
 	    fun dump s = TextIO.output(os, s)
 	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
 
 	    fun print1 indent (decl, SOME ty) =
-              ( dump ("/* ML type: "^
-		           (SMLType.toString (TypeInfo.toPrimType tinfo ty)
-			    handle TypeInfo.Unbound _ => "") ^" */\n")
+              ( dump ("/* ML type: "^ (SMLType.toString ty) ^ " */\n")
               ; dump (toString (spaces indent) decl)
               )
 	      | print1 indent (decl, NONE) = dump(toString(spaces indent) decl)
@@ -47,9 +45,11 @@ functor GenCMLton(structure TypeInfo : TypeInfo)
 		    val construct = List.map(fn (v,c) => Ass(Var("*"^v),TStar TInt,Var(Name.asCEnumConst c))) (ListPair.zip(fresh,enums))
 		    val body = 
 			Block(NONE,[], rev construct)
+		    val ty =  
+			SMLType.ArrowTy([SMLType.TupTy(List.map (fn _ => SMLType.RefTy(SMLType.IntTy)) enums)], SMLType.UnitTy)
 		in  [(Fun(Proto(SOME"EXTERNML",Name.asCGetEnum name, List.map (fn v => (v,TStar TInt)) fresh, TVoid),
 			  body),
-		      SOME Type.Void)]
+		      SOME ty)]
 		end
 
 (*

@@ -248,7 +248,7 @@ structure Name :> NAME = struct
     val asCBoxed = asCName "" (fn s=>s)
     val asCFunc = (asCName "_" toLower) o cify
     val asCEnumConst = asCName "_" toUpper
-    fun asCStub name = "mgtk_" ^ asCName "_" toLower name
+    fun asCStub name = "mgtk_" ^ asCName "_" toLower (cify name)
     fun asCGetEnum name = "mgtk_get_" ^ asCName "_" toLower name
 
 end (* structure Name *)

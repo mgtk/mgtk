@@ -102,7 +102,7 @@ end
 
 
 /* *** Adjustment *** */
-/* ML type: real * real * real * real * real * real -> cptr */
+/* ML type: int -> cptr */
 EXTERNML value mgtk_gtk_adjustment_new(value mgtk_params) { /* ML */
     value valu = Field(mgtk_params, 0);
     value lower = Field(mgtk_params, 1);

@@ -102,11 +102,11 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreeView obj = inherit () (fn () => repr obj)
 	val get_model_ : cptr -> cptr
-	    = app1 (symb"mgtk_gtk_treeview_get_model")
+	    = app1 (symb"mgtk_gtk_tree_view_get_model")
 	val get_model : 'a t -> base TreeModel.t
 	    = fn self => TreeModel.inherit () (fn () => get_model_ (repr self))
 	val set_model_ : cptr -> cptr -> unit
-	    = app2 (symb"mgtk_gtk_treeview_set_model")
+	    = app2 (symb"mgtk_gtk_tree_view_set_model")
 	val set_model : 'a t -> 'b TreeModel.t option -> unit
 	    = fn self => fn model =>
 		 set_model_ (repr self)
@@ -134,12 +134,12 @@ end
 
 /* *** TreeView *** */
 /* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_treeview_get_model(value self) { /* ML */
+EXTERNML value mgtk_gtk_tree_view_get_model(value self) { /* ML */
     return Val_GtkObj(gtk_tree_view_get_model(GtkObj_val(self)));
 }
 
 /* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_treeview_set_model(value self, value model) { /* ML */
+EXTERNML value mgtk_gtk_tree_view_set_model(value self, value model) { /* ML */
     gtk_tree_view_set_model(GtkObj_val(self), GtkObj_val(model));
     return Val_unit;
 }

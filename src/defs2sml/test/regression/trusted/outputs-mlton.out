@@ -24,6 +24,7 @@ structure Gtk  = struct
 			 val ret = icon_size_lookup_ (size, width, height)
 		     in (ret, !width, !height) end
     type textiter = GObject.cptr
+    type tree_path = GObject.cptr
     type treeiter = GObject.cptr
     structure Object :>
       sig
@@ -40,6 +41,119 @@ structure Gtk  = struct
 	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure Widget :>
+      sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+	val translate_coordinates
+	  : 'a t -> 'b t -> int -> int -> bool * int * int
+	val path : 'a t -> int * string * string
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = Object.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val translate_coordinates_
+	  : cptr * cptr * int * int * int ref * int ref -> bool
+	    = _import "gtk_widget_translate_coordinates"
+		      : cptr * cptr * int * int * int ref * int ref -> bool;
+	val translate_coordinates
+	  : 'a t -> 'b t -> int -> int -> bool * int * int
+	    = fn self => fn dest_widget => fn src_x => fn src_y =>
+		 let val (dest_x, dest_y) = (ref 0, ref 0)
+		     val ret
+			 = GObject.withPtr
+			     (self, 
+			      fn self => GObject.withPtr
+					   (dest_widget, 
+					    fn dest_widget =>
+					       translate_coordinates_
+						 (self, dest_widget, src_x, 
+						  src_y, dest_x, dest_y)))
+		 in (ret, !dest_x, !dest_y) end
+	val path_
+	  : cptr * int ref * CString.cstring ref * CString.cstring ref -> unit
+	    = _import "gtk_widget_path" : cptr * int ref * CString.cstring ref 
+					* CString.cstring ref
+					  -> unit;
+	val path : 'a t -> int * string * string
+	    = fn self =>
+		 let val (path_length, path, path_reversed)
+			 = (ref 0, ref #" ", ref #" ")
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self => path_ (self, path_length, 
+						    CString.fromString path, 
+						    CString.fromString
+						      path_reversed))
+		 in (!path_length, !path, !path_reversed) end
+    end
+    structure Editable :>
+      sig
+	type base
+	type 'a editable_t
+	type 'a t = 'a editable_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toEditable : 'a t -> base t
+	val insert_text : 'a t -> string -> int -> int option -> int option
+	val insert_text' : 'a t -> string -> int -> int option
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a editable_t = unit
+	type 'a t = 'a editable_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toEditable obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val insert_text_ : cptr * CString.cstring * int * int ref -> unit
+	    = _import "gtk_editable_insert_text"
+		      : cptr * CString.cstring * int * int ref -> unit;
+	val insert_text : 'a t -> string -> int -> int option -> int option
+	    = fn self => fn new_text => fn new_text_length => fn position =>
+		 let val position = ref position
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self =>
+				     insert_text_
+				       (self, CString.fromString new_text, 
+					new_text_length, position))
+		 in !position end
+	val insert_text' : 'a t -> string -> int -> int option
+	    = fn self => fn new_text => fn new_text_length =>
+		 let val position = ref position
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self =>
+				     insert_text_
+				       (self, CString.fromString new_text, 
+					new_text_length, position))
+		 in !position end
+    end
+    structure CellEditable :>
+      sig
+	type base
+	type 'a celleditable_t
+	type 'a t = 'a celleditable_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toCellEditable : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a celleditable_t = unit
+	type 'a t = 'a celleditable_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toCellEditable obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
     structure TextBuffer :>
@@ -79,6 +193,7 @@ structure Gtk  = struct
 	type 'a t = 'a treemodel_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTreeModel : 'a t -> base t
+	val iter_next : 'a t -> treeiter -> bool * treeiter
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -88,6 +203,14 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreeModel obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val iter_next_ : cptr * cptr ref -> bool
+	    = _import "gtk_tree_model_iter_next" : cptr * cptr ref -> bool;
+	val iter_next : 'a t -> treeiter -> bool * treeiter
+	    = fn self => fn iter =>
+		 let val iter = ref iter
+		     val ret = GObject.withPtr
+				 (self, fn self => iter_next_ (self, iter))
+		 in (ret, !iter) end
     end
     structure TreeSelection :>
       sig
@@ -121,11 +244,80 @@ structure Gtk  = struct
 						     (self, model, iter)))
 		 in (ret, TreeModel.inherit () (fn () => !model)) end
     end
+    structure Container :>
+      sig
+	type base
+	type 'a container_t
+	type 'a t = 'a container_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toContainer : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a container_t = unit
+	type 'a t = 'a container_t Widget.t
+	fun inherit w con = Widget.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toContainer obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure TreeViewColumn :>
+      sig
+	type base
+	type 'a treeviewcolumn_t
+	type 'a t = 'a treeviewcolumn_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeViewColumn : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a treeviewcolumn_t = unit
+	type 'a t = 'a treeviewcolumn_t Object.t
+	fun inherit w con = Object.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeViewColumn obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure TreeView :>
+      sig
+	type base
+	type 'a treeview_t
+	type 'a t = 'a treeview_t Container.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeView : 'a t -> base t
+	val get_cursor : 'a t -> tree_path * base TreeViewColumn.t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a treeview_t = unit
+	type 'a t = 'a treeview_t Container.t
+	fun inherit w con = Container.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeView obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_cursor_ : cptr * cptr ref * cptr ref -> unit
+	    = _import "gtk_tree_view_get_cursor"
+		      : cptr * cptr ref * cptr ref -> unit;
+	val get_cursor : 'a t -> tree_path * base TreeViewColumn.t
+	    = fn self =>
+		 let val (path, focus_column)
+			 = (ref GObject.null, ref GObject.null)
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self => GObject.withPtr
+					       (focus_column, 
+						fn focus_column =>
+						   get_cursor_ (self, path, 
+								focus_column)))
+		 in (!path, 
+		     TreeViewColumn.inherit () (fn () => !focus_column))
+		 end
+    end
 end
 
 
 /* *** Gtk *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_ICON_SIZE_DIALOG;
   *x5 = GTK_ICON_SIZE_DND;
@@ -141,6 +333,15 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
 /* *** Object *** */
 
 
+/* *** Widget *** */
+
+
+/* *** Editable *** */
+
+
+/* *** CellEditable *** */
+
+
 /* *** TextBuffer *** */
 
 
@@ -148,3 +349,12 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
 
 
 /* *** TreeSelection *** */
+
+
+/* *** Container *** */
+
+
+/* *** TreeViewColumn *** */
+
+
+/* *** TreeView *** */

@@ -47,7 +47,7 @@ end
 
 
 /* *** Gtk *** */
-/* ML type: unit */
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_anchortype(value dummy) { /* ML */
   value res = alloc_tuple(17);
   Field(res, 0) = Val_int(GTK_ANCHOR_CENTER);
@@ -70,7 +70,7 @@ EXTERNML value mgtk_get_gtk_anchortype(value dummy) { /* ML */
   return res;
 }
 
-/* ML type: unit */
+/* ML type: unit -> int * int * int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_movement_step(value dummy) { /* ML */
   value res = alloc_tuple(9);
   Field(res, 0) = Val_int(GTK_MOVEMENT_LOGICAL_POSITIONS);
@@ -85,7 +85,7 @@ EXTERNML value mgtk_get_gtk_movement_step(value dummy) { /* ML */
   return res;
 }
 
-/* ML type: unit */
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_rc_tokentype(value dummy) { /* ML */
   value res = alloc_tuple(38);
   Field(res, 0) = Val_int(GTK_RC_TOKEN_INVALID);

@@ -26,7 +26,7 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTextBuffer obj = inherit () (fn () => repr obj)
 	val insert_ : cptr -> cptr -> string -> int -> unit
-	    = app4 (symb"mgtk_gtk_textbuffer_insert")
+	    = app4 (symb"mgtk_gtk_text_buffer_insert")
 	val insert : 'a t -> textiter -> string -> int option -> unit
 	    = fn self => fn iter => fn text => fn len =>
 		 insert_ (repr self) iter text (getOpt (len, ~1))
@@ -56,7 +56,7 @@ value Val_GtkTextIter(void* obj) {
 
 /* *** TextBuffer *** */
 /* ML type: cptr -> cptr -> string -> int -> unit */
-EXTERNML value mgtk_gtk_textbuffer_insert(value self, value iter, value text, value len) { /* ML */
+EXTERNML value mgtk_gtk_text_buffer_insert(value self, value iter, value text, value len) { /* ML */
     gtk_text_buffer_insert(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len));
     return Val_unit;
 }

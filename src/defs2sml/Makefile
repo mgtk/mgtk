@@ -75,6 +75,10 @@ regcompile: $(MAIN) $(patsubst %.defs,regcomp-%,$(REGFILES))
 trusted:
 	cp $(REGOUT)/*.out $(REGTRS)
 
+regressionclean:
+	rm -f $(REGOUT)/*.{out,sml,c,uo,ui}
+
+
 # Generate meta data .defs files
 
 GTKAPIXML=api/other/gtk-sharp-1.0/gtk/gtk-api.raw
@@ -125,7 +129,7 @@ mlton: $(RELDIR)/mgtk-mlton.cm $(RELDIR)/mgtk-mlton.o
 
 
 # Clean-up
-realclean:
+realclean: regressionclean
 	rm -f mgtk.c mgtk.sml mgtk.o mgtk
 	rm -f mgtk-mlton.c mgtk-mlton.sml mgtk-mlton.o mgtk-mlton
 	rm -f typetable.txt

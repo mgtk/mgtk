@@ -5,6 +5,60 @@
   (gtype-id "GTK_TYPE_OBJECT")
 )
 
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+)
+
+(define-method translate_coordinates
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_translate_coordinates")
+  (return-type "gboolean")
+  (parameters
+    '("GtkWidget*" "dest_widget")
+    '("gint" "src_x")
+    '("gint" "src_y")
+    '("gint*" "dest_x" (output))
+    '("gint*" "dest_y" (output))
+  )
+)
+
+(define-method path
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_path")
+  (return-type "none")
+  (parameters
+    '("guint*" "path_length" (output))
+    '("gchar**" "path" (output))
+    '("gchar**" "path_reversed" (output))
+  )
+)
+
+(define-interface Editable
+  (in-module "Gtk")
+  (c-name "GtkEditable")
+  (gtype-id "GTK_TYPE_EDITABLE")
+)
+
+(define-interface CellEditable
+  (in-module "Gtk")
+  (c-name "GtkCellEditable")
+  (gtype-id "GTK_TYPE_CELL_EDITABLE")
+)
+
+(define-method insert_text
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_insert_text")
+  (return-type "none")
+  (parameters
+    '("const-gchar*" "new_text")
+    '("gint" "new_text_length")
+    '("gint*" "position" ("default" "0") (inout))
+  )
+)
+
 (define-enum IconSize
   (in-module "Gtk")
   (c-name "GtkIconSize")
@@ -49,6 +103,11 @@
   (release-func "gtk_text_iter_free")
 )
 
+(define-boxed TreePath
+  (in-module "Gtk")
+  (c-name "GtkTreePath")
+)
+
 (define-method get_iter_at_line_offset
   (of-object "GtkTextBuffer")
   (c-name "gtk_text_buffer_get_iter_at_line_offset")
@@ -64,6 +123,15 @@
   (in-module "Gtk")
   (c-name "GtkTreeModel")
   (gtype-id "GTK_TYPE_TREE_MODEL")
+)
+
+(define-method iter_next
+  (of-object "GtkTreeModel")
+  (c-name "gtk_tree_model_iter_next")
+  (return-type "gboolean")
+  (parameters
+    '("GtkTreeIter*" "iter" (inout))
+  )
 )
 
 (define-boxed TreeIter
@@ -88,6 +156,45 @@
   (parameters
     '("GtkTreeModel**" "model" (output))
     '("GtkTreeIter*" "iter")
+  )
+)
+
+(define-object Container
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkContainer")
+  (gtype-id "GTK_TYPE_CONTAINER")
+  (fields
+    '("GtkWidget*" "focus_child")
+    '("guint" "border_width")
+    '("guint" "need_resize")
+    '("guint" "resize_mode")
+    '("guint" "reallocate_redraws")
+    '("guint" "has_focus_chain")    
+  )
+)
+
+(define-object TreeViewColumn
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkTreeViewColumn")
+  (gtype-id "GTK_TYPE_TREE_VIEW_COLUMN")
+)
+
+(define-object TreeView
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkTreeView")
+  (gtype-id "GTK_TYPE_TREE_VIEW")
+)
+
+(define-method get_cursor
+  (of-object "GtkTreeView")
+  (c-name "gtk_tree_view_get_cursor")
+  (return-type "none")
+  (parameters
+    '("GtkTreePath**" "path" (output))
+    '("GtkTreeViewColumn**" "focus_column" (output))
   )
 )
 

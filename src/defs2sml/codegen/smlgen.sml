@@ -3,14 +3,19 @@
 
 signature PRIMITIVES = sig
     structure TypeInfo : TypeInfo
+    type exp = TinySML.exp
+    type 'a ty = (Name.name, 'a) Type.ty
     val mkMethodName : Name.name -> string
-    val ccall : string -> int -> SMLType.ty -> TinySML.exp
+    val ccall : string -> int -> SMLType.ty -> exp
     val getEnumsTy : int -> SMLType.ty
-    val getEnums : string -> Name.name list -> TinySML.exp
+    val getEnums : string -> Name.name list -> exp
 
-    val mkToFunc: Name.name option -> TinySML.exp
-    val callStub : TypeInfo.typeinfo -> string  -> (Name.name, Name.name) Type.ty
-		-> (TinySML.exp * (Name.name, TinySML.exp) Type.ty) list -> TinySML.exp
+    val mkToFunc: Name.name option -> exp
+    val callStub : TypeInfo.typeinfo -> string  -> Name.name ty
+		-> (exp * exp ty) list -> exp
+    val mkOutputStub: TypeInfo.typeinfo -> ('a ty -> exp -> exp)
+		      -> (string * 'a ty) list -> 'a ty -> exp 
+		      -> (exp * (string * 'a ty) list * 'a ty list)
     val strHeader : TinySML.dec list
 end (* signature PRIMTIVES *)
 
@@ -18,6 +23,8 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 = struct
     structure TypeInfo = TypeInfo
     open TinySML SMLType
+    type exp = TinySML.exp
+    type 'a ty = (Name.name, 'a) Type.ty
     val mkMethodName = Name.asCStub
     fun ccall name args ty =
 	let val app = if args > max_curried then "app1" 
@@ -35,7 +42,12 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 	    [Unit,Fn("()",App(Var"repr",[Var"obj"]))])
 
     fun callStub tinfo name ret pars = 
-	let fun default (par,t as Type.WithDefault(ty, v)) = 
+	let val isoutout = TypeInfo.isOutput (fn Type.OUT => true
+					       | Type.INOUT => false) tinfo
+	    val pars = List.filter (not o isoutout o #2) pars
+	    fun default (par,t as Type.WithDefault(ty, v)) = 
+		App(Var"getOpt", [Tup[par, v]])
+	      | default (par,t as Type.Output(_, Type.WithDefault(ty,v))) =
 		App(Var"getOpt", [Tup[par, v]])
 	      | default (par,ty) = par
 	in  App(Var(name^"_"),
@@ -43,6 +55,24 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 		then [Tup(List.map default pars)]
 		else List.map default pars
             )
+	end
+    fun mkOutputStub tinfo fromprim parsty ret call =
+	let 
+	    fun isOut p (par,ty) = TypeInfo.isOutput p tinfo ty
+	    val isout    = isOut (fn _ => true)
+	    val isoutout = isOut (fn Type.OUT => true  | Type.INOUT => false)
+	    val isinout  = isOut (fn Type.OUT => false | Type.INOUT => true )
+
+	    val params = List.filter (not o isoutout) parsty
+	    val outputs = List.filter isout parsty
+	    val ret_ty = (case ret of Type.Void => []
+				    | ty => [ty])
+			 @ (List.map #2 outputs)
+	    val ress = List.tabulate(List.length ret_ty, fn i => "res"^Int.toString i)
+	    fun f (t,v) = TypeInfo.fromPrimValue tinfo t (Var v)
+	in  (Let(ValDec(TupPat(List.map VarPat ress), NONE, call),
+		 Tup(List.map f (ListPair.zip(ret_ty,ress)))),
+	     params, ret_ty)
 	end
 
     val strHeader =
@@ -58,6 +88,8 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 = struct
     structure TypeInfo = TypeInfo
     open TinySML SMLType
+    type exp = TinySML.exp
+    type 'a ty = (Name.name, 'a) Type.ty
     val mkMethodName = Name.asCFunc
     fun ccall name args ty = Import(name, ty)
     fun getEnumsTy num =
@@ -116,6 +148,41 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 				App(Var"CString.toString",[Var"t"]))
 		       else stub
 	in  List.foldr f call pars
+	end
+
+    (* generate code that handles output parameters 
+       - returns a "wrapped" stub call and the list
+         of parameters to be used for the exported
+         version of the function *)
+    fun mkOutputStub tinfo fromprim parsty ret call =
+	let 
+	    fun isOut p (par,ty) = TypeInfo.isOutput p tinfo ty
+	    val isout    = isOut (fn _ => true)
+	    val isoutout = isOut (fn Type.OUT => true  | Type.INOUT => false)
+	    val isinout  = isOut (fn Type.OUT => false | Type.INOUT => true )
+		
+	    val outputs = List.filter isout parsty
+	    val non = List.filter (not o isoutout) parsty
+	    fun refe e = App(Long(Name.fromString "ref"), [e])
+	    fun deref e = App(Var("!"), [e])
+	    fun inout (v,t) = if isinout (v,t) then refe (Var v)
+			      else refe (TypeInfo.defaultValue tinfo t)
+	    val ret_ty = (case ret of Type.Void => []
+				    | ty => [ty])
+			 @ (List.map #2 outputs)
+	    val ret_val = case ret of Type.Void => []
+				    | ty => [Var "ret"]
+	in  (Let(SeqDec
+                 [ ValDec(TupPat(List.map (VarPat o #1) outputs), NONE, 
+			  Tup(List.map inout outputs))
+		 , ValDec(VarPat "ret", NONE, call)
+                 ],
+		 Tup(ret_val @ 
+		     List.map (fn (x,t) => fromprim t (deref(Var x)))
+			      outputs
+		    )
+		),
+	     non, ret_ty)
 	end
 
     val strHeader = 
@@ -236,10 +303,12 @@ struct
 		    fun prim (par,ty) = (TypeInfo.toPrimValue tinfo ty par, ty)
 		    fun trans (par, ty) = 
 			(par, Type.mapiv (fn (ty,n)=>n) (transCValue tinfo) ty)
-		    fun default (_, t as Type.WithDefault(ty,v)) = 
+		    fun default (_, Type.WithDefault(ty,v)) = 
 			(transCValue tinfo (ty,v), ty)
 		                      (* the second ty above is correct here to
 				         avoid extra calls to withPtr *)
+		      | default (_, Type.Output(io,Type.WithDefault(ty,v))) =
+			(transCValue tinfo (ty,v), Type.Output(io, ty))
 		      | default (p, ty) = prim (p, ty)
 
                     (* type-based helpers *)
@@ -247,42 +316,15 @@ struct
 		    val fromtype = fn ty => seqfrom ty 
 		    val fromtypeclosed = 
 			fn ty => TypeInfo.toSMLType tinfo (fn _ => "base") ty
+		    fun negativefromtypeclosed ty = (* ugly hack *)
+			let val arrow = Type.Func([],ty)
+			    val arrow' = fromtypeclosed arrow
+			in  case arrow' of
+				SMLType.ArrowTy(_, ty') => ty'
+			      | _ => Util.abort 53634
+			end
 		    val primfrom = fn ty => TypeInfo.toPrimType tinfo ty
 		    fun fromprim ty e =	TypeInfo.fromPrimValue tinfo ty e
-
-                    (* generate code that handles output parameters 
-                       - returns a "wrapped" stub call and the list
-                         of parameters to be used for the exported
-                         version of the function *)
-		    fun mkOutputStub with_outputs ret call =
-			if with_outputs then
-			    let val outputs = List.filter (parFn isOut) parsty
-
-				val non = List.filter (not o parFn isOutOut) parsty
-				fun refe e = App(Long(Name.fromString "ref"), [e])
-				fun deref e = App(Var("!"), [e])
-				fun inout (v,t) =
-				    if TypeInfo.isOutput (fn Type.INOUT => true | Type.OUT => false) tinfo t
-				    then refe (Var v)
-				    else refe (TypeInfo.defaultValue tinfo t)
-				val ret_ty =
-				    (case ret of Type.Void => []
-					       | ty => [ty])
-				    @ (List.map #2 outputs)
-				val ret_val =
-				    case ret of Type.Void => []
-					      | ty => [Var "ret"]
-			    in  (Let(SeqDec
-                                       [ ValDec(TupPat(List.map (VarPat o #1) outputs), NONE, 
-					       Tup(List.map inout outputs))
-				       , ValDec(VarPat "ret", NONE, call)
-                                       ],
-				       Tup(ret_val @ List.map (fn (x,t) => fromprim t (deref(Var x))) outputs)
-				     ),
-				 non, ret_ty)
-			    end
-			else 
-			    (call, parsty, [ret])
 
 		    val with_defaults =	List.exists (parFn TI.isDefault) parsty
 		    val with_outputs =  List.exists (parFn isOut)        parsty
@@ -291,10 +333,12 @@ struct
 			                  (map (trans o prim o var) parsty)
 
 		    val (stub, outparsty, outret) = 
-			mkOutputStub with_outputs ret stub
+			if with_outputs then 
+			    Prims.mkOutputStub tinfo fromprim parsty ret stub
+			else (stub, parsty, [ret])
 
 		    val params_ml = List.map (fromtype o #2) outparsty
-		    val ret_ml    = SMLType.mkTuple(List.map fromtypeclosed outret)
+		    val ret_ml    = SMLType.mkTuple(List.map negativefromtypeclosed outret)
 		    val ty_ml     = SMLType.ArrowTy(params_ml, ret_ml)
 
 		    val primty = primfrom ty
@@ -309,21 +353,26 @@ struct
 		    val defparams = if List.length defparams = 0 then
 					[SMLType.UnitTy]
 				    else defparams
-		    val defpars' = List.map #1 (List.filter (not o (TypeInfo.isDefault tinfo) o #2) parsty)
+		    val defpars' = List.filter (not o (TypeInfo.isDefault tinfo) o #2) parsty
 		    val defpars' = if List.length defpars' = 0 then
-				        ["dummy"]
+				        [("dummy", Type.Void)]
 				   else defpars'
-		    val (stubcall',_,_) = mkOutputStub with_outputs ret (P.callStub tinfo name ret defpars)
+		    val stubcall = P.callStub tinfo name ret defpars
+		    val (stubcall',_,_) = 
+			if with_outputs then
+			    Prims.mkOutputStub tinfo fromprim defpars' ret 
+					       stubcall
+			else (stubcall, defpars', [ret])
 		    val ty'_ml = SMLType.ArrowTy(defparams, ret_ml)
 		in  {stru = 
                        ValDec(VarPat(name^"_"), SOME primty,
-			       P.ccall cname (List.length parsty) primty)
+			       P.ccall cname (List.length outparsty) primty)
                  ++    ValDec(VarPat name, SOME ty_ml,
 			       List.foldr Fn (fromprim ret stub) 
 					  (List.map #1 outparsty))
                  ++ (if with_defaults then 
 		      ValDec(VarPat(name^"'"), SOME ty'_ml,
-			     List.foldr Fn (fromprim ret stubcall') defpars')
+			     List.foldr Fn (fromprim ret stubcall') (List.map (#1) defpars'))
 		     else EmptyDec),
 		     sign = ValSpec(VarPat name, ty_ml) 
 		         ** (if with_defaults then

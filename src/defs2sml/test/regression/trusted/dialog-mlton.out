@@ -163,7 +163,7 @@ end
 
 
 /* *** Dialog *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_dialog_flags(int* x0, int* x1, int* x2) {
     *x2 = GTK_DIALOG_NO_SEPARATOR;
     *x1 = GTK_DIALOG_DESTROY_WITH_PARENT;

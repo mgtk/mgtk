@@ -188,7 +188,7 @@ EXTERNML value mgtk_main_quit(value dummy) { /* ML */
 /* ML type: unit -> unit */
 EXTERNML value mgtk_get_null(value dummy) { /* ML */
   value res = alloc(1, Abstract_tag);
-  Field(res,1) = NULL;
+  Field(res,1) = (value)NULL;
   return res;
 }
 
@@ -202,17 +202,30 @@ EXTERNML value mgtk_get_null(value dummy) { /* ML */
 #define GValue_val(arg) ( (GValue*) Field(arg, 1) )
 #define GValue_val_nocast(arg) ( Field(arg, 1) )
 
-static void ml_finalize_gvalue (value val) {
+static void ml_finalize_gvalue_old (value val) {
   g_value_unset ((GValue*) Field(val,1)); 
 }
 
-static inline value create_GValue (GType type) { 
+static void ml_finalize_gvalue (value val) {
+  g_value_unset ((GValue*) &Field(val,1)); 
+}
+
+static inline value create_GValue_old (GType type) { 
   GValue const dummy = {0, };
   value res; 
   res = alloc_final (3 + 1, ml_finalize_gvalue, 0, 1);
   *GValue_val(res) = dummy;
   g_value_init(GValue_val(res), type);
   return res; 
+}
+
+static inline value create_GValue (GType type) {
+  value res;
+  res = alloc_final (2, ml_finalize_gvalue, 0, 1);
+  GValue_val_nocast(res) = (value) malloc(sizeof(GValue));
+  memset(GValue_val(res), 0, sizeof(GValue));
+  g_value_init(GValue_val(res), type);
+  return res;
 }
 
 EXTERNML value mgtk_g_value_set_int (value i){

@@ -195,11 +195,36 @@ structure Gtk  = struct
 		 Flags.get (GObject.withPtr
 			      (self, fn self => get_display_options_ self))
     end
+    structure Entry :>
+      sig
+	type base
+	type 'a entry_t
+	type 'a t = 'a entry_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toEntry : 'a t -> base t
+	val new_with_max_length : int option -> base t
+	val new_with_max_length' : unit -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a entry_t = unit
+	type 'a t = 'a entry_t Widget.t
+	fun inherit w con = Widget.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toEntry obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val new_with_max_length_ : int -> cptr
+	    = _import "gtk_entry_new_with_max_length" : int -> cptr;
+	val new_with_max_length : int option -> base t
+	    = fn max => make (new_with_max_length_ (getOpt (max, 0)))
+	val new_with_max_length' : unit -> base t
+	    = fn dummy => make (new_with_max_length_ 0)
+    end
 end
 
 
 /* *** Gtk *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_ICON_SIZE_DIALOG;
   *x5 = GTK_ICON_SIZE_DND;
@@ -228,7 +253,7 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
 
 
 /* *** Calendar *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_calendar_display_options(int* x0, int* x1, int* x2, int* x3, int* x4) {
     *x4 = GTK_CALENDAR_WEEK_START_MONDAY;
     *x3 = GTK_CALENDAR_SHOW_WEEK_NUMBERS;
@@ -237,3 +262,6 @@ EXTERNML void mgtk_get_gtk_calendar_display_options(int* x0, int* x1, int* x2, i
     *x0 = GTK_CALENDAR_SHOW_HEADING;
 }
 
+
+
+/* *** Entry *** */

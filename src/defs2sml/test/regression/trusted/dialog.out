@@ -165,7 +165,7 @@ end
 
 
 /* *** Dialog *** */
-/* ML type: unit */
+/* ML type: unit -> int * int * int */
 EXTERNML value mgtk_get_gtk_dialog_flags(value dummy) { /* ML */
     value res = alloc_tuple(3);
     Field(res, 0) = Val_int(GTK_DIALOG_MODAL);

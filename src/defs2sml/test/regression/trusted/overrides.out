@@ -62,18 +62,16 @@ structure Gtk  = struct
 	fun inherit w con = Bin.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWindow obj = inherit () (fn () => repr obj)
-	val get_position_ : cptr -> int ref -> int ref -> unit
-	    = app3 (symb"mgtk_gtk_window_get_position")
+	val get_position_ : cptr -> int * int
+	    = app1 (symb"mgtk_gtk_window_get_position")
 	val get_position : 'a t -> int * int
-	    = fn self => let val (root_x, root_y) = (ref 0, ref 0)
-			     val ret = get_position_ (repr self) root_x root_y
-			 in (!root_x, !root_y) end
-	val get_size_ : cptr -> int ref -> int ref -> unit
-	    = app3 (symb"mgtk_gtk_window_get_size")
+	    = fn self => let val (res0, res1) = get_position_ (repr self)
+			 in (res0, res1) end
+	val get_size_ : cptr -> int * int
+	    = app1 (symb"mgtk_gtk_window_get_size")
 	val get_size : 'a t -> int * int
-	    = fn self => let val (width, height) = (ref 0, ref 0)
-			     val ret = get_size_ (repr self) width height
-			 in (!width, !height) end
+	    = fn self => let val (res0, res1) = get_size_ (repr self)
+			 in (res0, res1) end
     end
 end
 
@@ -88,23 +86,27 @@ end
 
 
 /* *** Window *** */
-/* ML type: cptr -> int ref -> int ref -> unit */
-EXTERNML value mgtk_gtk_window_get_position(value self, value root_x_ref, value root_y_ref) { /* ML */
-    int root_x = Int_val(GetRefVal(root_x_ref));
-    int root_y = Int_val(GetRefVal(root_y_ref));
-    gtk_window_get_position(GtkObj_val(self), &(root_x), &(root_y));
-    SetRefVal(root_x_ref, Val_int(root_x));
-    SetRefVal(root_y_ref, Val_int(root_y));
-    return Val_unit;
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_window_get_position(value self) { /* ML */
+    value result;
+    int root_x;
+    int root_y;
+    gtk_window_get_position(GtkObj_val(self), &root_x, &root_y);
+    result = alloc_tuple(2);
+    Field(result, 0) = Val_int(root_x);
+    Field(result, 1) = Val_int(root_y);
+    return result;
 }
 
-/* ML type: cptr -> int ref -> int ref -> unit */
-EXTERNML value mgtk_gtk_window_get_size(value self, value width_ref, value height_ref) { /* ML */
-    int width = Int_val(GetRefVal(width_ref));
-    int height = Int_val(GetRefVal(height_ref));
-    gtk_window_get_size(GtkObj_val(self), &(width), &(height));
-    SetRefVal(width_ref, Val_int(width));
-    SetRefVal(height_ref, Val_int(height));
-    return Val_unit;
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_window_get_size(value self) { /* ML */
+    value result;
+    int width;
+    int height;
+    gtk_window_get_size(GtkObj_val(self), &width, &height);
+    result = alloc_tuple(2);
+    Field(result, 0) = Val_int(width);
+    Field(result, 1) = Val_int(height);
+    return result;
 }
 

@@ -367,7 +367,7 @@ end
 
 
 /* *** Window *** */
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_window_type(int* x0, int* x1) {
     *x1 = GTK_WINDOW_POPUP;
     *x0 = GTK_WINDOW_TOPLEVEL;

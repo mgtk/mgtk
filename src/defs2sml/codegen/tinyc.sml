@@ -66,6 +66,46 @@ struct
 	     Fun of prototype * stmt
 	   | Define of string * string
 
+    structure Set = Splayset
+    val empty = Set.empty(String.compare)
+    val singleton = Set.singleton(String.compare)
+    val union = Set.union
+    val difference = Set.difference
+    val member = Set.member
+    fun usedStmt (stmt,acc) =
+	case stmt of 
+	    Empty => acc
+	  | Exp e => usedExp (e,acc)
+	  | Ass(e,_,e') => usedExp (e', usedExp (e, acc))
+	  | Block(_,decls,stmts) =>
+	    let val locally = List.foldl usedStmt empty stmts
+		fun f (VDecl(_,_,SOME e),acc) = usedExp(e,acc)
+		  | f (VDecl(_,_,NONE),acc) = acc
+		val locally = List.foldl f locally decls
+		fun g (VDecl(x,_,_),bound) = union(singleton x, bound)
+		val bound = List.foldl g empty decls
+	    in  union(difference(locally, bound), acc)
+	    end
+	  | Return e => usedExp (e,acc)
+	  | Comment _ => acc
+	  | Verbatim _ => acc
+    and usedExp (exp, acc) =
+	case exp of
+	     Var x => union(acc,singleton x)
+	   | Int _ => acc
+	   | Float _ => acc
+	   | Cast(_,e) => usedExp (e,acc)
+	   | Call(f,_,exps) => List.foldl usedExp acc exps
+	   | VerbExp _ => acc
+    val used = fn stmts => List.foldl usedStmt empty stmts
+	    
+    fun coalesce ((a as Ass(Var x,_,e))::
+		  (r as Return(Var y)) :: ss) =
+	if x = y then Return e :: coalesce ss
+	else a::r :: coalesce ss
+      | coalesce (stmt::stmts) = stmt :: coalesce stmts
+      | coalesce [] = []
+
     fun showTy ty =
 	case ty of 
 	    TInt => "int"
@@ -86,6 +126,7 @@ struct
 		  | Cast(t,e) => "(" ^ showTy t ^ ") " ^ showExp e
 		  | VerbExp e => e
 		  | Call("",cast,[arg]) => showExp arg
+		  | Call("&",cast,[Var x]) => "&" ^ x
 		  | Call(f,cast,args) => 
 		       f ^ Util.stringSep "(" ")" ", " showExp args
 	    fun showDecl (VDecl(x,ty,e)) =
@@ -98,15 +139,23 @@ struct
 		  | Ass(l,ty,r) => 
 		       indent^showExp l ^ " = " ^ showExp r ^ ";\n"
 		  | Block(label,decls, Comment c :: stmts) =>
-		       ("{ /* "^c^" */\n") 
-		       ^ Util.stringSep "" "" "" showDecl decls
-		       ^ Util.stringSep "" "}\n" "" showStmt stmts
+		       let val stmts = coalesce stmts
+			   val needed = used stmts
+			   fun f (VDecl(x,_,_)) = member(needed,x)
+			   val decls = List.filter f decls
+		       in  
+			   ("{ /* "^c^" */\n") 
+			 ^ Util.stringSep "" "" "" showDecl decls
+			 ^ Util.stringSep "" "" "" showStmt stmts
+                         ^ "}\n"
+		       end
 		  | Block(label,decls, stmts) =>
 		       Util.stringSep "{\n" "" "" showDecl decls
-		       ^ Util.stringSep "" "}\n" "" showStmt stmts
+		       ^ Util.stringSep "" "" "" showStmt (coalesce stmts) ^ "}\n"
 		  | Return e => indent^"return " ^ showExp e ^ ";\n"
 		  | Comment c => indent^"/* " ^ c ^ " */\n"
 		  | Verbatim s => s
+
 	    fun showTop top =
 		case top of
 		    Fun(Proto(spec, f, pars, ret),stmt) =>

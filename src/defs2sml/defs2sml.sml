@@ -194,7 +194,7 @@ fun main () =
 	val api'' = GenCMLton.generate typeinfo api
 		    handle (exn as Fail m) => (TextIO.output(TextIO.stdOut, "Caught Fail(" ^ m ^ ")\n"); raise exn)
 	val _ = Option.app (copyFile (getOutFile())) (!cPreamble)
-	val _ = GenCMLton.print typeinfo (getOutFile()) api''
+	val _ = GenCMLton.print (getOutFile()) api''
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 		in () end
@@ -217,7 +217,7 @@ fun main () =
 	val api'' = GenCMosml.generate typeinfo api
 		    handle (exn as Fail m) => (TextIO.output(TextIO.stdOut, "Caught Fail(" ^ m ^ ")\n"); raise exn)
 	val _ = Option.app (copyFile (getOutFile())) (!cPreamble)
-	val _ = GenCMosml.print typeinfo (getOutFile()) api''
+	val _ = GenCMosml.print (getOutFile()) api''
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 		in () end

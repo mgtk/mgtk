@@ -176,6 +176,33 @@ structure Gtk  = struct
 	val get_display_options : 'a t -> display_options list
 	    = fn self => Flags.get (get_display_options_ (repr self))
     end
+    structure Entry :>
+      sig
+	type base
+	type 'a entry_t
+	type 'a t = 'a entry_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toEntry : 'a t -> base t
+	val new_with_max_length : int option -> base t
+	val new_with_max_length' : unit -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a entry_t = unit
+	type 'a t = 'a entry_t Widget.t
+	fun inherit w con = Widget.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toEntry obj = inherit () (fn () => repr obj)
+	val new_with_max_length_ : int -> cptr
+	    = app1 (symb"mgtk_gtk_entry_new_with_max_length")
+	val new_with_max_length : int option -> base t
+	    = fn max => make (new_with_max_length_ (getOpt (max, 0)))
+	val new_with_max_length' : unit -> base t
+	    = fn dummy => make (new_with_max_length_ 0)
+    end
 end
 
 
@@ -194,7 +221,7 @@ value Val_GtkIconSet(void* obj) {
   return res;
 }
 
-/* ML type: unit */
+/* ML type: unit -> int * int * int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
   value res = alloc_tuple(7);
   Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
@@ -246,7 +273,7 @@ EXTERNML value mgtk_gtk_widget_modify_style(value self, value style) { /* ML */
 
 
 /* *** Calendar *** */
-/* ML type: unit */
+/* ML type: unit -> int * int * int * int * int */
 EXTERNML value mgtk_get_gtk_calendar_display_options(value dummy) { /* ML */
     value res = alloc_tuple(5);
     Field(res, 0) = Val_int(GTK_CALENDAR_SHOW_HEADING);
@@ -266,5 +293,13 @@ EXTERNML value mgtk_gtk_calendar_display_options(value self, value flags) { /* M
 /* ML type: cptr -> int */
 EXTERNML value mgtk_gtk_calendar_get_display_options(value self) { /* ML */
     return Val_int(gtk_calendar_get_display_options(GtkObj_val(self)));
+}
+
+
+
+/* *** Entry *** */
+/* ML type: int -> cptr */
+EXTERNML value mgtk_gtk_entry_new_with_max_length(value max) { /* ML */
+    return Val_GtkObj(gtk_entry_new_with_max_length(Int_val(max)));
 }
 

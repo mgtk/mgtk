@@ -62,4 +62,7 @@ struct
     fun hashString s = Word.toInt(CharVector.foldl hashChar 0w0 s)
     end (* local *)
 
+    fun number xs =
+	ListPair.zip(List.tabulate (List.length xs, fn i => i), xs)
+
 end (* structure Util *)
