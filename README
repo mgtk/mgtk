@@ -7,15 +7,18 @@ Homepage:
 Authors:
     Ken Friis Larsen <kfl@it.edu> and Henning Niss <hniss@diku.dk>
 
-Copyright (C) 2000, 2001 by Ken Friis Larsen and Henning Niss.
+Copyright (C) 2000-2004 by Ken Friis Larsen and Henning Niss.
 
 
 CURRENT VERSION
 ---------------
 The current version is 
-    pink-chickens (or mgtk-beta-0.03)
+    mgtk-pre-0.93
 
 Previous versions include
+    mgtk-pre-0.92 (released July 12, 2004).
+    mgtk-pre-0.90 (released June, 2004).
+    pink-chickens (or mgtk-beta-0.03)
     red-hens (or mgtk-beta-0.02)
     green-horses-and-blue-ducks (or mgtk-alpha-0.01)
 
@@ -27,11 +30,7 @@ mGTK is an SML interface to the C-based graphical toolkit Gtk+ (the
 Gimp Toolkit).  Gtk+ is available from the homepage:
 	http://www.gtk.org
 
-We use Moscow ML's foreign function interface to call the C functions
-in Gtk+.  Therefore, mGTK can only be used with Moscow ML (version
-1.44 or newer).  However, we are very interested if somebody wants to
-port mGTK to other SML systems and are willing to provide information
-and help.
+mGTK can currently be used with SML systems Moscow ML and MLton.
 
 To subscribe to the mgtk-announce mailing list go to:
         http://lists.sourceforge.net/lists/listinfo/mgtk-announce
@@ -41,26 +40,32 @@ To subscribe to the mgtk-announce mailing list go to:
 REQUIREMENTS
 ------------
 
-mGTK should work on any platform supported by both Moscow ML and
+mGTK should work on any platform supported by both Moscow ML or MLton, and
 Gtk+. We develop and test mGTK on Linux machines (running RedHat).
 mGTK is known to run successfully on the following machines
 
-*   Linux, X86, RedHat 6.1/6.2
-*   Windows, X86
+*   Linux, X86, Debian Sarge
+*   Windows, X86 (not in this pre-release)
 
 
 If you have had any success running mGTK on some other platform,
 please send us an email with a description of the machine.
 
-The following versions of Moscow ML and Gtk+ are required:
+The following versions of Moscow ML or MLton, and Gtk+ are required:
 
 Moscow ML: Version 2.00 (or newer) compiled with dynlib support.  
        Moscow ML is available from:
 	      http://www.dina.kvl.dk/~sestoft/mosml.html
+or
+MLton: Tested with version 20040227 and 20041109 from Debian.
+       MLton is available from:
+              http://mlton.org
 
-Gtk+: mGTK will only work with the 1.2.x series.  Check your Gtk+ 
+
+and 
+Gtk+: mGTK will only work with the 2.4.x series.  Check your Gtk+ 
       version with the command:
-              gtk-config --version
+               pkg-config --modversion gtk+-2.0
       Gtk+ is available from:
               http://www.gtk.org/
               http://www.gimp.org/win32 (Windows version)
@@ -81,7 +86,7 @@ COPYRIGHT NOTICE for mGTK
 -------------------------
 
 mGTK - a SML interface to the graphical toolkit gtk+
-Copyright (C) 2000, 2001 Ken Friis Larsen and Henning Niss
+Copyright (C) 2000-2004 Ken Friis Larsen and Henning Niss
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
