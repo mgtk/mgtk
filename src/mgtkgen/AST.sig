@@ -26,6 +26,7 @@ sig
     datatype declaration =
 	OBJECT_DECL of pos * string * string * (parameter list option)
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
+      | ENUM_DECL of pos * string * constructor list
       | FLAGS_DECL of pos * string * constructor list
       | BOXED_DECL of pos * string * (string list) * string option
       | SIGNAL_DECL of pos * string * string list * long_texp option
@@ -33,6 +34,7 @@ sig
     val isWidget: declaration -> bool
     val isFunction: declaration -> bool
     val isEnum: declaration -> bool
+    val isFlags: declaration -> bool
     val isBoxed: declaration -> bool
     val isSignal: declaration -> bool
 

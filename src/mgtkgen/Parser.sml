@@ -51,7 +51,8 @@ struct
     val fields = $$ "fields"
     val defObj = $$ "define-object"
     val defFnc = $$ "define-func"
-    val defFlags = $$ "define-flags" || $$ "define-enum"
+    val defFlags = $$ "define-flags"
+    val defEnum =  $$ "define-enum"
     val defBoxed = $$ "define-boxed"
     val defSignal = $$ "define-signal"
     val listQual = $$ "list"
@@ -61,6 +62,8 @@ struct
 	AST.OBJECT_DECL (pos, name,inherits,fields)
     fun mkFunctionDecl (pos, ((name, typeExp), parameters)) =
 	AST.FUNCTION_DECL (pos, name, typeExp, parameters)
+    fun mkEnumDecl (pos, (enum, cs)) = 
+	AST.ENUM_DECL(pos, enum, cs)
     fun mkFlagsDecl (pos, (enum, cs)) = 
 	AST.FLAGS_DECL(pos, enum, cs)
     fun mkBoxedDecl (pos, ((name, names), size)) =
@@ -115,6 +118,7 @@ struct
     (* declarations *)
     val objDecl = parenthesized' (defObj $-- word -- inherits -- optional fieldList)
     val fncDecl = parenthesized' (defFnc $-- word -- typeExp -- parDefaultList)
+    val enumDecl = parenthesized' (defEnum $-- word -- constructors)
     val flagsDecl = parenthesized' (defFlags $-- word -- constructors)
 
     val size = Combinators.string 
@@ -130,6 +134,7 @@ struct
 
     val decl' = (fncDecl >> mkFunctionDecl)
              || (objDecl >> mkObjectDecl) 
+             || (enumDecl >> mkEnumDecl)
              || (flagsDecl >> mkFlagsDecl)
              || (boxedDecl >> mkBoxedDecl)
              || (signalDecl >> mkSignalDecl)

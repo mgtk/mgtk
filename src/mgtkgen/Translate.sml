@@ -30,8 +30,10 @@ struct
     (* insert declaration in type info table *)
     fun insertDecl (AST.OBJECT_DECL(pos, name,inherits,_)) =
 	TypeInfo.insert (name, TypeInfo.objectInfo name)
-      | insertDecl (AST.FLAGS_DECL(pos, name,constr)) =
+      | insertDecl (AST.ENUM_DECL(pos, name,constr)) =
 	TypeInfo.insert (name, TypeInfo.enumInfo (name,constr))
+      | insertDecl (AST.FLAGS_DECL(pos, name,constr)) =
+	TypeInfo.insert (name, TypeInfo.flagsInfo (name,constr))
       | insertDecl (AST.BOXED_DECL(pos, name, funcs, _)) =
 	TypeInfo.insert (name, TypeInfo.boxedInfo (name, funcs))
       | insertDecl _ = ()
@@ -402,7 +404,9 @@ old*)
       | unwrapArg (AST.LONG(_, AST.LIST typExp), name) =
 	if TypeInfo.isWidget typExp then $$["(map unwrap ", name, ")"]
 	else $name
-      | unwrapArg (_, name) = $name
+      | unwrapArg (typExp, name) =
+	if TypeInfo.isFlag typExp then $$["(setFlags ", name, ")"]
+	else $name
     fun wrapResult typExp res =
 	if TypeInfo.isWidget typExp then $"OBJ(" && res && $")"
         else res
@@ -646,7 +650,7 @@ old*)
     fun mkMLEnumDecl (name, constr) =
 	let val type_name = TypeInfo.mlEnumTypeName name
 	    val ml_type = mkMLType (AST.LONG([], AST.TYPENAME name))
-	    fun prCnstr (n,const) = mkValDecl (mlFlagName const, ml_type, NONE)
+	    fun prCnstr (n,const) = mkValDecl (mlEnumName const, ml_type, NONE)
 	in  mkTypeDecl (type_name, NONE)
          && prsep Empty prCnstr constr
          && Nl
@@ -664,6 +668,16 @@ old*)
          && $$[indent,indent,"= get_", type_name, "_ ()"] && Nl
          && Nl
 	end
+
+    val mkFlagsDecl = mkEnumDecl
+    fun mkMLFlagsDecl (name, constr) =
+	let val type_name = TypeInfo.mlFlagsTypeName name
+	    fun prCnstr (n,const) = mkValDecl (mlEnumName const, $type_name, NONE)
+	in  mkTypeDecl (type_name, NONE)
+         && prsep Empty prCnstr constr
+         && Nl
+	end
+    val mkMLFlagsVal = mkMLEnumVal
 
     (* signals 
        ------------------------------------------------------------
@@ -717,8 +731,10 @@ old*)
 	let val params' = if null params then [dummyPair] else params
 	in  mkCFunction (name, retTyp, params)
 	end
-      | mkCdecl (AST.FLAGS_DECL(pos, name, constr)) =
+      | mkCdecl (AST.ENUM_DECL(pos, name, constr)) =
            mkEnumDecl (name, constr)
+      | mkCdecl (AST.FLAGS_DECL(pos, name, constr)) =
+           mkFlagsDecl (name, constr)
       | mkCdecl (AST.BOXED_DECL(pos, name, funcs, _)) =
 	   mkBoxedDecl (name, funcs)
       | mkCdecl _ = Empty
@@ -739,8 +755,10 @@ old*)
 	     then Empty
              else mkMLFunDecl NONE (name^"'", mlFunType(retTyp, params'')))
 	end
-      | mkMLSigdecl (AST.FLAGS_DECL(pos, name,constr)) =
+      | mkMLSigdecl (AST.ENUM_DECL(pos, name,constr)) =
 	   mkMLEnumDecl (name, constr)
+      | mkMLSigdecl (AST.FLAGS_DECL(pos, name,constr)) =
+	   mkMLFlagsDecl (name, constr)
       | mkMLSigdecl (AST.SIGNAL_DECL(pos, name,signal,cbType)) =
 	   mkValDecl ("connect_" ^ mlSignalName signal, 
 		      mkMLType(mlConnectType (name, cbType)), NONE)
@@ -762,8 +780,10 @@ old*)
 	     then Empty
 	     else mkMLFunVal true (name, retTyp, params''))
 	end
-      | mkMLStrdecl (AST.FLAGS_DECL(pos, name,constr)) =
+      | mkMLStrdecl (AST.ENUM_DECL(pos, name,constr)) =
 	   mkMLEnumVal (name, constr)
+      | mkMLStrdecl (AST.FLAGS_DECL(pos, name,constr)) =
+	   mkMLFlagsVal (name, constr)
       | mkMLStrdecl (AST.SIGNAL_DECL(pos, name,signal,cbType)) =
 	   let val cnc_func = mlConnectFunction cbType
 	   in  mkValDecl ("connect_" ^ mlSignalName signal, 

@@ -10,6 +10,7 @@ struct
     infix &&
 
     fun mlEnumTypeName name = NameUtil.separateWords #"_" (NameUtil.removePrefix name)
+    fun mlFlagsTypeName name = NameUtil.separateWords #"_" (NameUtil.removePrefix name)
     fun mlBoxedTypeName name = NameUtil.separateWords #"_" name
 
     type type_info = {mlType: wseq -> wseq, 
@@ -18,31 +19,34 @@ struct
 		      toCValue: wseq -> wseq,
 		      fromCValue: wseq -> wseq,
 		      widget: bool,
-		      primitive: bool
+		      primitive: bool,
+		      flag: bool
 		     }
 
     fun cstFnc value = fn _ => $value
     fun wrapFnc value = fn n => $value && $"(" && n && $")"
-    fun info (primTyp, typ, cTyp, toC, fromC, prim): type_info =
+    fun info (primTyp, typ, cTyp, toC, fromC, prim, flag): type_info =
 	{mlType = cstFnc typ, mlPrimType = $primTyp, cType = $cTyp, 
-	 widget=false, primitive = prim,
+	 widget=false, primitive = prim,flag=flag,
 	 toCValue = toC, fromCValue = fromC}
 
-    val unitInfo = info ("unit", "unit", "void", cstFnc "Unit_val", cstFnc "Val_unit", false)
-    val intInfo = info ("int", "int", "int", wrapFnc "Int_val", wrapFnc "Val_int", false)
+    val unitInfo = info ("unit", "unit", "void", cstFnc "Unit_val", cstFnc "Val_unit", false,false)
+    val intInfo = info ("int", "int", "int", wrapFnc "Int_val", wrapFnc "Val_int", false,false)
     val wordInfo = (* this is NOT correct *)
-	  info ("word", "word", "unsigned int", wrapFnc "Int_val", wrapFnc "Val_int", false)
+	  info ("word", "word", "unsigned int", wrapFnc "Int_val", wrapFnc "Val_int", false,false)
     val staticStringInfo = (* this is NOT correct *)
-          info ("string", "string", "char*", wrapFnc "String_val", wrapFnc "copy_string", false)
+          info ("string", "string", "char*", wrapFnc "String_val", wrapFnc "copy_string", false,false)
     val stringInfo = staticStringInfo
-    val boolInfo = info ("bool", "bool", "int", wrapFnc "Bool_val", wrapFnc "Val_bool", false)
-    val realInfo = info ("real", "real", "int", wrapFnc "Double_val", wrapFnc "copy_double", false)
+    val boolInfo = info ("bool", "bool", "int", wrapFnc "Bool_val", wrapFnc "Val_bool", false,false)
+    val realInfo = info ("real", "real", "int", wrapFnc "Double_val", wrapFnc "copy_double", false,false)
     fun enumInfo (typExp,constr) =
-	info ("int", mlEnumTypeName typExp, typExp, wrapFnc "Int_val", wrapFnc "Val_int", false)
+	info ("int", mlEnumTypeName typExp, typExp, wrapFnc "Int_val", wrapFnc "Val_int", false,false)
+    fun flagsInfo (typExp,constr) =
+	info ("int", mlFlagsTypeName typExp ^ " list", typExp, wrapFnc "Int_val", wrapFnc "Val_int", false,true)
     fun boxedInfo (typExp, funcs) =
 	info (mlBoxedTypeName typExp, mlBoxedTypeName typExp, typExp,
 	      wrapFnc (typExp ^ "_val"), wrapFnc ("Val_" ^ typExp),
-	      true)
+	      true,false)
 
     fun objectInfo objTyp =
 	    {mlType=fn argTyp => argTyp && $" " && $objTyp, 
@@ -50,6 +54,7 @@ struct
 	     cType= $"GtkObject",
 	     widget=true,
 	     primitive=true,
+	     flag=false,
 	     toCValue=fn n => $"GtkObj_val(" && n && $")",
 	     fromCValue=fn n => $"Val_GtkObj(" && n && $")"
 	    }
@@ -105,6 +110,14 @@ struct
     in  fun isPrimVal long = isprim (get_texp long)
         fun isPrimVal' (long, name) = isPrimVal long
     end
+
+    local
+	fun isflag (AST.TYPENAME tName) = #flag (lookupTypeName tName)
+	  | isflag _ = false
+    in  fun isFlag long = isflag (get_texp long)
+        fun isFlag' (long, name) = isFlag long
+    end
+
 
     local 
 	fun isstring (AST.TYPENAME "string") = true

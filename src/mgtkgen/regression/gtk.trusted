@@ -7549,10 +7549,10 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val widget_queue_resize: 'a GtkWidget -> unit
     val widget_draw_focus: 'a GtkWidget -> unit
     val widget_draw_default: 'a GtkWidget -> unit
-    val widget_add_accelerator: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type -> accel_flags -> unit
-    val widget_remove_accelerator: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type -> unit
+    val widget_add_accelerator: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type list -> accel_flags list -> unit
+    val widget_remove_accelerator: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type list -> unit
     val widget_remove_accelerators: 'a GtkWidget -> string -> bool -> unit
-    val widget_accelerator_signal: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type -> word
+    val widget_accelerator_signal: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type list -> word
     val widget_lock_accelerators: 'a GtkWidget -> unit
     val widget_unlock_accelerators: 'a GtkWidget -> unit
     val widget_accelerators_locked: 'a GtkWidget -> bool
@@ -7573,14 +7573,14 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val widget_get_parent_window: 'a GtkWidget -> gdk_window
     val widget_set_uposition: 'a GtkWidget -> int -> int -> unit
     val widget_set_usize: 'a GtkWidget -> int -> int -> unit
-    val widget_set_events: 'a GtkWidget -> gdk_event_mask -> unit
-    val widget_add_events: 'a GtkWidget -> gdk_event_mask -> unit
-    val widget_set_extension_events: 'a GtkWidget -> gdk_event_mask -> unit
-    val widget_get_extension_events: 'a GtkWidget -> gdk_event_mask
+    val widget_set_events: 'a GtkWidget -> gdk_event_mask list -> unit
+    val widget_add_events: 'a GtkWidget -> gdk_event_mask list -> unit
+    val widget_set_extension_events: 'a GtkWidget -> gdk_event_mask list -> unit
+    val widget_get_extension_events: 'a GtkWidget -> gdk_event_mask list
     val widget_get_toplevel: 'a GtkWidget -> base GtkWidget
     val widget_get_ancestor: 'a GtkWidget -> word -> base GtkWidget
     val widget_get_colormap: 'a GtkWidget -> gdk_colormap
-    val widget_get_events: 'a GtkWidget -> gdk_event_mask
+    val widget_get_events: 'a GtkWidget -> gdk_event_mask list
     val widget_is_ancestor: 'a GtkWidget -> 'b GtkWidget -> bool
     val widget_hide_on_delete: 'a GtkWidget -> int
     val widget_set_style: 'a GtkWidget -> gtk_style -> unit
@@ -7615,7 +7615,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val drag_set_icon_pixmap: gdk_drag_context -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
     val drag_set_icon_default: gdk_drag_context -> unit
     val drag_set_default_icon: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
-    val gdk_drag_status: gdk_drag_context -> gdk_drag_action -> word -> unit
+    val gdk_drag_status: gdk_drag_context -> gdk_drag_action list -> word -> unit
     val selection_remove_all: 'a GtkWidget -> unit
 
     (* *** Tooltips *** *)
@@ -7819,9 +7819,9 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
 
     val packer_new: unit -> base GtkPacker
-    val packer_add_defaults: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> unit
-    val packer_add: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
-    val packer_set_child_packing: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
+    val packer_add_defaults: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options list -> unit
+    val packer_add: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options list -> word -> word -> word -> word -> word -> unit
+    val packer_set_child_packing: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options list -> word -> word -> word -> word -> word -> unit
     val packer_reorder_child: 'a GtkPacker -> 'b GtkWidget -> int -> unit
     val packer_set_spacing: 'a GtkPacker -> word -> unit
     val packer_set_default_border_width: 'a GtkPacker -> word -> unit
@@ -8344,7 +8344,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val calendar_mark_day: 'a GtkCalendar -> word -> int
     val calendar_unmark_day: 'a GtkCalendar -> word -> int
     val calendar_clear_marks: 'a GtkCalendar -> unit
-    val calendar_display_options: 'a GtkCalendar -> calendar_display_options -> unit
+    val calendar_display_options: 'a GtkCalendar -> calendar_display_options list -> unit
     val calendar_get_date: 'a GtkCalendar -> word * word * word
     val calendar_freeze: 'a GtkCalendar -> unit
     val calendar_thaw: 'a GtkCalendar -> unit
@@ -8610,7 +8610,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val item_factory_new: word -> string -> gtk_accel_group -> base GtkItemFactory
     val item_factory_parse_rc: string -> unit
     val item_factory_parse_rc_string: string -> unit
-    val item_factory_add_foreign: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type -> unit
+    val item_factory_add_foreign: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type list -> unit
     val item_factory_from_widget: 'a GtkWidget -> base GtkItemFactory
     val item_factory_path_from_widget: 'a GtkWidget -> string
     val item_factory_get_widget: 'a GtkItemFactory -> string -> base GtkWidget
@@ -10067,13 +10067,13 @@ end
 
     val widget_add_accelerator_: gtkobj * string * gtk_accel_group * word * int * int -> unit
         = app1(symb"mgtk_widget_add_accelerator")
-    val widget_add_accelerator: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type -> accel_flags -> unit
-        = fn OBJ widget => fn signal_name => fn group => fn key => fn modifiers => fn flags => widget_add_accelerator_ (widget, signal_name, group, key, modifiers, flags)
+    val widget_add_accelerator: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type list -> accel_flags list -> unit
+        = fn OBJ widget => fn signal_name => fn group => fn key => fn modifiers => fn flags => widget_add_accelerator_ (widget, signal_name, group, key, (setFlags modifiers), (setFlags flags))
 
     val widget_remove_accelerator_: gtkobj -> gtk_accel_group -> word -> int -> unit
         = app4(symb"mgtk_widget_remove_accelerator")
-    val widget_remove_accelerator: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type -> unit
-        = fn OBJ widget => fn group => fn key => fn modifiers => widget_remove_accelerator_ widget group key modifiers
+    val widget_remove_accelerator: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type list -> unit
+        = fn OBJ widget => fn group => fn key => fn modifiers => widget_remove_accelerator_ widget group key (setFlags modifiers)
 
     val widget_remove_accelerators_: gtkobj -> string -> bool -> unit
         = app3(symb"mgtk_widget_remove_accelerators")
@@ -10082,8 +10082,8 @@ end
 
     val widget_accelerator_signal_: gtkobj -> gtk_accel_group -> word -> int -> word
         = app4(symb"mgtk_widget_accelerator_signal")
-    val widget_accelerator_signal: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type -> word
-        = fn OBJ widget => fn group => fn key => fn modifiers => widget_accelerator_signal_ widget group key modifiers
+    val widget_accelerator_signal: 'a GtkWidget -> gtk_accel_group -> word -> gdk_modifier_type list -> word
+        = fn OBJ widget => fn group => fn key => fn modifiers => widget_accelerator_signal_ widget group key (setFlags modifiers)
 
     val widget_lock_accelerators_: gtkobj -> unit
         = app1(symb"mgtk_widget_lock_accelerators")
@@ -10187,22 +10187,22 @@ end
 
     val widget_set_events_: gtkobj -> int -> unit
         = app2(symb"mgtk_widget_set_events")
-    val widget_set_events: 'a GtkWidget -> gdk_event_mask -> unit
-        = fn OBJ widget => fn events => widget_set_events_ widget events
+    val widget_set_events: 'a GtkWidget -> gdk_event_mask list -> unit
+        = fn OBJ widget => fn events => widget_set_events_ widget (setFlags events)
 
     val widget_add_events_: gtkobj -> int -> unit
         = app2(symb"mgtk_widget_add_events")
-    val widget_add_events: 'a GtkWidget -> gdk_event_mask -> unit
-        = fn OBJ widget => fn events => widget_add_events_ widget events
+    val widget_add_events: 'a GtkWidget -> gdk_event_mask list -> unit
+        = fn OBJ widget => fn events => widget_add_events_ widget (setFlags events)
 
     val widget_set_extension_events_: gtkobj -> int -> unit
         = app2(symb"mgtk_widget_set_extension_events")
-    val widget_set_extension_events: 'a GtkWidget -> gdk_event_mask -> unit
-        = fn OBJ widget => fn events => widget_set_extension_events_ widget events
+    val widget_set_extension_events: 'a GtkWidget -> gdk_event_mask list -> unit
+        = fn OBJ widget => fn events => widget_set_extension_events_ widget (setFlags events)
 
     val widget_get_extension_events_: gtkobj -> int
         = app1(symb"mgtk_widget_get_extension_events")
-    val widget_get_extension_events: 'a GtkWidget -> gdk_event_mask
+    val widget_get_extension_events: 'a GtkWidget -> gdk_event_mask list
         = fn OBJ widget => widget_get_extension_events_ widget
 
     val widget_get_toplevel_: gtkobj -> gtkobj
@@ -10222,7 +10222,7 @@ end
 
     val widget_get_events_: gtkobj -> int
         = app1(symb"mgtk_widget_get_events")
-    val widget_get_events: 'a GtkWidget -> gdk_event_mask
+    val widget_get_events: 'a GtkWidget -> gdk_event_mask list
         = fn OBJ widget => widget_get_events_ widget
 
     val widget_is_ancestor_: gtkobj -> gtkobj -> bool
@@ -10397,8 +10397,8 @@ end
 
     val gdk_drag_status_: gdk_drag_context -> int -> word -> unit
         = app3(symb"mgdk_drag_status")
-    val gdk_drag_status: gdk_drag_context -> gdk_drag_action -> word -> unit
-        = fn context => fn action => fn time => gdk_drag_status_ context action time
+    val gdk_drag_status: gdk_drag_context -> gdk_drag_action list -> word -> unit
+        = fn context => fn action => fn time => gdk_drag_status_ context (setFlags action) time
 
     val selection_remove_all_: gtkobj -> unit
         = app1(symb"mgtk_selection_remove_all")
@@ -10953,18 +10953,18 @@ end
 
     val packer_add_defaults_: gtkobj -> gtkobj -> int -> int -> int -> unit
         = app5(symb"mgtk_packer_add_defaults")
-    val packer_add_defaults: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> unit
-        = fn OBJ packer => fn OBJ child => fn side => fn anchor => fn options => packer_add_defaults_ packer child side anchor options
+    val packer_add_defaults: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options list -> unit
+        = fn OBJ packer => fn OBJ child => fn side => fn anchor => fn options => packer_add_defaults_ packer child side anchor (setFlags options)
 
     val packer_add_: gtkobj * gtkobj * int * int * int * word * word * word * word * word -> unit
         = app1(symb"mgtk_packer_add")
-    val packer_add: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
-        = fn OBJ packer => fn OBJ child => fn side => fn anchor => fn options => fn border_width => fn pad_x => fn pad_y => fn ipad_x => fn ipad_y => packer_add_ (packer, child, side, anchor, options, border_width, pad_x, pad_y, ipad_x, ipad_y)
+    val packer_add: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options list -> word -> word -> word -> word -> word -> unit
+        = fn OBJ packer => fn OBJ child => fn side => fn anchor => fn options => fn border_width => fn pad_x => fn pad_y => fn ipad_x => fn ipad_y => packer_add_ (packer, child, side, anchor, (setFlags options), border_width, pad_x, pad_y, ipad_x, ipad_y)
 
     val packer_set_child_packing_: gtkobj * gtkobj * int * int * int * word * word * word * word * word -> unit
         = app1(symb"mgtk_packer_set_child_packing")
-    val packer_set_child_packing: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
-        = fn OBJ packer => fn OBJ child => fn size => fn anchor => fn options => fn border_width => fn pad_x => fn pad_y => fn ipad_x => fn ipad_y => packer_set_child_packing_ (packer, child, size, anchor, options, border_width, pad_x, pad_y, ipad_x, ipad_y)
+    val packer_set_child_packing: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options list -> word -> word -> word -> word -> word -> unit
+        = fn OBJ packer => fn OBJ child => fn size => fn anchor => fn options => fn border_width => fn pad_x => fn pad_y => fn ipad_x => fn ipad_y => packer_set_child_packing_ (packer, child, size, anchor, (setFlags options), border_width, pad_x, pad_y, ipad_x, ipad_y)
 
     val packer_reorder_child_: gtkobj -> gtkobj -> int -> unit
         = app3(symb"mgtk_packer_reorder_child")
@@ -12418,8 +12418,8 @@ end
 
     val calendar_display_options_: gtkobj -> int -> unit
         = app2(symb"mgtk_calendar_display_options")
-    val calendar_display_options: 'a GtkCalendar -> calendar_display_options -> unit
-        = fn OBJ calendar => fn flags => calendar_display_options_ calendar flags
+    val calendar_display_options: 'a GtkCalendar -> calendar_display_options list -> unit
+        = fn OBJ calendar => fn flags => calendar_display_options_ calendar (setFlags flags)
 
     val calendar_get_date_: gtkobj -> word * word * word
         = app1(symb"mgtk_calendar_get_date")
@@ -13342,8 +13342,8 @@ end
 
     val item_factory_add_foreign_: gtkobj -> string -> gtk_accel_group -> word -> int -> unit
         = app5(symb"mgtk_item_factory_add_foreign")
-    val item_factory_add_foreign: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type -> unit
-        = fn OBJ accel_widget => fn full_path => fn accel_group => fn keyval => fn modifiers => item_factory_add_foreign_ accel_widget full_path accel_group keyval modifiers
+    val item_factory_add_foreign: 'a GtkWidget -> string -> gtk_accel_group -> word -> gdk_modifier_type list -> unit
+        = fn OBJ accel_widget => fn full_path => fn accel_group => fn keyval => fn modifiers => item_factory_add_foreign_ accel_widget full_path accel_group keyval (setFlags modifiers)
 
     val item_factory_from_widget_: gtkobj -> gtkobj
         = app1(symb"mgtk_item_factory_from_widget")
