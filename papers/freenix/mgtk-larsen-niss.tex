@@ -271,6 +271,9 @@ by the Moscow ML compiler
 !   'a button_t container_t widget_t t
 \end{verbatim}
 
+\begin{ednote}{Henning}
+  Explain the cool signal thing.
+\end{ednote}
 
 \section{Process}
 \label{sec:process}
@@ -313,6 +316,44 @@ also when new releases of \gtk are produced. Most of the work in
 constructing the binding for the new release is over when the muck-up
 has been completed.
 
+Let us return to our running example, and look at some example
+specifications of widgets, functions, and signals. Figure~\ref{fig:gtk-defs}
+shows three entries in the \texttt{gtk.defs} file.
+\begin{figure}[htbp]
+\begin{centering}
+\begin{verbatim}
+(define-object Button
+  (in-module "Gtk")
+  (parent "GtkBin")
+  (c-name "GtkButton")
+  (gtype-id "GTK_TYPE_BUTTON")
+)
+
+(define-function 
+       gtk_button_new_with_label
+  (c-name 
+       "gtk_button_new_with_label")
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-gchar*" "label")
+  )
+)
+
+(define-signal clicked
+  (of-object "GtkButton")
+  (return-type "void")
+  (when "first")
+)
+\end{verbatim}
+\caption{\texttt{gtk.defs} excerpt.\label{fig:gtk-defs}}
+\end{centering}
+\end{figure}
+The first entry shows the shape of widget specification (defining
+\texttt{Button} to be a sub-widget of \texttt{Bin}). The next entry
+shows a function specification (that actually is constructor for the
+\texttt{Button} widget) with return type \texttt{GtkWidget*} (in the C
+implementation) and a string argument. Finally, we show a specification
+of a signal on buttons.
 
 \subsection{Stubs and code generation}
 \label{sec:stubs-code-gener}
