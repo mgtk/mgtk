@@ -10,7 +10,7 @@ v Signals
     that previously clashed, have their widget name as part of the
     SML connection function name.]
 * More functions from Sugar: latest comparison:
-  + bitmaps / drawables
+  v bitmaps / drawables [Fixed: Henning, June 14, 2000]
   + cursors
 v Incoporate Mike's Win32 port [Fixed: Henning, June 5, 2000]
 v Fix  mgtk_callback_destroy

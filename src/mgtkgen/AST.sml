@@ -21,7 +21,7 @@ struct
 	OBJECT_DECL of pos * long_texp * (parameter list option)
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
       | FLAGS_DECL of pos * long_texp * constructor list
-      | BOXED_DECL of pos * long_texp * (string list) * string option
+      | BOXED_DECL of pos * long_texp * (string list)
       | SIGNAL_DECL of pos * long_texp * string list * long_texp option
 
     fun isWidget (OBJECT_DECL _) = true
@@ -43,7 +43,7 @@ struct
     fun nameOf (OBJECT_DECL (_, obj, _)) = TypeExp.widgetOf obj
       | nameOf (FUNCTION_DECL (_, func, _, _)) = func
       | nameOf (FLAGS_DECL (_, flag, _)) = TypeExp.flagOf flag
-      | nameOf (BOXED_DECL (_,pointer, _, _)) = TypeExp.boxedOf pointer
+      | nameOf (BOXED_DECL (_, pointer, _)) = TypeExp.boxedOf pointer
       | nameOf (SIGNAL_DECL (_, widget, signal, _)) = signalOf signal
 
     fun typeOf (OBJECT_DECL _) = "object"
@@ -55,7 +55,7 @@ struct
     fun posOf (OBJECT_DECL (p,_,_)) = p
       | posOf (FUNCTION_DECL (p,_,_,_)) = p
       | posOf (FLAGS_DECL (p, _, _)) = p
-      | posOf (BOXED_DECL (p,_,_,_)) = p
+      | posOf (BOXED_DECL (p,_,_)) = p
       | posOf (SIGNAL_DECL (p,_,_,_)) = p
 
     local
@@ -81,8 +81,9 @@ struct
 	    func1 = func2 andalso typExp1 = typExp2 andalso equal_pars (pars1, pars2)
 	  | equal (FLAGS_DECL(_,flag1,cons1), FLAGS_DECL(_,flag2,cons2)) =
 	    TypeExp.equal_long_texp (flag1,flag2) andalso equal_list (op =) (cons1,cons2)
-	  | equal (BOXED_DECL(_,typ1,funcs1,_), BOXED_DECL(_,typ2,funcs2,_)) =
-	    TypeExp.equal_long_texp (typ1,typ2) andalso equal_list (op =) (funcs1, funcs2)
+	  | equal (BOXED_DECL(_,typ1,funcs1), BOXED_DECL(_,typ2,funcs2)) =
+	    TypeExp.equal_long_texp (typ1,typ2) andalso TypeExp.equal_long_texp (typ1,typ2)
+	    andalso equal_list (op =) (funcs1, funcs2)
 	  | equal (SIGNAL_DECL(_,wid1,signal1,cbType1), SIGNAL_DECL(_,wid2,signal2,cbType2)) =
 	    TypeExp.equal_long_texp (wid1,wid2) andalso equal_list (op =) (signal1,signal2) andalso equal_opt TypeExp.equal_long_texp (cbType1, cbType2)
 	  | equal _ = false

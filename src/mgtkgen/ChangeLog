@@ -1,3 +1,9 @@
+2000-06-14  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml (et al): Added the possibility for boxed types to
+	have an inheritance hierarchy associated with it (only on the
+	types level). This is modeled after the stuff we do for widgets.
+	
 2000-06-13  Ken Friis Larsen  <kfl@it.edu>
 
 	* Translate.sml: Fixed a small bug: the keyword eqtype is not
@@ -5,43 +11,28 @@
 
 2000-06-13  Henning Niss  <hniss@diku.dk>
 
-	* Translate.sml: Made flags ``real'' flags. Functions with a flag
-	argument expects a list of flags; functions returning a flag
-	returns a list of flags. All flags and enums have been made
+	* Translate.sml (et al): Made flags ``real'' flags. Functions with
+	a flag argument expects a list of flags; functions returning a
+	flag returns a list of flags. All flags and enums have been made
 	eqtypes.
 	
 2000-06-11  Henning Niss  <hniss@diku.dk>
 
-	* AST.sig: Made the handling of types more modular. Now
-	all ``major'' types have their own constructor, and most
-	type related stuff are delegated to TypeExp or TypeInfo.
-
-	* AST.sml: ditto.
-
-	* Translate.sml: ditto.
-
-	* Parse.sml: ditto.
+	* Translate.sml (et al): Made the handling of types more
+	modular. Now all ``major'' types have their own constructor, and
+	most type related stuff are delegated to TypeExp or TypeInfo.
 
 2000-06-11  Henning Niss  <hniss@diku.dk>
 
 	* ChangeLog: I have forgotten to update the ChangeLog in a
 	while. I will be more careful.
 	
-2000-05-09  Henning Niss  <hniss@tyr.diku.dk>
+2000-05-09  Henning Niss  <hniss@diku.dk>
 
-	* AST.sig: Prepared for the split into Gdk and Gtk: added a new
-	``long type'' with a path describing the modules of the real type.
+	* Translate.sml (et al): Prepared for the split into Gdk and Gtk:
+	added a new ``long type'' with a path describing the modules of
+	the real type.
 
-	* AST.sml: ditto.
-
-	* Parser.sml: ditto.
-
-	* Translate.sml: ditto.
-
-	* TypeInfo.sml: ditto.
-
-	* Util.sml: ditto.
-	
 2000-05-02  Henning Niss  <hniss@diku.dk>
 
 	* Combinators.sig: Added two functions skip and skipN

@@ -1273,44 +1273,47 @@
    (int x)
    (int y)))
 
+;;; Henning; consider the following section (until end-sec) marked ;;;
 ; Pixmaps and bitmaps
-(define-func gdk_pixmap_new
-  GdkPixmap
-  ((GdkWindow window); (null-ok)); Henning, NULL only allowed if depth is given
-   (int width)
-   (int height)
-   (int depth)))
+;(define-func gdk_pixmap_new
+;  GdkPixmap
+;  ((GdkWindow window (null-ok)); Henning, NULL only allowed if depth is given
+;   (int width)
+;   (int height)
+;   (int depth)))
 
-(define-func gdk_pixmap_create_from_data
-  GdkPixmap
-  ((GdkWindow window); (null-ok)); Henning, NULL only allowed if depth is given
-   (static_string data)
-   (int width)
-   (int height)
-   (int depth)
-   (GdkColor fg)
-   (GdkColor bg)))
+;(define-func gdk_pixmap_create_from_data
+;  GdkPixmap
+;  ((GdkWindow window (null-ok)); Henning, NULL only allowed if depth is given
+;   (static_string data)
+;   (int width)
+;   (int height)
+;   (int depth)
+;   (GdkColor fg)
+;   (GdkColor bg)))
 
-(define-func gdk_pixmap_create_from_xpm
-  GdkPixmap
-  ((GdkWindow window)
-   (GdkBitmap mask (null-ok)); Henning
-   (GdkColor transparent_color (null-ok))
-   (static_string filename)))
+;(define-func gdk_pixmap_create_from_xpm
+;  GdkPixmap
+;  ((GdkWindow window)
+;   (GdkBitmap mask (null-ok)); Henning
+;   (GdkColor transparent_color (null-ok))
+;   (static_string filename)))
 
-;;;(define-func gdk_pixmap_create_from_xpm_d
-;;;  GdkPixmap
-;;;  ((GdkWindow window)
-;;;   (GdkBitmap mask (null-ok)); Henning
-;;;   (GdkColor transparent_color (null-ok))
-;;;   (string data)))
+;;(define-func gdk_pixmap_create_from_xpm_d
+;;  GdkPixmap
+;;  ((GdkWindow window)
+;;   (GdkBitmap mask (null-ok)); Henning
+;;   (GdkColor transparent_color (null-ok))
+;;   (string data)))
 
-(define-func gdk_bitmap_create_from_data
-  GdkBitmap
-  ((GdkWindow window (null-ok))
-   (static_string data)
-   (int width)
-   (int height)))
+;(define-func gdk_bitmap_create_from_data
+;  GdkBitmap
+;  ((GdkWindow window (null-ok))
+;   (static_string data)
+;   (int width)
+;   (int height)))
+
+;;; end-sec
 
 ; Drawing primitives
 (define-func gdk_window_clear_area 
@@ -1445,7 +1448,6 @@
 ;;;   (GdkColor bg)
 ;;;   (int x) (int y)))
 
-;;; This function does not exist in Gtk+
 ;;; (define-func gdk_draw_bitmap
 ;;;   none
 ;;;   ((GdkDrawable drawable)
@@ -1804,6 +1806,10 @@
 ; Access internal widget data
 (define-func gtk_widget_get_window
   GdkWindow
+  ((GtkWidget widget)))
+
+(define-func gtk_widget_get_drawable
+  GdkDrawable
   ((GtkWidget widget)))
 
 (define-func gtk_widget_get_state 

@@ -452,9 +452,11 @@ struct
 
     *)
 
-    fun boxedName (TypeExp.LONG(_, TypeExp.POINTER boxed)) = boxed
+    fun boxedName (TypeExp.LONG(_, TypeExp.POINTER (box,inh))) = box
       | boxedName _ = Util.shouldntHappen "boxedName: not a pointer"
-    fun mlBoxedType pointer = TypeInfo.mlBoxedTypeName (boxedName pointer)
+    fun boxedInherits (TypeExp.LONG(_, TypeExp.POINTER (box,inh))) = inh
+      | boxedInherits _ = Util.shouldntHappen "boxedInherits: not a pointer"
+
     fun mkBoxedDecl (pointer, funcs) =
 	let val name = boxedName pointer
 	    val name' = TypeInfo.mlBoxedTypeName name
@@ -489,11 +491,18 @@ struct
 	 && $$["}"] && Nl && Nl
 	end
 
-    fun mkMLBoxedDecl pointer = 
-	mkTypeDecl (mlBoxedType pointer, NONE) && Nl
-
-    fun mkMLBoxedVal pointer =
-	mkTypeDecl (mlBoxedType pointer, SOME ($"gpointer")) && Nl
+    fun mlBoxedWitness pointer = 
+	NameUtil.toLower (NameUtil.removePrefix (boxedName pointer) ^ "_t")
+    fun mkMLBoxedDecl' base pointer = 
+	case boxedInherits pointer of
+	    NONE => mkTypeDecl' (TypeInfo.mkMLType pointer, if base = NONE then NONE else SOME ($"gpointer")) && Nl
+        |   SOME (TypeExp.INH_ROOT) => mkTypeDecl' (TypeInfo.mkMLType pointer, if base = NONE then NONE else SOME ($"gpointer")) && Nl
+        |   SOME (TypeExp.INH_FROM inherits) =>
+                (  mkTypeDecl' ($"'a " && $(mlBoxedWitness pointer), base)
+  	        && mkTypeDecl' (TypeInfo.mkMLType pointer, SOME($"'a " && $(mlBoxedWitness pointer) && $" " && $(TypeInfo.mlBoxedTypeName inherits))) && Nl
+                )
+    fun mkMLBoxedDecl pointer = mkMLBoxedDecl' NONE pointer
+    fun mkMLBoxedVal pointer = mkMLBoxedDecl' (SOME ($"base")) pointer
 
 
     (* code to declare enums
@@ -632,7 +641,7 @@ struct
 	end
       | mkCdecl (AST.FLAGS_DECL(pos, name, constr)) =
            mkFlagsDecl (name, constr)
-      | mkCdecl (AST.BOXED_DECL(pos, name, funcs, _)) =
+      | mkCdecl (AST.BOXED_DECL(pos, name, funcs)) =
 	   mkBoxedDecl (name, funcs)
       | mkCdecl _ = Empty
 
@@ -657,7 +666,7 @@ struct
       | mkMLSigdecl (AST.SIGNAL_DECL(pos, name,signal,cbType)) =
 	   mkValDecl ("connect_" ^ mlSignalName signal, 
 		      TypeInfo.mkMLType(mlConnectType (name, cbType)), NONE)
-      | mkMLSigdecl (AST.BOXED_DECL(pos, name, _, _)) =
+      | mkMLSigdecl (AST.BOXED_DECL(pos, name, _)) =
 	   mkMLBoxedDecl name
 
     (* Generation of SML structure
@@ -684,7 +693,7 @@ struct
 			  SOME($$["fn wid => fn cb => ", cnc_func,
 				  " wid \"", AST.signalOf signal, "\" cb"]))
 	   end
-      | mkMLStrdecl (AST.BOXED_DECL(pos, name, _, _)) =
+      | mkMLStrdecl (AST.BOXED_DECL(pos, name, _)) =
 	   mkMLBoxedVal name
 
 

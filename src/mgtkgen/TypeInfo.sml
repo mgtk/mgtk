@@ -64,7 +64,7 @@ struct
 	)
       | mkc (TypeExp.OUTPUT t) = mkCType t
       | mkc (TypeExp.WIDGET (wid,_)) = $"GtkObject"
-      | mkc (TypeExp.POINTER boxed) = $boxed
+      | mkc (TypeExp.POINTER (boxed,_)) = $boxed
       | mkc (TypeExp.FLAG (fName,_)) = $fName
       | mkc _ = Util.notImplemented "mkCType: not a type name"
     and mkCType long = mkc (get_texp long)
@@ -109,10 +109,14 @@ struct
 	    $(mlFlagsTypeName fName)
           | mkType nest ML_PRIM_TYPE tArg (TypeExp.FLAG(fName,_)) = 
 	    $"int"
-          | mkType nest ML_TYPE tArg (TypeExp.POINTER boxed) = 
+          | mkType nest ML_TYPE tArg (TypeExp.POINTER (boxed,NONE)) = 
 	    $(mlBoxedTypeName boxed)
-          | mkType nest ML_PRIM_TYPE tArg (TypeExp.POINTER boxed) = 
+          | mkType nest ML_PRIM_TYPE tArg (TypeExp.POINTER (boxed,NONE)) = 
 	    $(mlBoxedTypeName boxed)
+          | mkType nest ML_TYPE tArg (TypeExp.POINTER (boxed,SOME _)) = 
+	    (fn argTyp => argTyp && $" " && $(mlBoxedTypeName boxed)) (tArg())
+          | mkType nest ML_PRIM_TYPE tArg (TypeExp.POINTER (boxed,SOME _)) = 
+	    (fn argTyp => argTyp && $" " && $(mlBoxedTypeName boxed)) (tArg())
 	and mkLongType nest toType tArg long = 
 	    mkType nest toType tArg (get_texp long)
 
@@ -165,7 +169,7 @@ struct
 	    )
 	  | toc long (TypeExp.FLAG (fName,_), name) = $"Int_val(" && name && $")"
 	  | toc long (TypeExp.WIDGET (wid,_), name) = $"GtkObj_val(" && name && $")"
-	  | toc long (TypeExp.POINTER boxed, name) = $boxed && $"_val(" && name && $")"
+	  | toc long (TypeExp.POINTER (boxed,_), name) = $boxed && $"_val(" && name && $")"
 	  | toc long (typExp, name) = 
 	    Util.notImplemented ("toCValue: not a type name: " ^ TypeExp.toString long)
 
@@ -207,7 +211,7 @@ struct
 	  | fromc long' (TypeExp.OUTPUT (tName as (TypeExp.LONG(_, TypeExp.PRIMTYPE _))), name) = 
 	    fromCValue (tName, name)
           | fromc long (TypeExp.WIDGET (wid,_), name) = $"Val_GtkObj(" && name && $")"
-          | fromc long (TypeExp.POINTER boxed, name) = $"Val_" && $boxed && $"(" && name && $")"
+          | fromc long (TypeExp.POINTER (boxed,_), name) = $"Val_" && $boxed && $"(" && name && $")"
 	  | fromc long (TypeExp.FLAG (fName,_), name) = $"Val_int(" && name && $")"
 	  | fromc long (typExp, name) = 
 	    Util.notImplemented ("fromCValue: neither type name or output type (" ^ TypeExp.toString long ^ ")")

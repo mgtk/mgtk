@@ -17,7 +17,7 @@ sig
 	OBJECT_DECL of pos * long_texp * (parameter list option)
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
       | FLAGS_DECL of pos * long_texp * constructor list
-      | BOXED_DECL of pos * long_texp * (string list) * string option
+      | BOXED_DECL of pos * long_texp * (string list)
       | SIGNAL_DECL of pos * long_texp * string list * long_texp option
 
     val isWidget: declaration -> bool

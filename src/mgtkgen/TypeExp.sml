@@ -1,6 +1,10 @@
 structure TypeExp :> TypeExp =
 struct
 
+    datatype inherits =
+	INH_ROOT (* base of inheritance hierarchy *)
+      | INH_FROM of string (* inherits from string *)
+
     datatype texp = 
 	PRIMTYPE of string
       | TUPLE of long_texp list
@@ -9,7 +13,7 @@ struct
       | OUTPUT of long_texp
       | FLAG of string * bool (* is this an enum? *)
       | WIDGET of string * string option (* parent *)
-      | POINTER of string
+      | POINTER of string * inherits option (* parent *)
       | LIST of long_texp
     and long_texp = LONG of string list * texp
 
@@ -33,7 +37,7 @@ struct
       | texpToString (OUTPUT long) = toString long ^ " output"
       | texpToString (FLAG (name,false)) = name ^ " flag"
       | texpToString (FLAG (name,true)) = name ^ " enum"
-      | texpToString (POINTER boxed) = boxed
+      | texpToString (POINTER (boxed,inherits)) = boxed
       | texpToString (WIDGET (name,parent)) = name ^ " widget"
       | texpToString (LIST long) = toString long ^ " list"
     and toString (LONG ([], texp)) = texpToString texp
@@ -45,7 +49,7 @@ struct
       | widgetOf _ = Util.shouldntHappen "widgetOf: not a widget"
     fun flagOf (LONG(_, FLAG(fName,_))) = fName
       | flagOf _ = Util.shouldntHappen "flagOf: not a flag"
-    fun boxedOf (LONG(_, POINTER boxed)) = boxed
+    fun boxedOf (LONG(_, POINTER (boxed,inherits))) = boxed
       | boxedOf _ = Util.shouldntHappen "boxedOf: not a pointer"
 
 
@@ -58,6 +62,10 @@ struct
       | equal_opt eq (SOME x, SOME y) = eq (x,y)
       | equal_opt eq _ = false
 
+    fun equal_inherits (INH_ROOT, INH_ROOT) = true
+      | equal_inherits (INH_FROM p1, INH_FROM p2) = p1=p2
+      | equal_inherits _ = false
+
     fun equal_texp (PRIMTYPE name1, PRIMTYPE name2) = name1=name2
       | equal_texp (TUPLE texps1, TUPLE texps2) = 
 	equal_long_texp_list (texps1, texps2)
@@ -69,8 +77,8 @@ struct
 	flag1=flag2 andalso enum1=enum2
       | equal_texp (WIDGET(widget1, parent1), WIDGET(widget2,parent2)) =
 	widget1=widget2 andalso parent1=parent2
-      | equal_texp (POINTER boxed1, POINTER boxed2) =
-	boxed1=boxed2 
+      | equal_texp (POINTER (boxed1,inherits1), POINTER (boxed2,inherits2)) =
+	boxed1=boxed2 andalso equal_opt equal_inherits (inherits1,inherits2)
       | equal_texp (LIST texp1, LIST texp2) = equal_long_texp (texp1,texp2)
       | equal_texp _ = false
     and equal_long_texp (LONG (path1, texp1), LONG (path2, texp2)) = 

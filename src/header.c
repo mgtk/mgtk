@@ -232,10 +232,6 @@ GdkWindow *gtk_widget_get_window (GtkWidget *widget) {
   return widget->window;
 }
 
-GdkDrawable *gtk_widget_get_drawable (GtkWidget *widget) {
-  return widget->window;
-}
-
 GtkStateType gtk_widget_get_state (GtkWidget *widget) {
   return widget->state;
 }

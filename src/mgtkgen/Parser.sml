@@ -77,7 +77,7 @@ struct
 	fun insertFlag tName = insert tName (TypeExp.FLAG(tName,false))
 	fun insertEnum tName = insert tName (TypeExp.FLAG(tName,true))
 	fun insertWidget wid inh = insert wid (TypeExp.WIDGET(wid,SOME inh))
-	fun insertPointer boxed = insert boxed (TypeExp.POINTER boxed)
+	fun insertPointer box inh = insert box (TypeExp.POINTER(box,inh))
 	fun lookup tName =
 	    ((Polyhash.find table tName)
 	     handle Find => Util.notFound("unbound type name: " ^ tName))
@@ -99,9 +99,9 @@ struct
 	( insertEnum flagName
 	; AST.FLAGS_DECL(pos, TypeExp.LONG([], TypeExp.FLAG(flagName, true)), cs)
         )
-    fun mkBoxedDecl (pos, ((name, names), size)) =
-	( insertPointer name
-	; AST.BOXED_DECL (pos, TypeExp.LONG([], TypeExp.POINTER name), names, size)
+    fun mkBoxedDecl (pos, (((name, inherits), names), size)) =
+	( insertPointer name inherits
+	; AST.BOXED_DECL (pos, TypeExp.LONG([], TypeExp.POINTER(name,inherits)), names)
 	)
     fun mkSignalDecl (pos, ((name,signal),cbType)) = 
 	(AST.SIGNAL_DECL (pos, TypeExp.LONG([],mkTypeExp name), signal, cbType))
@@ -156,7 +156,11 @@ struct
     val flagsDecl = parenthesized' (defFlags $-- word -- constructors)
 
     val size = Combinators.string 
-    val boxedDecl = parenthesized' (defBoxed $-- word -- repeat word -- optional size)
+    fun mkInherits NONE = NONE
+      | mkInherits (SOME(NONE)) = SOME(TypeExp.INH_ROOT)
+      | mkInherits (SOME(SOME inh)) = SOME(TypeExp.INH_FROM inh)
+    val inherits = optional (parenthesized (optional word)) >> mkInherits
+    val boxedDecl = parenthesized' (defBoxed $-- word -- inherits -- repeat word -- optional size)
 
     val cbType = parenthesized (typeExp -- (parList >> map #1))
                  >> mkFunType

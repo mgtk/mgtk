@@ -1,6 +1,10 @@
 signature TypeExp =
 sig
 
+    datatype inherits =
+	INH_ROOT (* base of inheritance hierarchy *)
+      | INH_FROM of string (* inherits from string *)
+
     datatype texp = 
 	PRIMTYPE of string
       | TUPLE of long_texp list
@@ -9,7 +13,7 @@ sig
       | OUTPUT of long_texp
       | FLAG of string * bool (* is this an enum? *)
       | WIDGET of string * string option (* parent type *)
-      | POINTER of string
+      | POINTER of string * inherits option (* parent type *)
       | LIST of long_texp
     and long_texp = LONG of string list (* path to the type *)
                           * texp (* the type itself *)

@@ -6,7 +6,7 @@
 TRANSLATE=../mgtkgen
 REMOVE=rm -f
 
-all: gtk-adj gtk-fonts gtk-boxed gtk-output gtk-split-words gtk
+all: gtk-adj gtk-fonts gtk-boxed gtk-output gtk-split-words gtk gtk2
 
 fresh: clean all
 

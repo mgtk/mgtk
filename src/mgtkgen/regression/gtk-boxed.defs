@@ -6,3 +6,17 @@
   gdk_color_copy
   gdk_color_free
   "sizeof(GdkColor)")
+
+(define-boxed GdkDrawable ()
+  gdk_window_ref
+  gdk_window_unref)
+
+(define-boxed GdkWindow (GdkDrawable)
+  gdk_window_ref
+  gdk_window_unref)
+  
+(define-func gdk_window_clear_area 
+   none
+   ((GdkWindow drawable)
+    (int x1) (int y1)
+    (int x2) (int y2)))

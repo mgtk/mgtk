@@ -131,25 +131,25 @@ end
 
     type gdk_font = gpointer
 
-    eqtype gdk_im_style = int
+    type gdk_im_style = int
     val get_gdk_im_style_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_im_style")
     val (GDK_IM_PREEDIT_AREA,GDK_IM_PREEDIT_CALLBACKS,GDK_IM_PREEDIT_POSITION)
         = get_gdk_im_style_ ()
 
-    eqtype gdk_ic_attributes_type = int
+    type gdk_ic_attributes_type = int
     val get_gdk_ic_attributes_type_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_ic_attributes_type")
     val (GDK_IC_STYLE,GDK_IC_CLIENT_WINDOW,GDK_IC_FOCUS_WINDOW)
         = get_gdk_ic_attributes_type_ ()
 
-    eqtype gdk_im = int
+    type gdk_im = int
     val get_gdk_im_: unit -> int * int * int
         = app1(symb"mgtk_get_gdk_im")
     val (GDK_PREEDIT_AREA,GDK_PREEDIT_CALLBACKS,GDK_PREEDIT_POSITION)
         = get_gdk_im_ ()
 
-    eqtype clist_drag_pos = int
+    type clist_drag_pos = int
     val get_clist_drag_pos_: unit -> int * int * int * int
         = app1(symb"mgtk_get_clist_drag_pos")
     val (CLIST_DRAG_NONE,CLIST_DRAG_BEFORE,CLIST_DRAG_INTO,CLIST_DRAG_AFTER)
