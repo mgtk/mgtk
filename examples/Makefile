@@ -10,6 +10,15 @@ MLTONBIN=/usr/bin/
 
 MGTKHOME=../src/defs2sml/release/mgtk
 
+MLTON_VERSION=$(shell mlton)
+
+ifeq ($(word 2, $(MLTON_VERSION)), 20041109)
+MLTONFLAGS=-default-ann 'allowImport true'  -default-ann 'allowExport true' \
+           -link-opt "`pkg-config --libs-only-l gtk+-2.0`"
+else
+MLTONFLAGS=-link-opt "`pkg-config --libs-only-l gtk+-2.0`"
+endif
+
 
 .PHONY: all mosml mlton
 
@@ -22,7 +31,8 @@ mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview treeview
 
 # mosml stuff
 %: %.sml $(MGTKHOME)/mgtk.ui
-	$(MOSMLBIN)/mosmlc -o $* -I $(MGTKHOME) mgtk.ui $*.sml
+	$(MOSMLBIN)/mosmlc -standalone -o $* -I $(MGTKHOME) mgtk.ui $*.sml
+#	mosmlc -o $* -I $(MGTKHOME) mgtk.ui $*.sml
 
 
 # MLton stuff
@@ -32,7 +42,7 @@ mgtk-mlton.o: $(MGTKHOME)/mgtk-mlton.c
 #                      $(shell mlton -stop f %-mlton.cm)
 %-mlton: %.sml %-mlton.cm mgtk-mlton.o 
 	$(MLTONBIN)/mlton -output $*-mlton \
-			  -link-opt "`pkg-config --libs-only-l gtk+-2.0`" \
+			  $(MLTONFLAGS) \
 	                  $*-mlton.cm mgtk-mlton.o
 
 # cleaning
