@@ -26,10 +26,14 @@ sig
     val int  : (int, 'rest)  read
     val unit : (unit, 'rest) read
 
+    val void : (unit, 'rest) read
+
     val return_bool : bool return
     val return_int  : int  return
     val return_unit : unit return
 
+    val return_void : unit return
+ 
     val --> : ('a, 'b) read * ('b, 'c) trans -> ('a -> 'b, 'c) trans 
 
     type 'a signal

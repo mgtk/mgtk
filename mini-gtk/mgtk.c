@@ -139,22 +139,20 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   value res;
   valueptr mvp;
 
-  Push_roots(r, 2);  // because both alloc_tuple and Val_GtkObj allocates
-    r[0] = Val_GtkObj(object);
-    r[1] = wrap_GtkArg(args);
-    res  = alloc_tuple(3);
+  Push_roots(r, 1);  /* because both alloc_tuple and wrap_GtkArg allocates */
+    r[0] = wrap_GtkArg(args);
+    res  = alloc_tuple(2);
     Field(res,0) = r[0]; 
-    Field(res,1) = r[1];
-    Field(res,2) = Val_int(nargs);   
   Pop_roots();
+    Field(res,1) = Val_int(nargs);
+
 
   mvp = get_valueptr("mgtk_callback_dispatch"); 
   if(mvp == (valueptr) NULL)
     failwith("Cannot find mgtk_callback_dispatch");
 
-  /* printf("callback id = %i\n",(int) data); */
-
-  /* data is really a SML int */
+  /* printf("callback id = %i\n",(int) data); 
+   */
   res = callbackptr2(mvp, (value) data, res);
 }
 

@@ -48,7 +48,7 @@ struct
     local
 	prim_type GtkArgs
 
-        type callback_data = gtkobj * GtkArgs * int
+        type callback_data = GtkArgs * int
 	type callback = callback_data -> unit
 	type callback_id  = int
 
@@ -99,15 +99,24 @@ struct
     type ('a, 'rest) read = ('a -> 'rest, 'rest) trans
     type 'a return        = ('a, unit) trans
 
+    fun state f arg max = (f, S(arg, max, 0))
+
+    fun wrap conv f (arg, max) = ignore(conv(state f arg max)) 
+
     fun getter get (f, S(arg, max, next)) = 
-        if next <= max  (* FIXME: it should be < but that gives problems with
+        if next < max  (* FIXME: it should be < but that gives problems with
                                   return_unit.  Currently unsafe! *)
         then (f (get arg next), S(arg, max, next+1))
+        else (app print ["next = ", Int.toString next," max = ",Int.toString max, "\n"]; raise Subscript)
+
+
+    fun drop (f, S(arg, max, next)) = 
+        if next < max then (f, S(arg, max, next+1))
         else raise Subscript
 
     fun setter set (x, dummy as S(arg, max, next)) =
         if next = max then (set arg max x; ((),dummy))
-        else raise Subscript
+        else (app print ["next = ", Int.toString next," max = ",Int.toString max, "\n"]; raise Subscript)
 
     fun int x        = getter getInt x
     fun return_int x = setter setInt x
@@ -116,11 +125,12 @@ struct
     fun return_bool x = setter setBool x
 
     
-    fun unit x        = getter (fn _ => fn _ => ()) x
-    fun return_unit x = x
-    (*fun return_unit x = setter (fn _ => fn _ => fn _ => ()) x
-    *)           
+    (* FIXME: convince Ken that this correct *)
+    fun void (f, state) = (f(), state)
+    fun return_void (f, S(arg, max, next)) = (f, S(arg,max+1,next))
 
+    fun unit x        = getter (fn _ => fn _ => ()) x
+    fun return_unit x =  x
                
     infix --> 
 
@@ -128,10 +138,7 @@ struct
 
     datatype 'a signal = Sig of string * bool * callback
 
-    fun signal sign after conv f = 
-        let fun wrap (_, arg, max) = ignore(conv (f, S(arg, max, 0)))
-        in  Sig(sign, after, wrap)
-        end
+    fun signal sign after conv f = Sig(sign, after, wrap conv f)
 
     type signal_id = int
 
@@ -143,7 +150,7 @@ struct
     (* new formulations of the two old connect functions *)
     (* connect a callback with type unit -> unit *)
     fun unit_connect wid sign cb =
-        ignore(signalConnect wid (signal sign false (unit --> return_unit) cb))
+        ignore(signalConnect wid (signal sign false (void --> return_void) cb))
 
     (* connect a callback with type unit -> bool *)
     fun bool_connect wid sign cb =
