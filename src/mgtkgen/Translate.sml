@@ -437,9 +437,9 @@ struct
 			 $unRefFunc && $" (" && name && $"_val(val)); ")
 		  | _ => raise Fail("wrong number of ref/unref functions (" ^ flatten name ^ ")")
 		   
-	in  $"#define " && name && $"_val(x) ((void*) Field(x, 1))" && Nl && Nl
-         && $"#define " && name && $"_val_nocast(x) (Field(x, 1))" && Nl && Nl
-
+	in  $"#define " && name && $"_val(x) (((void*) Field(x, 1)))" && Nl&&Nl
+    (* && $"#define " && name && $"_val_nocast(x) (Field(x, 1))" && Nl && Nl
+    *)
          && $"static void ml_finalize_" && name && $" (value val) {" && Nl
          && $"  " && unRefExp && Nl
          && $"}" && Nl && Nl
@@ -448,7 +448,7 @@ struct
          && $"  value res;" && Nl
          && $"  " && refExp && Nl
          && $"  res = alloc_final (2, ml_finalize_" && name && $", 0, 1);" && Nl
-         && $"  " && name && $"_val_nocast(res) = (value) " && objExp && $";" && Nl
+         && $"  " && name && $"_val(res) = " && objExp && $";" && Nl
 	 && $"  return res;" && Nl
 	 && $"}" && Nl && Nl
 	end
