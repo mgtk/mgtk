@@ -40,7 +40,7 @@ struct
       | showModBegin (SIGNATURE _) = "sig"
 
     val toString = TinySML.toString (isStrMode, isSigMode)	    
-    fun print preamble os module =
+    fun print preamble sep_struct os module =
 	let fun dump s = TextIO.output(os, s)
 	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
 	    fun dump_preamble indent (SOME file) =
@@ -63,16 +63,17 @@ struct
 		; dump(spaces indent ^ "end\n")
 		)
 	    fun print_toplevel (AST.Module{name,members,info}) =
-		( dump(spaces 0 ^ showModInfo info ^ " = " ^ showModBegin info ^ "\n")
-                ;  dump_preamble 4 preamble
-                ; List.app (print_member info 4) members
-                ; dump("end\n")
-                )
-            (* no structure Gtk = ... wrapper *)
-	    fun print_toplevel (AST.Module{name,members,info}) =
-		( dump_preamble 0 preamble
-                ; List.app (print_member info 0) members
-                )
+		if sep_struct then
+		    ( dump(spaces 0 ^ showModInfo info ^ " = " ^ 
+			   showModBegin info ^ "\n")
+                    ;  dump_preamble 4 preamble
+                    ; List.app (print_member info 4) members
+                    ; dump("end\n")
+                    )
+		else
+		    ( dump_preamble 0 preamble
+                    ; List.app (print_member info 0) members
+                    )
 	in  print_toplevel module
 	end
 
@@ -123,8 +124,9 @@ struct
 		    fun fromprim ty e =
 			TypeInfo.fromPrimValue tinfo ty e
 			handle TypeInfo.Unbound n => ubnd n
+		    val primty = primtypeFromType ty
 		in  StrOnly(
-                       ValDecl(VarPat(name^"_"), Some(primtypeFromType ty), 
+                       ValDecl(VarPat(name^"_"), Some primty,
 			       ccall cname (List.length pars)))
                  ++ Some(
                        ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),

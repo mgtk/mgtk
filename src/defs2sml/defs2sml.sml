@@ -62,6 +62,7 @@ fun main () =
 	val verbosity = ref 0
 
 	val forMLton = ref false
+	val sep_struct = ref false
 
 	val args = [ ("-I",  ArgParse.String DefsParse.addPath)
 		   , ("-so", ArgParse.String setSMLOutFile)
@@ -73,6 +74,7 @@ fun main () =
 		   , ("-q",  ArgParse.Unit   MsgUtil.quiet)
 		   , ("-v",  ArgParse.Unit   (inc verbosity))
 		   , ("--mlton",  ArgParse.Unit   (fn () => forMLton := true))
+		   , ("--separate-struct",  ArgParse.Unit   (fn () => sep_struct := true))
                    ] @ Debug.argparse ()
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
@@ -163,7 +165,8 @@ fun main () =
 	val typeinfo = MLtonTypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
 	val api' = GenSMLMLton.generate typeinfo api
-	val _ = GenSMLMLton.print (!smlPreamble) (getOutFile()) api'
+	val _ = GenSMLMLton.print (!smlPreamble) (!sep_struct) 
+				  (getOutFile()) api'
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 	val _ = MsgUtil.print "No C code generated for MLton"
@@ -177,7 +180,8 @@ fun main () =
 	val typeinfo = MosmlTypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
 	val api' = GenSMLMosml.generate typeinfo api
-	val _ = GenSMLMosml.print (!smlPreamble) (getOutFile()) api'
+	val _ = GenSMLMosml.print (!smlPreamble) (!sep_struct)
+				  (getOutFile()) api'
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 

@@ -22,7 +22,7 @@ regression: $(MAIN)
 	echo "Regression test results ... "; \
         for file in $$files ; do \
 	      base=`basename $$file .defs`; \
-              ./$(MAIN) -q $$file -o $(REGRESSIONDIR)/output/$$base.out ; \
+              ./$(MAIN) --separate-struct -q $$file -o $(REGRESSIONDIR)/output/$$base.out ; \
 	      diff -Naur $(REGRESSIONDIR)/trusted/$$base.out $(REGRESSIONDIR)/output/$$base.out ; \
         done
 
@@ -31,21 +31,21 @@ test-compile: $(MAIN)
 	echo "Regression test results ... "; \
         for file in $$files ; do \
 	      base=`basename $$file .defs`; \
-              ./$(MAIN) $$file -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$$base ; \
+              ./$(MAIN) --separate-struct $$file -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$$base ; \
 	      mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$$base.sml ; \
 	      gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$$base.c ; \
         done
 
 
 testgen-%: $(MAIN)
-	./$(MAIN) $(OPTIONS) test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
+	./$(MAIN) $(OPTIONS) --separate-struct test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
 
 testcomp-%: testgen-%
 	gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$*.c
 	mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$*.sml
 
 reggen-%: $(MAIN)
-	@./$(MAIN) -q $(OPTIONS) -o $(REGRESSIONDIR)/output/$*.out test/regression/input/$*.defs
+	@./$(MAIN) --separate-struct -q $(OPTIONS) -o $(REGRESSIONDIR)/output/$*.out test/regression/input/$*.defs
 
 regcomp-%: reggen-%
 	@if diff -Naur $(REGRESSIONDIR)/trusted/$*.out $(REGRESSIONDIR)/output/$*.out ; then \

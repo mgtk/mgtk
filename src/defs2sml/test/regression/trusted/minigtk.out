@@ -177,7 +177,8 @@ structure Gtk = struct
         val inherit : 'a -> GObject.constructor -> 'a t
 
         type type_t
-
+        val TOPLEVEL : type_t
+        val POPUP : type_t
 
         val new : type_t -> base t
     end

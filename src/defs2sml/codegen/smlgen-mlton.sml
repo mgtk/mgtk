@@ -3,8 +3,8 @@
 
 functor GenSMLMLton(structure TypeInfo : TypeInfo) 
 	: GEN_SML where type typeinfo = TypeInfo.typeinfo =
-
 struct
+
     (* convenience *)
     open TinySML
 
@@ -36,7 +36,7 @@ struct
       | showModBegin (SIGNATURE _) = "sig"
 
     val toString = TinySML.toString (isStrMode, isSigMode)	    
-    fun print preamble os module =
+    fun print preamble sep_struct os module =
 	let fun dump s = TextIO.output(os, s)
 	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
 	    fun dump_preamble indent (SOME file) =
@@ -59,9 +59,17 @@ struct
 		; dump(spaces indent ^ "end\n")
 		)
 	    fun print_toplevel (AST.Module{name,members,info}) =
-		( dump_preamble 0 preamble
-                ; List.app (print_member info 0) members
-                )
+		if sep_struct then
+		    ( dump(spaces 0 ^ showModInfo info ^ " = " ^ 
+			   showModBegin info ^ "\n")
+                    ;  dump_preamble 4 preamble
+                    ; List.app (print_member info 4) members
+                    ; dump("end\n")
+                    )
+		else
+		    ( dump_preamble 0 preamble
+                    ; List.app (print_member info 0) members
+                    )
 	in  print_toplevel module
 	end
 
@@ -112,7 +120,7 @@ struct
 			handle TypeInfo.Unbound n => ubnd n
 		    val primty = primtypeFromType ty
 		in  StrOnly(
-                       ValDecl(VarPat(name^"_"), SigOnly(primty),
+                       ValDecl(VarPat(name^"_"), Some(primty),
 			       ccall cname primty))
                  ++ Some(
                        ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),
@@ -176,19 +184,25 @@ struct
 		    fun show ty =
 			let open Type
 			    fun loop Void = "void"
-			      | loop (Func([(_,ty)],ret)) = 
-				   loop ty ^ " --> " ^ "return_" ^ loop ret
-			      | loop (Func _) = raise Fail("signal: not impl.")
-			      | loop (Base tn) = Name.asType tn
+			      | loop (Func(args,ret)) = 
+				   Util.stringSep "" "" " --> " (loop o #2) args
+				   ^ " --> " ^ "return_" ^ loop ret
+			      | loop (Base tn) = 
+				   (case Name.asType tn of
+					"uint" => "int"
+				      | ty => ty
+                                   )
 			      | loop (Tname tn) = 
 				   (* FIXME: ? *) "unit"
 			      | loop (Ptr ty) = loop ty
-			      | loop _ = raise Fail("signal: not impl")
+			      | loop (Const ty) = loop ty
+			      | loop (Arr(i, ty)) = raise Fail("signal (dyn): not impl for "^name)
 			in  loop ty end
 		    fun toSmlType ty =
 			let open Type
 			    fun loop Void = UnitTy
 			      | loop (Ptr ty) = loop ty
+			      | loop (Const ty) = loop ty
 			      | loop (Func(args,ret)) = 
 				   ArrowTy(List.map (loop o #2) args, loop ret)
 			      | loop (Tname tn) = UnitTy
@@ -196,9 +210,13 @@ struct
 				   (case Name.asType tn of
 					"bool" => BoolTy
 				      | "char" => CharTy
-				      | _ => raise Fail("signal: not impl")
+				      | "uint" => IntTy
+				      | "int" => IntTy
+				      | "double" => RealTy
+				      | "float" => RealTy
+				      | ty => raise Fail("signal: not impl:" ^ty ^ " for " ^name)
                                    )
-			      | loop _ = raise Fail("signal: not impl")
+			      | loop (Arr(i,ty)) = raise Fail("signal (stat): not impl for "^name)
 			    val ret = TyApp([TyApp([TyVar "'a"], ["t"])], ["Signal","signal"])
 			in  ArrowTy([loop ty], ret) end
 		    val args = [Str name, Const "false", 
