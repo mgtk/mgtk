@@ -6,7 +6,7 @@ MOSMLBIN=/usr/bin
 # Debian setup
 MLTONHOME=/usr/lib/mlton
 MLTONINCLUDE=/usr/lib/mlton/include
-MLTONBIN=/usr/bin/
+MLTONBIN=/usr/bin
 
 MGTKHOME=../src/defs2sml/release/mgtk
 
