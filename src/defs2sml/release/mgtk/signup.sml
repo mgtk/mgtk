@@ -6,7 +6,7 @@ fun delete_event _ = ( GtkBasis.main_quit()
 
 local infixr --> val op--> = Signal.--> 
 val Entry_changed_sig = Signal.signal "changed" true 
-				      (Signal.unit --> Signal.return_void)
+				      (Signal.void --> Signal.return_void)
 in
 
 fun setUpGui() = 
@@ -44,7 +44,7 @@ fun setUpGui() =
                 end
 
         fun makeEntryLabel text entry =
-            let val l = Label.new (SOME text)
+            let val l = Label.new_with_mnemonic (SOME text)
             in  (* l.xalign = 0.0 
                  ; *) 
                 Box.pack_start v l (SOME true) (SOME false) (SOME 0)
