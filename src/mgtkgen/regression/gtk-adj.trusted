@@ -19,43 +19,43 @@
 /* *** Adjustment stuff *** */
 
 /* ML type: gtkobj -> real */
-value mgtk_adjustment_get_value(value wid) { /* ML */
+EXTERNML value mgtk_adjustment_get_value(value wid) { /* ML */
   return copy_double((GTK_ADJUSTMENT(GtkObj_val(wid))) -> value);
 }
 
 
 /* ML type: gtkobj -> real */
-value mgtk_adjustment_get_lower(value wid) { /* ML */
+EXTERNML value mgtk_adjustment_get_lower(value wid) { /* ML */
   return copy_double((GTK_ADJUSTMENT(GtkObj_val(wid))) -> lower);
 }
 
 
 /* ML type: gtkobj -> real */
-value mgtk_adjustment_get_upper(value wid) { /* ML */
+EXTERNML value mgtk_adjustment_get_upper(value wid) { /* ML */
   return copy_double((GTK_ADJUSTMENT(GtkObj_val(wid))) -> upper);
 }
 
 
 /* ML type: gtkobj -> real */
-value mgtk_adjustment_get_step_increment(value wid) { /* ML */
+EXTERNML value mgtk_adjustment_get_step_increment(value wid) { /* ML */
   return copy_double((GTK_ADJUSTMENT(GtkObj_val(wid))) -> step_increment);
 }
 
 
 /* ML type: gtkobj -> real */
-value mgtk_adjustment_get_page_increment(value wid) { /* ML */
+EXTERNML value mgtk_adjustment_get_page_increment(value wid) { /* ML */
   return copy_double((GTK_ADJUSTMENT(GtkObj_val(wid))) -> page_increment);
 }
 
 
 /* ML type: gtkobj -> real */
-value mgtk_adjustment_get_page_size(value wid) { /* ML */
+EXTERNML value mgtk_adjustment_get_page_size(value wid) { /* ML */
   return copy_double((GTK_ADJUSTMENT(GtkObj_val(wid))) -> page_size);
 }
 
 
 /* ML type: real * real * real * real * real * real -> gtkobj */
-value mgtk_adjustment_new(value mgtk_params) { /* ML */
+EXTERNML value mgtk_adjustment_new(value mgtk_params) { /* ML */
   value valu = Field(mgtk_params, 0);
   value lower = Field(mgtk_params, 1);
   value upper = Field(mgtk_params, 2);

@@ -31,7 +31,7 @@ value Val_GdkColor (void* obj) {
 }
 
 /* ML type: string -> bool * gdk_color */
-value mgdk_color_parse(value name) { /* ML */
+EXTERNML value mgdk_color_parse(value name) { /* ML */
   value res;
   GdkColor rescolor;
   value rescall = gdk_color_parse(String_val(name), &rescolor);
@@ -45,7 +45,7 @@ value mgdk_color_parse(value name) { /* ML */
 
 
 /* ML type: gtkobj -> string */
-value mgtk_label_get(value label) { /* ML */
+EXTERNML value mgtk_label_get(value label) { /* ML */
   char* resstr;
   gtk_label_get(GtkObj_val(label), &resstr);
   return copy_string(resstr);
@@ -55,7 +55,7 @@ value mgtk_label_get(value label) { /* ML */
 
 
 /* ML type: gtkobj -> int * int * int */
-value mgtk_calendar_get(value cal) { /* ML */
+EXTERNML value mgtk_calendar_get(value cal) { /* ML */
   value res;
   int resyear;
   int resmonth;

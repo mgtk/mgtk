@@ -31,7 +31,7 @@ value Val_GdkFont (void* obj) {
 }
 
 /* ML type: unit -> int * int * int */
-value mgtk_get_gdk_im_style (value dummy) { /* ML */
+EXTERNML value mgtk_get_gdk_im_style (value dummy) { /* ML */
   value res = alloc_tuple(3);
   Field(res,0) = Val_int(GDK_IM_PREEDIT_AREA);
   Field(res,1) = Val_int(GDK_IM_PREEDIT_CALLBACKS);
@@ -40,7 +40,7 @@ value mgtk_get_gdk_im_style (value dummy) { /* ML */
 }
 
 /* ML type: unit -> int * int * int */
-value mgtk_get_gdk_ic_attributes_type (value dummy) { /* ML */
+EXTERNML value mgtk_get_gdk_ic_attributes_type (value dummy) { /* ML */
   value res = alloc_tuple(3);
   Field(res,0) = Val_int(GDK_IC_STYLE);
   Field(res,1) = Val_int(GDK_IC_CLIENT_WINDOW);
@@ -49,7 +49,7 @@ value mgtk_get_gdk_ic_attributes_type (value dummy) { /* ML */
 }
 
 /* ML type: unit -> int * int * int */
-value mgtk_get_gdk_im (value dummy) { /* ML */
+EXTERNML value mgtk_get_gdk_im (value dummy) { /* ML */
   value res = alloc_tuple(3);
   Field(res,0) = Val_int(GDK_PREEDIT_AREA);
   Field(res,1) = Val_int(GDK_PREEDIT_CALLBACKS);
@@ -58,7 +58,7 @@ value mgtk_get_gdk_im (value dummy) { /* ML */
 }
 
 /* ML type: unit -> int * int * int * int */
-value mgtk_get_clist_drag_pos (value dummy) { /* ML */
+EXTERNML value mgtk_get_clist_drag_pos (value dummy) { /* ML */
   value res = alloc_tuple(4);
   Field(res,0) = Val_int(GTK_CLIST_DRAG_NONE);
   Field(res,1) = Val_int(GTK_CLIST_DRAG_BEFORE);

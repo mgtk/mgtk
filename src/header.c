@@ -8,6 +8,12 @@
 #include <memory.h>
 #include <callback.h>
 
+#ifdef WIN32
+#define EXTERNML __declspec(dllexport)
+#else
+#define EXTERNML
+#endif
+
 
 /* TODO: 
 
@@ -37,7 +43,7 @@ value Val_GtkObj (void* obj) {
 /* *** Basic stuff *** */
 
 /* ML type: string vector -> unit */
-value mgtk_init(value args) { /* ML */
+EXTERNML value mgtk_init(value args) { /* ML */
   /* PRECONDITION: Wosize_val(args) > 0 */
   int argc, i;
   char** argv;
@@ -68,13 +74,13 @@ value mgtk_init(value args) { /* ML */
 
 
 /* ML type: unit -> unit */
-value mgtk_main(value dummy) { /* ML */
+EXTERNML value mgtk_main(value dummy) { /* ML */
   gtk_main ();
   return Val_unit;
 }
 
 /* ML type: unit -> unit */
-value mgtk_main_quit(value dummy) { /* ML */
+EXTERNML value mgtk_main_quit(value dummy) { /* ML */
   gtk_main_quit ();
   return Val_unit;
 }
@@ -154,7 +160,7 @@ void mgtk_callback_destroy (gpointer data) {
 
 
 /* ML type: gtkobj -> string -> clb -> bool -> int */
-value mgtk_signal_connect (value object, value name, value clb, value after){
+EXTERNML value mgtk_signal_connect (value object, value name, value clb, value after){
   int res;
 
   //  printf("register id = %i\n",(int) clb);
@@ -173,7 +179,7 @@ value mgtk_signal_connect (value object, value name, value clb, value after){
 /* *** GtkArg stuff *** */
 
 /* ML type : GtkArgs -> int -> bool -> unit */
-value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
+EXTERNML value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
   int p = Int_val(pos);
 
   if (GTK_FUNDAMENTAL_TYPE(args[p].type) != GTK_TYPE_BOOL)
@@ -197,7 +203,7 @@ static void mgtk_finalize_glist (value val) {
 
 
 /* ML type: unit -> glist */
-value mgtk_glist_nil (value dummy) { /* ML */
+EXTERNML value mgtk_glist_nil (value dummy) { /* ML */
   value res; 
   res = alloc_final (2, mgtk_finalize_glist, 0, 1);
   Glist_val(res) = (value) NULL;  
@@ -205,7 +211,7 @@ value mgtk_glist_nil (value dummy) { /* ML */
 }
 
 /* ML type: glist -> string -> unit */
-value mgtk_glist_append_string(value ls, value s) { /* ML */
+EXTERNML value mgtk_glist_append_string(value ls, value s) { /* ML */
   Glist_val(ls) = g_list_append (Glist_val(ls), String_val (s));
   return Val_unit;
 }
@@ -237,3 +243,5 @@ void gtk_widget_get_allocation (GtkWidget *widget, int *width, int *height,
 GdkGC *gtk_widget_get_style_fg_gc (GtkWidget *widget, GtkStateType state) {
   return widget->style->fg_gc[state];
 }
+
+

@@ -326,7 +326,7 @@ old*)
 	    val (outPars, pars, retType) = separateParams (retTyp, params)
 	    val typ = mlFunType (retTyp, params)
 	in  $"/* ML type: " && mkMLPrimType typ && $" */" && Nl
-         && $$["value m", name] && paramList pars && $" { /* ML */" && Nl
+         && $$["EXTERNML ", "value m", name] && paramList pars && $" { /* ML */" && Nl
          && declareOutParams (retType, outPars)
          && (if fitsDynApp pars then Empty else extractParams pars && Nl)
          && mkReturn cExp (retType, outPars)
@@ -594,8 +594,9 @@ old*)
 	    fun prCnstr (n, (_,c)) =
 		$$["  Field(res,",Int.toString n,") = Val_int(",c,");"]
 	    val typ = mlPrimEnumType (name, constr)
-	in  $"/* ML type: unit -> " && mkMLPrimType typ && $" */" && Nl
-         && $$["value mgtk_get_", type_name, " (value dummy) { /* ML */"] && Nl
+	in  (* why don't we use mkFunDecl above? *)
+            $"/* ML type: unit -> " && mkMLPrimType typ && $" */" && Nl
+         && $$["EXTERNML value mgtk_get_", type_name, " (value dummy) { /* ML */"] && Nl
          && $$["  value res = alloc_tuple(", Int.toString (List.length constr), ");"] && Nl
          && prsep Nl prCnstr constr' && Nl
          && $$["  return res;"] && Nl

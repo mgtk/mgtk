@@ -31,12 +31,12 @@ value Val_GdkFont (void* obj) {
 }
 
 /* ML type: string -> gdk_font */
-value mgdk_font_load(value name) { /* ML */
+EXTERNML value mgdk_font_load(value name) { /* ML */
   return Val_GdkFont(gdk_font_load(String_val(name)));
 }
 
 /* ML type: string -> gdk_font */
-value mgdk_fontset_load(value name) { /* ML */
+EXTERNML value mgdk_fontset_load(value name) { /* ML */
   return Val_GdkFont(gdk_fontset_load(String_val(name)));
 }
 
