@@ -24,9 +24,9 @@ endif
 
 all: mosml mlton
 
-mosml: helloworld buttons-galore signup menus listview treeview
+mosml: helloworld buttons-galore signup menus listview treeview editor
 
-mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview-mlton treeview-mlton
+mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview-mlton treeview-mlton editor-mlton
 
 
 # mosml stuff

@@ -48,10 +48,10 @@ struct
 	    val seenbefore = ref (Set.empty Name.compare)
 	    fun add name = seenbefore := Set.add(!seenbefore,name)
 	    val _ = add (Name.fromString "GObject")
-	    fun lookup (full,base) =
+	    fun lookup tyname current (full,base) =
 		if Set.member(!seenbefore, Name.fromPaths(full,[],base))
 		then (full,base,[])
-		else (full,[],base)
+		else (full,[], base)
 	    fun id (full,base) = (full,[],base)
 	    fun splitfcn info = 
                 case info of
@@ -94,7 +94,7 @@ struct
 	      | resMemInfo path (Object obj) = Object(resObject path obj)
 	    and resType (parent,current) ty =
 		let fun demod_ty (Type.Tname _, tyname) = 
-			let val (f,p,b) = toName lookup Name.separateWords current tyname
+			let val (f,p,b) = toName (lookup tyname current) Name.separateWords current tyname
 			in  Name.fromPaths(f,p,b) end
 		      | demod_ty (Type.Base _, tyname) = Name.fromPaths([],[],[tyname])
 		      | demod_ty (_,_) = raise Fail("resType: shouldn't happen")
@@ -102,7 +102,7 @@ struct
 		in  Type.mapiv demod_ty demod_def ty end
 	    and resObject (parent,current) (ty,typarent,impl) =
 		let fun demod n =
-		    let val (f,p,b) = toName lookup Name.separateWords parent n
+		    let val (f,p,b) = toName (lookup n current) Name.separateWords parent n
 		    in  Name.fromPaths(f,p,b) end
 		in  (demod ty, Option.map demod typarent, List.map demod impl)
 		end

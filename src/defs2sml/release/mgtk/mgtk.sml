@@ -6793,10 +6793,9 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toFileChooserDialog : 'a t -> base t
 	val asFileChooser : 'a t -> base FileChooser.t
-	val new : string option -> 'a Window.t option -> action 
-	       -> string option
+	val new : string option -> 'a Window.t option -> FileChooser.action 
 		  -> base t
-	val new' : action -> base t
+	val new' : FileChooser.action -> base t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6809,17 +6808,16 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toFileChooserDialog obj = inherit () (fn () => repr obj)
 	fun asFileChooser obj = FileChooser.inherit () (fn () => repr obj)
-	val new_ : string -> cptr -> int -> string -> cptr
+	val new_ : string -> cptr -> FileChooser.action -> cptr -> cptr
 	    = app4 (symb"mgtk_gtk_file_chooser_dialog_new")
-	val new : string option -> 'a Window.t option -> action 
-	       -> string option
+	val new : string option -> 'a Window.t option -> FileChooser.action 
 		  -> base t
-	    = fn title => fn parent => fn action => fn first_button_text =>
+	    = fn title => fn parent => fn action => 
 		 make (new_ (getOpt (title, ""))
 			    (getOpt (Option.map repr parent, GObject.null))
-			    action (getOpt (first_button_text, "")))
-	val new' : action -> base t
-	    = fn action => make (new_ "" GObject.null action "")
+			    action GObject.null)
+	val new' : FileChooser.action -> base t
+	    = fn action => make (new_ "" GObject.null action GObject.null)
     end
     structure FileChooserWidget :>
       sig
@@ -6829,7 +6827,7 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toFileChooserWidget : 'a t -> base t
 	val asFileChooser : 'a t -> base FileChooser.t
-	val new : action -> base t
+	val new : FileChooser.action -> base t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6842,8 +6840,8 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toFileChooserWidget obj = inherit () (fn () => repr obj)
 	fun asFileChooser obj = FileChooser.inherit () (fn () => repr obj)
-	val new_ : int -> cptr = app1 (symb"mgtk_gtk_file_chooser_widget_new")
-	val new : action -> base t = fn action => make (new_ action)
+	val new_ : FileChooser.action -> cptr = app1 (symb"mgtk_gtk_file_chooser_widget_new")
+	val new : FileChooser.action -> base t = fn action => make (new_ action)
     end
     structure FileFilter :>
       sig

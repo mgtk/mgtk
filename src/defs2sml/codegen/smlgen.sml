@@ -333,7 +333,7 @@ struct
 
     exception Skip of string
 
-    fun ubnd whre n = raise Skip("Unbound type name("^whre^"): "^Name.toString n)
+    fun ubnd whre n = raise Skip("Unbound type name("^whre^"): "^Name.toString' n)
 
     fun trans tinfo (name,member) =
 	case member of

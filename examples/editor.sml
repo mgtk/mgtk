@@ -65,7 +65,9 @@ fun getFile kind =
                 OPEN => ("Open File", FileChooser.ACTION_OPEN, "gtk-open")
               | SAVE => ("Save As", FileChooser.ACTION_SAVE, "gtk-save-as")
 
-        val dialog = FileChooserDialog.new title NONE action NONE
+	val _ = print "Making dialog ...\n"
+        val dialog = FileChooserDialog.new NONE NONE action
+	val _ = print "Dialog up\n"
         val _ = map (uncurry (Dialog.add_button dialog))
                     [ ("gtk-cancel", RESPONSE_CANCEL)
                     , (stock       , RESPONSE_ACCEPT)
@@ -119,14 +121,14 @@ fun setUpGui() =
                          val textView = TextView.new()
                          val buffer = TextView.get_buffer textView
                          val scrolled = ScrolledWindow.new'()
-                         val lab = Label.new (SOME file)                  
+                         val lab = Label.new file
                      in  ScrolledWindow.set_policy scrolled POLICY_AUTOMATIC 
                                                             POLICY_AUTOMATIC
                        ; Container.add scrolled textView  
                        ; TextBuffer.set_text buffer content ~1
                        ; Widget.show_all scrolled
                        ; Widget.show lab
-                       ; Notebook.prepend_page notebook scrolled lab
+                       ; Notebook.prepend_page notebook scrolled (SOME lab)
                        ; Notebook.set_current_page notebook 0
                        ; buffers := buffer :: !buffers
                        ; say (file ^ " has " ^ 
@@ -161,7 +163,7 @@ fun setUpGui() =
                                       
                             val buffer = BasisList.nth(!buffers, n)
                             val (startIter, endIter) = TextBuffer.get_bounds buffer
-                            val content = TextBuffer.get_text buffer startIter endIter (SOME false)
+                            val content = TextBuffer.get_text buffer startIter endIter false
                         in  TextIO.output(dev, content)
                           ; TextIO.closeOut dev 
                           ; say ("Buffer saved to file "^file)
