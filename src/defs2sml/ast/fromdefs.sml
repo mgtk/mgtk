@@ -39,7 +39,6 @@ structure FromDefs :> FromDefs = struct
 		    fun loop [] acc = nothing
 		      | loop (ith::rest) acc = 
 			let val ith = Name.capitalize ith
-			    val _ = print("Looking at " ^ ith ^ "\n")
 			    val probable = String.concat(rev(ith::acc))
 			in  if Map.peek(map,probable) = NONE then
 				loop rest (ith::acc)

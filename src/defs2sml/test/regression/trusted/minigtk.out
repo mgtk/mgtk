@@ -1,6 +1,7 @@
 structure Gtk = struct
+    open Dynlib
+    val symb = GtkBasis.symb
     signature Object = sig
-
         type base
         type 'a object_t
         type 'a t = 'a object_t GObject.t
@@ -13,7 +14,6 @@ structure Gtk = struct
 
     end
     structure Object :> Object = struct
-
         type base = unit
         type 'a object_t = unit
         type 'a t = 'a object_t GObject.t
@@ -26,7 +26,6 @@ structure Gtk = struct
         fun make ptr = GObject.inherit () (fn () => ptr)
     end
     signature Widget = sig
-
         type base
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
@@ -45,7 +44,6 @@ structure Gtk = struct
         val hide_all : 'a t -> unit
     end
     structure Widget :> Widget = struct
-
         type base = unit
         type 'a widget_t = unit
         type 'a t = 'a widget_t Object.t
@@ -82,7 +80,6 @@ structure Gtk = struct
             = fn self => hide_all_ (repr self)
     end
     signature Container = sig
-
         type base
         type 'a container_t
         type 'a t = 'a container_t Widget.t
@@ -99,7 +96,6 @@ structure Gtk = struct
         val remove : 'a t -> 'b Widget.t -> unit
     end
     structure Container :> Container = struct
-
         type base = unit
         type 'a container_t = unit
         type 'a t = 'a container_t Widget.t
@@ -128,7 +124,6 @@ structure Gtk = struct
             = fn self => fn widget => remove_ (repr self) (repr widget)
     end
     signature Bin = sig
-
         type base
         type 'a bin_t
         type 'a t = 'a bin_t Container.t
@@ -141,7 +136,6 @@ structure Gtk = struct
 
     end
     structure Bin :> Bin = struct
-
         type base = unit
         type 'a bin_t = unit
         type 'a t = 'a bin_t Container.t
@@ -154,7 +148,6 @@ structure Gtk = struct
         fun make ptr = Container.inherit () (fn () => ptr)
     end
     signature Window = sig
-
         type base
         type 'a window_t
         type 'a t = 'a window_t Bin.t
@@ -165,10 +158,12 @@ structure Gtk = struct
 
         val inherit : 'a -> GObject.constructor -> 'a t
 
-        val new : WindowType.WindowType -> base t
+        type type_t
+
+
+        val new : Type.type_t -> base t
     end
     structure Window :> Window = struct
-
         type base = unit
         type 'a window_t = unit
         type 'a t = 'a window_t Bin.t
@@ -179,13 +174,16 @@ structure Gtk = struct
 
         fun inherit w con = Bin.inherit () con
         fun make ptr = Bin.inherit () (fn () => ptr)
+        type type_t = int
+        val get_type_t_ : unit -> int * int
+            = app1 (symb"mgtk_get_gtk_window_type")
+        val (TOPLEVEL,POPUP) = get_type_t_ ()
         val new_ : int -> cptr
             = app1 (symb"mgtk_gtk_window_new")
-        val new : WindowType.WindowType -> base t
+        val new : Type.type_t -> base t
             = fn wtype => make (new_ (repr wtype))
     end
     signature Button = sig
-
         type base
         type 'a button_t
         type 'a t = 'a button_t Bin.t
@@ -203,7 +201,6 @@ structure Gtk = struct
         val get_label : 'a t -> string
     end
     structure Button :> Button = struct
-
         type base = unit
         type 'a button_t = unit
         type 'a t = 'a button_t Bin.t
@@ -235,10 +232,6 @@ structure Gtk = struct
         val get_label : 'a t -> string
             = fn self => get_label_ (repr self)
     end
-    type windowtype = int
-    val get_windowtype_ : unit -> int * int
-        = app1 (symb"mgtk_get_gtk_windowtype")
-    val (GTK_WINDOW_TOPLEVEL,GTK_WINDOW_POPUP) = get_windowtype_ ()
 end
 
 
@@ -317,6 +310,14 @@ EXTERNML value mgtk_gtk_container_remove(value self, value widget) { /* ML */
 
 
 /* *** Window *** */
+/* ML type: unit */
+EXTERNML value mgtk_gtk_window_type(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(TOPLEVEL);
+    Field(res, 1) = Val_int(POPUP);
+    return res;
+}
+
 /* ML type: int -> cptr */
 EXTERNML value mgtk_gtk_window_new(value wtype) { /* ML */
     return Val_GtkObj(gtk_window_new(Int_val(wtype)));
@@ -349,13 +350,5 @@ EXTERNML value mgtk_gtk_button_set_label(value self, value label) { /* ML */
 /* ML type: cptr -> string */
 EXTERNML value mgtk_gtk_button_get_label(value self) { /* ML */
     return my_copy_string(gtk_button_get_label(GtkObj_val(self)));
-}
-
-/* ML type: unit */
-EXTERNML value mgtk_gtk_windowtype(value dummy) { /* ML */
-  value res = alloc_tuple(2);
-  Field(res, 0) = Val_int(GTK_WINDOW_TOPLEVEL);
-  Field(res, 1) = Val_int(GTK_WINDOW_POPUP);
-  return res;
 }
 

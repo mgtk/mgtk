@@ -1,3 +1,5 @@
+TESTING
+gtk_dummy_function
 THESE_SIMPLY_DO_NOT_WORK
 gtk_accel_group_find
 _gtk_accel_map_init

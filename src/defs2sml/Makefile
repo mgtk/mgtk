@@ -38,7 +38,7 @@ test-compile: $(MAIN)
 
 
 test-%: $(MAIN)
-	./$(MAIN) test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
+	./$(MAIN) $(OPTIONS) test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
 	mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$*.sml
 	gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$*.c
 

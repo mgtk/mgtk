@@ -62,6 +62,7 @@ fun main () =
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
 
+        (* 1. Parse *)
 	val defs = (MsgUtil.print "Parsing (defs)..."; 
 		    DefsParse.parseFile (getFile ()) 
 		    before
@@ -69,6 +70,7 @@ fun main () =
 	val _ = MsgUtil.print ("Defs file with " ^ Int.toString (List.length defs) ^ " definitions\n")
 
 
+        (* 2. Build modules and exclude items*)
 	val api = FromDefs.fromDefs "Gtk" defs
 	val exclude = 
 	    let fun read file =
@@ -91,8 +93,8 @@ fun main () =
            not filtered away, valOf below should always work. *)
 	val api = Option.valOf(AST.filteri (filter,filter) api)
 
-        (* Change the order of the entries in the file to move 
-           all non-module stuff up before modules. *)
+        (* 3. Change the order of the entries in the file to move 
+              all non-module stuff up before modules. *)
 	fun order api =
 	    let fun oModule (AST.Module{name,members,info}) =
 		    let val (mods,non) = 
@@ -107,14 +109,16 @@ fun main () =
 	    end
 	val api = order api
 
+        (* 4. Resolve types and names *)
 	val api = ResolveTypes.resolve (ResolveNames.resolve api)
 
-	val typeinfo = TypeInfo.build api
 
+	val typeinfo = TypeInfo.build api
 	val (modules,values) = AST.fold (fn (mn,(m,v)) => (m+1,v), fn (mn,(m,v)) => (m,v+1)) (0,0) api
 	val _ = MsgUtil.close ("  corresponding to " ^ Int.toString modules ^ "(sub)modules with " ^ Int.toString values ^ " values\n")
 
-
+	(* 5. Generate code ... *)
+        (*    ... SML *)
 	val _ = MsgUtil.print "Generating SML code ..."
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
 	val api' = GenSML.generate typeinfo api
@@ -122,6 +126,7 @@ fun main () =
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 
+        (*    ... C *)
 	val _ = MsgUtil.print "Generating C code ..."
 	val (getOutFile,closeOutFile) = outFileSetup cOutFile
 	val api'' = GenC.generate typeinfo api

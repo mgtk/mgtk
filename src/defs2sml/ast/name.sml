@@ -103,7 +103,7 @@ structure Name :> NAME = struct
     (* make sure a name gets output as a valid ML name *)
     fun mlify name =
 	let val (f,p,b) = (getFullPath name, getPath name, getBase name)
-	    fun ify "Type" = "Ctype" (* FIXME *)
+	    fun ify "Type" = "type_t" (* FIXME *)
 	      | ify n = n
 	in  fromPaths(map ify f, map ify p, map ify b) end
 
