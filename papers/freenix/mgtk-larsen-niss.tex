@@ -553,7 +553,7 @@ inheritance subtyping.  In particular we use \emph{phantom types} to
 encode the inheritance path.
 
 
-\begin{figure}[htp]
+\begin{figure}[thp]
   \centering
 % \includegraphics[width=.8\linewidth]{example-class-diagram.eps}
 %  \includegraphics[width=.8\linewidth]{filedecr-class-diagram.eps}
@@ -582,8 +582,10 @@ that is, the parts that go into the signatures. The parts that go into
 the structures are not as interesting: that is simply a matter of
 calling into the C runtime.
 
-\begin{description}
-\item[Class types] A base class like \classname{Widget} in
+{\setlength{\leftmargini}{0mm}%
+\begin{description} \itemsep 1.5em%
+
+\item[Class types:] A base class like \classname{Widget} in
   Figure~\ref{fig:class-hierarchy} is encoded as an abstract
   parameterized type:
 \begin{SMLcode}
@@ -595,7 +597,7 @@ variable !'path! will be used to hold the inheritance path for
 subclasses.
 
 
-\item[Subtyping/Inheritance] For a subclass like \classname{Label} we
+\item[Subtyping/Inheritance:] For a subclass like \classname{Label} we
   need to encode two things: the existence of the class
   (type), and the
   subtype relation to the parent class.  To do this, we declare two
@@ -630,7 +632,7 @@ code to really comprehend the trick.
 %%   (e.g. me :-).
 %% \end{ednote}
 
-\item[Methods] Because \sml is not an object-oriented language we shall
+\item[Methods:] Because \sml is not an object-oriented language we shall
   model methods with ordinary functions. We use the usual convention
   that the first argument is the object on which the method is called.
   (\gtk also uses this convention.)
@@ -653,7 +655,7 @@ That is, !set_title! takes two arguments, an object of type
 \classname{Window} and a string, and it returns !unit!.
 
 
-\item[Constructors] We have to be a bit careful with constructors.  If
+\item[Constructors:] We have to be a bit careful with constructors.  If
   we return a value with a polymorphic type-variable !'path!
   that holds an inheritance path that has not yet been ``plugged'',
   then we could accidentally use a super-class constructor to construct
@@ -667,12 +669,12 @@ val new : unit -> base label
 \end{SMLcode}
 The convention in \gtk is that constructors are named !new!.
 
-\item[Fields] We are not able to handle fields directly, because we
+\item[Fields:] We are not able to handle fields directly, because we
   keep the representation of objects completely opaque.  Thus, all
   inspections of and changes to fields must be done through accessor
   methods.
 
-\end{description}
+\end{description}}
 
 We then wrap all parts of the encoding of a class into a
  signature/structure
@@ -1029,14 +1031,14 @@ stub code.
 \label{sec:acknowledgments}
 
 We are grateful to the lead developer of \mosml, Peter~Sestoft, who
-have answered a multitude of questions about interfacing \mosml with C
+has answered a multitude of questions about interfacing \mosml with C
 libraries.  Without Peter's initial technical support, \mgtk would
-never have seen the light.  Likewise, the \mlton developers, in
+never have seen the light of day.  Likewise, the \mlton developers, in
 particular Stephen~Weeks, has been supportive in answering questions
-about interfacing \mlton to C.  They have even made changes to the \mlton
-compiler that was needed for \mgtk.  Also, we would like to thank the
-IT~University of Copenhagen, were we have been employed while doing the
-greater moiety of the work presented in the article.  Finally, we
+about interfacing \mlton to C.  They have even made changes to the
+\mlton compiler that were needed for \mgtk.  Also, we would like to
+thank the IT~University of Copenhagen, were we have been employed
+while doing much of the work presented in the article.  Finally, we
 must express our deepest gratitude to our FREENIX shepherd on this
 article, Bart~Massey.  Without his patience, encouragements, and many
 suggestions for improvements, this article would have been much less
