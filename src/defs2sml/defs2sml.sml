@@ -169,9 +169,9 @@ fun main () =
 	val _ = MsgUtil.print "Generating SML code ..."
 	val typeinfo = MLtonPrims.TypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
-	val api' = GenSMLMLton.generate typeinfo api
+	val topdec = GenSMLMLton.translate typeinfo api
 	val _ = GenSMLMLton.print (!smlPreamble) (!sep_struct) 
-				  (getOutFile()) api'
+				  (getOutFile()) topdec
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 
@@ -191,9 +191,9 @@ fun main () =
 	val _ = MsgUtil.print "Generating SML code ..."
 	val typeinfo = MosmlPrims.TypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
-	val api' = GenSMLMosml.generate typeinfo api
+	val topdec = GenSMLMosml.translate typeinfo api
 	val _ = GenSMLMosml.print (!smlPreamble) (!sep_struct)
-				  (getOutFile()) api'
+				  (getOutFile()) topdec
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 

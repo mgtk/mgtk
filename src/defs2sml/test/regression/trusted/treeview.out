@@ -1,131 +1,130 @@
-structure Gtk = struct
+structure Gtk  = struct
+    
     open Dynlib
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
- 
-    signature Object = sig
-        type base
-        type 'a object_t
-        type 'a t = 'a object_t GObject.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toObject : 'a t -> base t
+    signature Object = sig type base
+			   type 'a object_t
+			   type 'a t = 'a object_t GObject.t
+			   val inherit : 'a -> GObject.constructor -> 'a t
+			   val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
-        open Dynlib
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
- 
-        type base = unit
-        type 'a object_t = unit
-        type 'a t = 'a object_t GObject.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in GObject.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toObject obj = inherit () (fn () => repr obj)
- 
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj = inherit () (fn () => repr obj)
     end
-    signature Widget = sig
-        type base
-        type 'a widget_t
-        type 'a t = 'a widget_t Object.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toWidget : 'a t -> base t
+    signature Widget = sig type base
+			   type 'a widget_t
+			   type 'a t = 'a widget_t Object.t
+			   val inherit : 'a -> GObject.constructor -> 'a t
+			   val toWidget : 'a t -> base t
     end
     structure Widget :> Widget = struct
-        open Dynlib
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
- 
-        type base = unit
-        type 'a widget_t = unit
-        type 'a t = 'a widget_t Object.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in Object.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toWidget obj = inherit () (fn () => repr obj)
- 
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj = inherit () (fn () => repr obj)
     end
-    signature Container = sig
-        type base
-        type 'a container_t
-        type 'a t = 'a container_t Widget.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toContainer : 'a t -> base t
+    signature Container = sig type base
+			      type 'a container_t
+			      type 'a t = 'a container_t Widget.t
+			      val inherit : 'a -> GObject.constructor -> 'a t
+			      val toContainer : 'a t -> base t
     end
     structure Container :> Container = struct
-        open Dynlib
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
- 
-        type base = unit
-        type 'a container_t = unit
-        type 'a t = 'a container_t Widget.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in Widget.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toContainer obj = inherit () (fn () => repr obj)
- 
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a container_t = unit
+	type 'a t = 'a container_t Widget.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Widget.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toContainer obj = inherit () (fn () => repr obj)
     end
-    signature TreeModel = sig
-        type base
-        type 'a treemodel_t
-        type 'a t = 'a treemodel_t Widget.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toTreeModel : 'a t -> base t
+    signature TreeModel = sig type base
+			      type 'a treemodel_t
+			      type 'a t = 'a treemodel_t Widget.t
+			      val inherit : 'a -> GObject.constructor -> 'a t
+			      val toTreeModel : 'a t -> base t
     end
     structure TreeModel :> TreeModel = struct
-        open Dynlib
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
- 
-        type base = unit
-        type 'a treemodel_t = unit
-        type 'a t = 'a treemodel_t Widget.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in Widget.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toTreeModel obj = inherit () (fn () => repr obj)
- 
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a treemodel_t = unit
+	type 'a t = 'a treemodel_t Widget.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Widget.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeModel obj = inherit () (fn () => repr obj)
     end
     signature TreeView = sig
-        type base
-        type 'a treeview_t
-        type 'a t = 'a treeview_t Container.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toTreeView : 'a t -> base t
-        val get_model : 'a t -> base TreeModel.t
-        val set_model : 'a t -> 'b TreeModel.t option -> unit
-        val set_model' : 'a t -> unit
+	type base
+	type 'a treeview_t
+	type 'a t = 'a treeview_t Container.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeView : 'a t -> base t
+	val get_model : 'a t -> base TreeModel.t
+	val set_model : 'a t -> 'b TreeModel.t option -> unit
+	val set_model' : 'a t -> unit
     end
     structure TreeView :> TreeView = struct
-        open Dynlib
-        type cptr = GObject.cptr
-        val repr = GObject.repr
-        val symb = GtkBasis.symb
- 
-        type base = unit
-        type 'a treeview_t = unit
-        type 'a t = 'a treeview_t Container.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in Container.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toTreeView obj = inherit () (fn () => repr obj)
- 
-        val get_model_ : cptr -> cptr
-            = app1 (symb"mgtk_gtk_treeview_get_model")
-        val get_model : 'a t -> base TreeModel.t
-            = fn self => TreeModel.inherit () (fn () => get_model_ (repr self))
-        val set_model_ : cptr -> cptr -> unit
-            = app2 (symb"mgtk_gtk_treeview_set_model")
-        val set_model : 'a t -> 'b TreeModel.t option -> unit
-            = fn self => fn model => set_model_ (repr self) (getOpt (Option.map repr model,GObject.null))
-        val set_model' : 'a t -> unit
-            = fn self => set_model_ (repr self) GObject.null
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a treeview_t = unit
+	type 'a t = 'a treeview_t Container.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Container.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeView obj = inherit () (fn () => repr obj)
+	val get_model_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_treeview_get_model")
+	val get_model : 'a t -> base TreeModel.t
+	    = fn self => TreeModel.inherit () (fn () => get_model_ (repr self))
+	val set_model_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_treeview_set_model")
+	val set_model : 'a t -> 'b TreeModel.t option -> unit
+	    = fn self => fn model =>
+			    set_model_ (repr self)
+				       (getOpt (Option.map repr model, 
+						GObject.null))
+	val set_model' : 'a t -> unit
+	    = fn self => set_model_ (repr self) GObject.null
     end
 end
 

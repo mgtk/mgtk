@@ -41,12 +41,12 @@ reggenmlton-%: $(MAIN)
 	@./$(MAIN) $(REGOPTSMLTON) -o $(REGOUT)/$*-mlton.out $(REGIN)/$*.defs
 
 regdiff-%: reggen-%
-	@if diff -Naur $(REGTRS)/$*.out $(REGOUT)/$*.out ; then \
+	@if diff -Naur $(DIFFOPTIONS) $(REGTRS)/$*.out $(REGOUT)/$*.out ; then \
            echo ok ;\
         fi
 
 regdiffmlton-%: reggenmlton-%
-	@if diff -Naur $(REGTRS)/$*-mlton.out $(REGOUT)/$*-mlton.out ; then \
+	@if diff -Naur $(DIFFOPTIONS) $(REGTRS)/$*-mlton.out $(REGOUT)/$*-mlton.out ; then \
            echo ok ;\
         fi
 

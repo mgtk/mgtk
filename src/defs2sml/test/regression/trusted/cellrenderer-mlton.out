@@ -1,50 +1,58 @@
-structure Gtk = struct
+structure Gtk  = struct
+    
     type cptr = GObject.cptr
-    signature Object = sig
-        type base
-        type 'a object_t
-        type 'a t = 'a object_t GObject.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toObject : 'a t -> base t
+    signature Object = sig type base
+			   type 'a object_t
+			   type 'a t = 'a object_t GObject.t
+			   val inherit : 'a -> GObject.constructor -> 'a t
+			   val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
-        type cptr = GObject.cptr
-        type base = unit
-        type 'a object_t = unit
-        type 'a t = 'a object_t GObject.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in GObject.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toObject obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
- 
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
     signature CellRenderer = sig
-        type base
-        type 'a cellrenderer_t
-        type 'a t = 'a cellrenderer_t Object.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toCellRenderer : 'a t -> base t
-        val get_type : unit -> int
-        val set_fixed_size : 'a t -> int -> int -> unit
+	type base
+	type 'a cellrenderer_t
+	type 'a t = 'a cellrenderer_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toCellRenderer : 'a t -> base t
+	val get_type : unit -> int
+	val set_fixed_size : 'a t -> int -> int -> unit
     end
     structure CellRenderer :> CellRenderer = struct
-        type cptr = GObject.cptr
-        type base = unit
-        type 'a cellrenderer_t = unit
-        type 'a t = 'a cellrenderer_t Object.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in Object.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toCellRenderer obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
- 
-        val get_type_ : unit -> int
-            = _import "gtk_cell_renderer_get_type" : unit -> int;
-        val get_type : unit -> int
-            = fn dummy => get_type_ dummy
-        val set_fixed_size_ : cptr * int * int -> unit
-            = _import "gtk_cell_renderer_set_fixed_size" : cptr * int * int -> unit;
-        val set_fixed_size : 'a t -> int -> int -> unit
-            = fn self => fn width => fn height => GObject.withPtr (self,fn self => set_fixed_size_ (self,width,height))
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a cellrenderer_t = unit
+	type 'a t = 'a cellrenderer_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toCellRenderer obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_type_ : unit -> int
+	    = _import "gtk_cell_renderer_get_type" : unit -> int;
+	val get_type : unit -> int = fn dummy => get_type_ dummy
+	val set_fixed_size_ : cptr * int * int -> unit
+	    = _import "gtk_cell_renderer_set_fixed_size"
+		      : cptr * int * int -> unit;
+	val set_fixed_size : 'a t -> int -> int -> unit
+	    = fn self => fn width => fn height =>
+					GObject.withPtr
+					  (self, 
+					   fn self => set_fixed_size_
+							(self, width, height))
     end
 end
 

@@ -1,9 +1,8 @@
-structure Gtk = struct
-    open Dynlib
-    type cptr = GObject.cptr
-    val repr = GObject.repr
-    val symb = GtkBasis.symb
- 
+structure Gtk  = struct 
+			open Dynlib
+			type cptr = GObject.cptr
+			val repr = GObject.repr
+			val symb = GtkBasis.symb
 end
 
 

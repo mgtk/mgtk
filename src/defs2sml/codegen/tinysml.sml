@@ -1,4 +1,4 @@
-structure TinySML = struct
+structure TinySML :> TinySML = struct
 
     val max_curried = 5
 
@@ -44,7 +44,120 @@ structure TinySML = struct
       | Comment of string option (* an empty comment prints as newline *)
       | Open of string list
       | Infix of fixity option * string list
-      | Local of decl incl * decl incl
+      | Local of decl incl * decl
+
+
+    datatype topdec =
+	StrDec of string (* strid *) * string option (* signature constraint *)
+		  * topdec list
+      | SigDec of string (* sigid *) * topdec list (* really specs *)
+      | CoreDec of decl incl
+
+    fun equalincl eq (i, i') =
+	case (i, i') of
+	    (None, None) => true
+	  | (Some x, Some x') => eq (x,x')
+	  | (StrOnly x, StrOnly x') => eq (x,x')
+	  | (SigOnly x, SigOnly x') => eq (x,x')
+	  | _ => false
+
+    fun equalpat (p,p') =
+	case (p,p') of
+	    (VarPat v, VarPat v') => v = v'
+	  | (TupPat ps, TupPat ps') => List.all equalpat (ListPair.zip(ps,ps'))
+	  | _ => false
+    fun equalexp (e, e') =
+	case (e, e') of
+	    (Unit, Unit) => true
+	  | (Const c, Const c') => c = c'
+	  | (Var v, Var v') => v = v'
+	  | (Long n, Long n') => Name.equal (n, n')
+	  | (Str s, Str s') => s = s'
+	  | (Fn(a,e), Fn(a',e')) => a = a' andalso equalexp (e, e')
+	  | (App(e,es), App(e',es')) =>
+	      equalexp (e,e') andalso equalexplists (es,es')
+	  | (Tup es, Tup es') => equalexplists (es,es')
+	  | (Import(c,ty), Import(c',ty')) => 
+	      c = c' andalso SMLType.equal(ty,ty')
+	  | (Let(d,e), Let(d',e')) => 
+	      equal (d,d') andalso equalexp (e,e')
+	  | (SeqExp es, SeqExp es') => equalexplists (es,es')
+	  | _ => false
+    and equalexplists es = List.all equalexp (ListPair.zip es)
+    and equal (d, d') =
+	case (d, d') of
+	    (EmptyDecl, EmptyDecl) => true
+	  | (Comment s, Comment s') => 
+	      Util.optionCmp String.compare (s,s') = EQUAL
+	  | (Open strs, Open strs') =>
+              List.all (op=) (ListPair.zip (strs, strs'))
+	  | (Infix(f, ids), Infix(f', ids')) =>
+	      List.all (op=) (ListPair.zip (ids, ids'))
+	  | (ValDecl(p,t,e), ValDecl(p',t',e')) =>
+              equalpat(p,p') andalso equalincl SMLType.equal (t,t')
+	      andalso equalexp (e,e')
+	  | (FunDecl(n,ps,t,e), FunDecl(n',ps',t',e')) =>
+              n=n' andalso List.all equalpat (ListPair.zip(ps,ps'))
+              andalso equalincl SMLType.equal (t,t') andalso equalexp (e,e')
+	  | (TypeDecl((a,n),t), TypeDecl((a',n'),t')) =>
+              List.all SMLType.eqTyVar (ListPair.zip(a,a')) 
+	      andalso SMLType.eqTyName(n,n')
+              andalso equalincl SMLType.equal (t,t')
+	  | (Local(d1,d2), Local(d1',d2')) =>
+	      equalincl equal (d1,d1') andalso equal(d2,d2')
+	  | (SeqDecl ds, SeqDecl ds') =>
+              List.all (equalincl equal) (ListPair.zip (ds,ds'))
+	  | _ => false
+(*
+    fun rank d =
+	case d of
+	    EmptyDecl => 0
+	  | Comment => 10
+	  | Open _ => 20
+	  | Infix _ => 30
+	  | ValDecl _ => 40
+	  | FunDecl _ => 50
+	  | TypeDecl _ => 60
+	  | LocalDecl _ => 70
+	  | SeqDecl _ => 80
+*)
+
+    datatype mode = STR | SIG
+    fun flatten mode (d: decl) : decl list =
+	case d of
+	    SeqDecl ds => List.concat (List.map (flatten' mode) ds)
+	  | Local(d,d') => [Local(d,d')]
+	  | d => [d]
+    and flatten' mode (d: decl incl) : decl list =
+	let val d = case d of
+			Some d => d
+		      | StrOnly d => if mode = STR then d else EmptyDecl
+		      | SigOnly d => if mode = SIG then d else EmptyDecl
+		      | None => EmptyDecl
+	in  flatten mode d end
+(*
+    fun iCtns (None) = NONE
+      | iCtns (SigOnly x) = SOME x
+      | iCtns (StrOnly x) = SOME x
+      | iCtns (Some x) = SOME x
+    fun iRank (None) = 0
+      | iRank (SigOnly _) = 5
+      | iRank (StrOnly _) = 10
+      | iRank (Some _) = 20
+    fun inclcmp cmp (x,x') =
+	case Int.cmp(iRank x, iRank x') of
+	    EQUAL => Util.optionCmp cmp (iCtns x, iCtns)
+	  | order => order
+*)
+    fun coalesce ds =
+	case ds of
+	    (d as Local(d1,d1'))::
+	    (d' as Local(d2,d2'))::rest =>
+	      if equalincl equal (d1,d2)
+	      then coalesce (Local(d1,SeqDecl[Some d1',Some d2'])::rest)
+	      else d::coalesce(d'::rest)
+	  | d::rest => d::coalesce rest
+	  | [] => []
 
     infix ==>
     fun x ==> e = Fn(x,e)
@@ -68,11 +181,22 @@ structure TinySML = struct
     fun mlify str = H.find trans_table str
 		    handle NotFound => str
 
+    (* The pretty printer is not always all that pretty.
+
+       However, please not that it sometimes sacrifies prettyness
+       for compactness.
+    *)
     local open Pretty in
-    fun ppDec dec =
+    fun ppDec (strIncl,sigIncl) dec =
 	let fun parens safe level tree = 
 		if level > safe then "(" ^+ tree +^ ")"
 		else tree
+	    fun ppincl pp incl =
+		case incl of
+		    None => empty
+		  | Some x => pp x
+		  | StrOnly x => if strIncl then pp x else empty
+		  | SigOnly x => if sigIncl then pp x else empty
 	    fun ppexp level e =
 		case e of
                     (* special case some idioms *)
@@ -87,21 +211,29 @@ structure TinySML = struct
 		  | Import(cglobal,ty) =>
                       ppString "_import" ++
 			   break(1,0)(ppString ("\""^cglobal^"\""),
-				      ": " ^+ (ppString(SMLType.show ty)) +^ ";")
+				      ": " ^+ (SMLType.pp ty) +^ ";")
 		  | Fn(x,e) =>
-		      parens 1 level 
-			 ( break(1,3)("fn" ^+ ppString(mlify x) +^ "=>",
-				      ppexp 1 e) )
+		      let fun bd (Fn(x,e)) fns = bd e (x::fns)
+			    | bd _ [] = Util.abort 53745
+			    | bd e fns = (rev fns,e)
+			  val (fns,e) = bd (Fn(x,e)) []
+			  fun f x = "fn " ^+ ppString(mlify x)
+		      in  parens 1 level 
+			     ( break(1,3)( ilist " => #" f fns +^ " =>"
+                                         , ppexp 1 e )
+                             )
+		      end
 		  | App(e,es) =>
 		      parens 2 level
                          ( ppexp 3 e ++ makelist (true, " ") (map (ppexp 4) es) )
 		  | Tup [] => ppString "()"
 		  | Tup [e] => ppexp level e
-		  | Tup es => ppelist "(" ")" "," es
+		  | Tup es => pperoundlist es
 		  | SeqExp es => ppelist "" "" ";" es
 		  | Let(d,e) => pplet (Let(d,e))
+	    and pperoundlist es = bracket "(#)" (ilist ", #" (ppexp 1) es)
 	    and ppelist start finish sep es =
-		compose(start ^+ clist ("#"^sep^" ") (ppexp 1) es,
+		compose(start ^+ clist (sep^" #") (ppexp 1) es,
 			1,2,0,ppString finish)
 	    and pplet e =
 		let fun loop (Let(d,e)) acc = loop e (ppdec d::acc)
@@ -116,26 +248,62 @@ structure TinySML = struct
 			end
 		in  loop e [] end
 	    and pplocal d =
-		let fun loop _ [] = raise Fail"pplocal: shouldn't happen"
-		      | loop (Local(d,d')) acc =
-			let val body = ppdec' d
-			in  case [ppdec' d'] of
-				[] => body
-			      | d::ds =>
-				break(1,0) (ppString "local" ++ makelist(true,"") (d :: map forcemulti ds),
-					    compose (ppString "in" ++ body,1,2,0,ppString "end"))
-			end
-		      | loop d acc = ppdec d
+		let fun loop (Local(d,d')) acc = loop d' (ppdec' d::acc)
+		      | loop _ [] = raise Fail"pplocal: shouldn't happen"
+		      | loop d acc = 
+                          let val body = ppdec d
+			  in  case rev acc of
+				  [] => body
+				| d::ds =>
+				    let val bds = makelist(true,"") (d :: map forcemulti ds)
+				    in  if isPrinting bds then
+					    break(1,0) (ppString "local" ++ bds
+					               ,compose(ppString "in"++body,1,2,0,ppString "end"))
+					else body
+				    end
+			  end
 		in  loop d [] end
-	    and ppdec d = 
+	    and pppat p =
+		case p of
+		    VarPat v => ppString (mlify v)
+		  | TupPat ps => bracket "(#)" (ilist ", #" pppat ps)
+	    and brkprt sep opt (t1, t2) =
+		if isPrinting t2 then break opt (t1, sep ^+ t2) else t1
+	    and ppsimple d = 
 		case d of
-		    ValDecl(pat,ty,exp) => ppString "val"
-		  | FunDecl(name,args,ty,exp) => ppString "fun"
-		  | TypeDecl((args,name),ty) => ppString "type"
-		  | SeqDecl [] => empty
-		  | SeqDecl [d] => ppdec' d
-		  | SeqDecl (d::ds) => 
-		      makelist(true,"") (ppdec' d :: map (forcemulti o ppdec') ds)
+		    ValDecl(pat,ty,exp) => 
+		      let val bind = ppString "val" ++ pppat pat
+			  val ty = ppincl SMLType.pp ty
+		      in  if sigIncl then
+			      brkprt ": " (1,2) (bind, ty)
+			  else 
+			      break(1,4)
+				( brkprt ": " (1,2)(bind, ty)
+				, "= " ^+ ppexp 1 exp )
+		      end
+		  | FunDecl(name,args,ty,exp) => 
+		      if sigIncl then
+			  break(1,2) 
+                            ( ppString "val" ++ ppString name
+                            , ": " ^+ ppincl SMLType.pp ty )
+		      else
+			  break(1,2)
+			    ( ppString "fun" ++ ppString name 
+                                ++ clist " #" pppat args
+                            , "= " ^+ ppexp 1 exp )
+
+		  | TypeDecl((args,name),ty) => 
+		      let val bindty = 
+			      case args of
+				  [] => SMLType.ppTyName name
+				| [a] => SMLType.ppTyVar a ++ SMLType.ppTyName name
+				| args => bracket "(#)"
+					    (clist ",#" SMLType.ppTyVar args )
+                                          ++ SMLType.ppTyName name
+			  val bind = ppString "type" ++ bindty
+			  val ty = ppincl SMLType.pp ty
+		      in  brkprt "= " (1,2) ( bind, ty )
+		      end
 		  | EmptyDecl => empty
 		  | Comment NONE => empty
 		  | Comment (SOME s) => bracket "(*#*)" (ppString s)
@@ -143,123 +311,58 @@ structure TinySML = struct
 		  | Infix (fixity, ids) => 
 		      ppString (show_fixity fixity) ++ clist "# " ppString ids
 		  | Local(d,d') => pplocal (Local(d,d'))
+		  | SeqDecl _ => raise Fail "Shouldn't happen (ppsimple(seq))"
+	    and ppdec d =
+		case coalesce (flatten (if strIncl then STR else SIG) d) of
+		    [] => empty
+		  | [d] => ppsimple d
+		  | d::ds => 
+		      let val ds = 
+			      List.filter isPrinting
+				 ((ppsimple d) ::
+			          List.map (forcemulti o ppsimple) ds)
+		      in  makelist (true,"") ds end
+
 	    and ppdec' d =
 		case d of
 		    None => empty
 		  | Some d => ppdec d
 		  | StrOnly d => ppdec d
 		  | SigOnly d => ppdec d
-	in  ppdec dec
+	in  ppdec' dec
 	end
-    end
- 
-    fun toString (isStrMode,isSigMode) mode indent info =
-	let fun parens safe level s = if level > safe then "(" ^ s ^ ")"
-				      else s
-	    fun printing s =
-		List.exists (not o Char.isSpace) (String.explode s)
-
-	    local
-		fun str _ nil _ _ = ""
-		  | str p (h::t) sep needSep =
-		    let val ph = p h
-			val ns = printing ph
-			val s = p h ^ (str p t sep ns)
-		    in  if needSep then sep ^ s else s
-		    end
-	    in
-	    fun stringSep start finish sep p l = 
-		start ^ (str p l sep false) ^ finish
-	    end (* local *)
-
-	    fun show_pat pat =
-		case pat of
-		    VarPat x => mlify x
-		  | TupPat ps => Util.stringSep "(" ")" "," show_pat ps
-	    fun show_type_incl sep None = "" 
-	      | show_type_incl sep (Some ty) = sep ^ SMLType.toString ty
-	      | show_type_incl sep (StrOnly ty) = 
-		if isStrMode mode then sep ^ SMLType.toString ty else ""
-	      | show_type_incl sep (SigOnly ty) = 
-		if isSigMode mode then sep ^ SMLType.toString ty else ""
-
-	    fun show_fixity (NONE) = "infix"
-	      | show_fixity (SOME Right) = "infixr"
-	      | show_fixity (SOME Left)  = "infixl"
-
-	    fun show_exp level exp =
-		case exp of
-		    Unit => "()"
-		  | Var x => mlify x
-		  | Const c => c
-		  | Long n => Name.toString n
-		  | Str s => "\"" ^ s ^ "\""
-		  | Fn(x,e) => parens 1 level ("fn " ^ mlify x ^ " => " ^ show_exp 1 e)
-		  | App(Var "symb",[Str s]) => "(symb\""^s^"\")"
-		  | App(e,es) => parens 2 level 
-				    (show_exp 3 e ^ 
-				     Util.stringSep " " "" " " (show_exp 3) es)
-		  | Tup [] => "()"
-		  | Tup [e] => show_exp level e
-		  | Tup es => Util.stringSep "(" ")" "," (show_exp 1) es
-		  | Import(cglobal,ty) =>
-		      "_import \"" ^ cglobal ^ "\" : " ^ SMLType.toString ty ^ ";"
-		  | SeqExp es => Util.stringSep "" "" "; " (show_exp 1) es
-		  | Let(d,e) =>
-		      let val dstr = show d
-		      in  if printing dstr
-			  then "let " ^ show d ^ " in " ^ show_exp 1 e ^ " end"
-			  else show_exp 1 e
-		      end
-
-	    and show decl =
-		case decl of
-		    ValDecl(pat,ty,exp) =>
-		       if isStrMode mode then
-			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
-			   ^ (if printing (show_type_incl " : " ty) then "\n" ^ indent ^ "    = " else " = ") ^ show_exp 1 exp
-		       else
-			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
-		  | FunDecl(name,pars,ty,exp) =>
-		       if isStrMode mode then
-			   indent ^ "fun " ^ name ^ Util.stringSep " " "" " " show_pat pars
-			   ^ " = " ^ show_exp 1 exp
-		       else
-			   indent ^ "val " ^ name ^ show_type_incl " : " ty
-		  | TypeDecl((tvs,tname),ty) =>
-		       indent ^ "type " 
-		     ^ SMLType.toString(SMLType.TyApp(map SMLType.TyVar tvs,tname))
-		     ^ show_type_incl " = " ty
-		  | SeqDecl decs =>
-		       let fun isempty "\n" = true
-			     | isempty "" = true
-			     | isempty _ = false
-			   val decs' = List.filter (not o isempty)
-						   (List.map show' decs)
-		       in  stringSep "" "" "\n" (fn s=>s) decs' end
-		  | EmptyDecl => ""
-		  | Comment NONE => " "
-		  | Comment(SOME c) => "(*" ^ c ^ "*)"
-		  | Open strs => indent ^ Util.stringSep "open " "" " " (fn s=>s) strs
-		  | Infix(fixity, strs) => 
-		        indent ^ Util.stringSep (show_fixity fixity ^ " ")
-						"" " " (fn s=>s) strs
-		  | Local(dec1, dec2) =>
-		       let val dec1 = show' dec1
-		       in  if printing dec1 
-			   then indent ^ "local\n" 
-			      ^ dec1 ^ "\n" ^ indent ^ "in\n"
-                              ^ show' dec2
-                              ^ "\n" ^ indent ^ "end"
-			   else show' dec2
+    fun ppTopDec dec =
+	let 
+	    fun coalesce tops =
+		case tops of
+		    CoreDec(d1)::CoreDec(d2)::tops =>
+		        coalesce (CoreDec(Some(SeqDecl[d1,d2]))::tops)
+		  | top::tops => top::coalesce tops
+		  | [] => []
+	    fun pptop mode dec =
+		case dec of
+		    StrDec(strid, sigopt, decs) =>
+                       let val sigcons = 
+			       case sigopt of 
+				   NONE => empty
+				 | SOME sigid => ":> " ^+ ppString sigid
+		       in  close(1,"end")
+			     (break(1,4)( ("structure " ^+ ppString strid ++ sigcons) +^ " = struct"
+					, pptoplist (true,false) decs )
+                             )
 		       end
-	    and show' (None) = ""
-	      | show' (Some decl) = show decl
-	      | show' (StrOnly decl) = if isStrMode mode then show decl else ""
-	      | show' (SigOnly decl) = if isSigMode mode then show decl else ""
-
-	in  show' info ^ "\n"
-	end
-
+		  | SigDec(sigid, specs) =>
+		       close(1,"end")
+                             (break(1,4)( "signature " ^+ ppString sigid +^ " = sig"
+                                        , pptoplist (false,true) specs )
+                             )
+		  | CoreDec decl => ppDec mode decl
+	    and pptoplist mode tops =
+		let val tops = 
+			List.filter isPrinting (map (pptop mode) (coalesce tops))
+		in  clist "#" forcemulti tops
+		end
+	in  pptop (true,false) dec end
+    end (* local *)
 
 end (* structure TinySML *)

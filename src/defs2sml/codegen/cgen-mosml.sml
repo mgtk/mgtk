@@ -20,7 +20,7 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 
 	    fun print1 indent (decl, SOME ty) =
               ( dump ("/* ML type: "^
-		           (SMLType.show (TypeInfo.toPrimType tinfo ty)
+		           (SMLType.toString (TypeInfo.toPrimType tinfo ty)
 			    handle TypeInfo.Unbound _ => "") ^" */\n")
               ; dump (toString (spaces indent) decl)
               )

@@ -25,6 +25,13 @@ struct
 				in  x end
 	end
 
+    fun optionCmp cmp (x, y) =
+	case (x, y) of
+	    (NONE, NONE) => EQUAL
+	  | (NONE, SOME y) => LESS
+	  | (SOME x, NONE) => GREATER
+	  | (SOME x, SOME y) => cmp (x, y)
+
     fun listCmp cmp (xs, ys) =
 	let fun loop [] [] = EQUAL
               | loop [] (y::ys) = LESS
@@ -42,5 +49,9 @@ struct
 				   else (rev acc, x::xs)
 	in  loop l []
 	end
+
+    fun abort code = 
+	let val msg = "Internal error: " ^ Int.toString code
+	in  raise Fail msg end
 
 end (* structure Util *)

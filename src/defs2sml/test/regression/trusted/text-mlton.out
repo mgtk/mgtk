@@ -1,31 +1,49 @@
-structure Gtk = struct
+structure Gtk  = struct
+    
     type cptr = GObject.cptr
     type textiter = GObject.cptr
     signature TextBuffer = sig
-        type base
-        type 'a textbuffer_t
-        type 'a t = 'a textbuffer_t GObject.t
-        val inherit : 'a -> GObject.constructor -> 'a t
-        val toTextBuffer : 'a t -> base t
-        val insert : 'a t -> textiter -> string -> int option -> unit
-        val insert' : 'a t -> textiter -> string -> unit
+	type base
+	type 'a textbuffer_t
+	type 'a t = 'a textbuffer_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTextBuffer : 'a t -> base t
+	val insert : 'a t -> textiter -> string -> int option -> unit
+	val insert' : 'a t -> textiter -> string -> unit
     end
     structure TextBuffer :> TextBuffer = struct
-        type cptr = GObject.cptr
-        type base = unit
-        type 'a textbuffer_t = unit
-        type 'a t = 'a textbuffer_t GObject.t
-        fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
-        val witness = () in GObject.inherit witness con end
-        fun make ptr = inherit () (fn () => ptr)
-        fun toTextBuffer obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
- 
-        val insert_ : cptr * cptr * CString.cstring * int -> unit
-            = _import "gtk_text_buffer_insert" : cptr * cptr * CString.cstring * int -> unit;
-        val insert : 'a t -> textiter -> string -> int option -> unit
-            = fn self => fn iter => fn text => fn len => GObject.withPtr (self,fn self => insert_ (self,iter,CString.fromString text,getOpt (len,~1)))
-        val insert' : 'a t -> textiter -> string -> unit
-            = fn self => fn iter => fn text => GObject.withPtr (self,fn self => insert_ (self,iter,CString.fromString text,~1))
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a textbuffer_t = unit
+	type 'a t = 'a textbuffer_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTextBuffer obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val insert_ : cptr * cptr * CString.cstring * int -> unit
+	    = _import "gtk_text_buffer_insert"
+		      : cptr * cptr * CString.cstring * int -> unit;
+	val insert : 'a t -> textiter -> string -> int option -> unit
+	    = fn self =>
+		 fn iter =>
+		    fn text =>
+		       fn len => GObject.withPtr
+				   (self, 
+				    fn self =>
+				       insert_ (self, iter, 
+						CString.fromString text, 
+						getOpt (len, ~1)))
+	val insert' : 'a t -> textiter -> string -> unit
+	    = fn self =>
+		 fn iter =>
+		    fn text =>
+		       GObject.withPtr
+			 (self, 
+			  fn self => insert_ (self, iter, 
+					      CString.fromString text, ~1))
     end
 end
 

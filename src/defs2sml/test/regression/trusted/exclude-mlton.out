@@ -1,5 +1,5 @@
-structure Gtk = struct
-    type cptr = GObject.cptr
+structure Gtk  = struct 
+			type cptr = GObject.cptr
 end
 
 

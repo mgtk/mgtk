@@ -1,11 +1,10 @@
-structure Gtk = struct
-    open Dynlib
-    type cptr = GObject.cptr
-    val repr = GObject.repr
-    val symb = GtkBasis.symb
- 
-    type icon_source = GObject.cptr
-    type textiter = GObject.cptr
+structure Gtk  = struct 
+			open Dynlib
+			type cptr = GObject.cptr
+			val repr = GObject.repr
+			val symb = GtkBasis.symb
+			type icon_source = GObject.cptr
+			type textiter = GObject.cptr
 end
 
 

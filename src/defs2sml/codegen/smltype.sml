@@ -1,7 +1,7 @@
 (* mgtk --- an SML binding for GTK.                                          *)
-(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
-structure SMLType = struct
+structure SMLType :> SMLType = struct
 
     type tyvar = string
     type tyname = string list
@@ -19,26 +19,52 @@ structure SMLType = struct
       | TyApp of ty list * tyname
       | RefTy of ty
 
-    fun show_tname tname = Util.stringSep "" "" "." (fn s=>s) tname
+    fun eqTyVar (tv,tv') = tv = tv'
+    fun eqTyName (tn,tn') = List.all (op=) (ListPair.zip(tn,tn'))
+    fun equal (t,t') =
+	case (t,t') of
+	    (IntTy, IntTy) => true
+	  | (CharTy, CharTy) => true
+	  | (UnitTy, UnitTy) => true
+	  | (BoolTy, BoolTy) => true
+	  | (RealTy, RealTy) => true
+	  | (StringTy, StringTy) => true
+	  | (TyVar tv, TyVar tv') => eqTyVar(tv,tv')
+	  | (TupTy ts, TupTy ts') => eqlists (ts, ts')
+	  | (ArrowTy(ts,t), ArrowTy(ts',t')) => 
+	      eqlists (ts,ts') andalso equal (t,t')
+	  | (RefTy t, RefTy t') => equal (t,t')
+	  | (TyApp(ts,tn), TyApp(ts',tn')) => 
+	      eqlists (ts,ts') andalso eqTyName(tn,tn')
+	  | _ => false
+    and eqlists (ts,ts') = List.all equal (ListPair.zip (ts,ts'))
 
-    fun show ty =
+    local open Pretty
+    in
+    fun ppTyName tname = clist "#." ppString tname
+    fun ppTyVar  tyvar = ppString tyvar
+    fun parens my safe tree = if my<=safe then bracket "(#)" tree else tree
+    fun pp safe ty =
 	case ty of
-	    IntTy => "int"
-	  | CharTy => "char"
-	  | StringTy => "string"
-	  | UnitTy => "unit"
-	  | BoolTy => "bool"
-	  | RealTy => "real"
-	  | TyVar a => a
-	  | TupTy tys => Util.stringSep "" "" " * " show tys
-	  | ArrowTy ([ty as ArrowTy(tys,ty1)],ty2) =>
-	      "(" ^ show ty ^ ") -> " ^ show ty2
-	  | ArrowTy (tys,ty2) =>Util.stringSep "" " -> " " -> " show tys ^ show ty2
-	  | TyApp([],tname) => show_tname tname
-	  | TyApp([ty],tname) => show ty ^ " " ^ show_tname tname
-	  | TyApp(tys,tname) => Util.stringSep "(" (") "^show_tname tname) "," show tys
-	  | RefTy ty => show ty ^ " ref"
-    val toString = show
+	    IntTy => ppString "int"
+	  | CharTy => ppString "char"
+	  | StringTy => ppString "string"
+	  | UnitTy => ppString "unit"
+	  | BoolTy => ppString "bool"
+	  | RealTy => ppString "real"
+	  | TyVar a => ppString a
+	  | TupTy tys => parens 2 safe (ilist " #* " (pp 2) tys)
+	  | ArrowTy (tys, ty) => 
+	      parens 1 safe (ppBinary(ilist " #-> " (pp 1) tys, "->", pp 1 ty))
+	  | TyApp([],tname) => ppTyName tname
+	  | TyApp([ty],tname) => pp 2 ty ++ ppTyName tname
+	  | TyApp(tys,tname) =>
+	      bracket "(#)" (clist ",#" (pp 2) tys) ++ ppTyName tname
+	  | RefTy ty => pp safe ty +^ " ref"
+    end (* local *)
+    val pp = fn ty => pp 0 ty
+
+    val toString = Pretty.ppToString o pp
 
 end (* structure SMLType *)
 

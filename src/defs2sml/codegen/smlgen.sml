@@ -143,58 +143,44 @@ struct
     fun tys ==> ty2 = ArrowTy(tys, ty2)
 
     type typeinfo = TypeInfo.typeinfo
-    type 'a incl = 'a TinySML.incl
-    type sml_info = TinySML.decl
 
-    datatype module_info = STRUCTURE of string * string option (* sig? *)
-			 | SIGNATURE of string
-    fun isStrMode (STRUCTURE _) = true
-      | isStrMode _ = false
-    fun isSigMode (SIGNATURE _) = true
-      | isSigMode _ = false
-    fun showModInfo (STRUCTURE(name,sign)) = 
-	"structure " ^ name ^ (case sign of SOME s => " :> " ^s | NONE => "")
-      | showModInfo (SIGNATURE name) = "signature " ^ name
-    fun showModBegin (STRUCTURE _) = "struct"
-      | showModBegin (SIGNATURE _) = "sig"
-
-    val toString = TinySML.toString (isStrMode, isSigMode)	    
-    fun print preamble sep_struct os module =
-	let fun dump s = TextIO.output(os, s)
-	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
-	    fun dump_preamble indent (SOME file) =
+    fun print preamble sep_struct os (TinySML.StrDec(strid,sigopt,decs)) =
+	let open Pretty
+	    val device = plainOutput ( "(*" , "*)" )
+	    fun ppPreamble (SOME file) =
 		let val is = TextIO.openIn file
-		    val indent = spaces indent
-		    fun loop () = 
-			if TextIO.endOfStream is then ()
-			else ( dump (indent ^ TextIO.inputLine is)
-                             ; loop() )
-		in  loop () ; TextIO.closeIn is end
-	      | dump_preamble indent NONE = ()
-	    fun indent cols str = spaces cols ^ str
-	    fun print_member mode indent (AST.Member{name,info}) = 
-		dump (toString mode (spaces indent) info)
-	      | print_member mode indent (AST.Sub module) = 
-		print_module indent module
-	    and print_module indent (AST.Module{name,members,info}) =
-		( dump(spaces indent ^ showModInfo info ^ " = " ^ showModBegin info ^ "\n")
-		; List.app (print_member info (indent+4)) members
-		; dump(spaces indent ^ "end\n")
-		)
-	    fun print_toplevel (AST.Module{name,members,info}) =
+		    fun chop l = 
+			let val n = String.size l
+			in  if String.sub(l,n-1) = #"\n" 
+			    then String.extract(l,0,SOME(n-1))
+			    else l
+			end
+		    fun loop acc = 
+			if TextIO.endOfStream is then rev acc
+			else loop (chop(TextIO.inputLine is) :: acc)
+		in  List.map ppString (loop []) 
+	        before
+		    TextIO.closeIn is
+		end
+	      | ppPreamble NONE = [empty]
+	    val preamble = ppPreamble preamble
+	    val body = clist "#" (forcemulti o TinySML.ppTopDec) decs
+	    val sigcons = case sigopt of 
+			      NONE => empty
+			    | SOME sigid => ppString(" :> "^sigid)
+	    val res =
 		if sep_struct then
-		    ( dump(spaces 0 ^ showModInfo info ^ " = " ^ 
-			   showModBegin info ^ "\n")
-                    ;  dump_preamble 4 preamble
-                    ; List.app (print_member info 4) members
-                    ; dump("end\n")
-                    )
+		    close(1,"end")
+		      (break(1,4)( ("structure " ^+ ppString strid ++ sigcons) +^ " = struct"
+                                 , clist "#" forcemulti 
+				      (preamble @ (List.map ppTopDec decs)) )
+                      )
 		else
-		    ( dump_preamble 0 preamble
-                    ; List.app (print_member info 0) members
-                    )
-	in  print_toplevel module
+		    clist "#" forcemulti
+		       (preamble @ (List.map ppTopDec decs))
+	in  ppPrint res device os
 	end
+      | print preamble sep_struct os _ = raise Fail("print: not a strdec")
 
     (* code generation *)
     type name = Name.name
@@ -405,7 +391,7 @@ struct
 		    fun toUnderscore #"-" = #"_"
 		      | toUnderscore ch = ch
 		in  Some(Local(StrOnly(Open ["Signal"]) ++ StrOnly(Infix(SOME Right, ["-->"])),
-			 Some(ValDecl(VarPat((String.map toUnderscore name)^"_sig"), 
+			 (ValDecl(VarPat((String.map toUnderscore name)^"_sig"), 
 				      Some(toSmlType ty), 
 				      Fn("f", App(Var("signal"), args))))))
 		end
@@ -455,43 +441,37 @@ struct
 	 ++ StrOnly(FunDecl("make"(*^Name.asModule name*),[VarPat"ptr"],None,
 		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")])))
 	 ++ Some(FunDecl("to"^Name.asModule name, [VarPat "obj"],
-	         Some([TyApp([TyVar "'a"],["t"])] ==> TyApp([TyVar "base"],["t"])),
+	         Some(TyApp([TyVar "'a"],["t"]) --> TyApp([TyVar "base"],["t"])),
 		 Prims.mkToFunc ()))
          ++ StrOnly(Comment NONE)
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)
 
-
-    local
-	open AST 
+    local 
+	open AST TinySML
 	val trans = fn tinfo => fn (name,member) => trans tinfo (name,member)
 		   handle Skip msg => ( TextIO.output(TextIO.stdErr,
 		       "Error translating " ^ Name.toString name ^ ": " ^msg^"\n")
                      ; None)
-	fun generate_module tinfo (Module{name,members,info}) = 
-	    let val subs = List.concat(List.map (generate_member tinfo) members)
-	    in  [ Module{name=name, info=SIGNATURE (Name.asModule name),
-			 members=Member{name=Name.fromString "signatureheader",
-					info=header tinfo (name,info)}
-				 :: subs}
-		, Module{name=name, info=STRUCTURE (Name.asModule name, SOME (Name.asModule name)),
-			 members=Member{name=Name.fromString "structureheader",
-					info=header tinfo (name,info)}
-				 :: subs}
+	fun transMod tinfo (Module{name,members,info}) =
+	    let val head = CoreDec(header tinfo (name,info))
+		val name = Name.asModule name
+		val contents = 
+		      (head :: List.concat(List.map (transMem tinfo) members))
+	    in  [ SigDec(name, contents)
+		, StrDec(name, SOME name, contents)
 		]
 	    end
-	and generate_member tinfo (Sub module) = 
-	    List.map Sub (generate_module tinfo module)
-	  | generate_member tinfo (Member{name,info}) = 
-	    [Member{name=name,info=trans tinfo (name,info)}]
-    in  fun generate tinfo (Module{name,members,info}) = 
-	    let fun f d = Member{name = Name.fromString "structureheader",
-				 info = StrOnly d}
-	    in  Module{name=name,info=STRUCTURE(Name.asModule name, NONE),
-		       members=
-		             List.map f Prims.strHeader
-			   @ List.concat(List.map (generate_member tinfo) members)}
+	and transMem tinfo (Sub module) = transMod tinfo module
+	  | transMem tinfo (Member{name,info}) =
+	    [ CoreDec (trans tinfo (name,info)) ]
+    in  fun translate tinfo (Module{name,members,info}) =
+	    let val name = Name.asModule name
+		val head = CoreDec(Some(SeqDecl(List.map StrOnly Prims.strHeader)))
+		val contents = 
+		      (head :: List.concat(List.map (transMem tinfo) members))
+	    in  StrDec(name, NONE, contents)
 	    end
-    end (* local *)
+    end
 
 end (* structure GenSML *)

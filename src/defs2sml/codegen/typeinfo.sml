@@ -142,9 +142,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	end
 
     fun show os table =
-	let fun sinfo {stype,ptype,toc,fromc,super,fromprim,wrapped} = 
+	let fun sinfo {stype,ptype,toc,fromc,super,fromprim,wrapped} = "ML"
+(* FIXME:
 		(SMLType.show ptype) ^ " x "  ^
 		(SMLType.show (stype (nextgen())))
+*)
 	in  List.app (fn (n,i) => 
 			 TextIO.output(os,Name.toString' n^" -> "^sinfo i^"\n"))
 		     (Splaymap.listItems table)
@@ -195,9 +197,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       SMLType.ArrowTy(List.map (toSMLType tinfo fresh o #2) pars,
 			       toSMLType tinfo fresh ret)
 	  | Type.Arr(len,ty) => 
-	       (* FIXME *)
+	       raise Fail("Not implemented: toSMLType(arr)")
+	       (* FIXME 
 	       SMLType.TyVar(SMLType.toString(toSMLType tinfo fresh ty)^"["^
 		     (case len of NONE => "" | SOME l => Int.toString l)^"]")
+               *)
 
     fun toSMLTypeSeq tinfo = 
 	let val no = ref 0
