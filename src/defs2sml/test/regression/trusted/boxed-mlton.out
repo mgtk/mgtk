@@ -1,0 +1,8 @@
+structure Gtk = struct
+    type cptr = GObject.cptr
+    type icon_source = GObject.cptr
+    type textiter = GObject.cptr
+end
+
+
+/* *** Gtk *** */

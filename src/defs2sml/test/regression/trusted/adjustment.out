@@ -1,0 +1,74 @@
+structure Gtk = struct
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+
+    signature Object = sig
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Object :> Object = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+    end
+    signature Adjustment = sig
+        type base
+        type 'a adjustment_t
+        type 'a t = 'a adjustment_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val new : real -> real -> real -> real -> real -> real -> base t
+    end
+    structure Adjustment :> Adjustment = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        type base = unit
+        type 'a adjustment_t = unit
+        type 'a t = 'a adjustment_t Object.t
+        fun inherit w con = Object.inherit () con
+        fun make ptr = Object.inherit () (fn () => ptr)
+
+        val new_ : real * real * real * real * real * real -> cptr
+            = app1 (symb"mgtk_gtk_adjustment_new")
+        val new : real -> real -> real -> real -> real -> real -> base t
+            = fn value => fn lower => fn upper => fn step_increment => fn page_increment => fn page_size => make (new_ (value,lower,upper,step_increment,page_increment,page_size))
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Adjustment *** */
+/* ML type: real * real * real * real * real * real -> cptr */
+EXTERNML value mgtk_gtk_adjustment_new(value mgtk_params) { /* ML */
+    value valu = Field(mgtk_params, 0);
+    value lower = Field(mgtk_params, 1);
+    value upper = Field(mgtk_params, 2);
+    value step_increment = Field(mgtk_params, 3);
+    value page_increment = Field(mgtk_params, 4);
+    value page_size = Field(mgtk_params, 5);
+    return Val_GtkObj(gtk_adjustment_new(Double_val(valu), Double_val(lower), Double_val(upper), Double_val(step_increment), Double_val(page_increment), Double_val(page_size)));
+}
+

@@ -17,15 +17,6 @@ CINCLUDE=-I$(MOSMLRUNTIME) `pkg-config --cflags gtk+-2.0`
 
 all: $(MAIN) regression
 
-regression: $(MAIN)
-	@files="$(wildcard $(REGRESSIONDIR)/input/*.defs)"; \
-	echo "Regression test results ... "; \
-        for file in $$files ; do \
-	      base=`basename $$file .defs`; \
-              ./$(MAIN) --separate-struct -q $$file -o $(REGRESSIONDIR)/output/$$base.out ; \
-	      diff -Naur $(REGRESSIONDIR)/trusted/$$base.out $(REGRESSIONDIR)/output/$$base.out ; \
-        done
-
 test-compile: $(MAIN)
 	@files="$(wildcard $(REGRESSIONDIR)/input/*.defs)"; \
 	echo "Regression test results ... "; \
@@ -38,19 +29,34 @@ test-compile: $(MAIN)
 
 
 testgen-%: $(MAIN)
+	echo Generating code for $*
 	./$(MAIN) $(OPTIONS) --separate-struct test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
 
 testcomp-%: testgen-%
 	gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$*.c
 	mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$*.sml
 
+# "Regression" test
 reggen-%: $(MAIN)
+	@echo -n "$* "
 	@./$(MAIN) --separate-struct -q $(OPTIONS) -o $(REGRESSIONDIR)/output/$*.out test/regression/input/$*.defs
+
+reggenmlton-%: $(MAIN)
+	@echo -n "$* (MLton) "
+	@./$(MAIN) --mlton --separate-struct -q $(OPTIONS) -o $(REGRESSIONDIR)/output/$*-mlton.out test/regression/input/$*.defs
 
 regcomp-%: reggen-%
 	@if diff -Naur $(REGRESSIONDIR)/trusted/$*.out $(REGRESSIONDIR)/output/$*.out ; then \
            echo Ok ;\
         fi
+
+regcompmlton-%: reggenmlton-%
+	@if diff -Naur $(REGRESSIONDIR)/trusted/$*-mlton.out $(REGRESSIONDIR)/output/$*-mlton.out ; then \
+           echo Ok ;\
+        fi
+
+regression: $(MAIN) $(patsubst %.defs,regcomp-%,$(notdir $(wildcard test/regression/input/*.defs))) $(patsubst %.defs,regcompmlton-%,$(notdir $(wildcard test/regression/input/*.defs)))
+
 
 mgtk.c mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
 	./$(MAIN) -co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gtk.defs

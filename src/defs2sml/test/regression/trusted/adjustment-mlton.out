@@ -1,0 +1,51 @@
+structure Gtk = struct
+    type cptr = GObject.cptr
+    signature Object = sig
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Object :> Object = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+    end
+    signature Adjustment = sig
+        type base
+        type 'a adjustment_t
+        type 'a t = 'a adjustment_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val new : real -> real -> real -> real -> real -> real -> base t
+    end
+    structure Adjustment :> Adjustment = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a adjustment_t = unit
+        type 'a t = 'a adjustment_t Object.t
+        fun inherit w con = Object.inherit () con
+        fun make ptr = Object.inherit () (fn () => ptr)
+
+        val new_ : real * real * real * real * real * real -> cptr
+            = _import "gtk_adjustment_new" : real * real * real * real * real * real -> cptr;
+        val new : real -> real -> real -> real -> real -> real -> base t
+            = fn value => fn lower => fn upper => fn step_increment => fn page_increment => fn page_size => make (new_ (value,lower,upper,step_increment,page_increment,page_size))
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Adjustment *** */

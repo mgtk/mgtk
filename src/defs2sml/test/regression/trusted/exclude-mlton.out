@@ -1,0 +1,6 @@
+structure Gtk = struct
+    type cptr = GObject.cptr
+end
+
+
+/* *** Gtk *** */

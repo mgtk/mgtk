@@ -1,0 +1,136 @@
+structure Gtk = struct
+    type cptr = GObject.cptr
+    type icon_set = GObject.cptr
+    type icon_size = int
+    val get_icon_size_ : int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit
+        = _import "mgtk_get_gtk_icon_size" : int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit;
+    val (ICON_SIZE_INVALID,ICON_SIZE_MENU,ICON_SIZE_SMALL_TOOLBAR,ICON_SIZE_LARGE_TOOLBAR,ICON_SIZE_BUTTON,ICON_SIZE_DND,ICON_SIZE_DIALOG) = let     val (x0,x1,x2,x3,x4,x5,x6) = (ref 0,ref 0,ref 0,ref 0,ref 0,ref 0,ref 0) in get_icon_size_ (x0,x1,x2,x3,x4,x5,x6); (! x0,! x1,! x2,! x3,! x4,! x5,! x6) end
+    val icon_size_register_ : CString.cstring * int * int -> int
+        = _import "gtk_icon_size_register" : CString.cstring * int * int -> int;
+    val icon_size_register : string -> int -> int -> icon_size
+        = fn name => fn width => fn height => icon_size_register_ (CString.fromString name,width,height)
+    signature Settings = sig
+        type base
+        type 'a settings_t
+        type 'a t = 'a settings_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Settings :> Settings = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a settings_t = unit
+        type 'a t = 'a settings_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+    end
+    signature Style = sig
+        type base
+        type 'a style_t
+        type 'a t = 'a style_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Style :> Style = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a style_t = unit
+        type 'a t = 'a style_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+    end
+    signature RcStyle = sig
+        type base
+        type 'a rcstyle_t
+        type 'a t = 'a rcstyle_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val rc_get_style_by_paths : 'a Settings.t -> string -> string -> int -> base Style.t
+    end
+    structure RcStyle :> RcStyle = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a rcstyle_t = unit
+        type 'a t = 'a rcstyle_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+        val rc_get_style_by_paths_ : cptr * CString.cstring * CString.cstring * int -> cptr
+            = _import "gtk_rc_get_style_by_paths" : cptr * CString.cstring * CString.cstring * int -> cptr;
+        val rc_get_style_by_paths : 'a Settings.t -> string -> string -> int -> base Style.t
+            = fn settings => fn widget_path => fn class_path => fn typ => make (GObject.withPtr (settings,fn settings => rc_get_style_by_paths_ (settings,CString.fromString widget_path,CString.fromString class_path,typ)))
+    end
+    signature Object = sig
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Object :> Object = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+    end
+    signature Widget = sig
+        type base
+        type 'a widget_t
+        type 'a t = 'a widget_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val modify_style : 'a t -> 'b RcStyle.t -> unit
+    end
+    structure Widget :> Widget = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a widget_t = unit
+        type 'a t = 'a widget_t Object.t
+        fun inherit w con = Object.inherit () con
+        fun make ptr = Object.inherit () (fn () => ptr)
+
+        val modify_style_ : cptr * cptr -> unit
+            = _import "gtk_widget_modify_style" : cptr * cptr -> unit;
+        val modify_style : 'a t -> 'b RcStyle.t -> unit
+            = fn self => fn style => GObject.withPtr (self,fn self => GObject.withPtr (style,fn style => modify_style_ (self,style)))
+    end
+end
+
+
+/* *** Gtk *** */
+/* ML type: unit */
+EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
+  *x6 = GTK_ICON_SIZE_DIALOG;
+  *x5 = GTK_ICON_SIZE_DND;
+  *x4 = GTK_ICON_SIZE_BUTTON;
+  *x3 = GTK_ICON_SIZE_LARGE_TOOLBAR;
+  *x2 = GTK_ICON_SIZE_SMALL_TOOLBAR;
+  *x1 = GTK_ICON_SIZE_MENU;
+  *x0 = GTK_ICON_SIZE_INVALID;
+}
+
+
+
+/* *** Settings *** */
+
+
+/* *** Style *** */
+
+
+/* *** RcStyle *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */

@@ -1,0 +1,171 @@
+structure Gtk = struct
+    signature Object = sig
+
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+
+
+
+
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+    end
+    structure Object :> Object = struct
+
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+    end
+    signature Widget = sig
+
+        type base
+        type 'a widget_t
+        type 'a t = 'a widget_t Object.t
+
+
+
+
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+    end
+    structure Widget :> Widget = struct
+
+        type base = unit
+        type 'a widget_t = unit
+        type 'a t = 'a widget_t Object.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        fun inherit w con = Object.inherit () con
+        fun make ptr = Object.inherit () (fn () => ptr)
+    end
+    signature Misc = sig
+
+        type base
+        type 'a misc_t
+        type 'a t = 'a misc_t Widget.t
+
+
+
+
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+    end
+    structure Misc :> Misc = struct
+
+        type base = unit
+        type 'a misc_t = unit
+        type 'a t = 'a misc_t Widget.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        fun inherit w con = Widget.inherit () con
+        fun make ptr = Widget.inherit () (fn () => ptr)
+    end
+    signature Label = sig
+
+        type base
+        type 'a label_t
+        type 'a t = 'a label_t Misc.t
+
+
+
+
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+        val get_text : 'a t -> string
+    end
+    structure Label :> Label = struct
+
+        type base = unit
+        type 'a label_t = unit
+        type 'a t = 'a label_t Misc.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        fun inherit w con = Misc.inherit () con
+        fun make ptr = Misc.inherit () (fn () => ptr)
+        val get_text_ : cptr -> string
+            = app1 (symb"mgtk_gtk_label_get_text")
+        val get_text : 'a t -> string
+            = fn self => get_text_ (repr self)
+    end
+    signature Calendar = sig
+
+        type base
+        type 'a calendar_t
+        type 'a t = 'a calendar_t Widget.t
+
+
+
+
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+        val get_date : 'a t -> int -> int -> int -> unit
+    end
+    structure Calendar :> Calendar = struct
+
+        type base = unit
+        type 'a calendar_t = unit
+        type 'a t = 'a calendar_t Widget.t
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        fun inherit w con = Widget.inherit () con
+        fun make ptr = Widget.inherit () (fn () => ptr)
+        val get_date_ : cptr -> cptr -> cptr -> cptr -> unit
+            = app4 (symb"mgtk_gtk_calendar_get_date")
+        val get_date : 'a t -> int -> int -> int -> unit
+            = fn self => fn year => fn month => fn day => get_date_ (repr self) year month day
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** Misc *** */
+
+
+/* *** Label *** */
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_label_get_text(value self) { /* ML */
+    return my_copy_string(gtk_label_get_text(GtkObj_val(self)));
+}
+
+
+
+/* *** Calendar *** */
+/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_calendar_get_date(value self, value year, value month, value day) { /* ML */
+    gtk_calendar_get_date(GtkObj_val(self), Int_val(year), Int_val(month), Int_val(day));
+    return Val_unit;
+}
+

@@ -1,0 +1,32 @@
+structure Gtk = struct
+    type cptr = GObject.cptr
+    type textiter = GObject.cptr
+    signature TextBuffer = sig
+        type base
+        type 'a textbuffer_t
+        type 'a t = 'a textbuffer_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val insert : 'a t -> textiter -> string -> int -> unit
+    end
+    structure TextBuffer :> TextBuffer = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a textbuffer_t = unit
+        type 'a t = 'a textbuffer_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+        val insert_ : cptr * cptr * CString.cstring * int -> unit
+            = _import "gtk_text_buffer_insert" : cptr * cptr * CString.cstring * int -> unit;
+        val insert : 'a t -> textiter -> string -> int -> unit
+            = fn self => fn iter => fn text => fn len => GObject.withPtr (self,fn self => insert_ (self,iter,CString.fromString text,len))
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** TextBuffer *** */

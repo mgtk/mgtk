@@ -1,0 +1,61 @@
+structure Gtk = struct
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+
+    type textiter = GObject.cptr
+    signature TextBuffer = sig
+        type base
+        type 'a textbuffer_t
+        type 'a t = 'a textbuffer_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val insert : 'a t -> textiter -> string -> int -> unit
+    end
+    structure TextBuffer :> TextBuffer = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        type base = unit
+        type 'a textbuffer_t = unit
+        type 'a t = 'a textbuffer_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+        val insert_ : cptr -> cptr -> string -> int -> unit
+            = app4 (symb"mgtk_gtk_textbuffer_insert")
+        val insert : 'a t -> textiter -> string -> int -> unit
+            = fn self => fn iter => fn text => fn len => insert_ (repr self) iter text len
+    end
+end
+
+
+/* *** Gtk *** */
+#define GtkTextIter_val(x) (((void*) Field(x, 1)))
+
+#define GtkTextIter_val_nocast(x) (Field(x, 1))
+
+static void ml_finalize_GtkTextIter(value val) {
+  gtk_text_iter_free(GtkTextIter_val(val));
+}
+
+value Val_GtkTextIter(void* obj) {
+  value res;
+  res = alloc_final(2, ml_finalize_GtkTextIter, 0, 1);
+  GtkTextIter_val_nocast(res) = (value) gtk_text_iter_copy(obj);
+  return res;
+}
+
+
+
+/* *** TextBuffer *** */
+/* ML type: cptr -> cptr -> string -> int -> unit */
+EXTERNML value mgtk_gtk_textbuffer_insert(value self, value iter, value text, value len) { /* ML */
+    gtk_text_buffer_insert(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len));
+    return Val_unit;
+}
+

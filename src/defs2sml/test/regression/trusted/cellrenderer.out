@@ -1,0 +1,79 @@
+structure Gtk = struct
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+
+    signature Object = sig
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Object :> Object = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+    end
+    signature CellRenderer = sig
+        type base
+        type 'a cellrenderer_t
+        type 'a t = 'a cellrenderer_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val get_type : unit -> int
+        val set_fixed_size : 'a t -> int -> int -> unit
+    end
+    structure CellRenderer :> CellRenderer = struct
+        open Dynlib
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+
+        type base = unit
+        type 'a cellrenderer_t = unit
+        type 'a t = 'a cellrenderer_t Object.t
+        fun inherit w con = Object.inherit () con
+        fun make ptr = Object.inherit () (fn () => ptr)
+
+        val get_type_ : unit -> int
+            = app1 (symb"mgtk_gtk_cellrenderer_get_type")
+        val get_type : unit -> int
+            = fn dummy => get_type_ dummy
+        val set_fixed_size_ : cptr -> int -> int -> unit
+            = app3 (symb"mgtk_gtk_cellrenderer_set_fixed_size")
+        val set_fixed_size : 'a t -> int -> int -> unit
+            = fn self => fn width => fn height => set_fixed_size_ (repr self) width height
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** CellRenderer *** */
+/* ML type: unit -> int */
+EXTERNML value mgtk_gtk_cellrenderer_get_type(value dummy) { /* ML */
+    return Val_int(gtk_cell_renderer_get_type());
+}
+
+/* ML type: cptr -> int -> int -> unit */
+EXTERNML value mgtk_gtk_cellrenderer_set_fixed_size(value self, value width, value height) { /* ML */
+    gtk_cell_renderer_set_fixed_size(GtkObj_val(self), Int_val(width), Int_val(height));
+    return Val_unit;
+}
+

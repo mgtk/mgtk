@@ -1,0 +1,244 @@
+structure Gtk = struct
+    type cptr = GObject.cptr
+    signature Object = sig
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Object :> Object = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+        fun inherit w con = GObject.inherit () con
+        fun make ptr = GObject.inherit () (fn () => ptr)
+
+    end
+    signature Widget = sig
+        type base
+        type 'a widget_t
+        type 'a t = 'a widget_t Object.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val destroy : 'a t -> unit
+        val show : 'a t -> unit
+        val show_now : 'a t -> unit
+        val hide : 'a t -> unit
+        val show_all : 'a t -> unit
+        val hide_all : 'a t -> unit
+        val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+        val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
+    end
+    structure Widget :> Widget = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a widget_t = unit
+        type 'a t = 'a widget_t Object.t
+        fun inherit w con = Object.inherit () con
+        fun make ptr = Object.inherit () (fn () => ptr)
+
+        val destroy_ : cptr -> unit
+            = _import "gtk_widget_destroy" : cptr -> unit;
+        val destroy : 'a t -> unit
+            = fn self => GObject.withPtr (self,fn self => destroy_ self)
+        val show_ : cptr -> unit
+            = _import "gtk_widget_show" : cptr -> unit;
+        val show : 'a t -> unit
+            = fn self => GObject.withPtr (self,fn self => show_ self)
+        val show_now_ : cptr -> unit
+            = _import "gtk_widget_show_now" : cptr -> unit;
+        val show_now : 'a t -> unit
+            = fn self => GObject.withPtr (self,fn self => show_now_ self)
+        val hide_ : cptr -> unit
+            = _import "gtk_widget_hide" : cptr -> unit;
+        val hide : 'a t -> unit
+            = fn self => GObject.withPtr (self,fn self => hide_ self)
+        val show_all_ : cptr -> unit
+            = _import "gtk_widget_show_all" : cptr -> unit;
+        val show_all : 'a t -> unit
+            = fn self => GObject.withPtr (self,fn self => show_all_ self)
+        val hide_all_ : cptr -> unit
+            = _import "gtk_widget_hide_all" : cptr -> unit;
+        val hide_all : 'a t -> unit
+            = fn self => GObject.withPtr (self,fn self => hide_all_ self)
+        local
+        open Signal
+        infix -->
+        in
+        val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+            = fn f => signal "delete-event" false (unit --> return_bool) f
+        end
+        local
+        open Signal
+        infix -->
+        in
+        val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
+            = fn f => signal "destroy-event" false (unit --> return_bool) f
+        end
+    end
+    signature Container = sig
+        type base
+        type 'a container_t
+        type 'a t = 'a container_t Widget.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val set_border_width : 'a t -> int -> unit
+        val get_border_width : 'a t -> int
+        val add : 'a t -> 'b Widget.t -> unit
+        val remove : 'a t -> 'b Widget.t -> unit
+    end
+    structure Container :> Container = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a container_t = unit
+        type 'a t = 'a container_t Widget.t
+        fun inherit w con = Widget.inherit () con
+        fun make ptr = Widget.inherit () (fn () => ptr)
+
+        val set_border_width_ : cptr * int -> unit
+            = _import "gtk_container_set_border_width" : cptr * int -> unit;
+        val set_border_width : 'a t -> int -> unit
+            = fn self => fn border_width => GObject.withPtr (self,fn self => set_border_width_ (self,border_width))
+        val get_border_width_ : cptr -> int
+            = _import "gtk_container_get_border_width" : cptr -> int;
+        val get_border_width : 'a t -> int
+            = fn self => GObject.withPtr (self,fn self => get_border_width_ self)
+        val add_ : cptr * cptr -> unit
+            = _import "gtk_container_add" : cptr * cptr -> unit;
+        val add : 'a t -> 'b Widget.t -> unit
+            = fn self => fn widget => GObject.withPtr (self,fn self => GObject.withPtr (widget,fn widget => add_ (self,widget)))
+        val remove_ : cptr * cptr -> unit
+            = _import "gtk_container_remove" : cptr * cptr -> unit;
+        val remove : 'a t -> 'b Widget.t -> unit
+            = fn self => fn widget => GObject.withPtr (self,fn self => GObject.withPtr (widget,fn widget => remove_ (self,widget)))
+    end
+    signature Bin = sig
+        type base
+        type 'a bin_t
+        type 'a t = 'a bin_t Container.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure Bin :> Bin = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a bin_t = unit
+        type 'a t = 'a bin_t Container.t
+        fun inherit w con = Container.inherit () con
+        fun make ptr = Container.inherit () (fn () => ptr)
+
+    end
+    signature Window = sig
+        type base
+        type 'a window_t
+        type 'a t = 'a window_t Bin.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        type type_t
+        val TOPLEVEL : type_t
+        val POPUP : type_t
+
+        val new : type_t -> base t
+    end
+    structure Window :> Window = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a window_t = unit
+        type 'a t = 'a window_t Bin.t
+        fun inherit w con = Bin.inherit () con
+        fun make ptr = Bin.inherit () (fn () => ptr)
+
+        type type_t = int
+        val get_type_t_ : int ref * int ref -> unit
+            = _import "mgtk_get_gtk_window_type" : int ref * int ref -> unit;
+        val (TOPLEVEL,POPUP) = let         val (x0,x1) = (ref 0,ref 0) in get_type_t_ (x0,x1); (! x0,! x1) end
+        val new_ : int -> cptr
+            = _import "gtk_window_new" : int -> cptr;
+        val new : type_t -> base t
+            = fn wtype => make (new_ wtype)
+    end
+    signature Button = sig
+        type base
+        type 'a button_t
+        type 'a t = 'a button_t Bin.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val get_type : unit -> int
+        val new : unit -> base t
+        val new_with_label : string -> base t
+        val set_label : 'a t -> string -> unit
+        val get_label : 'a t -> string
+        val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+    end
+    structure Button :> Button = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a button_t = unit
+        type 'a t = 'a button_t Bin.t
+        fun inherit w con = Bin.inherit () con
+        fun make ptr = Bin.inherit () (fn () => ptr)
+
+        val get_type_ : unit -> int
+            = _import "gtk_button_get_type" : unit -> int;
+        val get_type : unit -> int
+            = fn dummy => get_type_ dummy
+        val new_ : unit -> cptr
+            = _import "gtk_button_new" : unit -> cptr;
+        val new : unit -> base t
+            = fn dummy => make (new_ dummy)
+        val new_with_label_ : CString.cstring -> cptr
+            = _import "gtk_button_new_with_label" : CString.cstring -> cptr;
+        val new_with_label : string -> base t
+            = fn label => make (new_with_label_ (CString.fromString label))
+        val set_label_ : cptr * CString.cstring -> unit
+            = _import "gtk_button_set_label" : cptr * CString.cstring -> unit;
+        val set_label : 'a t -> string -> unit
+            = fn self => fn label => GObject.withPtr (self,fn self => set_label_ (self,CString.fromString label))
+        val get_label_ : cptr -> CString.t
+            = _import "gtk_button_get_label" : cptr -> CString.t;
+        val get_label : 'a t -> string
+            = fn self => GObject.withPtr (self,fn self => let         val t = get_label_ self in CString.toString t end)
+        local
+        open Signal
+        infix -->
+        in
+        val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+            = fn f => signal "clicked" false (void --> return_void) f
+        end
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** Container *** */
+
+
+/* *** Bin *** */
+
+
+/* *** Window *** */
+/* ML type: unit */
+EXTERNML void mgtk_get_gtk_window_type(int* x0, int* x1) {
+    *x1 = GTK_WINDOW_POPUP;
+    *x0 = GTK_WINDOW_TOPLEVEL;
+}
+
+
+
+/* *** Button *** */
