@@ -2,5 +2,5 @@ name: /util/pretty/pretty + /util/util
 ast: name + /util/
 fromdefs: name /defs/defs ast + /util/ /util/
 resolvenames: ast name type + /util/
-type: + /util/util
+type: /util/pretty/pretty + /util/util
 resolvetypes: ast name type /util/ resolvenames

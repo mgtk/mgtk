@@ -1,7 +1,7 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
 
-structure Type :> Type = struct
+structure Type :> TYPE = struct
 
     datatype ('n, 'v) ty =
 	Void
@@ -51,6 +51,31 @@ structure Type :> Type = struct
 	in  shw ty
 	end
 
+    local open Pretty
+    in
+      fun parens my safe tree = if my<=safe then bracket "(#)" tree else tree
+      fun pp ppn ppv ty =
+	  let fun p safe ty =
+		  case ty of
+		      Void => ppString "void"
+		    | Base n => ppn n
+		    | Tname n => ppn n
+		    | Ptr ty => p safe ty +^ " ref"
+		    | Const ty => p safe ty +^ " const"
+		    | Arr(i,ty) =>
+		        (p safe ty +^ " array") ++
+			  (case i of NONE => empty | 
+				     SOME l => "[" ^+ ppInt l +^ "]")
+		    | Func(pars,ty) =>
+		        let fun f (par,ty) = ppBinary(ppString par,":",p 2 ty)
+			in
+			    parens 1 safe (ppBinary(ilist " #* " f pars, "->",
+						    p 1 ty))
+			end
+		    | WithDefault(ty,d) =>
+		        ppBinary(p safe ty, "with", ppv d)
+	  in  p 0 ty end
+    end (* local *)
 
     fun getParams(Func(pars,_)) = pars
       | getParams _ = raise Fail("getParams: Not a function type")
