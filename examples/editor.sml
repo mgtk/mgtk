@@ -56,7 +56,7 @@ fun makeMenubar agrp say =
 fun getFile () =
     let val fileSelector = FileSelection.new (SOME "Select a file for editing")
     in  Widget.show fileSelector
-      ; NONE
+      ; SOME "foobar.txt"
     end
 
 fun setUpGui() = 
@@ -74,6 +74,7 @@ fun setUpGui() =
 
         val statusbar = Statusbar.new()
         val menu_context = Statusbar.get_context_id statusbar "Menu bar"
+        fun say msg = ignore(Statusbar.push statusbar menu_context msg)
 
         val (menubar, connectOpen, connectClose) = makeMenubar agrp say
 
@@ -84,22 +85,18 @@ fun setUpGui() =
                          ; sw
                        end
 
-        val statusbar = Statusbar.new()
-
         val vbox = VBox.new' ()
     in  Box.pack_start vbox menubar (SOME false) (SOME false) (SOME 0)
       ; Box.pack_start' vbox scrolled
       ; Box.pack_start vbox statusbar (SOME false) (SOME false) (SOME 0)
       ; Container.add w vbox
       ; Widget.show_all w
-      ; let fun say msg = Statusbar.push statusbar menu_context msg in
-             connectOpen (MenuItem.activate_sig (fn () => 
-                                                    (say "Open"; 
-                                                     case getFile() of
-                                                         NONE => say "No file selected"
-                                                       | SOME s => say ("File :"^s^" selected"); ())))
-           ; connectClose (MenuItem.activate_sig (fn () => ignore(say "Close 4")))
-        end
+      ; connectOpen (MenuItem.activate_sig (fn () => 
+                                               (say "Open"; 
+                                                case getFile() of
+                                                    NONE => say "No file selected"
+                                                  | SOME s => say ("File :"^s^" selected"); ())))
+      ; connectClose (MenuItem.activate_sig (fn () => ignore(say "Close 4")))
     end
 
 fun main () = ( GtkBasis.init(CommandLine.name()::CommandLine.arguments())
