@@ -1,12 +1,22 @@
 
+val _ = Gtk.init(CommandLine.arguments())
+val upright = Gtk.gdk_font_load "-misc-fixed-medium-r-*-*-*-100-*-*-*-*-*-*"
+fun mkColor color =
+    let val (parsed, color) = Gtk.gdk_color_parse color
+	val colormap = Gtk.gdk_colormap_get_system ()
+    in  if parsed 
+	then if Gtk.gdk_colormap_alloc_color colormap color false true
+	     then SOME color
+	     else NONE
+	else (print "Couldn't find color\n"; NONE)
+    end
+val red = mkColor "red"
+
+val error_color = red
+
     fun order (d1, d2) = String.compare (AST.nameOf d1, AST.nameOf d2)
     fun equal (d1, d2) = (AST.nameOf d1 = AST.nameOf d2) andalso (AST.equal(d1, d2))
     fun less d1 d2 = order (d1,d2) = LESS
-
-    fun notIn file list =
-	List.app (fn d => TextIO.print ("Declaration " ^ AST.nameOf d ^ " not in " ^ file ^ "\n")) list
-    fun showDiff (d1, d2) =
-        TextIO.print (AST.nameOf d1 ^ " and " ^ AST.nameOf d2 ^ " differs!\n")
 
     fun member x xs =
 	let fun loop [] = false
@@ -20,15 +30,30 @@
 	in  loop xs []
 	end
 
+    fun extract file NONE = ""
+      | extract file (SOME (p1,p2)) =
+	let val str = Util.extractSource file (p1,p2+20)
+	in  str
+	end
+	
     fun parse file =
-	case Parse.parse Parser.decls file of
+	case Parse.parse' Parser.decls file of
 	    (_, SOME list) => list
-          | (_, NONE) => ( TextIO.print ("Error parsing " ^ file ^ "\n")
+          | (p, NONE) => ( TextIO.print ("Error parsing " ^ file ^ "\n")
                          ; TextIO.flushOut TextIO.stdOut
-			 ; raise Fail ("Error parsing " ^ file))
+			 ; raise Fail ("Error parsing " ^ file ^ ":\n" ^ extract file p))
 
-    fun diff (file1, file2) =
+    fun diff textWidget (file1, file2) =
 	let 
+
+	    fun insert text = Gtk.text_insert' textWidget text ~1
+
+	    fun notIn file list =
+		List.app (fn d => insert ("Declaration " ^ AST.nameOf d ^ " not in " ^ file ^ "\n")) list
+	    fun showDiff (d1, d2) =
+		insert (AST.nameOf d1 ^ " and " ^ AST.nameOf d2 ^ " differs!\n")
+
+
 	    val _ = TextIO.print ("Parsing " ^ file1 ^ " ...\n")
 	    val list1 = parse file1
 	    val _ = TextIO.print ("Parsing " ^ file2 ^ " ...\n")
@@ -76,6 +101,7 @@
 	      | loop pair = loop' pair
 	in  loop (list1, list2)
 	end
+        handle Fail msg => Gtk.text_insert textWidget NONE error_color NONE msg ~1
 
     fun fileEntry label =
 	let val frame = Gtk.frame_new (SOME label)
@@ -111,11 +137,13 @@
     fun delete_event _ = false
     fun destroy _ = Gtk.main_quit()
 
+    fun clear ed = Gtk.editable_delete_text ed 0 ~1 
 
     fun insertFile text font fname =
 	let val dev = TextIO.openIn fname
 	    val s   = TextIO.inputAll dev
 	in  TextIO.closeIn dev
+          ; clear text
           ; Gtk.text_freeze text
 	  ; Gtk.text_insert text (SOME font) NONE NONE s ~1
 	  ; Gtk.text_thaw text
@@ -123,10 +151,15 @@
 
     fun showFile text entry font _ = insertFile text font (Gtk.entry_get_text entry)
 
+    fun compareFiles textWidget entry1 entry2 _ =
+	let val file1 = Gtk.entry_get_text entry1
+	    val file2 = Gtk.entry_get_text entry2
+	in  clear textWidget
+        ;   diff textWidget (file1, file2)
+	end
+
     fun mkGUI () =
 	let 
-	    val _ = Gtk.init(CommandLine.arguments())
-	    
 	    val window = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 
 	    val vbox = Gtk.vbox_new false 2
@@ -142,7 +175,7 @@
 	    val panel = [toWidget hbox1, toWidget hbox2]
 	    val title = Gtk.label_new "Compare .defs files\n(c) Henning Niss"
 	    (* a window with the messages *)
-	    val messages = Gtk.scrolled_window_new' ()
+	    val (messages,msgtext) = fileView()
 
 	    (* a hpaned to show the two files *)
 	    val hpaned = Gtk.hpaned_new ()
@@ -153,7 +186,14 @@
 	    val (file1, file1entry) = fileEntry "File A"
 	    val (file2, file2entry) = fileEntry "File B"
 
-	    val upright = Gtk.gdk_font_load "-*-courier-medium-r-*-*-*-100-*-*-*-*-*-*"
+
+	    fun setFile file msg entry =
+		(Gtk.entry_set_text entry file; showFile msg entry upright ())
+	    val _ = case CommandLine.arguments () of
+		      [file] => setFile file msg1 file1entry
+		    | [file1, file2] => (setFile file1 msg1 file1entry;
+					 setFile file2 msg2 file2entry)
+                    | _ => ()
 
 	in  Gtk.connect_delete_event window delete_event 
 	  ; Gtk.connect_destroy window destroy
@@ -166,8 +206,10 @@
           (* add callbacks *)
           ; Gtk.connect_clicked exit destroy
 
+	  ; Gtk.connect_clicked compare (compareFiles msgtext file1entry file2entry)
+
 	  ; Gtk.connect_activate file1entry (showFile msg1 file1entry upright)
-	  ; Gtk.connect_activate file2entry (showFile msg2 file1entry upright)
+	  ; Gtk.connect_activate file2entry (showFile msg2 file2entry upright)
 
           (* add the widgets to the right containers *)
           ; pack hbox2 compare false false

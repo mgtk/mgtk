@@ -1,9 +1,9 @@
 include ../../Makefile.inc
 
-MOSMLINCLUDE=-I ..
+MOSMLINCLUDE=-I .. -I ../..
 
-OBJS=defsstat.uo defslist.uo defsfind.uo
-TOOLS=defsstat defslist defsfind
+OBJS=defsstat.uo defslist.uo defsfind.uo defsdiff.uo
+TOOLS=defsstat defslist defsfind defsdiff
 
 all: $(TOOLS)
 
@@ -16,6 +16,8 @@ defslist: defslist.uo
 defsfind: defsfind.uo
 	$(MOSMLC) $(MOSMLINCLUDE) -o $@ $<
 
+defsdiff: defsdiff.uo
+	$(MOSMLC) $(MOSMLINCLUDE) -o $@ $<
 
 clean:
 	$(REMOVE) *~
