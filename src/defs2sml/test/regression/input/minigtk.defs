@@ -40,6 +40,27 @@
   (gtype-id "GTK_TYPE_BUTTON")
 )
 
+(define-interface Editable
+  (in-module "Gtk")
+  (c-name "GtkEditable")
+  (gtype-id "GTK_TYPE_EDITABLE")
+)
+
+(define-interface CellEditable
+  (in-module "Gtk")
+  (c-name "GtkCellEditable")
+  (gtype-id "GTK_TYPE_CELL_EDITABLE")
+)
+
+(define-object Entry
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkEntry")
+  (gtype-id "GTK_TYPE_ENTRY")
+  (implements "GtkEditable")
+  (implements "GtkCellEditable")
+)
+
 (define-method destroy
   (of-object "GtkWidget")
   (c-name "gtk_widget_destroy")
@@ -197,4 +218,20 @@
   (parameters
     '("GdkEventAny*" "p0")
   )
+)
+
+(define-method get_chars
+  (of-object "GtkEditable")
+  (c-name "gtk_editable_get_chars")
+  (return-type "gchar*")
+  (parameters
+    '("gint" "start_pos")
+    '("gint" "end_pos")
+  )
+)
+
+(define-method get_text
+  (of-object "GtkEntry")
+  (c-name "gtk_entry_get_text")
+  (return-type "const-gchar*")
 )

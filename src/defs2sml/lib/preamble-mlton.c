@@ -35,6 +35,8 @@ EXTERNML rettype name (GValue* args, long p) { /* ML */ \
 
 MGTK_MakeGetter(mgtk_get_pos_bool, Bool, g_value_get_boolean)
 MGTK_MakeGetter(mgtk_get_pos_int, long, g_value_get_long)
+MGTK_MakeGetter(mgtk_get_pos_char, char, g_value_get_char)
+MGTK_MakeGetter(mgtk_get_pos_double, double, g_value_get_double)
 
 
 /* *** Signal stuff *** */

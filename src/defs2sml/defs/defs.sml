@@ -27,6 +27,7 @@ structure Defs = struct
       | Varargs of bool
       | CallerOwnsReturn of bool
       | When of when
+      | Implements of string
 
     exception AttribNotFound of string
 
@@ -35,6 +36,7 @@ structure Defs = struct
 	      | loop (a::ats) = case p a of SOME v => v | NONE => loop ats
 	in  loop
 	end
+    fun lookupAll attrib p attribs = List.mapPartial p attribs
 
     datatype def_tag =
 	Object
@@ -96,6 +98,10 @@ structure Defs = struct
 	in  lookup "release-func" 
 		   (fn (ReleaseFunc n) => SOME n | _ => NONE) atts
 	end
-
+    fun getImplements (def: definition) = 
+	let val atts = #3 def
+	in  lookupAll "implements"
+	              (fn (Implements n) => SOME n | _ => NONE) atts
+	end
 
 end (* structure Defs *)

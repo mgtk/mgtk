@@ -8,7 +8,7 @@ structure FromDefs :> FromDefs = struct
     structure Map = Splaymap
     structure A = AST
 
-    type module_info = (AST.api_type * AST.api_type option) option
+    type module_info = (string (*name*) * string option (* parent *) * string list (* implements *)) option
     type member_info = (string,AST.api_type) AST.api_info
 
     datatype module = 
@@ -55,10 +55,11 @@ structure FromDefs :> FromDefs = struct
 		Object => 
 		   let val md = getModule def
 		       val r = ref []
-		       val parent = SOME(A.ApiTy(getParent def))
+		       val parent = SOME(getParent def)
 			            handle AttribNotFound _ => NONE
+		       val implements = getImplements def
 		       val mem = Sub(Module{name=name,members=r,
-					    info=SOME(A.ApiTy name,parent)})
+					    info=SOME(name,parent,implements)})
 		   in  new (insert map md mem) name r end
 	      | Function =>
 		   let val md = 
@@ -131,9 +132,11 @@ structure FromDefs :> FromDefs = struct
         let fun pptype (AST.ApiTy s) = s
 	      | pptype (AST.ArrowTy (pars,ret)) =
 		Util.stringSep "[" ("] -> "^pptype ret) ", " (fn (s,ty)=>s^":"^pptype ty) pars
-	    fun ppmodi (SOME(ty, parent)) = 
-		": " ^ pptype ty ^
-		   (case parent of NONE => "" | SOME ty => " extends " ^ pptype ty)
+	    fun ppmodi (SOME(ty, parent, impl)) = 
+		": " ^ ty 
+		^  (case parent of NONE => "" | SOME ty => " extends " ^ ty)
+                ^  (case impl of [] => "" 
+			       | _ => Util.stringSep " implements " "" ", " (fn s => s) impl)
 	      | ppmodi NONE = ""
 	    fun ppmemi (A.Method ty) = ": method " ^ pptype ty
 	      | ppmemi (A.Field ty) = ": field " ^ pptype ty

@@ -325,12 +325,13 @@ struct
 		end
 
     fun header tinfo (name, info) =
-	let val (typ,parent) = 
+	let val (typ,parent,impl) = 
 		case info of
-		    SOME (n,parent) => 
+		    SOME (n,parent,impl) => 
 		       (Name.asType n,
 			case parent of SOME(p) => p
-		                     | _ => raise Skip("No parent")
+		                     | _ => raise Skip("No parent"),
+			impl
                        )
 		  | _ => raise Skip("No type information")
 
@@ -341,11 +342,13 @@ struct
 	    val type_t = "t"
 	    fun pRef id = Name.asModule parent ^ "." ^ id (* FIXME: Using names instead *)
 
+	    fun f (i,a) = TyApp([a], [Name.asModule i ^ ".t"])
+	    val path = List.foldl f (TyApp([TyVar "'a"], [witness_t])) impl
 	in  Some(SeqDecl(List.map StrOnly Prims.strHeader))
          ++ Some(TypeDecl(([],[base_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[witness_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[type_t]), 
-		    Some(TyApp([TyApp([TyVar "'a"],[witness_t])],[parent_t]))))
+		    Some(TyApp([path],[parent_t]))))
          ++ Some(FunDecl("inherit",[VarPat "w",VarPat "con"],
 		    (* 'a -> GObject.constructor -> 'a t *)
 		    SigOnly([TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"])),

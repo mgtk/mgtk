@@ -89,7 +89,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	end
 
     fun build module =
-	let fun bmod (AST.Module{name,members,info=SOME(n,parent)},table) = 
+	let fun bmod (AST.Module{name,members,info=SOME(n,parent,impl)},table) = 
 		let val table' = List.foldl bmem table members
 		    val nb = Name.getBase name
 (*

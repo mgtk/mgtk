@@ -67,14 +67,14 @@ structure Gtk = struct
             = fn self => GObject.withPtr (self,fn self => hide_all_ self)
         local
         open Signal
-        infix -->
+        infixr -->
         in
         val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
             = fn f => signal "delete-event" false (unit --> return_bool) f
         end
         local
         open Signal
-        infix -->
+        infixr -->
         in
         val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
             = fn f => signal "destroy-event" false (unit --> return_bool) f
@@ -208,11 +208,72 @@ structure Gtk = struct
             = fn self => GObject.withPtr (self,fn self => let         val t = get_label_ self in CString.toString t end)
         local
         open Signal
-        infix -->
+        infixr -->
         in
         val clicked_sig : (unit -> unit) -> 'a t Signal.signal
             = fn f => signal "clicked" false (void --> return_void) f
         end
+    end
+    signature Editable = sig
+        type base
+        type 'a editable_t
+        type 'a t = 'a editable_t Widget.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val get_chars : 'a t -> int -> int -> string
+    end
+    structure Editable :> Editable = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a editable_t = unit
+        type 'a t = 'a editable_t Widget.t
+        fun inherit w con = Widget.inherit () con
+        fun make ptr = Widget.inherit () (fn () => ptr)
+
+        val get_chars_ : cptr * int * int -> CString.t
+            = _import "gtk_editable_get_chars" : cptr * int * int -> CString.t;
+        val get_chars : 'a t -> int -> int -> string
+            = fn self => fn start_pos => fn end_pos => GObject.withPtr (self,fn self => let         val t = get_chars_ (self,start_pos,end_pos) in CString.toString t end)
+    end
+    signature CellEditable = sig
+        type base
+        type 'a celleditable_t
+        type 'a t = 'a celleditable_t Widget.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+    end
+    structure CellEditable :> CellEditable = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a celleditable_t = unit
+        type 'a t = 'a celleditable_t Widget.t
+        fun inherit w con = Widget.inherit () con
+        fun make ptr = Widget.inherit () (fn () => ptr)
+
+    end
+    signature Entry = sig
+        type base
+        type 'a entry_t
+        type 'a t = 'a entry_t Editable.t CellEditable.t Widget.t
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+
+        val get_text : 'a t -> string
+    end
+    structure Entry :> Entry = struct
+        type cptr = GObject.cptr
+        type base = unit
+        type 'a entry_t = unit
+        type 'a t = 'a entry_t Editable.t CellEditable.t Widget.t
+        fun inherit w con = Widget.inherit () con
+        fun make ptr = Widget.inherit () (fn () => ptr)
+
+        val get_text_ : cptr -> CString.t
+            = _import "gtk_entry_get_text" : cptr -> CString.t;
+        val get_text : 'a t -> string
+            = fn self => GObject.withPtr (self,fn self => let         val t = get_text_ self in CString.toString t end)
     end
 end
 
@@ -242,3 +303,12 @@ EXTERNML void mgtk_get_gtk_window_type(int* x0, int* x1) {
 
 
 /* *** Button *** */
+
+
+/* *** Editable *** */
+
+
+/* *** CellEditable *** */
+
+
+/* *** Entry *** */

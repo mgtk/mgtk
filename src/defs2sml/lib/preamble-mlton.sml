@@ -113,15 +113,21 @@ sig
     type ('a, 'rest) read = ('a -> 'rest, 'rest) trans
     type 'a return        = ('a, unit) trans
 
-    val bool : (bool, 'rest) read
-    val int  : (int, 'rest)  read
-    val unit : (unit, 'rest) read
+    val bool   : (bool,   'rest) read
+    val int    : (int,    'rest) read
+    val char   : (char,   'rest) read
+    val double : (real,   'rest) read
+    val string : (string, 'rest) read
+    val unit   : (unit,   'rest) read
 
     val void : (unit, 'rest) read
 
-    val return_bool : bool return
-    val return_int  : int  return
-    val return_unit : unit return
+    val return_bool   : bool   return
+    val return_int    : int    return
+    val return_char   : char   return
+    val return_double : real   return
+    val return_string : string return
+    val return_unit   : unit   return
 
     val return_void : unit return
 
@@ -195,6 +201,10 @@ struct
         val setBool = curry setBool
         val setInt  = _import "g_value_set_long" : int setter_;  
         val setInt  = curry setInt
+	val setChar = _import "g_value_set_char" : char setter_;
+        val setChar = curry setChar
+	val setDouble = _import "g_value_set_double" : real setter_;
+	val setDouble = curry setDouble
 
         type 'a getter_ = GValues * int -> 'a
         type 'a getter = GValues -> int -> 'a
@@ -202,6 +212,11 @@ struct
         val getBool = curry getBool
         val getInt  = _import "mgtk_get_pos_int"  : int getter_;
         val getInt  = curry getInt 
+	val getChar = _import "mgtk_get_pos_char" : char getter_;
+	val getChar = curry getChar
+	val getDouble = _import "mgtk_get_pos_double" : real getter_;
+        val getDouble = curry getDouble
+
 (*
         val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
         val getChar   : char getter   = app2(symb "mgtk_get_pos_char")

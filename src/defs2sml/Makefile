@@ -1,7 +1,6 @@
 # mgtk --- an SML binding for GTK.                                          
 # (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004.    
 
-REGRESSIONDIR=test/regression
 MAIN=defs2sml$(EXEEXT)
 
 MOSMLC  = mosmlc
@@ -17,45 +16,56 @@ CINCLUDE=-I$(MOSMLRUNTIME) `pkg-config --cflags gtk+-2.0`
 
 all: $(MAIN) regression
 
-test-compile: $(MAIN)
-	@files="$(wildcard $(REGRESSIONDIR)/input/*.defs)"; \
-	echo "Regression test results ... "; \
-        for file in $$files ; do \
-	      base=`basename $$file .defs`; \
-              ./$(MAIN) --separate-struct $$file -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$$base ; \
-	      mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$$base.sml ; \
-	      gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$$base.c ; \
-        done
-
-
-testgen-%: $(MAIN)
-	echo Generating code for $*
-	./$(MAIN) $(OPTIONS) --separate-struct test/regression/input/$*.defs -cp lib/preamble.c -sp lib/preamble.sml -o $(REGRESSIONDIR)/output/$*
-
-testcomp-%: testgen-%
-	gcc $(CINCLUDE) -c -o /dev/null $(REGRESSIONDIR)/output/$*.c
-	mosmlc -toplevel -liberal -c -o /dev/null $(REGRESSIONDIR)/output/$*.sml
-
 # "Regression" test
+REGDIR=test/regression
+REGIN =$(REGDIR)/input
+REGOUT=$(REGDIR)/output
+REGTRS=$(REGDIR)/trusted
+
+REGFILES=$(notdir $(wildcard $(REGIN)/*.defs))
+
+REGOPTS=--separate-struct -q $(OPTIONS)
+REGOPTSMOS=$(REGOPTS)
+REGOPTSMLTON=--mlton $(REGOPTS)
+
+REGCOMPOPTS=$(REGOPTS)
+REGCOMPOPTSMOS=$(REGCOMPOPTS) -sp lib/preamble.sml -cp lib/preamble.c
+REGCOMPOPTSMLTON=--mlton $(REGCOMPOPTS) -sp lib/preamble-mlton.sml -cp lib/preamble-mlton.c
+
 reggen-%: $(MAIN)
-	@echo -n "$* "
-	@./$(MAIN) --separate-struct -q $(OPTIONS) -o $(REGRESSIONDIR)/output/$*.out test/regression/input/$*.defs
+	@echo -n "[REG]          $*.defs "
+	@./$(MAIN) $(REGOPTSMOS) -o $(REGOUT)/$*.out $(REGIN)/$*.defs
 
 reggenmlton-%: $(MAIN)
-	@echo -n "$* (MLton) "
-	@./$(MAIN) --mlton --separate-struct -q $(OPTIONS) -o $(REGRESSIONDIR)/output/$*-mlton.out test/regression/input/$*.defs
+	@echo -n "[REG (MLton)]  $*.defs "
+	@./$(MAIN) $(REGOPTSMLTON) -o $(REGOUT)/$*-mlton.out $(REGIN)/$*.defs
 
-regcomp-%: reggen-%
-	@if diff -Naur $(REGRESSIONDIR)/trusted/$*.out $(REGRESSIONDIR)/output/$*.out ; then \
-           echo Ok ;\
+regdiff-%: reggen-%
+	@if diff -Naur $(REGTRS)/$*.out $(REGOUT)/$*.out ; then \
+           echo ok ;\
         fi
 
-regcompmlton-%: reggenmlton-%
-	@if diff -Naur $(REGRESSIONDIR)/trusted/$*-mlton.out $(REGRESSIONDIR)/output/$*-mlton.out ; then \
-           echo Ok ;\
+regdiffmlton-%: reggenmlton-%
+	@if diff -Naur $(REGTRS)/$*-mlton.out $(REGOUT)/$*-mlton.out ; then \
+           echo ok ;\
         fi
 
-regression: $(MAIN) $(patsubst %.defs,regcomp-%,$(notdir $(wildcard test/regression/input/*.defs))) $(patsubst %.defs,regcompmlton-%,$(notdir $(wildcard test/regression/input/*.defs)))
+reg-%: regdiff-% regdiffmlton-%
+	@echo -n
+
+regression: $(MAIN) $(patsubst %.defs,regdiff-%,$(REGFILES)) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
+
+regcompgen-%: $(MAIN)
+	@echo "[GEN]          $*.defs"
+	@./$(MAIN) $(REGCOMPOPTSMOS) -o $(REGDIR)/output/$* $(REGIN)/$*.defs 
+
+regcomp-%: regcompgen-%
+	@echo "[GCC]          $*.c"
+	@gcc $(CINCLUDE) -c -o /dev/null $(REGOUT)/$*.c
+	@echo "[MOSMLC]       $*.sml"
+	@mosmlc -toplevel -liberal -c $(REGOUT)/$*.sml
+
+reg-compile: $(MAIN) $(patsubst %.defs,regcomp-%,$(REGFILES))
 
 
 # Generate binding
@@ -73,23 +83,9 @@ MLTONHOME=/usr/lib/mlton
 MLTONINCLUDE=/usr/lib/mlton/include
 MLTONBIN=/usr/bin/
 
-minimgtk-mlton.c minimgtk-mlton.sml: $(MAIN) test/regression/input/minigtk.defs
-	@./$(MAIN) --mlton -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml -q $(OPTIONS) -co minimgtk-mlton.c -so minimgtk-mlton.sml test/regression/input/minigtk.defs
-
 mgtk-mlton.o: mgtk-mlton.c
 	gcc -c -O2 -I$(MLTONINCLUDE) \
 		   `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
-
-minimgtk-mlton.o: minimgtk-mlton.c
-	gcc -c -O2 -I$(MLTONINCLUDE) \
-		   `pkg-config --cflags gtk+-2.0` minimgtk-mlton.c
-
-minimgtk-mlton: minimgtk-mlton.cm minimgtk-mlton.o \
-                      $(shell mlton -stop f minimgtk-mlton.cm)
-	$(MLTONBIN)/mlton -output minimgtk-mlton \
-			  -link-opt "`pkg-config --libs-only-l gtk+-2.0`" \
-	                  minimgtk-mlton.cm minimgtk-mlton.o
-
 
 mltoncompile: $(MAIN) mgtk-mlton.sml mgtk-mlton.o
 	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" mgtk.cm mgtk-mlton.o

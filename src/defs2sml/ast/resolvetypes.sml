@@ -50,61 +50,8 @@ structure ResolveTypes :> ResolveTypes = struct
     end (* structure Parse *)
 
     type 'a ty = 'a Type.ty
-    type 'a module_info = ('a * 'a option) option
+    type module_info = (string * string option * string list) option
     type 'a member_info = (string,'a) AST.api_info
-
-(* old stuff
-
-    fun deModularize name (Tname _, tyname) = (* FIXME *)
-	let val context = Name.getFullPath name @ Name.getBase name
-	    val (path,base) = ResolveNames.toName Name.separateWords context tyname
-(*
-	    val _ = 
-		( TextIO.print  ("deModularizing: " ^ tyname ^ 
-			       " (in " ^ Util.stringSep "" "" "." (fn s=>s) context ^")" ^
-			       " -> " ^
-			       Util.stringSep "" "!" "." (fn s=>s) path ^
-			       Util.stringSep "" "" "-" (fn s=>s) base ^ "\n")
-                )
-*)
-	    val base = 
-		if length base = 0 then [hd(rev context)]
-		else base
-        in  Name.fromPaths (context,path,base)
-	end
-      | deModularize name (Base _ , tyname) = Name.fromPaths([],[],[tyname])
-      | deModularize name _ = raise Fail("deModularize: shouldn't happen")
-
-    fun deModularize name (Tname _, tyname) = (* FIXME *)
-	let val context = Name.getFullPath name @ Name.getBase name
-	    val splits = Name.separateWords tyname
-	    fun return full [] = (rev full,[],Name.getBase name)
-	      | return full [p] = (rev full,[p],[p])
-	      | return full path =
-		let val reversed = rev path
-		in (rev full, rev(tl reversed), [hd reversed]) end
-	    fun loop (e::p, e'::p') full = 
-		if Name.toLower e = Name.toLower e' then loop (p,p') (e::full)
-		else return full (e'::p')
-	      | loop ([], p') full = return full p'
-	      | loop (p, []) full = return (p@full) []
-
-	    val (full,path,base) = loop (context, splits) []
-	    val name = Name.fromPaths (full,path,base)
-(*
-	    val _ = 
-		( TextIO.print  ("deModularizing: " ^ tyname ^ 
-			       " [" ^ Util.stringSep "" "" "-" (fn s=>s) splits ^ "]" ^
-			       " (in " ^ Util.stringSep "" "" "." (fn s=>s) context ^")" ^
-			       " -> " ^
-			       Name.toString' name^"\n")
-                )
-*)
-        in  name
-	end
-      | deModularize name (Base _ , tyname) = Name.fromPaths([],[],[tyname])
-      | deModularize name _ = raise Fail("deModularize: shouldn't happen")
-old stuff *)
 
     fun resTy ty = 
 	case ty of
@@ -114,8 +61,7 @@ old stuff *)
     fun resTy' ty = 
 	case ty of 
 	    NONE => NONE
-	  | SOME(ty,parent) => 
-	    SOME(resTy ty, Option.map resTy parent)
+	  | SOME(ty,parent,impl) => SOME(ty, parent, impl)
 
     fun resMember member =
 	case member of
@@ -135,9 +81,11 @@ old stuff *)
     (* For debugging: *)
     val resolve = fn module => 
         let fun pptype ty = Type.show (fn s => s) ty
-	    fun ppmodi (SOME(ty, parent)) = 
-		": " ^ pptype ty ^
-		   (case parent of NONE => "" | SOME ty => " extends " ^ pptype ty)
+	    fun ppmodi (SOME(ty, parent, impl)) = 
+		": " ^ ty ^
+		   (case parent of NONE => "" | SOME ty => " extends " ^ ty)
+                ^  (case impl of [] => "" 
+			       | _ => Util.stringSep " implements " "" ", " (fn s => s) impl)
 	      | ppmodi NONE = ""
 	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
 	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty

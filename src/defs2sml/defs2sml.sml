@@ -136,9 +136,11 @@ fun main () =
 
 	val debug = fn module => 
         let fun pptype ty = Type.show (Name.toString') ty
-	    fun ppmodi (SOME(ty, parent)) = 
+	    fun ppmodi (SOME(ty, parent, impl)) = 
 		": " ^ Name.toString' ty ^
 		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)
+                ^  (case impl of [] => "" 
+			       | _ => Util.stringSep " implements " "" ", " Name.toString' impl)
 	      | ppmodi NONE = ""
 	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
 	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty

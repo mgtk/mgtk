@@ -32,7 +32,7 @@ struct
     type 'a ty = 'a Type.ty
     type name = Name.name
 
-    type 'a module_info = ('a * 'a option) option
+    type 'a module_info = ('a * 'a option * 'a list) option
     type 'a member_info = ('a, 'a ty) AST.api_info
 
     fun resolve module =
@@ -97,14 +97,14 @@ struct
 		      | demod (Type.Base _, tyname) = Name.fromPaths([],[],[tyname])
 		      | demod (_,_) = raise Fail("resType: shouldn't happen")
 		in  Type.mapi demod ty end
-	    and resType' current ty =
-		let fun detypename (Type.Tname n) = n
-		      | detypename _ = raise Fail("retTy': not a type name")
+	    and resType' cur ty =
+		let fun demod n =
+		    let val (f,p,b) = toName lookup Name.separateWords cur n
+		    in  Name.fromPaths(f,p,b) end
 		in  case ty of
 			NONE => NONE
-		      | SOME(ty,parent) =>
-			SOME(detypename(resType current ty),
-			     Option.map(detypename o resType current) parent)
+		      | SOME(ty,parent,impl) =>
+			SOME(demod ty, Option.map demod parent, List.map demod impl)
 		end
 	in  resMod [] module
 	end
@@ -129,9 +129,11 @@ struct
         let val module' = resolve module
 
 	    fun pptype ty = Type.show Name.toString' ty
-	    fun ppmodi (SOME(ty, parent)) = 
+	    fun ppmodi (SOME(ty, parent,impl)) = 
 		": " ^ Name.toString' ty ^
 		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.toString' ty)
+                ^  (case impl of [] => "" 
+			       | _ => Util.stringSep " implements " "" ", " Name.toString' impl)
 	      | ppmodi NONE = ""
 	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
 	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty

@@ -15,7 +15,7 @@ signature TypeInfo = sig
 	    fromprim: TinySML.exp->TinySML.exp, toprim: TinySML.exp->TinySML.exp}
 *)
     type typeinfo
-    val build: (name,(name * name option)option,('a,ty) AST.api_info) AST.module 
+    val build: (name,(name * name option * name list)option,('a,ty) AST.api_info) AST.module 
 	       -> typeinfo
 
     exception Unbound of name
