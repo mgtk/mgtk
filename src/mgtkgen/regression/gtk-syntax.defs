@@ -1,0 +1,12 @@
+(define-boxed GdkFont
+  gdk_font_ref
+  gdk_font_unref)
+
+(define-func gdk_font_load
+  GdkFont
+  ((string name)
+   (varargs )))
+
+(define-func gdk_fontset_load
+  GdkFont
+  ((string name)))
