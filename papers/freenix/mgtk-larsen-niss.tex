@@ -110,10 +110,86 @@ widely used for teaching and in reasearch.
 \label{sec:example}
 
 \begin{ednote}{}
+  Perhaps we can move this example further up the paper,
+  and thereby introduce SML lingo.
+\end{ednote}
+
+\begin{ednote}{}
   Mini-mgtk and a hello-world example
 \end{ednote}
 
+\begin{figure*}[htbp]
+\begin{centering}
+\begin{verbatim}
+fun hello _ = print "Hello World\n"
 
+fun main _ =
+    let val _ = 
+           GtkBasis.init(CommandLine.name()::CommandLine.arguments())
+        val window = Window.new ()
+        val button = Button.new_with_label "Hello World"
+    in  Signal.connect window (Widget.delete_event_sig (fn _ => false))
+      ; Signal.connect window (Widget.destroy_sig GtkBasis.main_quit)
+      ; Signal.connect button (Button.clicked_sig hello)
+      ; Container.add window button
+      ; Widget.show_all window
+      ; GtkBasis.main() 
+    end
+
+val _ = main()
+\end{verbatim}
+\caption{Hello World in mGTK.\label{fig:hello-world}}
+\end{centering}
+\end{figure*}
+In Figure~\ref{fig:hello-world} we use the following SML constructs
+(see a textbook on SML for further examples;
+\cite{Hansen-Rischel:1999,Paulson:1996} for example). The construct
+\texttt{fun} \textit{foo} \textit{x} \texttt{=} \textit{exp} declares
+a function \textit{foo} that has one formal parameter \textit{x} and
+function body \textit{exp}; \texttt{fn} \textit{x} \texttt{=>}
+\textit{exp} denotes a similar \emph{anonymous} function. If one does
+not care about the parameter, one can use the \emph{wildcard}
+\texttt{\_}. The construct \texttt{let}~\texttt{val} \textit{x} \texttt{=}
+\textit{exp} declares the identifier \textit{x} to be bound to the
+value obtained by evaluating \textit{exp}. If the only reason
+for evaluating \textit{exp} is any potential side effect, one
+can again use the wildcard \texttt{\_}. Expressions evaluated for
+their side effects can also be sequentialized using \texttt{;}.
+The value \texttt{()}, ``unit'', can be used as is and is also used
+as the return value of purely side-effecting functions.
+Finally, \textit{Foo}\texttt{.}\textit{bar} denotes the value bound
+to the identifier \textit{bar} in module \textit{Foo}, and
+\texttt{::} denotes the cons operation on lists as in
+\textit{hd}\texttt{::}\textit{tl}.
+
+Example base types are {\tUnit} for the unit value \texttt{()},
+{\tInt} for integer values, and {\tBool} for boolean values. The type
+of a list of integers is \tList{\tInt}. The type of a function
+expecting an integer list argument and returning an integer result is
+\tArrow{(\tList\tInt)}{\tInt}; the \textit{length} function on lists
+would have such a type, for example. 
+
+Some functions never need to
+``inspect'' (sub)parts of supplied arguments values; such functions
+are called \emph{polymorphic}. For example, the function that just
+returns it's argument unchanged (the ``identity function'') is
+polymorphic; so is the function that computes the length of a list. We
+indicate the parts of the values that are not inspected by using type
+variables $\alpha, \beta, \ldots$ at the corresponding locations in
+the type. For example, the type of the identity function is
+$\tArrow{\alpha}{\alpha}$ telling us that we can apply to any type of
+argument, and we get back a value of the same type. The
+\textit{length} function has type $\tArrow{\tList\alpha}{\tInt}$
+because, regardless of the type of elements in the list (here denoted
+$\alpha$), the function can compute the length of the list. Such type
+variables are \emph{instantiated} to (more) specific types when we
+apply the polymorphic function. For example, when we apply the
+polymorphic identity function to \texttt{()} we instantiate $\alpha$
+to {\tUnit} giving this occurence of the function the type
+\tArrow\tUnit\tUnit; when we apply it to \texttt{17} we instantiate
+$\alpha$ to {\tInt} and the occurrence of the function gets type
+\tArrow\tInt\tInt. The function is said to be (parametric) polymorphic
+because we can apply it to arguments of many shapes.
 
 \section{Process}
 \label{sec:process}

@@ -66,8 +66,3 @@ Hvad har vi de andre ikke har:
    * Bedre forståelse af koncepterne og problemerne
    * Bedre platform
 
-Hvad skal der til for at have noget de andre ikke har som vi kan
-dokumentere i en artikel (eller: hvilke artikler er der basis for):
-
-   * Lave Gtk-klasser i Standard ML (håndtere repr og typer).
-     ICFP 2004?
