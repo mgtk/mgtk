@@ -6,8 +6,8 @@ sig
     val init : string list -> unit
     val main : unit -> unit
     val main_quit : unit -> unit
-    val main_quit_with: exn -> 'a
-    
+(*    val main_quit_with: exn -> 'a
+*)    
     type base
     type 'a widget_t
     type 'a GtkWidget = 'a widget_t GtkObject

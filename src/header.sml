@@ -22,11 +22,19 @@ struct
 
     (* Basic GTK stuff *)
     val init_ : string vector -> unit = app1(symb "mgtk_init")
-    fun init args = init_(vector args)
+    fun init args = 
+	let val args =
+	        case args of
+		    [] => (print "mGTK Warning: Gtk.init called with empty list\n";
+			   [CommandLine.name()])
+		  | _  => args
+	in
+	    init_(vector args)
+	end
     val main : unit -> unit = app1(symb "mgtk_main")
     val main_quit : unit -> unit = app1(symb "mgtk_main_quit")
-    fun main_quit_with e = (main_quit(); raise e)
-
+(*    fun main_quit_with e = (main_quit(); raise e)
+*)
     (* A litle type cleverness *)
     datatype 'a GtkObject = OBJ of gtkobj
 
@@ -61,11 +69,13 @@ struct
 
 	fun dispatch id data =
 	    case peek id of
-		SOME f => (f data handle e => main_quit_with e)
-	      | NONE   => 
+		SOME f => f data(* handle e => main_quit_with e)*)
+	      | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
+				     Int.toString id^")")
+(*
 		   main_quit_with(Fail("mgtk: Unknown callback function (id: "^
 				       Int.toString id^")"))
-
+*)
 	val dummy = Callback.register "mgtk_callback_dispatch" dispatch
 
 	val set_bool_pos : GtkArgs -> int -> bool -> unit 

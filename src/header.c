@@ -37,18 +37,27 @@ value Val_GtkObj (void* obj) {
 
 /* *** Basic stuff *** */
 
-/* FIXME */
 /* ML type: string vector -> unit */
 value mgtk_init(value args) { /* ML */
-  int argc = 1;
+  int argc, i;
   char** argv;
 
-  argv = stat_alloc(4);
-  argv[0] = "dummy";
+  argc = Wosize_val(args);
+  argv = (char**) stat_alloc(sizeof(char*) * argc);
+
+  /* Assumes that gtk_init don't changes the strings; if it does we should use
+     copy_string instead of String_val */
+  for (i=0; i<argc; i++) {
+    argv[i] = String_val(Field(args, i)); 
+  }
+
   gtk_init(&argc, &argv);
-  stat_free(argv);
+
+  stat_free((char *) argv);
+
   return Val_unit;
 }
+
 
 /* ML type: unit -> unit */
 value mgtk_main(value dummy) { /* ML */
@@ -111,7 +120,7 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   Field(res,0) = Val_GtkObj(object); // last because it allocates
 
   mvp = get_valueptr("mgtk_callback_dispatch"); 
-  if(mvp == (value) NULL)
+  if(mvp == (valueptr) NULL)
     failwith("Cannot find mgtk_callback_dispatch");
 
   //printf("callback id = %i\n",(int) data);
