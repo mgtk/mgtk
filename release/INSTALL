@@ -1,0 +1,19 @@
+----------------------------------------------------------------------
+BUILDING MGTK
+
+Building mGTK should be easy.
+
+Let ${MGTKHOME} be the directory in which you unpacked mGtk.
+
+(1) Configure everything by changing ${MGTKHOME}/Makefile.inc to
+    match your setup.
+
+(2) Building mGTK
+
+    (a) make
+
+You can now try some of the examples in the ${MGTKHOME}/examples
+directory.  Remember the read the README file there
+
+---------------------------------------------------------------------- 
+                        Ken Friis Larsen and Henning Niss, April, 2000
