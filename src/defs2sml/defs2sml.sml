@@ -15,14 +15,16 @@ fun main () =
 	    let val is = TextIO.openIn file
 		val s = TextIO.inputAll is
 	    in  TextIO.output(os, s) 
-		before 
-		TextIO.closeIn is
+              ; TextIO.closeIn is
 	    end
 
 
 	(* preambles, copyrights, and stiff *)
 	val cPreamble = ref NONE
 	fun setCPreamble f = cPreamble := SOME f
+
+	val smlPreamble = ref NONE
+	fun setSMLPreamble f = smlPreamble := SOME f
 
         (* input and output files *)
 	val file = ref NONE
@@ -54,7 +56,8 @@ fun main () =
 		    ("-o",  ArgParse.String setOutFileBase),
 		    ("-co", ArgParse.String setCOutFile),
 		    ("-bo", ArgParse.String setOutFileBase),
-		    ("-cp", ArgParse.String setCPreamble)
+		    ("-cp", ArgParse.String setCPreamble),
+		    ("-sp", ArgParse.String setSMLPreamble)
                    ]
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
@@ -101,7 +104,7 @@ fun main () =
 	val _ = MsgUtil.print "Generating SML code ..."
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
 	val api' = GenSML.generate typeinfo api
-	val _ = GenSML.print (getOutFile()) api'
+	val _ = GenSML.print (!smlPreamble) (getOutFile()) api'
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 
