@@ -1,6 +1,8 @@
 *.ui
 *.uo
 buttons-galore	buttons-galore-mlton
+editor
+editor-mlton
 helloworld	helloworld-mlton
 listview	listview-mlton
 menus		menus-mlton

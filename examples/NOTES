@@ -1,3 +1,21 @@
+editor.sml
+----------
+Small editor.  Shows how to use status bar, text view, and file chooser.
+
+Planned feature (not implemented yet):
+  - Support for "Save", "Save as", and "Close" actions
+  - Populate the edit menu, to show how to work with the clipboard
+  - Keep track of open buffers
+  - Keep track of modified buffers
+  - Perhaps add tabs, so that each file get its own tab
+
+Defects:
+  - Missing support for file chooser
+  - Missing support for unicode.  Try to open a file non-ascii characters,
+    or a file with non-ascii in the file name.
+
+
+
 dragdrop.sml
 ------------
 An example adopted from "Mono, A Developers Notebook"

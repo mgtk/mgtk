@@ -1,16 +1,8 @@
 local open Gtk in
 
-fun leftAlign lab = 
-    Misc.set_alignment lab 0.0 0.5 (* Left align X and center Y *)
-
 fun delete_event _ = ( GtkBasis.main_quit()
 		     ; true
                      )
-
-fun say message () = TextIO.print (message^"\n")
-val openActivated = fn say => fn _ => ignore(say "Open")
-val openActivated2 = say "Open"
-val rotateActivated = say "Rotate" 
 
 fun makeMenubar agrp say = 
     let val mb = MenuBar.new()
@@ -54,10 +46,21 @@ fun makeMenubar agrp say =
     end
 
 fun getFile () =
-    let val fileSelector = FileSelection.new (SOME "Select a file for editing")
-    in  Widget.show fileSelector
-      ; SOME "foobar.txt"
+   (* let val dialog = FileChooserDialog.new "Open File" NONE
+                                           FILE_CHOOSER_ACTION_OPEN
+                                           [("gtk-cancel", RESPONSE_CANCEL) ,
+				            ("gtk-open", RESPONSE_ACCEPT)]
+                                          
+        val response = Dialog.run dialog  
+    in  if response = RESPONSE_ACCEPT then 
+            let val chooser = FileChooserDialog.asFileChooser dialog
+            in  FileChooser.get_filename chooser
+            end
+        else NONE
     end
+    *)
+   SOME "foobar.txt"
+
 
 fun setUpGui() = 
     let val w = let val w = Window.new' ()
@@ -79,6 +82,21 @@ fun setUpGui() =
         val (menubar, connectOpen, connectClose) = makeMenubar agrp say
 
         val textView = TextView.new()
+
+        fun openAction () =
+            let val filename = getFile()
+            in   case filename of
+                     NONE => say "No file selected"
+                   | SOME name => 
+                     let (* FIXME: check permissions and stuff *)
+                         val dev = TextIO.openIn name
+                         val content = TextIO.inputAll dev before TextIO.closeIn dev
+                         val buffer = TextView.get_buffer textView
+                     in  TextBuffer.set_text buffer content ~1
+                       ; say (Int.toString (TextBuffer.get_line_count buffer) ^ " lines")
+                     end
+            end
+
         val scrolled = let val sw = ScrolledWindow.new'()
                        in  ScrolledWindow.set_policy sw POLICY_AUTOMATIC POLICY_AUTOMATIC
                          ; Container.add sw textView
@@ -91,11 +109,7 @@ fun setUpGui() =
       ; Box.pack_start vbox statusbar (SOME false) (SOME false) (SOME 0)
       ; Container.add w vbox
       ; Widget.show_all w
-      ; connectOpen (MenuItem.activate_sig (fn () => 
-                                               (say "Open"; 
-                                                case getFile() of
-                                                    NONE => say "No file selected"
-                                                  | SOME s => say ("File :"^s^" selected"); ())))
+      ; connectOpen (MenuItem.activate_sig openAction)
       ; connectClose (MenuItem.activate_sig (fn () => ignore(say "Close 4")))
     end
 
