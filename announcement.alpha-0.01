@@ -23,9 +23,16 @@ mGTK can be obtained from the mGTK homepage at
 
 Current Release
 ---------------
-The current release is an alpha release.  It is quite stable, but the
-interface may (will) change, so do not expect that names and types
-will be the same in the next
+This version of mGTK is the first public release of the library (i.e.,
+it is an alpha version). A number of design decisions have yet to be
+made. Consequently, changes to the signature must be anticipated. That
+being said, the major design issues *are* resolved and the overall
+structure should remain intact. We anticipate only minor changes in
+user-visible parts of the toolkit; for example, (a) naming of
+functions, (b) the number of widgets and/or functions present, (c) the
+types of the functions connecting signals to widgets, and (d) improved
+pretty-printing of the generated code. We would like to encourage you
+to submit ideas for improvements to mGTK; see below.
 
 
 What is Gtk+? 
