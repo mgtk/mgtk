@@ -1106,23 +1106,90 @@
   int
   ())
 
-(define-func gdk_gc_set_foreground
-  none
-  ((GdkGC gc)
-   (GdkColor color)))
-
 (define-func gdk_gc_set_background
   none
   ((GdkGC gc)
    (GdkColor color)))
+
+(define-func gdk_gc_set_clip_mask
+  none
+  ((GdkGC gc)
+   (GdkBitmap mask)))
+
+(define-func gdk_gc_set_clip_origin
+  none
+  ((GdkGC gc)
+   (int x)
+   (int y)))
+
+;;;(define-func gdk_gc_set_clip_rectangle
+;;;  none
+;;;  ((GdkGC gc)
+;;;   (GdkRectangle rectangle)))
+
+;;;(define-func gdk_gc_set_clip_region
+;;;  none
+;;;  ((GdkGC gc)
+;;;   (GdkRegion region)))
+
+(define-func gdk_gc_set_dashes
+  none
+  ((GdkGC gc)
+   (int dash_offset)
+   (static_string dash_list)
+   (int n)))
+
+(define-func gdk_gc_set_exposures
+  none
+  ((GdkGC gc)
+   (int exposures)))
+
+(define-func gdk_gc_set_fill
+  none
+  ((GdkGC gc)
+   (GdkFill fill)))
 
 (define-func gdk_gc_set_font
   none
   ((GdkGC gc)
    (GdkFont font)))
 
+(define-func gdk_gc_set_foreground
+  none
+  ((GdkGC gc)
+   (GdkColor color)))
+
+(define-func gdk_gc_set_line_attributes
+  none
+  ((GdkGC gc)
+   (int line_width)
+   (GdkLineStyle line_style)
+   (GdkCapStyle cap_style)
+   (GdkJoinStyle join_style)))
+
+(define-func gdk_gc_set_stipple
+  none
+  ((GdkGC gc)
+   (GdkPixmap stipple)))
+
+(define-func gdk_gc_set_subwindow
+  none
+  ((GdkGC gc)
+   (GdkSubwindowMode mode)))
+
+(define-func gdk_gc_set_tile
+  none
+  ((GdkGC gc)
+   (GdkPixmap tile)))
+
+(define-func gdk_gc_set_ts_origin
+  none
+  ((GdkGC gc)
+   (int x)
+   (int y)))
+
 ;;; Henning; consider the following section (until end-sec) marked ;;;
-;; Pixmaps and bitmaps
+; Pixmaps and bitmaps
 ;(define-func gdk_pixmap_new
 ;  GdkPixmap
 ;  ((GdkWindow window (null-ok)); Henning, NULL only allowed if depth is given
@@ -1197,8 +1264,6 @@
    (int width)  (int height)
    (int angle1) (int angle2)))
 
-;; gdk_draw_polygon
-
 (define-func gdk_draw_string
   none
   ((GdkDrawable drawable)
@@ -1226,10 +1291,69 @@
 ;; gdk_draw_points
 ;; gdk_draw_segments
 ;; gdk_draw_lines
+;; gdk_draw_polygon
+
+(define-func gdk_string_extents
+  none
+  ((GdkFont font)
+   (static_string string)
+   (int lbearing (output))
+   (int rbearing (output))
+   (int width (output))
+   (int ascent (output))
+   (int descent (output))))
+
+(define-func gdk_string_height
+  int
+  ((GdkFont font)
+   (static_string string)))
+
+(define-func gdk_string_measure
+  int
+  ((GdkFont font)
+   (static_string string)))
+
+(define-func gdk_string_width
+  int
+  ((GdkFont font)
+   (static_string string)))
+
+(define-func gdk_text_extents
+  none
+  ((GdkFont font)
+   (static_string text)
+   (int text_length)
+   (int lbearing (output))
+   (int rbearing (output))
+   (int width (output))
+   (int ascent (output))
+   (int descent (output))))
+
+(define-func gdk_text_height
+  int
+  ((GdkFont font)
+   (static_string text)
+   (int text_length)))
+
+(define-func gdk_text_measure
+  int
+  ((GdkFont font)
+   (static_string text)
+   (int text_length)))
+
+(define-func gdk_text_width
+  int
+  ((GdkFont font)
+   (static_string text)
+   (int text_length)))
 
 ;;;(define-func gdk_cursor_new
 ;;;  GdkCursor
 ;;;  ((GdkCursorType cursor_type)))
+
+;;;(define-func gdk_cursor_destroy
+;;;  none
+;;;  ((GdkCursor cursor)))
 
 ;;;(define-func gdk_cursor_new_from_pixmap
 ;;;  GdkCursor
@@ -1238,6 +1362,97 @@
 ;;;   (GdkColor fg)
 ;;;   (GdkColor bg)
 ;;;   (int x) (int y)))
+
+;;; (define-func gdk_draw_bitmap
+;;;   none
+;;;   ((GdkDrawable drawable)
+;;;    (GdkGC gc)
+;;;    (GdkDrawable src)
+;;;    (int xsrc)
+;;;    (int ysrc)
+;;;    (int xdest)
+;;;    (int ydest)
+;;;    (int width)
+;;;    (int height)))
+  
+;;; (define-func gdk_draw_gray_image
+;;;   none
+;;;   ((GdkDrawable drawable)
+;;;    (GdkGC gc)
+;;;    (int x)
+;;;    (int y)
+;;;    (int width)
+;;;    (int height)
+;;;    (GdkRgbDither dith)
+;;;    (uchar* buf)
+;;;    (int rowstride)))
+  
+;;; (define-func gdk_draw_image
+;;;   none
+;;;   ((GdkDrawable drawable)
+;;;    (GdkGC gc)
+;;;    (GdkImage image)
+;;;    (int xsrc)
+;;;    (int ysrc)
+;;;    (int xdest)
+;;;    (int ydest)
+;;;    (int width)
+;;;    (int height)))
+  
+;;; (define-func gdk_draw_indexed_image
+;;;   none
+;;;   ((GdkDrawable drawable)
+;;;    (GdkGC gc)
+;;;    (int x)
+;;;    (int y)
+;;;    (int width)
+;;;    (int height)
+;;;    (GdkRgbDither dith)
+;;;    (uchar* buf)
+;;;    (int rowstride)
+;;;    (GdkRgbCmap cmap)))
+
+;;; (define-func gdk_draw_rgb_32_image
+;;;   none
+;;;   ((GdkDrawable drawable)
+;;;    (GdkGC gc)
+;;;    (int x)
+;;;    (int y)
+;;;    (int width)
+;;;    (int height)
+;;;    (GdkRgbDither dith)
+;;;    (uchar* buf)
+;;;    (int rowstride)))
+
+;;; (define-func gdk_draw_rgb_image
+;;;   none
+;;;   ((GdkDrawable drawable)
+;;;    (GdkGC gc)
+;;;    (int x)
+;;;    (int y)
+;;;    (int width)
+;;;    (int height)
+;;;    (GdkRgbDither dith)
+;;;    (uchar* rgb_buf)
+;;;    (int rowstride)))
+
+;;; (define-func gdk_draw_rgb_image_dithalign
+;;;   none
+;;;   ((GdkDrawable drawable)
+;;;    (GdkGC gc)
+;;;    (int x)
+;;;    (int y)
+;;;    (int width)
+;;;    (int height)
+;;;    (GdkRgbDither dith)
+;;;    (uchar* rgb_buf)
+;;;    (int rowstride)
+;;;    (int xdith)
+;;;    (int ydith)))
+
+(define-func gdk_get_display
+  string
+  ())
 
 ; Gtk equivalents
 (define-func gtk_draw_arrow
@@ -2415,6 +2630,9 @@
    (int ipad_x) 
    (int ipad_y)))
 
+;;; An internally used functions not to be called by clients (RDP)
+;;; define-func gtk_button_box_child_requisition
+
 ; HButtonBox
 
 (define-object GtkHButtonBox (GtkButtonBox))
@@ -3527,6 +3745,26 @@
 ;;(define-func gtk_progress_bar_percentage
 ;;  float
 ;;  ((GtkProgressBar progress_bar)))
+
+; Image
+;;;(define-object GtkImage (GtkMisc))
+
+;;;(define-func gtk_image_new
+;;;  GtkWidget
+;;;  ((GdkImage val)
+;;;   (GdkBitmap mask)))
+
+;;;(define-func gtk_image_get
+;;;  none
+;;;  ((GtkImage image)
+;;;   (GdkImage** val)
+;;;   (GdkBitmap** mask)))
+
+;;;(define-func gtk_image_set
+;;;  none
+;;;  ((GtkImage image)
+;;;   (GdkImage val)
+;;;   (GdkBitmap mask)))
 
 ; Pixmaps
 
