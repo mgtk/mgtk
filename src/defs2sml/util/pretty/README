@@ -1,0 +1,3 @@
+The pretty printer in this directory is taken from the prototype
+RegFun region-based compiler by Henning Makholm and Henning Niss. See
+the files for the license for the pretty printer.
