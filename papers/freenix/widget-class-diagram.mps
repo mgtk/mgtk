@@ -1,7 +1,7 @@
 %!PS-Adobe-3.0 EPSF-3.0
 %%BoundingBox: -1 0 575 366 
 %%Creator: MetaPost
-%%CreationDate: 2004.03.18:1241
+%%CreationDate: 2004.03.21:2001
 %%Pages: 1
 %%DocumentFonts: phvr pcrr
  /phvr /phvr def
@@ -153,8 +153,8 @@ newpath 258.657 29.7634 moveto
 (+set_title\(title:string\): void) pcrr 15.87387 fshow
  2.8346 0 dtransform exch truncate exch idtransform pop setlinewidth
 newpath 416.686 122.971 moveto
-416.686 89.29 lineto
-415.978 89.29 lineto
+416.686 69.448 lineto
+415.978 69.448 lineto
 415.978 69.448 lineto stroke
  1 setgray
 newpath 428.025 122.971 moveto

@@ -432,7 +432,7 @@ type error (at compile-time).
 
 
 \begin{ednote}{PC}
-    Explain in a few sentences why OO class hierarchies can be
+  Explain in a few sentences why OO class hierarchies can be
   thought of as having a subtype relationship.  Believe it or
   not, this won't be obvious to everyone.
 \end{ednote}
@@ -441,7 +441,9 @@ Fortunately, we are able to take advantage of two properties of \gtk
 and \sml.  First, \gtk implements a class system with only
 single-inheritance.  Second, \sml's type system is expressive enough
 to express the subtype relations of single-inheritance class
-hierarchies.
+hierarchies.  
+
+
 
 In type theoretical jargon, the trick is to use parametric
 polymorphism and \emph{existential types} to encode inheritance
@@ -459,46 +461,33 @@ inheritance path.
 \end{figure}
 
 Figure~\ref{fig:class-hierarchy} shows a small class hierarchy with
-four classes. \classname{SubClassA} and \classname{SubClassB}
-are subclasses of the class \classname{Super} and
-\classname{SubSubClassB} is a subclass of \classname{SubClassB}.  We
-shall go through the different parts of the encoding of a class.
-
-\begin{ednote}{PC}
-    The names for the example class hierarchy are confusing.
-  How about "A", "B1", "B2", and "C", or something similar?
-  I know that this is a non-trivial change, but I'm getting
-  lost in the whole "Super", "Sub", "SubSub" thing.  Also, for
-  the purposes of the paper, you probably can get by with
-  simply "A" "B" "C" and leave out the extra child?
-\end{ednote}
+just four classes. \classname{Label} and \classname{Container} are
+subclasses of the class \classname{Widget} and \classname{Window} is a
+subclass of \classname{Container}.  We shall go through the different
+parts of the encoding of a class.  For the specific class hierarchy i
+Figure~\ref{fig:class-hierarchy}, the properties we want from our
+type encoding into \sml's type system to enforce is that we should be
+allowed to call the !show! method on all kinds of arguments whether
+they are of class type \classname{Widget}, \classname{Label},
+\classname{Container}, or \classname{Window}; we should be allowed to
+call the !add! method on \classname{Container}s and
+\classname{Window}s, but not \classname{Widget}s and
+\classname{Label}s; we should only be allowed to call !set_title! on
+\classname{Window}s; and so on. 
 
 
 \begin{description}
-\item[Class types] A base class like \classname{Super} in
+\item[Class types] A base class like \classname{Widget} in
   Figure~\ref{fig:class-hierarchy} is encoded as an abstract
   parameterized type:
 \begin{SMLcode}
 type 'path super
 \end{SMLcode}
-(we follow a the convention suggested by the \smlbasis and spell
+(we follow the convention suggested by the \smlbasis and spell
 type-names in lower-case with underscores if needed).  The type
 variable !'path! will be used to hold the inheritance path for
 subclasses.
 
-\begin{ednote}{PC}
-    Give some intuition, and preferably lots, about why *witness
-  types* are necessary and are introduced.  All the magic is
-  introduced right here: this section and the previous on
-  class types should be expanded by about 0.5-1 page to
-  explain clearly and thoroughly what's going on with the type
-  system at this spot.  
-
-  Note in particular that typing the
-  running example into ML will result in an error, since type
-  specifications are available only in signatures.  This is
-  a bit confusing to even a knowledgeable reader (e.g. me :-).
-\end{ednote}
 
 \item[Subtyping/Inheritance] 
 
@@ -508,54 +497,60 @@ subclasses.
 
   \end{ednote}
 
-For a subclass like \classname{SubClassA}
+  For a subclass like \classname{Label}
   we need to declare two new \sml types: an abstract parameterized
   type, which we shall call a \emph{witness type}; and a type
   abbreviation specifying the inheritance:
 \begin{SMLcode}
-type 'path sub_class_a_t
-type 'path sub_class_a = 
-        'path sub_class_a_t super
+type 'path label_t
+type 'path label = 
+        'path label_t widget
 \end{SMLcode}
-where !sub_class_a_t! is the witness type and !sub_class_a! is the
-type specifying the inheritance.  In the declaration of !sub_class_a!
+where !label_t! is the witness type and !label! is the
+type specifying the inheritance.  In the declaration of !label!
 we see that the type variable !'path! in the declaration of the type
-!super! has been instantiated with the type expression 
-!'path sub_class_a_t!, which contains an new type variable (also named
+!widget! has been instantiated with the type expression 
+!'path label_t!, which contains an new type variable (also named
 !'path!).
 
 In the rest of the paper we shall use the convention that witness
 types ends with !_t!.
+
+\begin{ednote}{PC}
+    Give some intuition, and preferably lots, about why *witness
+  types* are necessary and are introduced.  All the magic is
+  introduced right here: this section and the previous on
+  class types should be expanded by about 0.5-1 page to
+  explain clearly and thoroughly what's going on with the type
+  system at this spot.  
+  
+  Note in particular that typing the running example into ML will
+  result in an error, since type specifications are available only in
+  signatures.  This is a bit confusing to even a knowledgeable reader
+  (e.g. me :-).
+\end{ednote}
 
 \item[Methods] Because \sml is not an object-oriented language we shall
   model methods with ordinary functions, and use the usual convention
   that the first argument is the object on which the method is called.
   (\gtk also uses this convention).
   
-  We can now write the type for the method !toString! in
-  \classname{SubclassB}:
+  We can now write the type for the method !add! in
+  \classname{Container}:
 \begin{SMLcode}
-val toString : 'path sub_class_b 
-                             -> string
+val add : 'path container -> 'a widget 
+                               -> unit
 \end{SMLcode}
-This type says that !toString! takes any object which is a subclass of
-\classname{SubClassB} and returns a string as result.   Similar the
-type for the method !foo! from class \classname{SubSubClassB} has the
-type:
+This type says that !add! takes two arguments: an object of type
+\classname{Container} and a widget, and returns !unit! as result.
+Similar the type for the method !set_title! from class
+\classname{Window} has the type:
 \begin{SMLcode}
-val foo : 'path sub_sub_class_b 
-                         -> int -> int
+val set_title : 'path window -> string 
+                               -> unit
 \end{SMLcode}
-That is, !foo! takes any object which is a subclass of
-\classname{SubSubClassB} and an integer and returns an integer.
-
-\begin{ednote}{PC}
-  "...any object which is a subclass of SubClassB and
-returns...": while this is technically correct, it might be
-less confusing to the OO types to simply say "an object of
-type SubClassB" since those folks usually regard subtypes of
-SubClassB as being included in that phrase.
-\end{ednote}
+That is, !foo! takes two arguments: an object of type 
+\classname{Window} and a string, and returns !unit!.
 
 \begin{ednote}{PC}
   
@@ -572,9 +567,9 @@ methods): OTOH, the C is not curryable...
   values that can be instantiated to the type of a sub-class.  Hence,
   we introduce the abstract dummy type !base! and use that to plug the
   type variable.  Thus, the type of the constructor for
-  \classname{SubClassA} is:
+  \classname{Label} is:
 \begin{SMLcode}
-val new : unit -> base sub_class_a
+val new : unit -> base label
 \end{SMLcode}
 The convention in \gtk is that constructors are named !new!.
 
@@ -584,26 +579,35 @@ via
    type base
 \end{ednote}
 
+
+\item[Fields] We are not able to handle fields directly, because we
+  keep the representation of objects completely opaque.  Thus, all
+  inspections and changes to fields must be done though getter and
+  setter methods.
+
+
 \end{description}
 
 We then wrap all parts of an encoding of a class into a structure of
-its own.  That is, for the class \classname{SubClassB} in
+its own.  That is, for the class \classname{Window} in
 Figure~\ref{fig:class-hierarchy} the \sml signatures is:
 \begin{SMLcode}
-signature SubClassB =
+signature Window =
 sig
-  type 'path sub_class_b_t
-  type 'path sub_class_b = 
-         'path sub_class_b_t Super.super
+  type 'path window_t
+  type 'path window = 
+         'path window_t Container.container
   val new : unit 
-            -> GtkBasis.base sub_class_b 
-  val toString : 'path sub_class_b 
-                               -> string
+            -> GtkBasis.base window
+  val set_title : 'path window -> string 
+                                 -> unit
 end
 \end{SMLcode}
 We see that this signature relies on two other structures:  The
-structure !Super! for the class \classname{Super} and !GtkBasis! for
-the dummy class !base!.
+structure !Super! for the class \classname{Widget} and !GtkBasis! for
+the dummy type !base!.  In addition to the signature !Window! we also
+need a structure called !Window! that implements the actual calling of
+the relevant \gtk C functions.
 
 \begin{ednote}{PC}
   
@@ -611,23 +615,18 @@ signatures vs structures --- make this clear.  I had to work
 a bunch of SML example---attached---on my own to figure out
 what's happening here.  Did I get the attached code right?
 
-Does the technique given here work for fields at all, or
-just for methods?  In other words, is it for general-purpose
-OO modeling or just for the Gtk+ case where all interesting
-bits are in methods?
-
 \end{ednote}
 
-Continuing our running example from Section~\ref{sec:example},
-the widgets \texttt{window} and \texttt{button} get the following
-types
+Continuing our running example from Section~\ref{sec:example}, the
+widgets \texttt{window} and \texttt{button} (in the real \gtk
+hierarchy) get the following types:
 \begin{SMLcode}
 val window : 
-       base window_t container_t widget_t t
+     base window_t container_t widget_t t
 val button : 
-       base button_t container_t widget_t t
+     base button_t container_t widget_t t
 \end{SMLcode}
-(where !t! is represents the top of the hierarchy e.g. Widget, and all
+(where !t! is represents the top of the hierarchy e.g. !Widget!, and all
 structure prefixes have been omitted).  The types tell us, reading from
 left to right, that \texttt{window} is a Window widget that extends
 the Container widget, which in turn extends the Widget widget;
@@ -643,7 +642,6 @@ button in all contexts expecting a Container.
 correct?  If so, try to show the type equivalence between
 this and what is currently there.  Also, you may want to put
 the structure names in, no?
-
 \end{ednote}
 
 
