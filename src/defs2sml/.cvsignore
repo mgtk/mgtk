@@ -4,4 +4,4 @@ mosmake.dep
 defs2sml
 mgtk-mlton.c mgtk-mlton.sml
 mgtk.c mgtk.sml
-mgtk
+mgtk mgtk-mlton

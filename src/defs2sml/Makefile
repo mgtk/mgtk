@@ -91,9 +91,9 @@ mgtk-mlton.o: mgtk-mlton.c
 		   `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
 
 mltoncompile: $(MAIN) mgtk-mlton.sml mgtk-mlton.o
-	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" mgtk.cm mgtk-mlton.o
+	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" mgtk-mlton.cm mgtk-mlton.o
 
 realclean:
-	rm -f mgtk.c mgtk.sml mgtk.o
-	rm -f mgtk-mlton.c mgtk-mlton.sml mgtk-mlton.o mgtk
+	rm -f mgtk.c mgtk.sml mgtk.o mgtk
+	rm -f mgtk-mlton.c mgtk-mlton.sml mgtk-mlton.o mgtk-mlton
 	rm -f typetable.txt
