@@ -48,12 +48,12 @@ EXTERNML value my_copy_string(const char *s) {
 #define GtkObj_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gtkobject (value val) {
-  gtk_object_unref (GtkObj_val(val)); 
+  g_object_unref (GtkObj_val(val)); 
 }
 
 static inline value Val_GtkObj (void* obj) { 
   value res; 
-  gtk_object_ref(obj); 
+  g_object_ref(obj); 
   res = alloc_final (2, ml_finalize_gtkobject, 0, 1);
   GtkObj_val_nocast(res) = (value)obj;  
   return res; 
