@@ -1,4 +1,11 @@
+2000-04-10  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml: Now boxed types are all defined to be
+	of type gpointer internally in the SML structure.
+
 2000-04-07  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml: Fixed a bug concerning output types.
 
 	* Parse.sml: Minor update to return the position of a syntax
 	error.

@@ -45,9 +45,10 @@ struct
       | toCValue' (typExp, name) = toCValue (typExp, name)
 
     fun fromCValue (AST.TYPENAME typExp, name) = (#fromCValue (TypeInfo.lookupTypeName typExp)) name
-      | fromCValue (AST.OUTPUT (typExp as (AST.TYPENAME "string")), name) = 
-	  fromCValue (typExp, name)
-      | fromCValue (AST.OUTPUT typExp, name) = fromCValue (typExp, $"&" && name)
+      | fromCValue (AST.OUTPUT (typExp as (AST.TYPENAME _)), name) = 
+	  if TypeInfo.isPrimVal typExp 
+	  then fromCValue (typExp, $"&" && name)
+	  else fromCValue (typExp, name)
       | fromCValue (typExp, name) = Util.notImplemented ("fromCValue: not a type name: " ^ WSeq.flatten name ^ " of " ^ AST.typeClass typExp)
 
 

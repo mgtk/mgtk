@@ -1595,9 +1595,113 @@ value mgdk_colormap_get_system_size(value dummy) { /* ML */
   return Val_int(gdk_colormap_get_system_size());
 }
 
-/* ML type: gdk_window -> int -> int -> int -> int -> unit */
-value mgdk_window_clear_area(value window, value x1, value y1, value x2, value y2) { /* ML */
-  gdk_window_clear_area(GdkWindow_val(window), Int_val(x1), Int_val(y1), Int_val(x2), Int_val(y2));
+/* ML type: gdk_gc -> gdk_color -> unit */
+value mgdk_gc_set_foreground(value gc, value color) { /* ML */
+  gdk_gc_set_foreground(GdkGC_val(gc), GdkColor_val(color));
+  return Val_unit;
+}
+
+/* ML type: gdk_gc -> gdk_color -> unit */
+value mgdk_gc_set_background(value gc, value color) { /* ML */
+  gdk_gc_set_background(GdkGC_val(gc), GdkColor_val(color));
+  return Val_unit;
+}
+
+/* ML type: gdk_gc -> gdk_font -> unit */
+value mgdk_gc_set_font(value gc, value font) { /* ML */
+  gdk_gc_set_font(GdkGC_val(gc), GdkFont_val(font));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable -> int -> int -> int -> int -> unit */
+value mgdk_window_clear_area(value drawable, value x1, value y1, value x2, value y2) { /* ML */
+  gdk_window_clear_area(GdkDrawable_val(drawable), Int_val(x1), Int_val(y1), Int_val(x2), Int_val(y2));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable -> gdk_gc -> int -> int -> unit */
+value mgdk_draw_point(value drawable, value gc, value x, value y) { /* ML */
+  gdk_draw_point(GdkDrawable_val(drawable), GdkGC_val(gc), Int_val(x), Int_val(y));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable * gdk_gc * int * int * int * int -> unit */
+value mgdk_draw_line(value mgtk_params) { /* ML */
+  value drawable = Field(mgtk_params, 0);
+  value gc = Field(mgtk_params, 1);
+  value x1 = Field(mgtk_params, 2);
+  value y1 = Field(mgtk_params, 3);
+  value x2 = Field(mgtk_params, 4);
+  value y2 = Field(mgtk_params, 5);
+  gdk_draw_line(GdkDrawable_val(drawable), GdkGC_val(gc), Int_val(x1), Int_val(y1), Int_val(x2), Int_val(y2));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable * gdk_gc * bool * int * int * int * int -> unit */
+value mgdk_draw_rectangle(value mgtk_params) { /* ML */
+  value drawable = Field(mgtk_params, 0);
+  value gc = Field(mgtk_params, 1);
+  value filled = Field(mgtk_params, 2);
+  value x = Field(mgtk_params, 3);
+  value y = Field(mgtk_params, 4);
+  value width = Field(mgtk_params, 5);
+  value height = Field(mgtk_params, 6);
+  gdk_draw_rectangle(GdkDrawable_val(drawable), GdkGC_val(gc), Bool_val(filled), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable * gdk_gc * bool * int * int * int * int * int * int -> unit */
+value mgdk_draw_arc(value mgtk_params) { /* ML */
+  value drawable = Field(mgtk_params, 0);
+  value gc = Field(mgtk_params, 1);
+  value filled = Field(mgtk_params, 2);
+  value x = Field(mgtk_params, 3);
+  value y = Field(mgtk_params, 4);
+  value width = Field(mgtk_params, 5);
+  value height = Field(mgtk_params, 6);
+  value angle1 = Field(mgtk_params, 7);
+  value angle2 = Field(mgtk_params, 8);
+  gdk_draw_arc(GdkDrawable_val(drawable), GdkGC_val(gc), Bool_val(filled), Int_val(x), Int_val(y), Int_val(width), Int_val(height), Int_val(angle1), Int_val(angle2));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable * gdk_font * gdk_gc * int * int * string -> unit */
+value mgdk_draw_string(value mgtk_params) { /* ML */
+  value drawable = Field(mgtk_params, 0);
+  value font = Field(mgtk_params, 1);
+  value gc = Field(mgtk_params, 2);
+  value x = Field(mgtk_params, 3);
+  value y = Field(mgtk_params, 4);
+  value str = Field(mgtk_params, 5);
+  gdk_draw_string(GdkDrawable_val(drawable), GdkFont_val(font), GdkGC_val(gc), Int_val(x), Int_val(y), String_val(str));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable * gdk_font * gdk_gc * int * int * string * int -> unit */
+value mgdk_draw_text(value mgtk_params) { /* ML */
+  value drawable = Field(mgtk_params, 0);
+  value font = Field(mgtk_params, 1);
+  value gc = Field(mgtk_params, 2);
+  value x = Field(mgtk_params, 3);
+  value y = Field(mgtk_params, 4);
+  value text = Field(mgtk_params, 5);
+  value text_length = Field(mgtk_params, 6);
+  gdk_draw_text(GdkDrawable_val(drawable), GdkFont_val(font), GdkGC_val(gc), Int_val(x), Int_val(y), String_val(text), Int_val(text_length));
+  return Val_unit;
+}
+
+/* ML type: gdk_drawable * gdk_gc * gdk_drawable * int * int * int * int * int * int -> unit */
+value mgdk_draw_pixmap(value mgtk_params) { /* ML */
+  value drawable = Field(mgtk_params, 0);
+  value gc = Field(mgtk_params, 1);
+  value src = Field(mgtk_params, 2);
+  value xsrc = Field(mgtk_params, 3);
+  value ysrc = Field(mgtk_params, 4);
+  value xdest = Field(mgtk_params, 5);
+  value ydest = Field(mgtk_params, 6);
+  value width = Field(mgtk_params, 7);
+  value height = Field(mgtk_params, 8);
+  gdk_draw_pixmap(GdkDrawable_val(drawable), GdkGC_val(gc), GdkDrawable_val(src), Int_val(xsrc), Int_val(ysrc), Int_val(xdest), Int_val(ydest), Int_val(width), Int_val(height));
   return Val_unit;
 }
 
@@ -1906,13 +2010,39 @@ value mgdk_screen_height_mm(value dummy) { /* ML */
 }
 
 /* ML type: gtkobj -> gdk_window */
-value mgtk_get_window(value widget) { /* ML */
-  return Val_GdkWindow(gtk_get_window(GtkObj_val(widget)));
+value mgtk_widget_get_window(value widget) { /* ML */
+  return Val_GdkWindow(gtk_widget_get_window(GtkObj_val(widget)));
+}
+
+/* ML type: gtkobj -> gdk_drawable */
+value mgtk_widget_get_drawable(value widget) { /* ML */
+  return Val_GdkDrawable(gtk_widget_get_drawable(GtkObj_val(widget)));
 }
 
 /* ML type: gtkobj -> int */
-value mgtk_get_state(value widget) { /* ML */
-  return Val_int(gtk_get_state(GtkObj_val(widget)));
+value mgtk_widget_get_state(value widget) { /* ML */
+  return Val_int(gtk_widget_get_state(GtkObj_val(widget)));
+}
+
+/* ML type: gtkobj -> int * int * int * int */
+value mgtk_widget_get_allocation(value widget) { /* ML */
+  value res;
+  int reswidth;
+  int resheight;
+  int resx;
+  int resy;
+  gtk_widget_get_allocation(GtkObj_val(widget), &reswidth, &resheight, &resx, &resy);
+  res = alloc_tuple(4);
+  Field(res, 0) = Val_int(reswidth);
+  Field(res, 1) = Val_int(resheight);
+  Field(res, 2) = Val_int(resx);
+  Field(res, 3) = Val_int(resy);
+  return res;
+}
+
+/* ML type: gtkobj -> int -> gdk_gc */
+value mgtk_widget_get_style_fg_gc(value widget, value state) { /* ML */
+  return Val_GdkGC(gtk_widget_get_style_fg_gc(GtkObj_val(widget), Int_val(state)));
 }
 
 /* *** Data stuff *** */
@@ -4493,9 +4623,9 @@ value mgtk_calendar_get_date(value cal) { /* ML */
   unsigned int resday;
   gtk_calendar_get_date(GtkObj_val(cal), &resyear, &resmonth, &resday);
   res = alloc_tuple(3);
-  Field(res, 0) = Val_int(&resyear);
-  Field(res, 1) = Val_int(&resmonth);
-  Field(res, 2) = Val_int(&resday);
+  Field(res, 0) = Val_int(resyear);
+  Field(res, 1) = Val_int(resmonth);
+  Field(res, 2) = Val_int(resday);
   return res;
 }
 
@@ -7081,7 +7211,17 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val gdk_colormap_free_colors: gdk_colormap -> gdk_color -> int -> unit
     val gdk_colormap_get_system: unit -> gdk_colormap
     val gdk_colormap_get_system_size: unit -> int
-    val gdk_window_clear_area: gdk_window -> int -> int -> int -> int -> unit
+    val gdk_gc_set_foreground: gdk_gc -> gdk_color -> unit
+    val gdk_gc_set_background: gdk_gc -> gdk_color -> unit
+    val gdk_gc_set_font: gdk_gc -> gdk_font -> unit
+    val gdk_window_clear_area: gdk_drawable -> int -> int -> int -> int -> unit
+    val gdk_draw_point: gdk_drawable -> gdk_gc -> int -> int -> unit
+    val gdk_draw_line: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> unit
+    val gdk_draw_rectangle: gdk_drawable -> gdk_gc -> bool -> int -> int -> int -> int -> unit
+    val gdk_draw_arc: gdk_drawable -> gdk_gc -> bool -> int -> int -> int -> int -> int -> int -> unit
+    val gdk_draw_string: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> unit
+    val gdk_draw_text: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> int -> unit
+    val gdk_draw_pixmap: gdk_drawable -> gdk_gc -> gdk_drawable -> int -> int -> int -> int -> int -> int -> unit
     val draw_arrow: gtk_style -> gdk_window -> state_type -> shadow_type -> arrow_type -> bool -> int -> int -> int -> int -> unit
     val draw_box: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> unit
     val draw_box_gap: gtk_style -> gdk_window -> state_type -> shadow_type -> int -> int -> int -> int -> position_type -> int -> int -> unit
@@ -7106,8 +7246,11 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val gdk_screen_height: unit -> int
     val gdk_screen_width_mm: unit -> int
     val gdk_screen_height_mm: unit -> int
-    val get_window: 'a GtkWidget -> gdk_window
-    val get_state: 'a GtkWidget -> state_type
+    val widget_get_window: 'a GtkWidget -> gdk_window
+    val widget_get_drawable: 'a GtkWidget -> gdk_drawable
+    val widget_get_state: 'a GtkWidget -> state_type
+    val widget_get_allocation: 'a GtkWidget -> int * int * int * int
+    val widget_get_style_fg_gc: 'a GtkWidget -> state_type -> gdk_gc
 
     (* *** Data *** *)
 
@@ -9281,10 +9424,60 @@ end
     val gdk_colormap_get_system_size: unit -> int
         = fn dummy => gdk_colormap_get_system_size_ dummy
 
-    val gdk_window_clear_area_: gdk_window -> int -> int -> int -> int -> unit
+    val gdk_gc_set_foreground_: gdk_gc -> gdk_color -> unit
+        = app2(symb"mgdk_gc_set_foreground")
+    val gdk_gc_set_foreground: gdk_gc -> gdk_color -> unit
+        = fn gc => fn color => gdk_gc_set_foreground_ gc color
+
+    val gdk_gc_set_background_: gdk_gc -> gdk_color -> unit
+        = app2(symb"mgdk_gc_set_background")
+    val gdk_gc_set_background: gdk_gc -> gdk_color -> unit
+        = fn gc => fn color => gdk_gc_set_background_ gc color
+
+    val gdk_gc_set_font_: gdk_gc -> gdk_font -> unit
+        = app2(symb"mgdk_gc_set_font")
+    val gdk_gc_set_font: gdk_gc -> gdk_font -> unit
+        = fn gc => fn font => gdk_gc_set_font_ gc font
+
+    val gdk_window_clear_area_: gdk_drawable -> int -> int -> int -> int -> unit
         = app5(symb"mgdk_window_clear_area")
-    val gdk_window_clear_area: gdk_window -> int -> int -> int -> int -> unit
-        = fn window => fn x1 => fn y1 => fn x2 => fn y2 => gdk_window_clear_area_ window x1 y1 x2 y2
+    val gdk_window_clear_area: gdk_drawable -> int -> int -> int -> int -> unit
+        = fn drawable => fn x1 => fn y1 => fn x2 => fn y2 => gdk_window_clear_area_ drawable x1 y1 x2 y2
+
+    val gdk_draw_point_: gdk_drawable -> gdk_gc -> int -> int -> unit
+        = app4(symb"mgdk_draw_point")
+    val gdk_draw_point: gdk_drawable -> gdk_gc -> int -> int -> unit
+        = fn drawable => fn gc => fn x => fn y => gdk_draw_point_ drawable gc x y
+
+    val gdk_draw_line_: gdk_drawable * gdk_gc * int * int * int * int -> unit
+        = app1(symb"mgdk_draw_line")
+    val gdk_draw_line: gdk_drawable -> gdk_gc -> int -> int -> int -> int -> unit
+        = fn drawable => fn gc => fn x1 => fn y1 => fn x2 => fn y2 => gdk_draw_line_ (drawable, gc, x1, y1, x2, y2)
+
+    val gdk_draw_rectangle_: gdk_drawable * gdk_gc * bool * int * int * int * int -> unit
+        = app1(symb"mgdk_draw_rectangle")
+    val gdk_draw_rectangle: gdk_drawable -> gdk_gc -> bool -> int -> int -> int -> int -> unit
+        = fn drawable => fn gc => fn filled => fn x => fn y => fn width => fn height => gdk_draw_rectangle_ (drawable, gc, filled, x, y, width, height)
+
+    val gdk_draw_arc_: gdk_drawable * gdk_gc * bool * int * int * int * int * int * int -> unit
+        = app1(symb"mgdk_draw_arc")
+    val gdk_draw_arc: gdk_drawable -> gdk_gc -> bool -> int -> int -> int -> int -> int -> int -> unit
+        = fn drawable => fn gc => fn filled => fn x => fn y => fn width => fn height => fn angle1 => fn angle2 => gdk_draw_arc_ (drawable, gc, filled, x, y, width, height, angle1, angle2)
+
+    val gdk_draw_string_: gdk_drawable * gdk_font * gdk_gc * int * int * string -> unit
+        = app1(symb"mgdk_draw_string")
+    val gdk_draw_string: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> unit
+        = fn drawable => fn font => fn gc => fn x => fn y => fn str => gdk_draw_string_ (drawable, font, gc, x, y, str)
+
+    val gdk_draw_text_: gdk_drawable * gdk_font * gdk_gc * int * int * string * int -> unit
+        = app1(symb"mgdk_draw_text")
+    val gdk_draw_text: gdk_drawable -> gdk_font -> gdk_gc -> int -> int -> string -> int -> unit
+        = fn drawable => fn font => fn gc => fn x => fn y => fn text => fn text_length => gdk_draw_text_ (drawable, font, gc, x, y, text, text_length)
+
+    val gdk_draw_pixmap_: gdk_drawable * gdk_gc * gdk_drawable * int * int * int * int * int * int -> unit
+        = app1(symb"mgdk_draw_pixmap")
+    val gdk_draw_pixmap: gdk_drawable -> gdk_gc -> gdk_drawable -> int -> int -> int -> int -> int -> int -> unit
+        = fn drawable => fn gc => fn src => fn xsrc => fn ysrc => fn xdest => fn ydest => fn width => fn height => gdk_draw_pixmap_ (drawable, gc, src, xsrc, ysrc, xdest, ydest, width, height)
 
     val draw_arrow_: gtk_style * gdk_window * int * int * int * bool * int * int * int * int -> unit
         = app1(symb"mgtk_draw_arrow")
@@ -9406,15 +9599,30 @@ end
     val gdk_screen_height_mm: unit -> int
         = fn dummy => gdk_screen_height_mm_ dummy
 
-    val get_window_: gtkobj -> gdk_window
-        = app1(symb"mgtk_get_window")
-    val get_window: 'a GtkWidget -> gdk_window
-        = fn OBJ widget => get_window_ widget
+    val widget_get_window_: gtkobj -> gdk_window
+        = app1(symb"mgtk_widget_get_window")
+    val widget_get_window: 'a GtkWidget -> gdk_window
+        = fn OBJ widget => widget_get_window_ widget
 
-    val get_state_: gtkobj -> int
-        = app1(symb"mgtk_get_state")
-    val get_state: 'a GtkWidget -> state_type
-        = fn OBJ widget => get_state_ widget
+    val widget_get_drawable_: gtkobj -> gdk_drawable
+        = app1(symb"mgtk_widget_get_drawable")
+    val widget_get_drawable: 'a GtkWidget -> gdk_drawable
+        = fn OBJ widget => widget_get_drawable_ widget
+
+    val widget_get_state_: gtkobj -> int
+        = app1(symb"mgtk_widget_get_state")
+    val widget_get_state: 'a GtkWidget -> state_type
+        = fn OBJ widget => widget_get_state_ widget
+
+    val widget_get_allocation_: gtkobj -> int * int * int * int
+        = app1(symb"mgtk_widget_get_allocation")
+    val widget_get_allocation: 'a GtkWidget -> int * int * int * int
+        = fn OBJ widget => widget_get_allocation_ widget
+
+    val widget_get_style_fg_gc_: gtkobj -> int -> gdk_gc
+        = app2(symb"mgtk_widget_get_style_fg_gc")
+    val widget_get_style_fg_gc: 'a GtkWidget -> state_type -> gdk_gc
+        = fn OBJ widget => fn state => widget_get_style_fg_gc_ widget state
 
     (* *** Data *** *)
 

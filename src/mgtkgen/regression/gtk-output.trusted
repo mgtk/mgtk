@@ -62,9 +62,9 @@ value mgtk_calendar_get(value cal) { /* ML */
   int resday;
   gtk_calendar_get(GtkObj_val(cal), &resyear, &resmonth, &resday);
   res = alloc_tuple(3);
-  Field(res, 0) = Val_int(&resyear);
-  Field(res, 1) = Val_int(&resmonth);
-  Field(res, 2) = Val_int(&resday);
+  Field(res, 0) = Val_int(resyear);
+  Field(res, 1) = Val_int(resmonth);
+  Field(res, 2) = Val_int(resday);
   return res;
 }
 
