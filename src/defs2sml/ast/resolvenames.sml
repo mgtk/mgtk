@@ -17,6 +17,8 @@ struct
 	      | loop ([], p') acc = (rev acc, p')
 	      | loop (_, []) acc = ([],rev acc) (* FIXME *)
 *)
+	    val show_path = Util.stringSep "{" "}" "-" (fn s => s)
+
 	    fun return full path = ret (rev full, path)
 	    fun loop (e::p, e'::p') full = 
 		if Name.toLower e = Name.toLower e' then loop (p,p') (e::full)

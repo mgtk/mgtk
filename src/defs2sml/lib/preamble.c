@@ -4,6 +4,10 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
+/* Do we really want this? */
+#define GTK_FILE_SYSTEM_ENABLE_UNSUPPORTED
+#include <gtk/gtkfilesystem.h>
+
 /* Mosml stuff */
 #include <mlvalues.h> 
 #include <fail.h>

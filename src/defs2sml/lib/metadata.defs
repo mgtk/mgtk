@@ -77,7 +77,7 @@
 (override-parameters gtk_icon_theme_set_search_path
   (of-object "GtkIconTheme")
   (parameters
-    '("const-gchar*" "path" (array "n_elements"))
+    '("const-gchar**" "path" (array "n_elements"))
     '("gint" "n_elements")
   )
 )

@@ -428,7 +428,6 @@
   <attr path="/api/namespace/object[@cname='GtkTextView']/constructor[@cname='gtk_text_view_new_with_buffer']/*/*[@name='buffer']" name="type">GtkTextBuffer*</attr>
   <attr path="/api/namespace/object[@cname='GtkTreeModelSort']/constructor[@cname='gtk_tree_model_sort_new_with_model']/*/*[@name='child_model']" name="type">GtkTreeModel*</attr>
   <attr path="/api/namespace/object[@cname='GtkTreeView']/constructor[@cname='gtk_tree_view_new_with_model']/*/*[@name='model']" name="type">GtkTreeModel*</attr>
-<!-- -->
   <attr path="/api/namespace/object[@cname='GtkVBox']/constructor[@cname='gtk_vbox_new']/*/*[@name='homogeneous']" name="type">gboolean</attr>
   <attr path="/api/namespace/object[@cname='GtkVBox']/constructor[@cname='gtk_vbox_new']/*/*[@name='spacing']" name="type">gint</attr>
   <attr path="/api/namespace/object[@cname='GtkViewport']/constructor[@cname='gtk_viewport_new']/*/*[@name='hadjustment']" name="type">GtkAdjustment*</attr>
@@ -436,4 +435,6 @@
   <attr path="/api/namespace/object[@cname='GtkVScale']/constructor[@cname='gtk_vscale_new']/*/*[@name='adjustment']" name="type">GtkAdjustment*</attr>
   <attr path="/api/namespace/object[@cname='GtkVScrollbar']/constructor[@cname='gtk_vscrollbar_new']/*/*[@name='adjustment']" name="type">GtkAdjustment*</attr>
   <attr path="/api/namespace/object[@cname='GtkWindow']/constructor[@cname='gtk_window_new']/*/*[@name='type']" name="type">GtkWindowType</attr>
+  <attr path="/api/namespace/object[@cname='GtkTreeStore']/constructor[@cname='gtk_tree_store_newv']/*/*[@name='types']" name="array">1</attr>
+  <attr path="/api/namespace/object[@cname='GtkListStore']/constructor[@cname='gtk_list_store_newv']/*/*[@name='types']" name="array">1</attr>
 </metadata>

@@ -681,6 +681,7 @@ structure Gtk  = struct
 	val new : GType.t -> string -> base t
 	val sink : 'a t -> unit
 	val destroy : 'a t -> unit
+	val destroy_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -706,6 +707,11 @@ structure Gtk  = struct
 	val sink : 'a t -> unit = fn self => sink_ (repr self)
 	val destroy_ : cptr -> unit = app1 (symb"mgtk_gtk_object_destroy")
 	val destroy : 'a t -> unit = fn self => destroy_ (repr self)
+	local open Signal
+	      infixr -->
+	in val destroy_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "destroy" false (void --> return_void) f
+	end
     end
     structure Settings :>
       sig
@@ -786,6 +792,10 @@ structure Gtk  = struct
 	val new : unit -> base t
 	val lock : 'a t -> unit
 	val unlock : 'a t -> unit
+	val accel_activate_sig : (unit -> int -> unit -> bool)
+				 -> 'a t Signal.signal
+	val accel_changed_sig : (int -> unit -> unit -> unit)
+				-> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -806,6 +816,17 @@ structure Gtk  = struct
 	val lock : 'a t -> unit = fn self => lock_ (repr self)
 	val unlock_ : cptr -> unit = app1 (symb"mgtk_gtk_accel_group_unlock")
 	val unlock : 'a t -> unit = fn self => unlock_ (repr self)
+	local open Signal
+	      infixr -->
+	in val accel_activate_sig : (unit -> int -> unit -> bool)
+				    -> 'a t Signal.signal
+	       = fn f => signal "accel-activate" false
+			        (unit --> int --> unit --> return_bool) f
+	   val accel_changed_sig : (int -> unit -> unit -> unit)
+				   -> 'a t Signal.signal
+	       = fn f => signal "accel-changed" false
+			        (int --> unit --> unit --> return_void) f
+	end
     end
     structure Adjustment :>
       sig
@@ -821,6 +842,8 @@ structure Gtk  = struct
 	val clamp_page : 'a t -> real -> real -> unit
 	val get_value : 'a t -> real
 	val set_value : 'a t -> real -> unit
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val value_changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -838,10 +861,10 @@ structure Gtk  = struct
 	val new_ : real * real * real * real * real * real -> cptr
 	    = app1 (symb"mgtk_gtk_adjustment_new")
 	val new : real -> real -> real -> real -> real -> real -> base t
-	    = fn value => fn lower => fn upper => fn step_incr => 
-	      fn page_incr => fn page_size =>
-		 make (new_ (value, lower, upper, step_incr, page_incr, 
-			     page_size))
+	    = fn value => fn lower => fn upper => fn step_increment => 
+	      fn page_increment => fn page_size =>
+		 make (new_ (value, lower, upper, step_increment, 
+			     page_increment, page_size))
 	val changed_ : cptr -> unit = app1 (symb"mgtk_gtk_adjustment_changed")
 	val changed : 'a t -> unit = fn self => changed_ (repr self)
 	val value_changed_ : cptr -> unit
@@ -860,6 +883,13 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_adjustment_set_value")
 	val set_value : 'a t -> real -> unit
 	    = fn self => fn value => set_value_ (repr self) value
+	local open Signal
+	      infixr -->
+	in val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "changed" false (void --> return_void) f
+	   val value_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "value-changed" false (void --> return_void) f
+	end
     end
     structure Clipboard :>
       sig
@@ -1093,6 +1123,74 @@ structure Gtk  = struct
 	val class_path : 'a t -> int * string * string
 	val add_mnemonic_label : 'a t -> 'b t -> unit
 	val remove_mnemonic_label : 'a t -> 'b t -> unit
+	val show_sig : (unit -> unit) -> 'a t Signal.signal
+	val hide_sig : (unit -> unit) -> 'a t Signal.signal
+	val map_sig : (unit -> unit) -> 'a t Signal.signal
+	val unmap_sig : (unit -> unit) -> 'a t Signal.signal
+	val realize_sig : (unit -> unit) -> 'a t Signal.signal
+	val unrealize_sig : (unit -> unit) -> 'a t Signal.signal
+	val size_request_sig : (unit -> unit) -> 'a t Signal.signal
+	val size_allocate_sig : (unit -> unit) -> 'a t Signal.signal
+	val state_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val parent_set_sig : (unit -> unit) -> 'a t Signal.signal
+	val hierarchy_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val style_set_sig : (unit -> unit) -> 'a t Signal.signal
+	val direction_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val grab_notify_sig : (bool -> unit) -> 'a t Signal.signal
+	val child_notify_sig : (unit -> unit) -> 'a t Signal.signal
+	val mnemonic_activate_sig : (bool -> bool) -> 'a t Signal.signal
+	val grab_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	val focus_sig : (unit -> bool) -> 'a t Signal.signal
+	val event_sig : (unit -> bool) -> 'a t Signal.signal
+	val event_after_sig : (unit -> unit) -> 'a t Signal.signal
+	val button_press_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val button_release_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val scroll_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val motion_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val expose_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val key_press_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val key_release_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val enter_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val leave_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val configure_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val focus_in_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val focus_out_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val map_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val unmap_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val property_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val selection_clear_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val selection_request_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val selection_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val selection_received_sig
+	  : (unit -> int -> unit) -> 'a t Signal.signal
+	val selection_get_sig : (unit -> int -> int -> unit)
+				-> 'a t Signal.signal
+	val proximity_in_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val proximity_out_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val drag_leave_sig : (unit -> int -> unit) -> 'a t Signal.signal
+	val drag_begin_sig : (unit -> unit) -> 'a t Signal.signal
+	val drag_end_sig : (unit -> unit) -> 'a t Signal.signal
+	val drag_data_delete_sig : (unit -> unit) -> 'a t Signal.signal
+	val drag_motion_sig : (unit -> int -> int -> int -> bool)
+			      -> 'a t Signal.signal
+	val drag_drop_sig : (unit -> int -> int -> int -> bool)
+			    -> 'a t Signal.signal
+	val drag_data_get_sig : (unit -> unit -> int -> int -> unit)
+				-> 'a t Signal.signal
+	val drag_data_received_sig
+	  : (unit -> int -> int -> unit -> int -> int -> unit)
+	    -> 'a t Signal.signal
+	val visibility_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val client_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val no_expose_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val window_state_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val popup_menu_sig : (unit -> bool) -> 'a t Signal.signal
+	val show_help_sig : (unit -> bool) -> 'a t Signal.signal
+	val accel_closures_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val screen_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val can_activate_accel_sig : (int -> bool) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -1492,6 +1590,170 @@ structure Gtk  = struct
 	val remove_mnemonic_label : 'a t -> 'b t -> unit
 	    = fn self => fn label => remove_mnemonic_label_
 				       (repr self) (repr label)
+	local open Signal
+	      infixr -->
+	in
+	  val show_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "show" false (void --> return_void) f
+	  val hide_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "hide" false (void --> return_void) f
+	  val map_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "map" false (void --> return_void) f
+	  val unmap_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "unmap" false (void --> return_void) f
+	  val realize_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "realize" false (void --> return_void) f
+	  val unrealize_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "unrealize" false (void --> return_void) f
+	  val size_request_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "size-request" false (unit --> return_void) f
+	  val size_allocate_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "size-allocate" false (unit --> return_void) f
+	  val state_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "state-changed" false (unit --> return_void) f
+	  val parent_set_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "parent-set" false (unit --> return_void) f
+	  val hierarchy_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "hierarchy-changed" false (unit --> return_void) f
+	  val style_set_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "style-set" false (unit --> return_void) f
+	  val direction_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "direction-changed" false (unit --> return_void) f
+	  val grab_notify_sig : (bool -> unit) -> 'a t Signal.signal
+	      = fn f => signal "grab-notify" false (bool --> return_void) f
+	  val child_notify_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "child-notify" false (unit --> return_void) f
+	  val mnemonic_activate_sig : (bool -> bool) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "mnemonic-activate" false (bool --> return_bool) f
+	  val grab_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "grab-focus" false (void --> return_void) f
+	  val focus_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "focus" false (unit --> return_bool) f
+	  val event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "event" false (unit --> return_bool) f
+	  val event_after_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "event-after" false (unit --> return_void) f
+	  val button_press_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "button-press-event" false
+			       (unit --> return_bool) f
+	  val button_release_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "button-release-event" false
+			       (unit --> return_bool) f
+	  val scroll_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "scroll-event" false (unit --> return_bool) f
+	  val motion_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "motion-notify-event" false
+			       (unit --> return_bool) f
+	  val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "delete-event" false (unit --> return_bool) f
+	  val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "destroy-event" false (unit --> return_bool) f
+	  val expose_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "expose-event" false (unit --> return_bool) f
+	  val key_press_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "key-press-event" false (unit --> return_bool) f
+	  val key_release_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "key-release-event" false (unit --> return_bool) f
+	  val enter_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "enter-notify-event" false
+			       (unit --> return_bool) f
+	  val leave_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "leave-notify-event" false
+			       (unit --> return_bool) f
+	  val configure_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "configure-event" false (unit --> return_bool) f
+	  val focus_in_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "focus-in-event" false (unit --> return_bool) f
+	  val focus_out_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "focus-out-event" false (unit --> return_bool) f
+	  val map_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "map-event" false (unit --> return_bool) f
+	  val unmap_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "unmap-event" false (unit --> return_bool) f
+	  val property_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "property-notify-event" false
+			       (unit --> return_bool) f
+	  val selection_clear_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "selection-clear-event" false
+			       (unit --> return_bool) f
+	  val selection_request_event_sig
+	    : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "selection-request-event" false
+			       (unit --> return_bool) f
+	  val selection_notify_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "selection-notify-event" false
+			       (unit --> return_bool) f
+	  val selection_received_sig
+	    : (unit -> int -> unit) -> 'a t Signal.signal
+	      = fn f => signal "selection-received" false
+			       (unit --> int --> return_void) f
+	  val selection_get_sig : (unit -> int -> int -> unit)
+				  -> 'a t Signal.signal
+	      = fn f => signal "selection-get" false
+			       (unit --> int --> int --> return_void) f
+	  val proximity_in_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "proximity-in-event" false
+			       (unit --> return_bool) f
+	  val proximity_out_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "proximity-out-event" false
+			       (unit --> return_bool) f
+	  val drag_leave_sig : (unit -> int -> unit) -> 'a t Signal.signal
+	      = fn f => signal "drag-leave" false
+			       (unit --> int --> return_void) f
+	  val drag_begin_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "drag-begin" false (unit --> return_void) f
+	  val drag_end_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "drag-end" false (unit --> return_void) f
+	  val drag_data_delete_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "drag-data-delete" false (unit --> return_void) f
+	  val drag_motion_sig : (unit -> int -> int -> int -> bool)
+				-> 'a t Signal.signal
+	      = fn f => signal "drag-motion" false
+			       (unit --> int --> int --> int --> return_bool) f
+	  val drag_drop_sig : (unit -> int -> int -> int -> bool)
+			      -> 'a t Signal.signal
+	      = fn f => signal "drag-drop" false
+			       (unit --> int --> int --> int --> return_bool) f
+	  val drag_data_get_sig : (unit -> unit -> int -> int -> unit)
+				  -> 'a t Signal.signal
+	      = fn f =>
+		   signal "drag-data-get" false
+			  (unit --> unit --> int --> int --> return_void) f
+	  val drag_data_received_sig
+	    : (unit -> int -> int -> unit -> int -> int -> unit)
+	      -> 'a t Signal.signal
+	      = fn f => signal 
+(*  31*)"drag-data-received" false
+(*  31*) (unit --> int --> int --> unit --> int --> int --> return_void) f
+	  val visibility_notify_event_sig
+	    : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "visibility-notify-event" false
+			       (unit --> return_bool) f
+	  val client_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "client-event" false (unit --> return_bool) f
+	  val no_expose_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "no-expose-event" false (unit --> return_bool) f
+	  val window_state_event_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "window-state-event" false
+			       (unit --> return_bool) f
+	  val popup_menu_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "popup-menu" false (void --> return_bool) f
+	  val show_help_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "show-help" false (unit --> return_bool) f
+	  val accel_closures_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "accel-closures-changed" false
+			       (void --> return_void) f
+	  val screen_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "screen-changed" false (unit --> return_void) f
+	  val can_activate_accel_sig : (int -> bool) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "can-activate-accel" false (int --> return_bool) f
+	end
     end
     structure Style :>
       sig
@@ -1505,6 +1767,8 @@ structure Gtk  = struct
 	val copy : 'a t -> base t
 	val detach : 'a t -> unit
 	val lookup_iconset : 'a t -> string -> IconSet.t
+	val realize_sig : (unit -> unit) -> 'a t Signal.signal
+	val unrealize_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -1528,6 +1792,13 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_style_lookup_icon_set")
 	val lookup_iconset : 'a t -> string -> IconSet.t
 	    = fn self => fn stock_id => lookup_iconset_ (repr self) stock_id
+	local open Signal
+	      infixr -->
+	in val realize_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "realize" false (void --> return_void) f
+	   val unrealize_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "unrealize" false (void --> return_void) f
+	end
     end
     structure Demoted :>
       sig
@@ -1743,7 +2014,7 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val new : unit -> base t
 	val get_default : unit -> base t
-	val set_search_path : 'a t -> char list -> int -> unit
+	val set_search_path : 'a t -> string list -> int -> unit
 	val append_search_path : 'a t -> string -> unit
 	val prepend_search_path : 'a t -> string -> unit
 	val set_custom_theme : 'a t -> string -> unit
@@ -1752,6 +2023,7 @@ structure Gtk  = struct
 	  : 'a t -> string -> int -> icon_lookup_flags list -> IconInfo.t
 	val get_example_icon_name : 'a t -> string
 	val rescan_if_needed : 'a t -> bool
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -1776,9 +2048,9 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_icon_theme_get_default")
 	val get_default : unit -> base t
 	    = fn dummy => make (get_default_ dummy)
-	val set_search_path_ : cptr -> char list -> int -> unit
+	val set_search_path_ : cptr -> string list -> int -> unit
 	    = app3 (symb"mgtk_gtk_icon_theme_set_search_path")
-	val set_search_path : 'a t -> char list -> int -> unit
+	val set_search_path : 'a t -> string list -> int -> unit
 	    = fn self => fn path => fn n_elements =>
 		 set_search_path_ (repr self) path n_elements
 	val append_search_path_ : cptr -> string -> unit
@@ -1812,6 +2084,11 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_icon_theme_rescan_if_needed")
 	val rescan_if_needed : 'a t -> bool
 	    = fn self => rescan_if_needed_ (repr self)
+	local open Signal
+	      infixr -->
+	in val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "changed" false (void --> return_void) f
+	end
     end
     structure TreeIter :>
       sig
@@ -1827,12 +2104,12 @@ structure Gtk  = struct
 	val symb = GtkBasis.symb
 	type t = GObject.cptr
 	type base = unit
-	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_treeiter_copy")
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_tree_iter_copy")
 	val copy : t -> t = fn self => copy_ self
-	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_treeiter_free")
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_tree_iter_free")
 	val free : t -> unit = fn self => free_ self
 	val get_type_ : unit -> GType.t
-	    = app1 (symb"mgtk_gtk_treeiter_get_type")
+	    = app1 (symb"mgtk_gtk_tree_iter_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
     end
     structure TreePath :>
@@ -2009,7 +2286,7 @@ structure Gtk  = struct
 					  (repr self) path_string
 		 in (res0, res1) end
 	val get_string_fromiter_ : cptr -> cptr -> string
-	    = app2 (symb"mgtk_gtk_tree_model_get_string_fromiter")
+	    = app2 (symb"mgtk_gtk_tree_model_get_string_from_iter")
 	val get_string_fromiter : 'a t -> TreeIter.t -> string
 	    = fn self => fn iter => get_string_fromiter_ (repr self) iter
 	val getiter_first_ : cptr -> bool * cptr
@@ -2251,6 +2528,7 @@ structure Gtk  = struct
 	val new : string -> base t
 	val get_priority : 'a t -> int
 	val set_priority : 'a t -> int -> unit
+	val event_sig : (unit -> unit -> unit -> bool) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -2274,6 +2552,12 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_text_tag_set_priority")
 	val set_priority : 'a t -> int -> unit
 	    = fn self => fn priority => set_priority_ (repr self) priority
+	local open Signal
+	      infixr -->
+	in val event_sig : (unit -> unit -> unit -> bool) -> 'a t Signal.signal
+	       = fn f => signal "event" false
+			        (unit --> unit --> unit --> return_bool) f
+	end
     end
     structure TextIter :>
       sig
@@ -2376,272 +2660,272 @@ structure Gtk  = struct
 	val symb = GtkBasis.symb
 	type t = GObject.cptr
 	type base = unit
-	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_textiter_copy")
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_text_iter_copy")
 	val copy : t -> t = fn self => copy_ self
-	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_textiter_free")
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_text_iter_free")
 	val free : t -> unit = fn self => free_ self
 	val get_type_ : unit -> GType.t
-	    = app1 (symb"mgtk_gtk_textiter_get_type")
+	    = app1 (symb"mgtk_gtk_text_iter_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val get_offset_ : cptr -> int
-	    = app1 (symb"mgtk_gtk_textiter_get_offset")
+	    = app1 (symb"mgtk_gtk_text_iter_get_offset")
 	val get_offset : t -> int = fn self => get_offset_ self
-	val get_line_ : cptr -> int = app1 (symb"mgtk_gtk_textiter_get_line")
+	val get_line_ : cptr -> int = app1 (symb"mgtk_gtk_text_iter_get_line")
 	val get_line : t -> int = fn self => get_line_ self
 	val get_line_offset_ : cptr -> int
-	    = app1 (symb"mgtk_gtk_textiter_get_line_offset")
+	    = app1 (symb"mgtk_gtk_text_iter_get_line_offset")
 	val get_line_offset : t -> int = fn self => get_line_offset_ self
 	val get_line_index_ : cptr -> int
-	    = app1 (symb"mgtk_gtk_textiter_get_line_index")
+	    = app1 (symb"mgtk_gtk_text_iter_get_line_index")
 	val get_line_index : t -> int = fn self => get_line_index_ self
 	val get_visible_line_offset_ : cptr -> int
-	    = app1 (symb"mgtk_gtk_textiter_get_visible_line_offset")
+	    = app1 (symb"mgtk_gtk_text_iter_get_visible_line_offset")
 	val get_visible_line_offset : t -> int
 	    = fn self => get_visible_line_offset_ self
 	val get_visible_line_index_ : cptr -> int
-	    = app1 (symb"mgtk_gtk_textiter_get_visible_line_index")
+	    = app1 (symb"mgtk_gtk_text_iter_get_visible_line_index")
 	val get_visible_line_index : t -> int
 	    = fn self => get_visible_line_index_ self
-	val get_char_ : cptr -> char = app1 (symb"mgtk_gtk_textiter_get_char")
+	val get_char_ : cptr -> char = app1 (symb"mgtk_gtk_text_iter_get_char")
 	val get_char : t -> char = fn self => get_char_ self
 	val get_slice_ : cptr -> cptr -> string
-	    = app2 (symb"mgtk_gtk_textiter_get_slice")
+	    = app2 (symb"mgtk_gtk_text_iter_get_slice")
 	val get_slice : t -> t -> string
 	    = fn self => fn en => get_slice_ self en
 	val get_text_ : cptr -> cptr -> string
-	    = app2 (symb"mgtk_gtk_textiter_get_text")
+	    = app2 (symb"mgtk_gtk_text_iter_get_text")
 	val get_text : t -> t -> string = fn self => fn en => get_text_ self en
 	val get_visible_slice_ : cptr -> cptr -> string
-	    = app2 (symb"mgtk_gtk_textiter_get_visible_slice")
+	    = app2 (symb"mgtk_gtk_text_iter_get_visible_slice")
 	val get_visible_slice : t -> t -> string
 	    = fn self => fn en => get_visible_slice_ self en
 	val get_visible_text_ : cptr -> cptr -> string
-	    = app2 (symb"mgtk_gtk_textiter_get_visible_text")
+	    = app2 (symb"mgtk_gtk_text_iter_get_visible_text")
 	val get_visible_text : t -> t -> string
 	    = fn self => fn en => get_visible_text_ self en
 	val get_child_anchor_ : cptr -> cptr
-	    = app1 (symb"mgtk_gtk_textiter_get_child_anchor")
+	    = app1 (symb"mgtk_gtk_text_iter_get_child_anchor")
 	val get_child_anchor : t -> base TextChildAnchor.t
 	    = fn self => TextChildAnchor.inherit
 			   () (fn () => get_child_anchor_ self)
 	val begins_tag_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_begins_tag")
+	    = app2 (symb"mgtk_gtk_text_iter_begins_tag")
 	val begins_tag : t -> 'a TextTag.t option -> bool
 	    = fn self => fn tag =>
 		 begins_tag_ self (getOpt (Option.map repr tag, GObject.null))
 	val begins_tag' : t -> bool = fn self => begins_tag_ self GObject.null
 	val ends_tag_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_ends_tag")
+	    = app2 (symb"mgtk_gtk_text_iter_ends_tag")
 	val ends_tag : t -> 'a TextTag.t option -> bool
 	    = fn self => fn tag =>
 		 ends_tag_ self (getOpt (Option.map repr tag, GObject.null))
 	val ends_tag' : t -> bool = fn self => ends_tag_ self GObject.null
 	val toggles_tag_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_toggles_tag")
+	    = app2 (symb"mgtk_gtk_text_iter_toggles_tag")
 	val toggles_tag : t -> 'a TextTag.t option -> bool
 	    = fn self => fn tag =>
 		 toggles_tag_ self (getOpt (Option.map repr tag, GObject.null))
 	val toggles_tag' : t -> bool
 	    = fn self => toggles_tag_ self GObject.null
 	val has_tag_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_has_tag")
+	    = app2 (symb"mgtk_gtk_text_iter_has_tag")
 	val has_tag : t -> 'a TextTag.t -> bool
 	    = fn self => fn tag => has_tag_ self (repr tag)
 	val editable_ : cptr -> bool -> bool
-	    = app2 (symb"mgtk_gtk_textiter_editable")
+	    = app2 (symb"mgtk_gtk_text_iter_editable")
 	val editable : t -> bool -> bool = fn self => fn default_setting =>
 					      editable_ self default_setting
 	val can_insert_ : cptr -> bool -> bool
-	    = app2 (symb"mgtk_gtk_textiter_can_insert")
+	    = app2 (symb"mgtk_gtk_text_iter_can_insert")
 	val can_insert : t -> bool -> bool
 	    = fn self => fn default_editability =>
 		 can_insert_ self default_editability
 	val starts_word_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_starts_word")
+	    = app1 (symb"mgtk_gtk_text_iter_starts_word")
 	val starts_word : t -> bool = fn self => starts_word_ self
 	val ends_word_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_ends_word")
+	    = app1 (symb"mgtk_gtk_text_iter_ends_word")
 	val ends_word : t -> bool = fn self => ends_word_ self
 	val inside_word_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_inside_word")
+	    = app1 (symb"mgtk_gtk_text_iter_inside_word")
 	val inside_word : t -> bool = fn self => inside_word_ self
 	val starts_sentence_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_starts_sentence")
+	    = app1 (symb"mgtk_gtk_text_iter_starts_sentence")
 	val starts_sentence : t -> bool = fn self => starts_sentence_ self
 	val ends_sentence_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_ends_sentence")
+	    = app1 (symb"mgtk_gtk_text_iter_ends_sentence")
 	val ends_sentence : t -> bool = fn self => ends_sentence_ self
 	val inside_sentence_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_inside_sentence")
+	    = app1 (symb"mgtk_gtk_text_iter_inside_sentence")
 	val inside_sentence : t -> bool = fn self => inside_sentence_ self
 	val starts_line_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_starts_line")
+	    = app1 (symb"mgtk_gtk_text_iter_starts_line")
 	val starts_line : t -> bool = fn self => starts_line_ self
 	val ends_line_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_ends_line")
+	    = app1 (symb"mgtk_gtk_text_iter_ends_line")
 	val ends_line : t -> bool = fn self => ends_line_ self
 	val is_cursor_position_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_is_cursor_position")
+	    = app1 (symb"mgtk_gtk_text_iter_is_cursor_position")
 	val is_cursor_position : t -> bool
 	    = fn self => is_cursor_position_ self
 	val get_chars_in_line_ : cptr -> int
-	    = app1 (symb"mgtk_gtk_textiter_get_chars_in_line")
+	    = app1 (symb"mgtk_gtk_text_iter_get_chars_in_line")
 	val get_chars_in_line : t -> int = fn self => get_chars_in_line_ self
 	val get_bytes_in_line_ : cptr -> int
-	    = app1 (symb"mgtk_gtk_textiter_get_bytes_in_line")
+	    = app1 (symb"mgtk_gtk_text_iter_get_bytes_in_line")
 	val get_bytes_in_line : t -> int = fn self => get_bytes_in_line_ self
 	val get_attributes_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_get_attributes")
+	    = app2 (symb"mgtk_gtk_text_iter_get_attributes")
 	val get_attributes : t -> TextAttributes.t -> bool
 	    = fn self => fn values => get_attributes_ self values
-	val is_end_ : cptr -> bool = app1 (symb"mgtk_gtk_textiter_is_end")
+	val is_end_ : cptr -> bool = app1 (symb"mgtk_gtk_text_iter_is_end")
 	val is_end : t -> bool = fn self => is_end_ self
-	val is_start_ : cptr -> bool = app1 (symb"mgtk_gtk_textiter_is_start")
+	val is_start_ : cptr -> bool = app1 (symb"mgtk_gtk_text_iter_is_start")
 	val is_start : t -> bool = fn self => is_start_ self
 	val forward_char_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_char")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_char")
 	val forward_char : t -> bool = fn self => forward_char_ self
 	val backward_char_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_backward_char")
+	    = app1 (symb"mgtk_gtk_text_iter_backward_char")
 	val backward_char : t -> bool = fn self => backward_char_ self
 	val forward_chars_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_chars")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_chars")
 	val forward_chars : t -> int -> bool
 	    = fn self => fn count => forward_chars_ self count
 	val backward_chars_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_chars")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_chars")
 	val backward_chars : t -> int -> bool
 	    = fn self => fn count => backward_chars_ self count
 	val forward_line_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_line")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_line")
 	val forward_line : t -> bool = fn self => forward_line_ self
 	val backward_line_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_backward_line")
+	    = app1 (symb"mgtk_gtk_text_iter_backward_line")
 	val backward_line : t -> bool = fn self => backward_line_ self
 	val forward_lines_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_lines")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_lines")
 	val forward_lines : t -> int -> bool
 	    = fn self => fn count => forward_lines_ self count
 	val backward_lines_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_lines")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_lines")
 	val backward_lines : t -> int -> bool
 	    = fn self => fn count => backward_lines_ self count
 	val forward_word_end_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_word_end")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_word_end")
 	val forward_word_end : t -> bool = fn self => forward_word_end_ self
 	val backward_word_start_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_backward_word_start")
+	    = app1 (symb"mgtk_gtk_text_iter_backward_word_start")
 	val backward_word_start : t -> bool
 	    = fn self => backward_word_start_ self
 	val forward_word_ends_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_word_ends")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_word_ends")
 	val forward_word_ends : t -> int -> bool
 	    = fn self => fn count => forward_word_ends_ self count
 	val backward_word_starts_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_word_starts")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_word_starts")
 	val backward_word_starts : t -> int -> bool
 	    = fn self => fn count => backward_word_starts_ self count
 	val forward_visible_word_end_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_visible_word_end")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_visible_word_end")
 	val forward_visible_word_end : t -> bool
 	    = fn self => forward_visible_word_end_ self
 	val backward_visible_word_start_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_backward_visible_word_start")
+	    = app1 (symb"mgtk_gtk_text_iter_backward_visible_word_start")
 	val backward_visible_word_start : t -> bool
 	    = fn self => backward_visible_word_start_ self
 	val forward_visible_word_ends_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_visible_word_ends")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_visible_word_ends")
 	val forward_visible_word_ends : t -> int -> bool
 	    = fn self => fn count => forward_visible_word_ends_ self count
 	val backward_visible_word_starts_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_visible_word_starts")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_visible_word_starts")
 	val backward_visible_word_starts : t -> int -> bool
 	    = fn self => fn count => backward_visible_word_starts_ self count
 	val forward_sentence_end_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_sentence_end")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_sentence_end")
 	val forward_sentence_end : t -> bool
 	    = fn self => forward_sentence_end_ self
 	val backward_sentence_start_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_backward_sentence_start")
+	    = app1 (symb"mgtk_gtk_text_iter_backward_sentence_start")
 	val backward_sentence_start : t -> bool
 	    = fn self => backward_sentence_start_ self
 	val forward_sentence_ends_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_sentence_ends")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_sentence_ends")
 	val forward_sentence_ends : t -> int -> bool
 	    = fn self => fn count => forward_sentence_ends_ self count
 	val backward_sentence_starts_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_sentence_starts")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_sentence_starts")
 	val backward_sentence_starts : t -> int -> bool
 	    = fn self => fn count => backward_sentence_starts_ self count
 	val forward_cursor_position_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_cursor_position")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_cursor_position")
 	val forward_cursor_position : t -> bool
 	    = fn self => forward_cursor_position_ self
 	val backward_cursor_position_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_backward_cursor_position")
+	    = app1 (symb"mgtk_gtk_text_iter_backward_cursor_position")
 	val backward_cursor_position : t -> bool
 	    = fn self => backward_cursor_position_ self
 	val forward_cursor_positions_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_cursor_positions")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_cursor_positions")
 	val forward_cursor_positions : t -> int -> bool
 	    = fn self => fn count => forward_cursor_positions_ self count
 	val backward_cursor_positions_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_cursor_positions")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_cursor_positions")
 	val backward_cursor_positions : t -> int -> bool
 	    = fn self => fn count => backward_cursor_positions_ self count
 	val forward_visible_cursor_position_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_visible_cursor_position")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_visible_cursor_position")
 	val forward_visible_cursor_position : t -> bool
 	    = fn self => forward_visible_cursor_position_ self
 	val backward_visible_cursor_position_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_backward_visible_cursor_position")
+	    = app1 (symb"mgtk_gtk_text_iter_backward_visible_cursor_position")
 	val backward_visible_cursor_position : t -> bool
 	    = fn self => backward_visible_cursor_position_ self
 	val forward_visible_cursor_positions_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_visible_cursor_positions")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_visible_cursor_positions")
 	val forward_visible_cursor_positions : t -> int -> bool
 	    = fn self => fn count =>
 		 forward_visible_cursor_positions_ self count
 	val backward_visible_cursor_positions_ : cptr -> int -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_visible_cursor_positions")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_visible_cursor_positions")
 	val backward_visible_cursor_positions : t -> int -> bool
 	    = fn self => fn count =>
 		 backward_visible_cursor_positions_ self count
 	val set_offset_ : cptr -> int -> unit
-	    = app2 (symb"mgtk_gtk_textiter_set_offset")
+	    = app2 (symb"mgtk_gtk_text_iter_set_offset")
 	val set_offset : t -> int -> unit
 	    = fn self => fn char_offset => set_offset_ self char_offset
 	val set_line_ : cptr -> int -> unit
-	    = app2 (symb"mgtk_gtk_textiter_set_line")
+	    = app2 (symb"mgtk_gtk_text_iter_set_line")
 	val set_line : t -> int -> unit
 	    = fn self => fn line_number => set_line_ self line_number
 	val set_line_offset_ : cptr -> int -> unit
-	    = app2 (symb"mgtk_gtk_textiter_set_line_offset")
+	    = app2 (symb"mgtk_gtk_text_iter_set_line_offset")
 	val set_line_offset : t -> int -> unit
 	    = fn self => fn char_on_line => set_line_offset_ self char_on_line
 	val set_line_index_ : cptr -> int -> unit
-	    = app2 (symb"mgtk_gtk_textiter_set_line_index")
+	    = app2 (symb"mgtk_gtk_text_iter_set_line_index")
 	val set_line_index : t -> int -> unit
 	    = fn self => fn byte_on_line => set_line_index_ self byte_on_line
 	val forward_to_end_ : cptr -> unit
-	    = app1 (symb"mgtk_gtk_textiter_forward_to_end")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_to_end")
 	val forward_to_end : t -> unit = fn self => forward_to_end_ self
 	val forward_to_line_end_ : cptr -> bool
-	    = app1 (symb"mgtk_gtk_textiter_forward_to_line_end")
+	    = app1 (symb"mgtk_gtk_text_iter_forward_to_line_end")
 	val forward_to_line_end : t -> bool
 	    = fn self => forward_to_line_end_ self
 	val set_visible_line_offset_ : cptr -> int -> unit
-	    = app2 (symb"mgtk_gtk_textiter_set_visible_line_offset")
+	    = app2 (symb"mgtk_gtk_text_iter_set_visible_line_offset")
 	val set_visible_line_offset : t -> int -> unit
 	    = fn self => fn char_on_line =>
 		 set_visible_line_offset_ self char_on_line
 	val set_visible_line_index_ : cptr -> int -> unit
-	    = app2 (symb"mgtk_gtk_textiter_set_visible_line_index")
+	    = app2 (symb"mgtk_gtk_text_iter_set_visible_line_index")
 	val set_visible_line_index : t -> int -> unit
 	    = fn self => fn byte_on_line =>
 		 set_visible_line_index_ self byte_on_line
 	val forward_to_tag_toggle_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_forward_to_tag_toggle")
+	    = app2 (symb"mgtk_gtk_text_iter_forward_to_tag_toggle")
 	val forward_to_tag_toggle : t -> 'a TextTag.t option -> bool
 	    = fn self => fn tag =>
 		 forward_to_tag_toggle_
@@ -2649,7 +2933,7 @@ structure Gtk  = struct
 	val forward_to_tag_toggle' : t -> bool
 	    = fn self => forward_to_tag_toggle_ self GObject.null
 	val backward_to_tag_toggle_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_backward_to_tag_toggle")
+	    = app2 (symb"mgtk_gtk_text_iter_backward_to_tag_toggle")
 	val backward_to_tag_toggle : t -> 'a TextTag.t option -> bool
 	    = fn self => fn tag =>
 		 backward_to_tag_toggle_
@@ -2658,7 +2942,7 @@ structure Gtk  = struct
 	    = fn self => backward_to_tag_toggle_ self GObject.null
 	val forward_search_ : cptr -> string -> int -> cptr
 			      -> bool * cptr * cptr
-	    = app4 (symb"mgtk_gtk_textiter_forward_search")
+	    = app4 (symb"mgtk_gtk_text_iter_forward_search")
 	val forward_search
 	  : t -> string -> text_search_flags list -> t option -> bool * t * t
 	    = fn self => fn str => fn flags => fn limit =>
@@ -2675,7 +2959,7 @@ structure Gtk  = struct
 		 in (res0, res1, res2) end
 	val backward_search_ : cptr -> string -> int -> cptr
 			       -> bool * cptr * cptr
-	    = app4 (symb"mgtk_gtk_textiter_backward_search")
+	    = app4 (symb"mgtk_gtk_text_iter_backward_search")
 	val backward_search
 	  : t -> string -> text_search_flags list -> t option -> bool * t * t
 	    = fn self => fn str => fn flags => fn limit =>
@@ -2691,17 +2975,17 @@ structure Gtk  = struct
 			     self str (Flags.set flags) GObject.null
 		 in (res0, res1, res2) end
 	val equal_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_textiter_equal")
+	    = app2 (symb"mgtk_gtk_text_iter_equal")
 	val equal : t -> t -> bool = fn self => fn rhs => equal_ self rhs
 	val compare_ : cptr -> cptr -> int
-	    = app2 (symb"mgtk_gtk_textiter_compare")
+	    = app2 (symb"mgtk_gtk_text_iter_compare")
 	val compare : t -> t -> int = fn self => fn rhs => compare_ self rhs
 	val in_range_ : cptr -> cptr -> cptr -> bool
-	    = app3 (symb"mgtk_gtk_textiter_in_range")
+	    = app3 (symb"mgtk_gtk_text_iter_in_range")
 	val in_range : t -> t -> t -> bool
 	    = fn self => fn start => fn en => in_range_ self start en
 	val order_ : cptr -> cptr -> unit
-	    = app2 (symb"mgtk_gtk_textiter_order")
+	    = app2 (symb"mgtk_gtk_text_iter_order")
 	val order : t -> t -> unit = fn self => fn second => order_ self second
     end
     structure TreeRowReference :>
@@ -2813,6 +3097,7 @@ structure Gtk  = struct
 	val pixbuf_get_type : unit -> GType.t
 	val text_get_type : unit -> GType.t
 	val toggle_get_type : unit -> GType.t
+	val editing_canceled_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -2860,6 +3145,12 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_cell_renderer_toggle_get_type")
 	val toggle_get_type : unit -> GType.t
 	    = fn dummy => toggle_get_type_ dummy
+	local open Signal
+	      infixr -->
+	in val editing_canceled_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "editing-canceled" false (void --> return_void) f
+	end
     end
     structure CellLayout :>
       sig
@@ -3046,6 +3337,10 @@ structure Gtk  = struct
 	  : 'a t -> 'b Widget.t -> string -> GValue.GValue -> unit
 	val child_get_property
 	  : 'a t -> 'b Widget.t -> string -> GValue.GValue -> unit
+	val add_sig : (unit -> unit) -> 'a t Signal.signal
+	val remove_sig : (unit -> unit) -> 'a t Signal.signal
+	val check_resize_sig : (unit -> unit) -> 'a t Signal.signal
+	val set_focus_child_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -3159,6 +3454,18 @@ structure Gtk  = struct
 	    = fn self => fn child => fn property_name => fn value =>
 		 child_get_property_
 		   (repr self) (repr child) property_name value
+	local open Signal
+	      infixr -->
+	in val add_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "add" false (unit --> return_void) f
+	   val remove_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "remove" false (unit --> return_void) f
+	   val check_resize_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "check-resize" false (void --> return_void) f
+	   val set_focus_child_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "set-focus-child" false (unit --> return_void) f
+	end
     end
     structure Bin :>
       sig
@@ -3317,6 +3624,12 @@ structure Gtk  = struct
 	val group_get_type : unit -> GType.t
 	val remove_embedded_xid : 'a t -> int -> unit
 	val add_embedded_xid : 'a t -> int -> unit
+	val set_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	val frame_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val activate_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	val activate_default_sig : (unit -> unit) -> 'a t Signal.signal
+	val move_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	val keys_changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -3593,6 +3906,22 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_window_add_embedded_xid")
 	val add_embedded_xid : 'a t -> int -> unit
 	    = fn self => fn xid => add_embedded_xid_ (repr self) xid
+	local open Signal
+	      infixr -->
+	in val set_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "set-focus" false (unit --> return_void) f
+	   val frame_event_sig : (unit -> bool) -> 'a t Signal.signal
+	       = fn f => signal "frame-event" false (unit --> return_bool) f
+	   val activate_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "activate-focus" false (void --> return_void) f
+	   val activate_default_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "activate-default" false (void --> return_void) f
+	   val move_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "move-focus" false (unit --> return_void) f
+	   val keys_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "keys-changed" false (void --> return_void) f
+	end
     end
     structure FileChooser :>
       sig
@@ -4005,6 +4334,10 @@ structure Gtk  = struct
 	val set_selectable : 'a t -> bool -> unit
 	val get_selectable : 'a t -> bool
 	val select_region : 'a t -> int -> int -> unit
+	val move_cursor_sig : (unit -> int -> bool -> unit)
+			      -> 'a t Signal.signal
+	val copy_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	val populate_popup_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -4111,6 +4444,17 @@ structure Gtk  = struct
 	val select_region : 'a t -> int -> int -> unit
 	    = fn self => fn start_offset => fn end_offset =>
 		 select_region_ (repr self) start_offset end_offset
+	local open Signal
+	      infixr -->
+	in val move_cursor_sig : (unit -> int -> bool -> unit)
+				 -> 'a t Signal.signal
+	       = fn f => signal "move-cursor" false
+			        (unit --> int --> bool --> return_void) f
+	   val copy_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "copy-clipboard" false (void --> return_void) f
+	   val populate_popup_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "populate-popup" false (unit --> return_void) f
+	end
     end
     structure AccelLabel :>
       sig
@@ -4183,6 +4527,7 @@ structure Gtk  = struct
 	val unblock_activate_from : 'a t -> 'b Widget.t -> unit
 	val set_accel_path : 'a t -> string -> unit
 	val set_accelgroup : 'a t -> 'b AccelGroup.t -> unit
+	val activate_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -4265,6 +4610,11 @@ structure Gtk  = struct
 	val set_accelgroup : 'a t -> 'b AccelGroup.t -> unit
 	    = fn self => fn accel_group =>
 		 set_accelgroup_ (repr self) (repr accel_group)
+	local open Signal
+	      infixr -->
+	in val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "activate" false (void --> return_void) f
+	end
     end
     structure ActionGroup :>
       sig
@@ -4287,6 +4637,10 @@ structure Gtk  = struct
 	val add_action_with_accel' : 'a t -> 'b Action.t -> unit
 	val remove_action : 'a t -> 'b Action.t -> unit
 	val set_translation_domain : 'a t -> string -> unit
+	val connect_proxy_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val disconnect_proxy_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val pre_activate_sig : (unit -> unit) -> 'a t Signal.signal
+	val post_activate_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -4350,6 +4704,20 @@ structure Gtk  = struct
 	val set_translation_domain : 'a t -> string -> unit
 	    = fn self => fn domain =>
 		 set_translation_domain_ (repr self) domain
+	local open Signal
+	      infixr -->
+	in val connect_proxy_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "connect-proxy" false
+			        (unit --> unit --> return_void) f
+	   val disconnect_proxy_sig
+	     : (unit -> unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "disconnect-proxy" false
+			        (unit --> unit --> return_void) f
+	   val pre_activate_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "pre-activate" false (unit --> return_void) f
+	   val post_activate_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "post-activate" false (unit --> return_void) f
+	end
     end
     structure Alignment :>
       sig
@@ -4668,6 +5036,12 @@ structure Gtk  = struct
 	val get_focus_on_click : 'a t -> bool
 	val set_alignment : 'a t -> real -> real -> unit
 	val get_alignment : 'a t -> real * real
+	val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+	val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	val pressed_sig : (unit -> unit) -> 'a t Signal.signal
+	val released_sig : (unit -> unit) -> 'a t Signal.signal
+	val enter_sig : (unit -> unit) -> 'a t Signal.signal
+	val leave_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -4768,6 +5142,21 @@ structure Gtk  = struct
 	val get_alignment : 'a t -> real * real
 	    = fn self => let val (res0, res1) = get_alignment_ (repr self)
 			 in (res0, res1) end
+	local open Signal
+	      infixr -->
+	in val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "clicked" false (void --> return_void) f
+	   val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "activate" false (void --> return_void) f
+	   val pressed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "pressed" false (void --> return_void) f
+	   val released_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "released" false (void --> return_void) f
+	   val enter_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "enter" false (void --> return_void) f
+	   val leave_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "leave" false (void --> return_void) f
+	end
     end
     structure ButtonBox :>
       sig
@@ -4825,6 +5214,14 @@ structure Gtk  = struct
 	val display_options : 'a t -> display_options list -> unit
 	val freeze : 'a t -> unit
 	val thaw : 'a t -> unit
+	val month_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val day_selected_sig : (unit -> unit) -> 'a t Signal.signal
+	val day_selected_double_click_sig
+	  : (unit -> unit) -> 'a t Signal.signal
+	val prev_month_sig : (unit -> unit) -> 'a t Signal.signal
+	val next_month_sig : (unit -> unit) -> 'a t Signal.signal
+	val prev_year_sig : (unit -> unit) -> 'a t Signal.signal
+	val next_year_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -4885,6 +5282,25 @@ structure Gtk  = struct
 	val freeze : 'a t -> unit = fn self => freeze_ (repr self)
 	val thaw_ : cptr -> unit = app1 (symb"mgtk_gtk_calendar_thaw")
 	val thaw : 'a t -> unit = fn self => thaw_ (repr self)
+	local open Signal
+	      infixr -->
+	in val month_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "month-changed" false (void --> return_void) f
+	   val day_selected_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "day-selected" false (void --> return_void) f
+	   val day_selected_double_click_sig
+	     : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "day-selected-double-click" false
+			        (void --> return_void) f
+	   val prev_month_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "prev-month" false (void --> return_void) f
+	   val next_month_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "next-month" false (void --> return_void) f
+	   val prev_year_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "prev-year" false (void --> return_void) f
+	   val next_year_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "next-year" false (void --> return_void) f
+	end
     end
     structure CellRendererPixbuf :>
       sig
@@ -4918,6 +5334,7 @@ structure Gtk  = struct
 	val toCellRendererText : 'a t -> base t
 	val new : unit -> base t
 	val set_fixed_height_from_font : 'a t -> int -> unit
+	val edited_sig : (char -> char -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -4937,6 +5354,12 @@ structure Gtk  = struct
 	val set_fixed_height_from_font : 'a t -> int -> unit
 	    = fn self => fn number_of_rows =>
 		 set_fixed_height_from_font_ (repr self) number_of_rows
+	local open Signal
+	      infixr -->
+	in val edited_sig : (char -> char -> unit) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "edited" false (char --> char --> return_void) f
+	end
     end
     structure CellRendererToggle :>
       sig
@@ -4950,6 +5373,7 @@ structure Gtk  = struct
 	val set_radio : 'a t -> bool -> unit
 	val get_active : 'a t -> bool
 	val set_active : 'a t -> bool -> unit
+	val toggled_sig : (char -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -4978,6 +5402,11 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_cell_renderer_toggle_set_active")
 	val set_active : 'a t -> bool -> unit
 	    = fn self => fn setting => set_active_ (repr self) setting
+	local open Signal
+	      infixr -->
+	in val toggled_sig : (char -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggled" false (char --> return_void) f
+	end
     end
     structure ToggleButton :>
       sig
@@ -4997,6 +5426,7 @@ structure Gtk  = struct
 	val toggled : 'a t -> unit
 	val set_inconsistent : 'a t -> bool -> unit
 	val get_inconsistent : 'a t -> bool
+	val toggled_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5047,6 +5477,11 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_toggle_button_get_inconsistent")
 	val get_inconsistent : 'a t -> bool
 	    = fn self => get_inconsistent_ (repr self)
+	local open Signal
+	      infixr -->
+	in val toggled_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggled" false (void --> return_void) f
+	end
     end
     structure CheckButton :>
       sig
@@ -5098,6 +5533,9 @@ structure Gtk  = struct
 	val factory_get_type : unit -> GType.t
 	val factory_path_from_widget : 'a Widget.t -> string
 	val factory_popup_data_from_widget : 'a Widget.t -> cptr
+	val select_sig : (unit -> unit) -> 'a t Signal.signal
+	val deselect_sig : (unit -> unit) -> 'a t Signal.signal
+	val toggle_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5129,6 +5567,15 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_item_factory_popup_data_from_widget")
 	val factory_popup_data_from_widget : 'a Widget.t -> cptr
 	    = fn widget => factory_popup_data_from_widget_ (repr widget)
+	local open Signal
+	      infixr -->
+	in val select_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "select" false (void --> return_void) f
+	   val deselect_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "deselect" false (void --> return_void) f
+	   val toggle_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggle" false (void --> return_void) f
+	end
     end
     structure MenuItem :>
       sig
@@ -5150,6 +5597,10 @@ structure Gtk  = struct
 	val set_right_justified : 'a t -> bool -> unit
 	val get_right_justified : 'a t -> bool
 	val set_accel_path : 'a t -> string -> unit
+	val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	val activate_item_sig : (unit -> unit) -> 'a t Signal.signal
+	val toggle_size_request_sig : (int -> unit) -> 'a t Signal.signal
+	val toggle_size_allocate_sig : (int -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5208,6 +5659,19 @@ structure Gtk  = struct
 	val set_accel_path : 'a t -> string -> unit
 	    = fn self => fn accel_path =>
 		 set_accel_path_ (repr self) accel_path
+	local open Signal
+	      infixr -->
+	in val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "activate" false (void --> return_void) f
+	   val activate_item_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "activate-item" false (void --> return_void) f
+	   val toggle_size_request_sig : (int -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggle-size-request" false
+			        (int --> return_void) f
+	   val toggle_size_allocate_sig : (int -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggle-size-allocate" false
+			        (int --> return_void) f
+	end
     end
     structure CheckMenuItem :>
       sig
@@ -5227,6 +5691,7 @@ structure Gtk  = struct
 	val get_inconsistent : 'a t -> bool
 	val set_draw_as_radio : 'a t -> bool -> unit
 	val get_draw_as_radio : 'a t -> bool
+	val toggled_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5278,6 +5743,11 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_check_menu_item_get_draw_as_radio")
 	val get_draw_as_radio : 'a t -> bool
 	    = fn self => get_draw_as_radio_ (repr self)
+	local open Signal
+	      infixr -->
+	in val toggled_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggled" false (void --> return_void) f
+	end
     end
     structure ColorButton :>
       sig
@@ -5294,6 +5764,7 @@ structure Gtk  = struct
 	val get_use_alpha : 'a t -> bool
 	val set_title : 'a t -> string -> unit
 	val get_title : 'a t -> string
+	val color_set_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5332,6 +5803,11 @@ structure Gtk  = struct
 	val get_title_ : cptr -> string
 	    = app1 (symb"mgtk_gtk_color_button_get_title")
 	val get_title : 'a t -> string = fn self => get_title_ (repr self)
+	local open Signal
+	      infixr -->
+	in val color_set_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "color-set" false (void --> return_void) f
+	end
     end
     structure VBox :>
       sig
@@ -5378,6 +5854,7 @@ structure Gtk  = struct
 	val get_previous_alpha : 'a t -> int
 	val is_adjusting : 'a t -> bool
 	val dialog_get_type : unit -> GType.t
+	val color_changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5435,6 +5912,11 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_color_selection_dialog_get_type")
 	val dialog_get_type : unit -> GType.t
 	    = fn dummy => dialog_get_type_ dummy
+	local open Signal
+	      infixr -->
+	in val color_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "color-changed" false (void --> return_void) f
+	end
     end
     structure Dialog :>
       sig
@@ -5462,6 +5944,8 @@ structure Gtk  = struct
 	val get_has_separator : 'a t -> bool
 	val response : 'a t -> int -> unit
 	val run : 'a t -> int
+	val response_sig : (int -> unit) -> 'a t Signal.signal
+	val close_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5535,6 +6019,13 @@ structure Gtk  = struct
 	    = fn self => fn response_id => response_ (repr self) response_id
 	val run_ : cptr -> int = app1 (symb"mgtk_gtk_dialog_run")
 	val run : 'a t -> int = fn self => run_ (repr self)
+	local open Signal
+	      infixr -->
+	in val response_sig : (int -> unit) -> 'a t Signal.signal
+	       = fn f => signal "response" false (int --> return_void) f
+	   val close_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "close" false (void --> return_void) f
+	end
     end
     structure ColorSelectionDialog :>
       sig
@@ -5689,6 +6180,7 @@ structure Gtk  = struct
 	val remove_text : 'a t -> int -> unit
 	val popup : 'a t -> unit
 	val popdown : 'a t -> unit
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5729,11 +6221,11 @@ structure Gtk  = struct
 	val set_active : 'a t -> int -> unit
 	    = fn self => fn index => set_active_ (repr self) index
 	val get_activeiter_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_combo_box_get_activeiter")
+	    = app2 (symb"mgtk_gtk_combo_box_get_active_iter")
 	val get_activeiter : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => get_activeiter_ (repr self) iter
 	val set_activeiter_ : cptr -> cptr -> unit
-	    = app2 (symb"mgtk_gtk_combo_box_set_activeiter")
+	    = app2 (symb"mgtk_gtk_combo_box_set_active_iter")
 	val set_activeiter : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => set_activeiter_ (repr self) iter
 	val set_model_ : cptr -> cptr -> unit
@@ -5765,6 +6257,11 @@ structure Gtk  = struct
 	val popup : 'a t -> unit = fn self => popup_ (repr self)
 	val popdown_ : cptr -> unit = app1 (symb"mgtk_gtk_combo_box_popdown")
 	val popdown : 'a t -> unit = fn self => popdown_ (repr self)
+	local open Signal
+	      infixr -->
+	in val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "changed" false (void --> return_void) f
+	end
     end
     structure ComboBoxEntry :>
       sig
@@ -5840,6 +6337,7 @@ structure Gtk  = struct
 	val set_gamma : 'a t -> real -> unit
 	val set_range : 'a t -> real -> real -> real -> real -> unit
 	val set_curvetype : 'a t -> curvetype -> unit
+	val curve_type_changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5870,6 +6368,12 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_curve_set_curve_type")
 	val set_curvetype : 'a t -> curvetype -> unit
 	    = fn self => fn typ => set_curvetype_ (repr self) typ
+	local open Signal
+	      infixr -->
+	in val curve_type_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "curve-type-changed" false
+			        (void --> return_void) f
+	end
     end
     structure Entry :>
       sig
@@ -5902,6 +6406,17 @@ structure Gtk  = struct
 	val select_region : 'a t -> int -> int -> unit
 	val set_editable : 'a t -> bool -> unit
 	val completion_get_type : unit -> GType.t
+	val move_cursor_sig : (unit -> int -> bool -> unit)
+			      -> 'a t Signal.signal
+	val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	val insert_at_cursor_sig : (char -> unit) -> 'a t Signal.signal
+	val delete_from_cursor_sig
+	  : (unit -> int -> unit) -> 'a t Signal.signal
+	val cut_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	val copy_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	val paste_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	val toggle_overwrite_sig : (unit -> unit) -> 'a t Signal.signal
+	val populate_popup_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -5999,6 +6514,34 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_entry_completion_get_type")
 	val completion_get_type : unit -> GType.t
 	    = fn dummy => completion_get_type_ dummy
+	local open Signal
+	      infixr -->
+	in
+	  val move_cursor_sig : (unit -> int -> bool -> unit)
+				-> 'a t Signal.signal
+	      = fn f => signal "move-cursor" false
+			       (unit --> int --> bool --> return_void) f
+	  val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "activate" false (void --> return_void) f
+	  val insert_at_cursor_sig : (char -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "insert-at-cursor" false (char --> return_void) f
+	  val delete_from_cursor_sig
+	    : (unit -> int -> unit) -> 'a t Signal.signal
+	      = fn f => signal "delete-from-cursor" false
+			       (unit --> int --> return_void) f
+	  val cut_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "cut-clipboard" false (void --> return_void) f
+	  val copy_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "copy-clipboard" false (void --> return_void) f
+	  val paste_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "paste-clipboard" false (void --> return_void) f
+	  val toggle_overwrite_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "toggle-overwrite" false (void --> return_void) f
+	  val populate_popup_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "populate-popup" false (unit --> return_void) f
+	end
     end
     structure EntryCompletion :>
       sig
@@ -6019,6 +6562,8 @@ structure Gtk  = struct
 	val insert_action_markup : 'a t -> int -> string -> unit
 	val delete_action : 'a t -> int -> unit
 	val set_text_column : 'a t -> int -> unit
+	val match_selected_sig : (unit -> unit -> bool) -> 'a t Signal.signal
+	val action_activated_sig : (int -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6075,6 +6620,15 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_entry_completion_set_text_column")
 	val set_text_column : 'a t -> int -> unit
 	    = fn self => fn column => set_text_column_ (repr self) column
+	local open Signal
+	      infixr -->
+	in
+	  val match_selected_sig : (unit -> unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "match-selected" false
+			       (unit --> unit --> return_bool) f
+	  val action_activated_sig : (int -> unit) -> 'a t Signal.signal
+	      = fn f => signal "action-activated" false (int --> return_void) f
+	end
     end
     structure EventBox :>
       sig
@@ -6154,6 +6708,7 @@ structure Gtk  = struct
 	val set_label_widget : 'a t -> 'b Widget.t option -> unit
 	val set_label_widget' : 'a t -> unit
 	val get_label_widget : 'a t -> base Widget.t
+	val activate_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6236,6 +6791,11 @@ structure Gtk  = struct
 	val get_label_widget : 'a t -> base Widget.t
 	    = fn self => Widget.inherit
 			   () (fn () => get_label_widget_ (repr self))
+	local open Signal
+	      infixr -->
+	in val activate_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "activate" false (void --> return_void) f
+	end
     end
     structure FileChooserDialog :>
       sig
@@ -6470,6 +7030,7 @@ structure Gtk  = struct
 	val set_show_style : 'a t -> bool -> unit
 	val get_show_size : 'a t -> bool
 	val set_show_size : 'a t -> bool -> unit
+	val font_set_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6536,6 +7097,11 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_font_button_set_show_size")
 	val set_show_size : 'a t -> bool -> unit
 	    = fn self => fn show_size => set_show_size_ (repr self) show_size
+	local open Signal
+	      infixr -->
+	in val font_set_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "font-set" false (void --> return_void) f
+	end
     end
     structure FontSelection :>
       sig
@@ -6672,6 +7238,8 @@ structure Gtk  = struct
 	val get_handle_position : 'a t -> positiontype
 	val set_snap_edge : 'a t -> positiontype -> unit
 	val get_snap_edge : 'a t -> positiontype
+	val child_attached_sig : (unit -> unit) -> 'a t Signal.signal
+	val child_detached_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6713,6 +7281,13 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_handle_box_get_snap_edge")
 	val get_snap_edge : 'a t -> positiontype
 	    = fn self => get_snap_edge_ (repr self)
+	local open Signal
+	      infixr -->
+	in val child_attached_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "child-attached" false (unit --> return_void) f
+	   val child_detached_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "child-detached" false (unit --> return_void) f
+	end
     end
     structure HButtonBox :>
       sig
@@ -6759,6 +7334,12 @@ structure Gtk  = struct
 	val get_child1 : 'a t -> base Widget.t
 	val get_child2 : 'a t -> base Widget.t
 	val compute_position : 'a t -> int -> int -> int -> unit
+	val cycle_child_focus_sig : (bool -> bool) -> 'a t Signal.signal
+	val toggle_handle_focus_sig : (unit -> bool) -> 'a t Signal.signal
+	val move_handle_sig : (unit -> bool) -> 'a t Signal.signal
+	val cycle_handle_focus_sig : (bool -> bool) -> 'a t Signal.signal
+	val accept_position_sig : (unit -> bool) -> 'a t Signal.signal
+	val cancel_position_sig : (unit -> bool) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6812,6 +7393,25 @@ structure Gtk  = struct
 	val compute_position : 'a t -> int -> int -> int -> unit
 	    = fn self => fn allocation => fn child1_req => fn child2_req =>
 		 compute_position_ (repr self) allocation child1_req child2_req
+	local open Signal
+	      infixr -->
+	in
+	  val cycle_child_focus_sig : (bool -> bool) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "cycle-child-focus" false (bool --> return_bool) f
+	  val toggle_handle_focus_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "toggle-handle-focus" false
+			       (void --> return_bool) f
+	  val move_handle_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "move-handle" false (unit --> return_bool) f
+	  val cycle_handle_focus_sig : (bool -> bool) -> 'a t Signal.signal
+	      = fn f => signal "cycle-handle-focus" false
+			       (bool --> return_bool) f
+	  val accept_position_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "accept-position" false (void --> return_bool) f
+	  val cancel_position_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "cancel-position" false (void --> return_bool) f
+	end
     end
     structure HPaned :>
       sig
@@ -6924,6 +7524,9 @@ structure Gtk  = struct
 	val set_range : 'a t -> real -> real -> unit
 	val set_value : 'a t -> real -> unit
 	val get_value : 'a t -> real
+	val value_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val adjust_bounds_sig : (real -> unit) -> 'a t Signal.signal
+	val move_slider_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6977,6 +7580,15 @@ structure Gtk  = struct
 	    = fn self => fn value => set_value_ (repr self) value
 	val get_value_ : cptr -> real = app1 (symb"mgtk_gtk_range_get_value")
 	val get_value : 'a t -> real = fn self => get_value_ (repr self)
+	local open Signal
+	      infixr -->
+	in val value_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "value-changed" false (void --> return_void) f
+	   val adjust_bounds_sig : (real -> unit) -> 'a t Signal.signal
+	       = fn f => signal "adjust-bounds" false (real --> return_void) f
+	   val move_slider_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "move-slider" false (unit --> return_void) f
+	end
     end
     structure Scale :>
       sig
@@ -6993,6 +7605,7 @@ structure Gtk  = struct
 	val set_value_pos : 'a t -> positiontype -> unit
 	val get_value_pos : 'a t -> positiontype
 	val get_layout_offsets : 'a t -> int * int
+	val format_value_sig : (real -> char) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7034,6 +7647,11 @@ structure Gtk  = struct
 	val get_layout_offsets : 'a t -> int * int
 	    = fn self => let val (res0, res1) = get_layout_offsets_ (repr self)
 			 in (res0, res1) end
+	local open Signal
+	      infixr -->
+	in val format_value_sig : (real -> char) -> 'a t Signal.signal
+	       = fn f => signal "format-value" false (real --> return_char) f
+	end
     end
     structure HScale :>
       sig
@@ -7442,6 +8060,12 @@ structure Gtk  = struct
 	val activate_item : 'a t -> 'b Widget.t -> bool -> unit
 	val select_first : 'a t -> bool -> unit
 	val cancel : 'a t -> unit
+	val deactivate_sig : (unit -> unit) -> 'a t Signal.signal
+	val selection_done_sig : (unit -> unit) -> 'a t Signal.signal
+	val move_current_sig : (unit -> unit) -> 'a t Signal.signal
+	val activate_current_sig : (bool -> unit) -> 'a t Signal.signal
+	val cancel_sig : (unit -> unit) -> 'a t Signal.signal
+	val cycle_focus_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7492,6 +8116,22 @@ structure Gtk  = struct
 		 select_first_ (repr self) search_sensitive
 	val cancel_ : cptr -> unit = app1 (symb"mgtk_gtk_menu_shell_cancel")
 	val cancel : 'a t -> unit = fn self => cancel_ (repr self)
+	local open Signal
+	      infixr -->
+	in val deactivate_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "deactivate" false (void --> return_void) f
+	   val selection_done_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "selection-done" false (void --> return_void) f
+	   val move_current_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "move-current" false (unit --> return_void) f
+	   val activate_current_sig : (bool -> unit) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "activate-current" false (bool --> return_void) f
+	   val cancel_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "cancel" false (void --> return_void) f
+	   val cycle_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "cycle-focus" false (unit --> return_void) f
+	end
     end
     structure IMMulticontext :>
       sig
@@ -7534,6 +8174,8 @@ structure Gtk  = struct
 	val toInputDialog : 'a t -> base t
 	val get_type : unit -> GType.t
 	val new : unit -> base t
+	val enable_device_sig : (unit -> unit) -> 'a t Signal.signal
+	val disable_device_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7550,6 +8192,13 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : unit -> cptr = app1 (symb"mgtk_gtk_input_dialog_new")
 	val new : unit -> base t = fn dummy => make (new_ dummy)
+	local open Signal
+	      infixr -->
+	in val enable_device_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "enable-device" false (unit --> return_void) f
+	   val disable_device_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "disable-device" false (unit --> return_void) f
+	end
     end
     structure Invisible :>
       sig
@@ -7643,6 +8292,8 @@ structure Gtk  = struct
 	val set_hadjustment' : 'a t -> unit
 	val set_vadjustment : 'a t -> 'b Adjustment.t option -> unit
 	val set_vadjustment' : 'a t -> unit
+	val set_scroll_adjustments_sig
+	  : (unit -> unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7693,6 +8344,13 @@ structure Gtk  = struct
 		   (getOpt (Option.map repr adjustment, GObject.null))
 	val set_vadjustment' : 'a t -> unit
 	    = fn self => set_vadjustment_ (repr self) GObject.null
+	local open Signal
+	      infixr -->
+	in val set_scroll_adjustments_sig
+	     : (unit -> unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "set-scroll-adjustments" false
+			        (unit --> unit --> return_void) f
+	end
     end
     structure List :>
       sig
@@ -7709,6 +8367,9 @@ structure Gtk  = struct
 	val child_position : 'a t -> 'b Widget.t -> int
 	val item_get_type : unit -> GType.t
 	val store_get_type : unit -> GType.t
+	val selection_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val select_child_sig : (unit -> unit) -> 'a t Signal.signal
+	val unselect_child_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7751,6 +8412,16 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_list_store_get_type")
 	val store_get_type : unit -> GType.t
 	    = fn dummy => store_get_type_ dummy
+	local open Signal
+	      infixr -->
+	in val selection_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "selection-changed" false (void --> return_void) f
+	   val select_child_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "select-child" false (unit --> return_void) f
+	   val unselect_child_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "unselect-child" false (unit --> return_void) f
+	end
     end
     structure ListItem :>
       sig
@@ -7761,6 +8432,13 @@ structure Gtk  = struct
 	val toListItem : 'a t -> base t
 	val select : 'a t -> unit
 	val deselect : 'a t -> unit
+	val select_all_sig : (unit -> unit) -> 'a t Signal.signal
+	val unselect_all_sig : (unit -> unit) -> 'a t Signal.signal
+	val toggle_focus_row_sig : (unit -> unit) -> 'a t Signal.signal
+	val undo_selection_sig : (unit -> unit) -> 'a t Signal.signal
+	val start_selection_sig : (unit -> unit) -> 'a t Signal.signal
+	val end_selection_sig : (unit -> unit) -> 'a t Signal.signal
+	val toggle_add_mode_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7776,6 +8454,25 @@ structure Gtk  = struct
 	val select : 'a t -> unit = fn self => select_ (repr self)
 	val deselect_ : cptr -> unit = app1 (symb"mgtk_gtk_list_item_deselect")
 	val deselect : 'a t -> unit = fn self => deselect_ (repr self)
+	local open Signal
+	      infixr -->
+	in
+	  val select_all_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "select-all" false (void --> return_void) f
+	  val unselect_all_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "unselect-all" false (void --> return_void) f
+	  val toggle_focus_row_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "toggle-focus-row" false (void --> return_void) f
+	  val undo_selection_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "undo-selection" false (void --> return_void) f
+	  val start_selection_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "start-selection" false (void --> return_void) f
+	  val end_selection_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "end-selection" false (void --> return_void) f
+	  val toggle_add_mode_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "toggle-add-mode" false (void --> return_void) f
+	end
     end
     structure ListStore :>
       sig
@@ -7789,7 +8486,7 @@ structure Gtk  = struct
 	val asTreeDragDest : 'a t -> base TreeDragDest.t
 	val asTreeSortable : 'a t -> base TreeSortable.t
 	val new : int -> base t
-	val newv : int -> GType.t -> base t
+	val newv : int -> GType.t list -> base t
 	val set_column_types : 'a t -> int -> GType.t list -> unit
 	val set_value : 'a t -> TreeIter.t -> int -> GValue.GValue -> unit
 	val set : 'a t -> TreeIter.t -> unit
@@ -7825,10 +8522,10 @@ structure Gtk  = struct
 	fun asTreeSortable obj = TreeSortable.inherit () (fn () => repr obj)
 	val new_ : int -> cptr = app1 (symb"mgtk_gtk_list_store_new")
 	val new : int -> base t = fn n_columns => make (new_ n_columns)
-	val newv_ : int -> GType.t -> cptr
+	val newv_ : int -> GType.t list -> cptr
 	    = app2 (symb"mgtk_gtk_list_store_newv")
-	val newv : int -> GType.t -> base t
-	    = fn n_columns => fn value => make (newv_ n_columns value)
+	val newv : int -> GType.t list -> base t
+	    = fn n_columns => fn types => make (newv_ n_columns types)
 	val set_column_types_ : cptr -> int -> GType.t list -> unit
 	    = app3 (symb"mgtk_gtk_list_store_set_column_types")
 	val set_column_types : 'a t -> int -> GType.t list -> unit
@@ -7931,6 +8628,7 @@ structure Gtk  = struct
 	val set_monitor : 'a t -> int -> unit
 	val bar_get_type : unit -> GType.t
 	val item_get_type : unit -> GType.t
+	val move_scroll_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8019,6 +8717,11 @@ structure Gtk  = struct
 	val item_get_type_ : unit -> GType.t
 	    = app1 (symb"mgtk_gtk_menu_item_get_type")
 	val item_get_type : unit -> GType.t = fn dummy => item_get_type_ dummy
+	local open Signal
+	      infixr -->
+	in val move_scroll_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "move-scroll" false (unit --> return_void) f
+	end
     end
     structure MenuBar :>
       sig
@@ -8132,6 +8835,11 @@ structure Gtk  = struct
 	val set_tab_label_packing
 	  : 'a t -> 'b Widget.t -> bool -> bool -> packtype -> unit
 	val reorder_child : 'a t -> 'b Widget.t -> int -> unit
+	val move_focus_out_sig : (unit -> unit) -> 'a t Signal.signal
+	val switch_page_sig : (unit -> int -> unit) -> 'a t Signal.signal
+	val focus_tab_sig : (unit -> bool) -> 'a t Signal.signal
+	val select_page_sig : (bool -> bool) -> 'a t Signal.signal
+	val change_current_page_sig : (int -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8365,6 +9073,21 @@ structure Gtk  = struct
 	val reorder_child : 'a t -> 'b Widget.t -> int -> unit
 	    = fn self => fn child => fn position =>
 		 reorder_child_ (repr self) (repr child) position
+	local open Signal
+	      infixr -->
+	in val move_focus_out_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "move-focus-out" false (unit --> return_void) f
+	   val switch_page_sig : (unit -> int -> unit) -> 'a t Signal.signal
+	       = fn f => signal "switch-page" false
+			        (unit --> int --> return_void) f
+	   val focus_tab_sig : (unit -> bool) -> 'a t Signal.signal
+	       = fn f => signal "focus-tab" false (unit --> return_bool) f
+	   val select_page_sig : (bool -> bool) -> 'a t Signal.signal
+	       = fn f => signal "select-page" false (bool --> return_bool) f
+	   val change_current_page_sig : (int -> unit) -> 'a t Signal.signal
+	       = fn f => signal "change-current-page" false
+			        (int --> return_void) f
+	end
     end
     structure OldEditable :>
       sig
@@ -8408,6 +9131,7 @@ structure Gtk  = struct
 	val remove_menu : 'a t -> unit
 	val get_history : 'a t -> int
 	val set_history : 'a t -> int -> unit
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8440,6 +9164,11 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_option_menu_set_history")
 	val set_history : 'a t -> int -> unit
 	    = fn self => fn index => set_history_ (repr self) index
+	local open Signal
+	      infixr -->
+	in val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "changed" false (void --> return_void) f
+	end
     end
     structure Pixmap :>
       sig
@@ -8476,6 +9205,7 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toPlug : 'a t -> base t
 	val get_type : unit -> GType.t
+	val embedded_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8489,6 +9219,11 @@ structure Gtk  = struct
 	fun toPlug obj = inherit () (fn () => repr obj)
 	val get_type_ : unit -> GType.t = app1 (symb"mgtk_gtk_plug_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	local open Signal
+	      infixr -->
+	in val embedded_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "embedded" false (void --> return_void) f
+	end
     end
     structure Preview :>
       sig
@@ -8646,6 +9381,7 @@ structure Gtk  = struct
 	val get_active : 'a t -> bool
 	val set_draw_as_radio : 'a t -> bool -> unit
 	val get_draw_as_radio : 'a t -> bool
+	val toggled_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8679,6 +9415,11 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_toggle_action_get_draw_as_radio")
 	val get_draw_as_radio : 'a t -> bool
 	    = fn self => get_draw_as_radio_ (repr self)
+	local open Signal
+	      infixr -->
+	in val toggled_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggled" false (void --> return_void) f
+	end
     end
     structure RadioAction :>
       sig
@@ -8689,6 +9430,7 @@ structure Gtk  = struct
 	val toRadioAction : 'a t -> base t
 	val get_type : unit -> GType.t
 	val get_current_value : 'a t -> int
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8707,6 +9449,11 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_radio_action_get_current_value")
 	val get_current_value : 'a t -> int
 	    = fn self => get_current_value_ (repr self)
+	local open Signal
+	      infixr -->
+	in val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "changed" false (unit --> return_void) f
+	end
     end
     structure RadioButton :>
       sig
@@ -8719,6 +9466,7 @@ structure Gtk  = struct
 	val new_from_widget : 'a t -> base t
 	val new_with_label_from_widget : 'a t -> string -> base t
 	val new_with_mnemonic_from_widget : 'a t -> string -> base t
+	val group_changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8747,6 +9495,11 @@ structure Gtk  = struct
 	val new_with_mnemonic_from_widget : 'a t -> string -> base t
 	    = fn group => fn label =>
 		 make (new_with_mnemonic_from_widget_ (repr group) label)
+	local open Signal
+	      infixr -->
+	in val group_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "group-changed" false (void --> return_void) f
+	end
     end
     structure RadioMenuItem :>
       sig
@@ -8759,6 +9512,7 @@ structure Gtk  = struct
 	val new_from_widget : 'a t -> base Widget.t
 	val new_with_mnemonic_from_widget : 'a t -> string -> base Widget.t
 	val new_with_label_from_widget : 'a t -> string -> base Widget.t
+	val group_changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8792,6 +9546,11 @@ structure Gtk  = struct
 	    = fn self => fn label =>
 		 Widget.inherit
 		   () (fn () => new_with_label_from_widget_ (repr self) label)
+	local open Signal
+	      infixr -->
+	in val group_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "group-changed" false (void --> return_void) f
+	end
     end
     structure ToolItem :>
       sig
@@ -8824,6 +9583,10 @@ structure Gtk  = struct
 	val set_proxy_menu_item : 'a t -> string -> 'b Widget.t option -> unit
 	val set_proxy_menu_item' : 'a t -> string -> unit
 	val get_proxy_menu_item : 'a t -> string -> base Widget.t
+	val create_menu_proxy_sig : (unit -> bool) -> 'a t Signal.signal
+	val toolbar_reconfigured_sig : (unit -> unit) -> 'a t Signal.signal
+	val set_tooltip_sig : (unit -> char -> char -> bool)
+			      -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -8936,6 +9699,19 @@ structure Gtk  = struct
 	    = fn self => fn menu_item_id =>
 		 Widget.inherit
 		   () (fn () => get_proxy_menu_item_ (repr self) menu_item_id)
+	local open Signal
+	      infixr -->
+	in val create_menu_proxy_sig : (unit -> bool) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "create-menu-proxy" false (void --> return_bool) f
+	   val toolbar_reconfigured_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toolbar-reconfigured" false
+			        (void --> return_void) f
+	   val set_tooltip_sig : (unit -> char -> char -> bool)
+				 -> 'a t Signal.signal
+	       = fn f => signal "set-tooltip" false
+			        (unit --> char --> char --> return_bool) f
+	end
     end
     structure ToolButton :>
       sig
@@ -8962,6 +9738,7 @@ structure Gtk  = struct
 	val set_label_widget : 'a t -> 'b Widget.t option -> unit
 	val set_label_widget' : 'a t -> unit
 	val get_label_widget : 'a t -> base Widget.t
+	val clicked_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9045,6 +9822,11 @@ structure Gtk  = struct
 	val get_label_widget : 'a t -> base Widget.t
 	    = fn self => Widget.inherit
 			   () (fn () => get_label_widget_ (repr self))
+	local open Signal
+	      infixr -->
+	in val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "clicked" false (void --> return_void) f
+	end
     end
     structure ToggleToolButton :>
       sig
@@ -9058,6 +9840,7 @@ structure Gtk  = struct
 	val new_from_stock : string -> base t
 	val set_active : 'a t -> bool -> unit
 	val get_active : 'a t -> bool
+	val toggled_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9085,6 +9868,11 @@ structure Gtk  = struct
 	val get_active_ : cptr -> bool
 	    = app1 (symb"mgtk_gtk_toggle_tool_button_get_active")
 	val get_active : 'a t -> bool = fn self => get_active_ (repr self)
+	local open Signal
+	      infixr -->
+	in val toggled_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "toggled" false (void --> return_void) f
+	end
     end
     structure RadioToolButton :>
       sig
@@ -9141,6 +9929,8 @@ structure Gtk  = struct
 	val set_shadowtype : 'a t -> shadowtype -> unit
 	val get_shadowtype : 'a t -> shadowtype
 	val add_with_viewport : 'a t -> 'b Widget.t -> unit
+	val scroll_child_sig : (unit -> bool -> unit) -> 'a t Signal.signal
+	val move_focus_out_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9212,6 +10002,14 @@ structure Gtk  = struct
 	val add_with_viewport : 'a t -> 'b Widget.t -> unit
 	    = fn self => fn child =>
 		 add_with_viewport_ (repr self) (repr child)
+	local open Signal
+	      infixr -->
+	in val scroll_child_sig : (unit -> bool -> unit) -> 'a t Signal.signal
+	       = fn f => signal "scroll-child" false
+			        (unit --> bool --> return_void) f
+	   val move_focus_out_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "move-focus-out" false (unit --> return_void) f
+	end
     end
     structure SeparatorMenuItem :>
       sig
@@ -9328,6 +10126,8 @@ structure Gtk  = struct
 	val toSocket : 'a t -> base t
 	val get_type : unit -> GType.t
 	val new : unit -> base t
+	val plug_added_sig : (unit -> unit) -> 'a t Signal.signal
+	val plug_removed_sig : (unit -> bool) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9343,6 +10143,13 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : unit -> cptr = app1 (symb"mgtk_gtk_socket_new")
 	val new : unit -> base t = fn dummy => make (new_ dummy)
+	local open Signal
+	      infixr -->
+	in val plug_added_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "plug-added" false (void --> return_void) f
+	   val plug_removed_sig : (unit -> bool) -> 'a t Signal.signal
+	       = fn f => signal "plug-removed" false (void --> return_bool) f
+	end
     end
     structure SpinButton :>
       sig
@@ -9378,6 +10185,10 @@ structure Gtk  = struct
 	val set_snap_to_ticks : 'a t -> bool -> unit
 	val get_snap_to_ticks : 'a t -> bool
 	val update : 'a t -> unit
+	val input_sig : (real -> int) -> 'a t Signal.signal
+	val output_sig : (unit -> bool) -> 'a t Signal.signal
+	val value_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val change_value_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9491,6 +10302,17 @@ structure Gtk  = struct
 	    = fn self => get_snap_to_ticks_ (repr self)
 	val update_ : cptr -> unit = app1 (symb"mgtk_gtk_spin_button_update")
 	val update : 'a t -> unit = fn self => update_ (repr self)
+	local open Signal
+	      infixr -->
+	in val input_sig : (real -> int) -> 'a t Signal.signal
+	       = fn f => signal "input" false (real --> return_int) f
+	   val output_sig : (unit -> bool) -> 'a t Signal.signal
+	       = fn f => signal "output" false (void --> return_bool) f
+	   val value_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "value-changed" false (void --> return_void) f
+	   val change_value_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "change-value" false (unit --> return_void) f
+	end
     end
     structure Statusbar :>
       sig
@@ -9507,6 +10329,8 @@ structure Gtk  = struct
 	val remove : 'a t -> int -> int -> unit
 	val set_has_resize_grip : 'a t -> bool -> unit
 	val get_has_resize_grip : 'a t -> bool
+	val text_pushed_sig : (int -> char -> unit) -> 'a t Signal.signal
+	val text_popped_sig : (int -> char -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9549,6 +10373,15 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_statusbar_get_has_resize_grip")
 	val get_has_resize_grip : 'a t -> bool
 	    = fn self => get_has_resize_grip_ (repr self)
+	local open Signal
+	      infixr -->
+	in val text_pushed_sig : (int -> char -> unit) -> 'a t Signal.signal
+	       = fn f => signal "text-pushed" false
+			        (int --> char --> return_void) f
+	   val text_popped_sig : (int -> char -> unit) -> 'a t Signal.signal
+	       = fn f => signal "text-popped" false
+			        (int --> char --> return_void) f
+	end
     end
     structure Table :>
       sig
@@ -9725,6 +10558,9 @@ structure Gtk  = struct
 	val remove : 'a t -> 'b TextTag.t -> unit
 	val lookup : 'a t -> string -> base TextTag.t
 	val get_size : 'a t -> int
+	val tag_changed_sig : (unit -> bool -> unit) -> 'a t Signal.signal
+	val tag_added_sig : (unit -> unit) -> 'a t Signal.signal
+	val tag_removed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9757,6 +10593,16 @@ structure Gtk  = struct
 	val get_size_ : cptr -> int
 	    = app1 (symb"mgtk_gtk_text_tag_table_get_size")
 	val get_size : 'a t -> int = fn self => get_size_ (repr self)
+	local open Signal
+	      infixr -->
+	in val tag_changed_sig : (unit -> bool -> unit) -> 'a t Signal.signal
+	       = fn f => signal "tag-changed" false
+			        (unit --> bool --> return_void) f
+	   val tag_added_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "tag-added" false (unit --> return_void) f
+	   val tag_removed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "tag-removed" false (unit --> return_void) f
+	end
     end
     structure TextBuffer :>
       sig
@@ -9844,6 +10690,22 @@ structure Gtk  = struct
 	val delete_selection : 'a t -> bool -> bool -> bool
 	val begin_user_action : 'a t -> unit
 	val end_user_action : 'a t -> unit
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val insert_text_sig : (unit -> char -> int -> unit)
+			      -> 'a t Signal.signal
+	val insert_pixbuf_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val insert_child_anchor_sig
+	  : (unit -> unit -> unit) -> 'a t Signal.signal
+	val delete_range_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val modified_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val mark_set_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val mark_deleted_sig : (unit -> unit) -> 'a t Signal.signal
+	val apply_tag_sig : (unit -> unit -> unit -> unit)
+			    -> 'a t Signal.signal
+	val remove_tag_sig : (unit -> unit -> unit -> unit)
+			     -> 'a t Signal.signal
+	val begin_user_action_sig : (unit -> unit) -> 'a t Signal.signal
+	val end_user_action_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -10179,6 +11041,47 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_text_buffer_end_user_action")
 	val end_user_action : 'a t -> unit
 	    = fn self => end_user_action_ (repr self)
+	local open Signal
+	      infixr -->
+	in
+	  val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "changed" false (void --> return_void) f
+	  val insert_text_sig : (unit -> char -> int -> unit)
+				-> 'a t Signal.signal
+	      = fn f => signal "insert-text" false
+			       (unit --> char --> int --> return_void) f
+	  val insert_pixbuf_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "insert-pixbuf" false
+			       (unit --> unit --> return_void) f
+	  val insert_child_anchor_sig
+	    : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "insert-child-anchor" false
+			       (unit --> unit --> return_void) f
+	  val delete_range_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "delete-range" false
+			       (unit --> unit --> return_void) f
+	  val modified_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "modified-changed" false (void --> return_void) f
+	  val mark_set_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "mark-set" false (unit --> unit --> return_void) f
+	  val mark_deleted_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "mark-deleted" false (unit --> return_void) f
+	  val apply_tag_sig : (unit -> unit -> unit -> unit)
+			      -> 'a t Signal.signal
+	      = fn f => signal "apply-tag" false
+			       (unit --> unit --> unit --> return_void) f
+	  val remove_tag_sig : (unit -> unit -> unit -> unit)
+			       -> 'a t Signal.signal
+	      = fn f => signal "remove-tag" false
+			       (unit --> unit --> unit --> return_void) f
+	  val begin_user_action_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "begin-user-action" false (void --> return_void) f
+	  val end_user_action_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "end-user-action" false (void --> return_void) f
+	end
     end
     structure TextView :>
       sig
@@ -10242,6 +11145,23 @@ structure Gtk  = struct
 	val set_indent : 'a t -> int -> unit
 	val get_indent : 'a t -> int
 	val get_default_attributes : 'a t -> TextAttributes.t
+	val move_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	val set_scroll_adjustments_sig
+	  : (unit -> unit -> unit) -> 'a t Signal.signal
+	val move_cursor_sig : (unit -> int -> bool -> unit)
+			      -> 'a t Signal.signal
+	val select_all_sig : (bool -> unit) -> 'a t Signal.signal
+	val page_horizontally_sig : (int -> bool -> unit) -> 'a t Signal.signal
+	val move_viewport_sig : (unit -> int -> unit) -> 'a t Signal.signal
+	val set_anchor_sig : (unit -> unit) -> 'a t Signal.signal
+	val insert_at_cursor_sig : (char -> unit) -> 'a t Signal.signal
+	val delete_from_cursor_sig
+	  : (unit -> int -> unit) -> 'a t Signal.signal
+	val cut_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	val copy_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	val paste_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	val toggle_overwrite_sig : (unit -> unit) -> 'a t Signal.signal
+	val populate_popup_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -10476,6 +11396,49 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_text_view_get_default_attributes")
 	val get_default_attributes : 'a t -> TextAttributes.t
 	    = fn self => get_default_attributes_ (repr self)
+	local open Signal
+	      infixr -->
+	in
+	  val move_focus_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "move-focus" false (unit --> return_void) f
+	  val set_scroll_adjustments_sig
+	    : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "set-scroll-adjustments" false
+			       (unit --> unit --> return_void) f
+	  val move_cursor_sig : (unit -> int -> bool -> unit)
+				-> 'a t Signal.signal
+	      = fn f => signal "move-cursor" false
+			       (unit --> int --> bool --> return_void) f
+	  val select_all_sig : (bool -> unit) -> 'a t Signal.signal
+	      = fn f => signal "select-all" false (bool --> return_void) f
+	  val page_horizontally_sig
+	    : (int -> bool -> unit) -> 'a t Signal.signal
+	      = fn f => signal "page-horizontally" false
+			       (int --> bool --> return_void) f
+	  val move_viewport_sig : (unit -> int -> unit) -> 'a t Signal.signal
+	      = fn f => signal "move-viewport" false
+			       (unit --> int --> return_void) f
+	  val set_anchor_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "set-anchor" false (void --> return_void) f
+	  val insert_at_cursor_sig : (char -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "insert-at-cursor" false (char --> return_void) f
+	  val delete_from_cursor_sig
+	    : (unit -> int -> unit) -> 'a t Signal.signal
+	      = fn f => signal "delete-from-cursor" false
+			       (unit --> int --> return_void) f
+	  val cut_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "cut-clipboard" false (void --> return_void) f
+	  val copy_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "copy-clipboard" false (void --> return_void) f
+	  val paste_clipboard_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "paste-clipboard" false (void --> return_void) f
+	  val toggle_overwrite_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "toggle-overwrite" false (void --> return_void) f
+	  val populate_popup_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "populate-popup" false (unit --> return_void) f
+	end
     end
     structure Toolbar :>
       sig
@@ -10519,6 +11482,12 @@ structure Gtk  = struct
 	val get_style : 'a t -> style
 	val get_icon_size : 'a t -> icon_size
 	val get_tooltips : 'a t -> bool
+	val move_focus_sig : (unit -> bool) -> 'a t Signal.signal
+	val orientation_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val style_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val popup_context_menu_sig
+	  : (int -> int -> int -> bool) -> 'a t Signal.signal
+	val focus_home_or_end_sig : (bool -> bool) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -10623,6 +11592,23 @@ structure Gtk  = struct
 	val get_tooltips_ : cptr -> bool
 	    = app1 (symb"mgtk_gtk_toolbar_get_tooltips")
 	val get_tooltips : 'a t -> bool = fn self => get_tooltips_ (repr self)
+	local open Signal
+	      infixr -->
+	in val move_focus_sig : (unit -> bool) -> 'a t Signal.signal
+	       = fn f => signal "move-focus" false (unit --> return_bool) f
+	   val orientation_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "orientation-changed" false
+			        (unit --> return_void) f
+	   val style_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "style-changed" false (unit --> return_void) f
+	   val popup_context_menu_sig
+	     : (int -> int -> int -> bool) -> 'a t Signal.signal
+	       = fn f => signal "popup-context-menu" false
+			        (int --> int --> int --> return_bool) f
+	   val focus_home_or_end_sig : (bool -> bool) -> 'a t Signal.signal
+	       = fn f =>
+		    signal "focus-home-or-end" false (bool --> return_bool) f
+	end
     end
     structure TreeModelFilter :>
       sig
@@ -10781,7 +11767,7 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_tree_model_sort_clear_cache")
 	val clear_cache : 'a t -> unit = fn self => clear_cache_ (repr self)
 	val sortiter_is_valid_ : cptr -> cptr -> bool
-	    = app2 (symb"mgtk_gtk_tree_model_sortiter_is_valid")
+	    = app2 (symb"mgtk_gtk_tree_model_sort_iter_is_valid")
 	val sortiter_is_valid : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => sortiter_is_valid_ (repr self) iter
     end
@@ -10848,6 +11834,7 @@ structure Gtk  = struct
 	val cell_is_visible : 'a t -> bool
 	val focus_cell : 'a t -> 'b CellRenderer.t -> unit
 	val cell_get_position : 'a t -> 'b CellRenderer.t -> int * int
+	val clicked_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -11066,6 +12053,11 @@ structure Gtk  = struct
 		 let val (res0, res1) = cell_get_position_
 					  (repr self) (repr cell_renderer)
 		 in (res0, res1) end
+	local open Signal
+	      infixr -->
+	in val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "clicked" false (void --> return_void) f
+	end
     end
     structure TreeView :>
       sig
@@ -11139,6 +12131,25 @@ structure Gtk  = struct
 	val get_enable_search : 'a t -> bool
 	val get_search_column : 'a t -> int
 	val set_search_column : 'a t -> int -> unit
+	val set_scroll_adjustments_sig
+	  : (unit -> unit -> unit) -> 'a t Signal.signal
+	val row_activated_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val test_expand_row_sig : (unit -> unit -> bool) -> 'a t Signal.signal
+	val test_collapse_row_sig
+	  : (unit -> unit -> bool) -> 'a t Signal.signal
+	val row_expanded_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val row_collapsed_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val columns_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val cursor_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val move_cursor_sig : (unit -> int -> bool) -> 'a t Signal.signal
+	val select_all_sig : (unit -> bool) -> 'a t Signal.signal
+	val unselect_all_sig : (unit -> bool) -> 'a t Signal.signal
+	val select_cursor_row_sig : (bool -> bool) -> 'a t Signal.signal
+	val toggle_cursor_row_sig : (unit -> bool) -> 'a t Signal.signal
+	val expand_collapse_cursor_row_sig
+	  : (bool -> bool -> bool -> bool) -> 'a t Signal.signal
+	val select_cursor_parent_sig : (unit -> bool) -> 'a t Signal.signal
+	val start_interactive_search_sig : (unit -> bool) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -11393,6 +12404,59 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_tree_view_set_search_column")
 	val set_search_column : 'a t -> int -> unit
 	    = fn self => fn column => set_search_column_ (repr self) column
+	local open Signal
+	      infixr -->
+	in
+	  val set_scroll_adjustments_sig
+	    : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "set-scroll-adjustments" false
+			       (unit --> unit --> return_void) f
+	  val row_activated_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "row-activated" false
+			       (unit --> unit --> return_void) f
+	  val test_expand_row_sig
+	    : (unit -> unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "test-expand-row" false
+			       (unit --> unit --> return_bool) f
+	  val test_collapse_row_sig
+	    : (unit -> unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "test-collapse-row" false
+			       (unit --> unit --> return_bool) f
+	  val row_expanded_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "row-expanded" false
+			       (unit --> unit --> return_void) f
+	  val row_collapsed_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "row-collapsed" false
+			       (unit --> unit --> return_void) f
+	  val columns_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "columns-changed" false (void --> return_void) f
+	  val cursor_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "cursor-changed" false (void --> return_void) f
+	  val move_cursor_sig : (unit -> int -> bool) -> 'a t Signal.signal
+	      = fn f => signal "move-cursor" false
+			       (unit --> int --> return_bool) f
+	  val select_all_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "select-all" false (void --> return_bool) f
+	  val unselect_all_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "unselect-all" false (void --> return_bool) f
+	  val select_cursor_row_sig : (bool -> bool) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "select-cursor-row" false (bool --> return_bool) f
+	  val toggle_cursor_row_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f =>
+		   signal "toggle-cursor-row" false (void --> return_bool) f
+	  val expand_collapse_cursor_row_sig
+	    : (bool -> bool -> bool -> bool) -> 'a t Signal.signal
+	      = fn f => signal "expand-collapse-cursor-row" false
+			       (bool --> bool --> bool --> return_bool) f
+	  val select_cursor_parent_sig : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "select-cursor-parent" false
+			       (void --> return_bool) f
+	  val start_interactive_search_sig
+	    : (unit -> bool) -> 'a t Signal.signal
+	      = fn f => signal "start-interactive-search" false
+			       (void --> return_bool) f
+	end
     end
     structure TreeSelection :>
       sig
@@ -11417,6 +12481,7 @@ structure Gtk  = struct
 	val unselect_all : 'a t -> unit
 	val select_range : 'a t -> 'b TreePath.t -> 'c TreePath.t -> unit
 	val unselect_range : 'a t -> 'b TreePath.t -> 'c TreePath.t -> unit
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -11492,6 +12557,11 @@ structure Gtk  = struct
 	val unselect_range : 'a t -> 'b TreePath.t -> 'c TreePath.t -> unit
 	    = fn self => fn start_path => fn end_path =>
 		 unselect_range_ (repr self) (repr start_path) (repr end_path)
+	local open Signal
+	      infixr -->
+	in val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "changed" false (void --> return_void) f
+	end
     end
     structure TreeStore :>
       sig
@@ -11506,7 +12576,7 @@ structure Gtk  = struct
 	val asTreeSortable : 'a t -> base TreeSortable.t
 	val get_type : unit -> GType.t
 	val new : int -> base t
-	val newv : int -> GType.t -> base t
+	val newv : int -> GType.t list -> base t
 	val set_value : 'a t -> TreeIter.t -> int -> GValue.GValue -> unit
 	val set : 'a t -> TreeIter.t -> unit
 	val remove : 'a t -> TreeIter.t -> bool * TreeIter.t
@@ -11546,9 +12616,9 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : int -> cptr = app1 (symb"mgtk_gtk_tree_store_new")
 	val new : int -> base t = fn n_columns => make (new_ n_columns)
-	val newv_ : int -> GType.t -> cptr
+	val newv_ : int -> GType.t list -> cptr
 	    = app2 (symb"mgtk_gtk_tree_store_newv")
-	val newv : int -> GType.t -> base t
+	val newv : int -> GType.t list -> base t
 	    = fn n_columns => fn types => make (newv_ n_columns types)
 	val set_value_ : cptr -> cptr -> int -> GValue.GValue -> unit
 	    = app4 (symb"mgtk_gtk_tree_store_set_value")
@@ -11667,6 +12737,12 @@ structure Gtk  = struct
 	val get_ui : 'a t -> string
 	val ensure_update : 'a t -> unit
 	val new_merge_id : 'a t -> int
+	val add_widget_sig : (unit -> unit) -> 'a t Signal.signal
+	val actions_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	val connect_proxy_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val disconnect_proxy_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	val pre_activate_sig : (unit -> unit) -> 'a t Signal.signal
+	val post_activate_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -11753,6 +12829,25 @@ structure Gtk  = struct
 	val new_merge_id_ : cptr -> int
 	    = app1 (symb"mgtk_gtk_ui_manager_new_merge_id")
 	val new_merge_id : 'a t -> int = fn self => new_merge_id_ (repr self)
+	local open Signal
+	      infixr -->
+	in
+	  val add_widget_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "add-widget" false (unit --> return_void) f
+	  val actions_changed_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "actions-changed" false (void --> return_void) f
+	  val connect_proxy_sig : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "connect-proxy" false
+			       (unit --> unit --> return_void) f
+	  val disconnect_proxy_sig
+	    : (unit -> unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "disconnect-proxy" false
+			       (unit --> unit --> return_void) f
+	  val pre_activate_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "pre-activate" false (unit --> return_void) f
+	  val post_activate_sig : (unit -> unit) -> 'a t Signal.signal
+	      = fn f => signal "post-activate" false (unit --> return_void) f
+	end
     end
     structure VButtonBox :>
       sig
@@ -11797,6 +12892,8 @@ structure Gtk  = struct
 	val set_vadjustment' : 'a t -> unit
 	val set_shadowtype : 'a t -> shadowtype -> unit
 	val get_shadowtype : 'a t -> shadowtype
+	val set_scroll_adjustments_sig
+	  : (unit -> unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -11851,6 +12948,13 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_viewport_get_shadow_type")
 	val get_shadowtype : 'a t -> shadowtype
 	    = fn self => get_shadowtype_ (repr self)
+	local open Signal
+	      infixr -->
+	in val set_scroll_adjustments_sig
+	     : (unit -> unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "set-scroll-adjustments" false
+			        (unit --> unit --> return_void) f
+	end
     end
     structure VPaned :>
       sig

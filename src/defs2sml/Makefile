@@ -48,7 +48,7 @@ regdiff-%: reggen-%
         fi
 
 regdiffmlton-%: reggenmlton-%
-	@if diff -Naur $(DIFFOPTIONS) $(REGTRS)/$*-mlton.out $(REGOUT)/$*-mlton.out ; then \
+	@if diff -Naur $(DIFFOPTIONS) $(REGTRS)/$*-mlton.out $(REGOUT)/$*-mlton.out | tee -a $(REGRESULTS) ; then \
            echo ok ;\
         fi
 
@@ -80,6 +80,7 @@ trusted:
 	cp $(REGOUT)/*.out $(REGTRS)
 
 regressionclean:
+	rm -f $(REGRESULTS)
 	rm -f $(REGOUT)/*.{out,sml,c,uo,ui}
 
 

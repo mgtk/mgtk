@@ -218,6 +218,13 @@ structure Name :> NAME = struct
 *)
     local 
 	fun ify [] acc = rev acc
+	  | ify ("treeiter"::rest) acc = ify rest ("iter"::"tree"::acc)
+	  | ify ("textiter"::rest) acc = ify rest ("iter"::"text"::acc)
+	  | ify ("TreeIter"::rest) acc = ify rest ("Iter"::"Tree"::acc)
+	  | ify ("TextIter"::rest) acc = ify rest ("Iter"::"Text"::acc)
+	  | ify ("fromiter"::rest) acc = ify rest ("iter"::"from"::acc)
+	  | ify ("activeiter"::rest) acc = ify rest ("iter"::"active"::acc)
+	  | ify ("sortiter"::rest) acc = ify rest ("iter"::"sort"::acc)
 	  | ify ("CellRenderer"::rest) acc = ify rest ("Renderer"::"Cell"::acc)
 	  | ify ("TextBuffer"::rest) acc = ify rest ("Buffer"::"Text"::acc)
 	  | ify ("accelgroup"::rest) acc = ify rest ("group"::"accel"::acc)

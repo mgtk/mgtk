@@ -4,6 +4,10 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
+/* Do we really want this? */
+#define GTK_FILE_SYSTEM_ENABLE_UNSUPPORTED
+#include <gtk/gtkfilesystem.h>
+
 /* Mosml stuff */
 #include <mlvalues.h> 
 #include <fail.h>
@@ -1199,10 +1203,10 @@ EXTERNML value mgtk_gtk_adjustment_new(value mgtk_params) { /* ML */
     value valu = Field(mgtk_params, 0);
     value lower = Field(mgtk_params, 1);
     value upper = Field(mgtk_params, 2);
-    value step_incr = Field(mgtk_params, 3);
-    value page_incr = Field(mgtk_params, 4);
+    value step_increment = Field(mgtk_params, 3);
+    value page_increment = Field(mgtk_params, 4);
     value page_size = Field(mgtk_params, 5);
-    return Val_GtkObj(gtk_adjustment_new(Double_val(valu), Double_val(lower), Double_val(upper), Double_val(step_incr), Double_val(page_incr), Double_val(page_size)));
+    return Val_GtkObj(gtk_adjustment_new(Double_val(valu), Double_val(lower), Double_val(upper), Double_val(step_increment), Double_val(page_increment), Double_val(page_size)));
 }
 
 /* ML type: cptr -> unit */
@@ -2220,10 +2224,10 @@ EXTERNML value mgtk_gtk_icon_theme_get_default(value dummy) { /* ML */
     return Val_GtkObj(gtk_icon_theme_get_default());
 }
 
-/* ML type: cptr -> char list -> int -> unit */
+/* ML type: cptr -> string list -> int -> unit */
 EXTERNML value mgtk_gtk_icon_theme_set_search_path(value self, value path_arr, value n_elements) { /* ML */
-    char* path;
-    list_to_array(char, path, Char_val, path_arr);
+    char** path;
+    list_to_array(char*, path, String_val, path_arr);
     gtk_icon_theme_set_search_path(GtkObj_val(self), path, Int_val(n_elements));
     return Val_unit;
 }
@@ -2285,19 +2289,19 @@ value Val_GtkTreeIter(void* obj) {
 }
 
 /* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_treeiter_copy(value self) { /* ML */
-    return Val_GtkTreeIter(gtk_treeiter_copy(GtkTreeIter_val(self)));
+EXTERNML value mgtk_gtk_tree_iter_copy(value self) { /* ML */
+    return Val_GtkTreeIter(gtk_tree_iter_copy(GtkTreeIter_val(self)));
 }
 
 /* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_treeiter_free(value self) { /* ML */
-    gtk_treeiter_free(GtkTreeIter_val(self));
+EXTERNML value mgtk_gtk_tree_iter_free(value self) { /* ML */
+    gtk_tree_iter_free(GtkTreeIter_val(self));
     return Val_unit;
 }
 
 /* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_treeiter_get_type(value dummy) { /* ML */
-    return Val_int(gtk_treeiter_get_type());
+EXTERNML value mgtk_gtk_tree_iter_get_type(value dummy) { /* ML */
+    return Val_int(gtk_tree_iter_get_type());
 }
 
 
@@ -2449,8 +2453,8 @@ EXTERNML value mgtk_gtk_tree_model_get_iter_from_string(value self, value path_s
 }
 
 /* ML type: cptr -> cptr -> string */
-EXTERNML value mgtk_gtk_tree_model_get_string_fromiter(value self, value iter) { /* ML */
-    return my_copy_string(gtk_tree_model_get_string_fromiter(GtkObj_val(self), GtkTreeIter_val(iter)));
+EXTERNML value mgtk_gtk_tree_model_get_string_from_iter(value self, value iter) { /* ML */
+    return my_copy_string(gtk_tree_model_get_string_from_iter(GtkObj_val(self), GtkTreeIter_val(iter)));
 }
 
 /* ML type: cptr -> bool */
@@ -2757,385 +2761,385 @@ value Val_GtkTextIter(void* obj) {
 }
 
 /* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_textiter_copy(value self) { /* ML */
-    return Val_GtkTextIter(gtk_textiter_copy(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_copy(value self) { /* ML */
+    return Val_GtkTextIter(gtk_text_iter_copy(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_textiter_free(value self) { /* ML */
-    gtk_textiter_free(GtkTextIter_val(self));
+EXTERNML value mgtk_gtk_text_iter_free(value self) { /* ML */
+    gtk_text_iter_free(GtkTextIter_val(self));
     return Val_unit;
 }
 
 /* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_textiter_get_type(value dummy) { /* ML */
-    return Val_int(gtk_textiter_get_type());
+EXTERNML value mgtk_gtk_text_iter_get_type(value dummy) { /* ML */
+    return Val_int(gtk_text_iter_get_type());
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_offset(value self) { /* ML */
-    return Val_int(gtk_textiter_get_offset(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_offset(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_offset(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_line(value self) { /* ML */
-    return Val_int(gtk_textiter_get_line(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_line(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_line(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_line_offset(value self) { /* ML */
-    return Val_int(gtk_textiter_get_line_offset(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_line_offset(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_line_offset(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_line_index(value self) { /* ML */
-    return Val_int(gtk_textiter_get_line_index(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_line_index(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_line_index(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_visible_line_offset(value self) { /* ML */
-    return Val_int(gtk_textiter_get_visible_line_offset(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_visible_line_offset(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_visible_line_offset(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_visible_line_index(value self) { /* ML */
-    return Val_int(gtk_textiter_get_visible_line_index(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_visible_line_index(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_visible_line_index(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> char */
-EXTERNML value mgtk_gtk_textiter_get_char(value self) { /* ML */
-    return Val_long(gtk_textiter_get_char(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_char(value self) { /* ML */
+    return Val_long(gtk_text_iter_get_char(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> cptr -> string */
-EXTERNML value mgtk_gtk_textiter_get_slice(value self, value end) { /* ML */
-    return my_copy_string(gtk_textiter_get_slice(GtkTextIter_val(self), GtkTextIter_val(end)));
+EXTERNML value mgtk_gtk_text_iter_get_slice(value self, value end) { /* ML */
+    return my_copy_string(gtk_text_iter_get_slice(GtkTextIter_val(self), GtkTextIter_val(end)));
 }
 
 /* ML type: cptr -> cptr -> string */
-EXTERNML value mgtk_gtk_textiter_get_text(value self, value end) { /* ML */
-    return my_copy_string(gtk_textiter_get_text(GtkTextIter_val(self), GtkTextIter_val(end)));
+EXTERNML value mgtk_gtk_text_iter_get_text(value self, value end) { /* ML */
+    return my_copy_string(gtk_text_iter_get_text(GtkTextIter_val(self), GtkTextIter_val(end)));
 }
 
 /* ML type: cptr -> cptr -> string */
-EXTERNML value mgtk_gtk_textiter_get_visible_slice(value self, value end) { /* ML */
-    return my_copy_string(gtk_textiter_get_visible_slice(GtkTextIter_val(self), GtkTextIter_val(end)));
+EXTERNML value mgtk_gtk_text_iter_get_visible_slice(value self, value end) { /* ML */
+    return my_copy_string(gtk_text_iter_get_visible_slice(GtkTextIter_val(self), GtkTextIter_val(end)));
 }
 
 /* ML type: cptr -> cptr -> string */
-EXTERNML value mgtk_gtk_textiter_get_visible_text(value self, value end) { /* ML */
-    return my_copy_string(gtk_textiter_get_visible_text(GtkTextIter_val(self), GtkTextIter_val(end)));
+EXTERNML value mgtk_gtk_text_iter_get_visible_text(value self, value end) { /* ML */
+    return my_copy_string(gtk_text_iter_get_visible_text(GtkTextIter_val(self), GtkTextIter_val(end)));
 }
 
 /* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_textiter_get_child_anchor(value self) { /* ML */
-    return Val_GtkObj(gtk_textiter_get_child_anchor(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_child_anchor(value self) { /* ML */
+    return Val_GtkObj(gtk_text_iter_get_child_anchor(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_begins_tag(value self, value tag) { /* ML */
-    return Val_bool(gtk_textiter_begins_tag(GtkTextIter_val(self), GtkObj_val(tag)));
+EXTERNML value mgtk_gtk_text_iter_begins_tag(value self, value tag) { /* ML */
+    return Val_bool(gtk_text_iter_begins_tag(GtkTextIter_val(self), GtkObj_val(tag)));
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_ends_tag(value self, value tag) { /* ML */
-    return Val_bool(gtk_textiter_ends_tag(GtkTextIter_val(self), GtkObj_val(tag)));
+EXTERNML value mgtk_gtk_text_iter_ends_tag(value self, value tag) { /* ML */
+    return Val_bool(gtk_text_iter_ends_tag(GtkTextIter_val(self), GtkObj_val(tag)));
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_toggles_tag(value self, value tag) { /* ML */
-    return Val_bool(gtk_textiter_toggles_tag(GtkTextIter_val(self), GtkObj_val(tag)));
+EXTERNML value mgtk_gtk_text_iter_toggles_tag(value self, value tag) { /* ML */
+    return Val_bool(gtk_text_iter_toggles_tag(GtkTextIter_val(self), GtkObj_val(tag)));
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_has_tag(value self, value tag) { /* ML */
-    return Val_bool(gtk_textiter_has_tag(GtkTextIter_val(self), GtkObj_val(tag)));
+EXTERNML value mgtk_gtk_text_iter_has_tag(value self, value tag) { /* ML */
+    return Val_bool(gtk_text_iter_has_tag(GtkTextIter_val(self), GtkObj_val(tag)));
 }
 
 /* ML type: cptr -> bool -> bool */
-EXTERNML value mgtk_gtk_textiter_editable(value self, value default_setting) { /* ML */
-    return Val_bool(gtk_textiter_editable(GtkTextIter_val(self), Bool_val(default_setting)));
+EXTERNML value mgtk_gtk_text_iter_editable(value self, value default_setting) { /* ML */
+    return Val_bool(gtk_text_iter_editable(GtkTextIter_val(self), Bool_val(default_setting)));
 }
 
 /* ML type: cptr -> bool -> bool */
-EXTERNML value mgtk_gtk_textiter_can_insert(value self, value default_editability) { /* ML */
-    return Val_bool(gtk_textiter_can_insert(GtkTextIter_val(self), Bool_val(default_editability)));
+EXTERNML value mgtk_gtk_text_iter_can_insert(value self, value default_editability) { /* ML */
+    return Val_bool(gtk_text_iter_can_insert(GtkTextIter_val(self), Bool_val(default_editability)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_starts_word(value self) { /* ML */
-    return Val_bool(gtk_textiter_starts_word(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_starts_word(value self) { /* ML */
+    return Val_bool(gtk_text_iter_starts_word(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_ends_word(value self) { /* ML */
-    return Val_bool(gtk_textiter_ends_word(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_ends_word(value self) { /* ML */
+    return Val_bool(gtk_text_iter_ends_word(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_inside_word(value self) { /* ML */
-    return Val_bool(gtk_textiter_inside_word(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_inside_word(value self) { /* ML */
+    return Val_bool(gtk_text_iter_inside_word(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_starts_sentence(value self) { /* ML */
-    return Val_bool(gtk_textiter_starts_sentence(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_starts_sentence(value self) { /* ML */
+    return Val_bool(gtk_text_iter_starts_sentence(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_ends_sentence(value self) { /* ML */
-    return Val_bool(gtk_textiter_ends_sentence(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_ends_sentence(value self) { /* ML */
+    return Val_bool(gtk_text_iter_ends_sentence(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_inside_sentence(value self) { /* ML */
-    return Val_bool(gtk_textiter_inside_sentence(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_inside_sentence(value self) { /* ML */
+    return Val_bool(gtk_text_iter_inside_sentence(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_starts_line(value self) { /* ML */
-    return Val_bool(gtk_textiter_starts_line(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_starts_line(value self) { /* ML */
+    return Val_bool(gtk_text_iter_starts_line(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_ends_line(value self) { /* ML */
-    return Val_bool(gtk_textiter_ends_line(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_ends_line(value self) { /* ML */
+    return Val_bool(gtk_text_iter_ends_line(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_is_cursor_position(value self) { /* ML */
-    return Val_bool(gtk_textiter_is_cursor_position(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_is_cursor_position(value self) { /* ML */
+    return Val_bool(gtk_text_iter_is_cursor_position(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_chars_in_line(value self) { /* ML */
-    return Val_int(gtk_textiter_get_chars_in_line(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_chars_in_line(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_chars_in_line(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_textiter_get_bytes_in_line(value self) { /* ML */
-    return Val_int(gtk_textiter_get_bytes_in_line(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_get_bytes_in_line(value self) { /* ML */
+    return Val_int(gtk_text_iter_get_bytes_in_line(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_get_attributes(value self, value values) { /* ML */
-    return Val_bool(gtk_textiter_get_attributes(GtkTextIter_val(self), GtkTextAttributes_val(values)));
+EXTERNML value mgtk_gtk_text_iter_get_attributes(value self, value values) { /* ML */
+    return Val_bool(gtk_text_iter_get_attributes(GtkTextIter_val(self), GtkTextAttributes_val(values)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_is_end(value self) { /* ML */
-    return Val_bool(gtk_textiter_is_end(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_is_end(value self) { /* ML */
+    return Val_bool(gtk_text_iter_is_end(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_is_start(value self) { /* ML */
-    return Val_bool(gtk_textiter_is_start(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_is_start(value self) { /* ML */
+    return Val_bool(gtk_text_iter_is_start(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_char(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_char(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_char(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_char(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_char(value self) { /* ML */
-    return Val_bool(gtk_textiter_backward_char(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_backward_char(value self) { /* ML */
+    return Val_bool(gtk_text_iter_backward_char(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_chars(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_forward_chars(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_forward_chars(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_forward_chars(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_chars(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_backward_chars(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_backward_chars(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_backward_chars(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_line(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_line(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_line(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_line(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_line(value self) { /* ML */
-    return Val_bool(gtk_textiter_backward_line(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_backward_line(value self) { /* ML */
+    return Val_bool(gtk_text_iter_backward_line(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_lines(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_forward_lines(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_forward_lines(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_forward_lines(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_lines(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_backward_lines(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_backward_lines(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_backward_lines(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_word_end(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_word_end(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_word_end(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_word_end(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_word_start(value self) { /* ML */
-    return Val_bool(gtk_textiter_backward_word_start(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_backward_word_start(value self) { /* ML */
+    return Val_bool(gtk_text_iter_backward_word_start(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_word_ends(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_forward_word_ends(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_forward_word_ends(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_forward_word_ends(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_word_starts(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_backward_word_starts(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_backward_word_starts(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_backward_word_starts(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_visible_word_end(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_visible_word_end(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_visible_word_end(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_visible_word_end(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_visible_word_start(value self) { /* ML */
-    return Val_bool(gtk_textiter_backward_visible_word_start(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_backward_visible_word_start(value self) { /* ML */
+    return Val_bool(gtk_text_iter_backward_visible_word_start(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_visible_word_ends(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_forward_visible_word_ends(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_forward_visible_word_ends(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_forward_visible_word_ends(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_visible_word_starts(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_backward_visible_word_starts(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_backward_visible_word_starts(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_backward_visible_word_starts(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_sentence_end(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_sentence_end(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_sentence_end(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_sentence_end(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_sentence_start(value self) { /* ML */
-    return Val_bool(gtk_textiter_backward_sentence_start(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_backward_sentence_start(value self) { /* ML */
+    return Val_bool(gtk_text_iter_backward_sentence_start(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_sentence_ends(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_forward_sentence_ends(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_forward_sentence_ends(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_forward_sentence_ends(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_sentence_starts(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_backward_sentence_starts(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_backward_sentence_starts(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_backward_sentence_starts(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_cursor_position(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_cursor_position(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_cursor_position(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_cursor_position(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_cursor_position(value self) { /* ML */
-    return Val_bool(gtk_textiter_backward_cursor_position(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_backward_cursor_position(value self) { /* ML */
+    return Val_bool(gtk_text_iter_backward_cursor_position(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_cursor_positions(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_forward_cursor_positions(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_forward_cursor_positions(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_forward_cursor_positions(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_cursor_positions(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_backward_cursor_positions(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_backward_cursor_positions(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_backward_cursor_positions(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_visible_cursor_position(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_visible_cursor_position(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_visible_cursor_position(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_visible_cursor_position(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_visible_cursor_position(value self) { /* ML */
-    return Val_bool(gtk_textiter_backward_visible_cursor_position(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_backward_visible_cursor_position(value self) { /* ML */
+    return Val_bool(gtk_text_iter_backward_visible_cursor_position(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_visible_cursor_positions(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_forward_visible_cursor_positions(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_forward_visible_cursor_positions(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_forward_visible_cursor_positions(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_visible_cursor_positions(value self, value count) { /* ML */
-    return Val_bool(gtk_textiter_backward_visible_cursor_positions(GtkTextIter_val(self), Int_val(count)));
+EXTERNML value mgtk_gtk_text_iter_backward_visible_cursor_positions(value self, value count) { /* ML */
+    return Val_bool(gtk_text_iter_backward_visible_cursor_positions(GtkTextIter_val(self), Int_val(count)));
 }
 
 /* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_textiter_set_offset(value self, value char_offset) { /* ML */
-    gtk_textiter_set_offset(GtkTextIter_val(self), Int_val(char_offset));
+EXTERNML value mgtk_gtk_text_iter_set_offset(value self, value char_offset) { /* ML */
+    gtk_text_iter_set_offset(GtkTextIter_val(self), Int_val(char_offset));
     return Val_unit;
 }
 
 /* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_textiter_set_line(value self, value line_number) { /* ML */
-    gtk_textiter_set_line(GtkTextIter_val(self), Int_val(line_number));
+EXTERNML value mgtk_gtk_text_iter_set_line(value self, value line_number) { /* ML */
+    gtk_text_iter_set_line(GtkTextIter_val(self), Int_val(line_number));
     return Val_unit;
 }
 
 /* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_textiter_set_line_offset(value self, value char_on_line) { /* ML */
-    gtk_textiter_set_line_offset(GtkTextIter_val(self), Int_val(char_on_line));
+EXTERNML value mgtk_gtk_text_iter_set_line_offset(value self, value char_on_line) { /* ML */
+    gtk_text_iter_set_line_offset(GtkTextIter_val(self), Int_val(char_on_line));
     return Val_unit;
 }
 
 /* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_textiter_set_line_index(value self, value byte_on_line) { /* ML */
-    gtk_textiter_set_line_index(GtkTextIter_val(self), Int_val(byte_on_line));
+EXTERNML value mgtk_gtk_text_iter_set_line_index(value self, value byte_on_line) { /* ML */
+    gtk_text_iter_set_line_index(GtkTextIter_val(self), Int_val(byte_on_line));
     return Val_unit;
 }
 
 /* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_textiter_forward_to_end(value self) { /* ML */
-    gtk_textiter_forward_to_end(GtkTextIter_val(self));
+EXTERNML value mgtk_gtk_text_iter_forward_to_end(value self) { /* ML */
+    gtk_text_iter_forward_to_end(GtkTextIter_val(self));
     return Val_unit;
 }
 
 /* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_to_line_end(value self) { /* ML */
-    return Val_bool(gtk_textiter_forward_to_line_end(GtkTextIter_val(self)));
+EXTERNML value mgtk_gtk_text_iter_forward_to_line_end(value self) { /* ML */
+    return Val_bool(gtk_text_iter_forward_to_line_end(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_textiter_set_visible_line_offset(value self, value char_on_line) { /* ML */
-    gtk_textiter_set_visible_line_offset(GtkTextIter_val(self), Int_val(char_on_line));
+EXTERNML value mgtk_gtk_text_iter_set_visible_line_offset(value self, value char_on_line) { /* ML */
+    gtk_text_iter_set_visible_line_offset(GtkTextIter_val(self), Int_val(char_on_line));
     return Val_unit;
 }
 
 /* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_textiter_set_visible_line_index(value self, value byte_on_line) { /* ML */
-    gtk_textiter_set_visible_line_index(GtkTextIter_val(self), Int_val(byte_on_line));
+EXTERNML value mgtk_gtk_text_iter_set_visible_line_index(value self, value byte_on_line) { /* ML */
+    gtk_text_iter_set_visible_line_index(GtkTextIter_val(self), Int_val(byte_on_line));
     return Val_unit;
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_to_tag_toggle(value self, value tag) { /* ML */
-    return Val_bool(gtk_textiter_forward_to_tag_toggle(GtkTextIter_val(self), GtkObj_val(tag)));
+EXTERNML value mgtk_gtk_text_iter_forward_to_tag_toggle(value self, value tag) { /* ML */
+    return Val_bool(gtk_text_iter_forward_to_tag_toggle(GtkTextIter_val(self), GtkObj_val(tag)));
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_to_tag_toggle(value self, value tag) { /* ML */
-    return Val_bool(gtk_textiter_backward_to_tag_toggle(GtkTextIter_val(self), GtkObj_val(tag)));
+EXTERNML value mgtk_gtk_text_iter_backward_to_tag_toggle(value self, value tag) { /* ML */
+    return Val_bool(gtk_text_iter_backward_to_tag_toggle(GtkTextIter_val(self), GtkObj_val(tag)));
 }
 
 /* ML type: cptr -> string -> int -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_forward_search(value self, value str, value flags, value limit) { /* ML */
+EXTERNML value mgtk_gtk_text_iter_forward_search(value self, value str, value flags, value limit) { /* ML */
     value result;
     value res;
     GtkTextIter match_start;
     GtkTextIter match_end;
-    res = Val_bool(gtk_textiter_forward_search(GtkTextIter_val(self), String_val(str), Int_val(flags), &match_start, &match_end, GtkTextIter_val(limit)));
+    res = Val_bool(gtk_text_iter_forward_search(GtkTextIter_val(self), String_val(str), Int_val(flags), &match_start, &match_end, GtkTextIter_val(limit)));
     result = alloc_tuple(3);
     Field(result, 0) = res;
     Field(result, 1) = Val_GtkTextIter(&match_start);
@@ -3144,12 +3148,12 @@ EXTERNML value mgtk_gtk_textiter_forward_search(value self, value str, value fla
 }
 
 /* ML type: cptr -> string -> int -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_backward_search(value self, value str, value flags, value limit) { /* ML */
+EXTERNML value mgtk_gtk_text_iter_backward_search(value self, value str, value flags, value limit) { /* ML */
     value result;
     value res;
     GtkTextIter match_start;
     GtkTextIter match_end;
-    res = Val_bool(gtk_textiter_backward_search(GtkTextIter_val(self), String_val(str), Int_val(flags), &match_start, &match_end, GtkTextIter_val(limit)));
+    res = Val_bool(gtk_text_iter_backward_search(GtkTextIter_val(self), String_val(str), Int_val(flags), &match_start, &match_end, GtkTextIter_val(limit)));
     result = alloc_tuple(3);
     Field(result, 0) = res;
     Field(result, 1) = Val_GtkTextIter(&match_start);
@@ -3158,23 +3162,23 @@ EXTERNML value mgtk_gtk_textiter_backward_search(value self, value str, value fl
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_equal(value self, value rhs) { /* ML */
-    return Val_bool(gtk_textiter_equal(GtkTextIter_val(self), GtkTextIter_val(rhs)));
+EXTERNML value mgtk_gtk_text_iter_equal(value self, value rhs) { /* ML */
+    return Val_bool(gtk_text_iter_equal(GtkTextIter_val(self), GtkTextIter_val(rhs)));
 }
 
 /* ML type: cptr -> cptr -> int */
-EXTERNML value mgtk_gtk_textiter_compare(value self, value rhs) { /* ML */
-    return Val_int(gtk_textiter_compare(GtkTextIter_val(self), GtkTextIter_val(rhs)));
+EXTERNML value mgtk_gtk_text_iter_compare(value self, value rhs) { /* ML */
+    return Val_int(gtk_text_iter_compare(GtkTextIter_val(self), GtkTextIter_val(rhs)));
 }
 
 /* ML type: cptr -> cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_textiter_in_range(value self, value start, value end) { /* ML */
-    return Val_bool(gtk_textiter_in_range(GtkTextIter_val(self), GtkTextIter_val(start), GtkTextIter_val(end)));
+EXTERNML value mgtk_gtk_text_iter_in_range(value self, value start, value end) { /* ML */
+    return Val_bool(gtk_text_iter_in_range(GtkTextIter_val(self), GtkTextIter_val(start), GtkTextIter_val(end)));
 }
 
 /* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_textiter_order(value self, value second) { /* ML */
-    gtk_textiter_order(GtkTextIter_val(self), GtkTextIter_val(second));
+EXTERNML value mgtk_gtk_text_iter_order(value self, value second) { /* ML */
+    gtk_text_iter_order(GtkTextIter_val(self), GtkTextIter_val(second));
     return Val_unit;
 }
 
@@ -5763,13 +5767,13 @@ EXTERNML value mgtk_gtk_combo_box_set_active(value self, value index) { /* ML */
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_combo_box_get_activeiter(value self, value iter) { /* ML */
-    return Val_bool(gtk_combo_box_get_activeiter(GtkObj_val(self), GtkTreeIter_val(iter)));
+EXTERNML value mgtk_gtk_combo_box_get_active_iter(value self, value iter) { /* ML */
+    return Val_bool(gtk_combo_box_get_active_iter(GtkObj_val(self), GtkTreeIter_val(iter)));
 }
 
 /* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_combo_box_set_activeiter(value self, value iter) { /* ML */
-    gtk_combo_box_set_activeiter(GtkObj_val(self), GtkTreeIter_val(iter));
+EXTERNML value mgtk_gtk_combo_box_set_active_iter(value self, value iter) { /* ML */
+    gtk_combo_box_set_active_iter(GtkObj_val(self), GtkTreeIter_val(iter));
     return Val_unit;
 }
 
@@ -7317,9 +7321,11 @@ EXTERNML value mgtk_gtk_list_store_new(value n_columns) { /* ML */
     return Val_GtkObj(gtk_list_store_new(Int_val(n_columns)));
 }
 
-/* ML type: int -> GType.t -> cptr */
-EXTERNML value mgtk_gtk_list_store_newv(value n_columns, value valu) { /* ML */
-    return Val_GtkObj(gtk_list_store_newv(Int_val(n_columns), Int_val(valu)));
+/* ML type: int -> GType.t list -> cptr */
+EXTERNML value mgtk_gtk_list_store_newv(value n_columns, value types_arr) { /* ML */
+    GType* types;
+    list_to_array(GType, types, Int_val, types_arr);
+    return Val_GtkObj(gtk_list_store_newv(Int_val(n_columns), types));
 }
 
 /* ML type: cptr -> int -> GType.t list -> unit */
@@ -9654,8 +9660,8 @@ EXTERNML value mgtk_gtk_tree_model_sort_clear_cache(value self) { /* ML */
 }
 
 /* ML type: cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_tree_model_sortiter_is_valid(value self, value iter) { /* ML */
-    return Val_bool(gtk_tree_model_sortiter_is_valid(GtkObj_val(self), GtkTreeIter_val(iter)));
+EXTERNML value mgtk_gtk_tree_model_sort_iter_is_valid(value self, value iter) { /* ML */
+    return Val_bool(gtk_tree_model_sort_iter_is_valid(GtkObj_val(self), GtkTreeIter_val(iter)));
 }
 
 
@@ -10305,9 +10311,11 @@ EXTERNML value mgtk_gtk_tree_store_new(value n_columns) { /* ML */
     return Val_GtkObj(gtk_tree_store_new(Int_val(n_columns)));
 }
 
-/* ML type: int -> GType.t -> cptr */
-EXTERNML value mgtk_gtk_tree_store_newv(value n_columns, value types) { /* ML */
-    return Val_GtkObj(gtk_tree_store_newv(Int_val(n_columns), Int_val(types)));
+/* ML type: int -> GType.t list -> cptr */
+EXTERNML value mgtk_gtk_tree_store_newv(value n_columns, value types_arr) { /* ML */
+    GType* types;
+    list_to_array(GType, types, Int_val, types_arr);
+    return Val_GtkObj(gtk_tree_store_newv(Int_val(n_columns), types));
 }
 
 /* ML type: cptr -> cptr -> int -> GValue.GValue -> unit */

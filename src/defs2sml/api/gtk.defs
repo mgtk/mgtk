@@ -731,8 +731,10 @@
     '("value" (optional))
     '("lower" (optional))
     '("upper" (optional))
-    '("step_increment" (argname "step_incr") (optional))
-    '("page_increment" (argname "page_incr") (optional))
+;HN;    '("step_increment" (argname "step_incr") (optional))
+;HN;    '("page_increment" (argname "page_incr") (optional))
+    '("step_increment" (optional))
+    '("page_increment" (optional))
     '("page_size" (optional))
   )
 )
@@ -8943,7 +8945,8 @@
   (return-type "GtkListStore*")
   (parameters
     '("gint" "n_columns")
-    '("GType*" "value")
+;HN;    '("GType*" "value")
+    '("GType*" "types")
   )
 )
 
@@ -20900,3 +20903,5 @@
     '("guint" "xid")
   )
 )
+
+(include "gtk-signals.defs")
