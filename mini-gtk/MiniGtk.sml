@@ -108,14 +108,18 @@ struct
 	val callbackTable : (int, callback) Polyhash.hash_table
                           = Polyhash.mkPolyTable(401, Domain)
                       
-	val add  = Polyhash.insert callbackTable
-	val peek = Polyhash.peek callbackTable
+	val add     = Polyhash.insert callbackTable
+	val peek    = Polyhash.peek callbackTable
+        val destroy = Polyhash.remove callbackTable
 
 	local
 	    val intern = ref 0;
 	in
 	    val localId = fn f => f (!intern before intern := !intern + 1)
 	end
+
+	open Dynlib
+	val symb = GB.symb
 
 	fun dispatch id data =
 	    case peek id of
@@ -124,13 +128,13 @@ struct
 	      | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
 				     Int.toString id^")")
 
-        fun destroy id = Polyhash.remove callbackTable id
-
 	val dummy = ( Callback.register "mgtk_callback_dispatch" dispatch
                     ; Callback.register "mgtk_callback_destroy" destroy
 		    )
-        open Dynlib
-        val symb = GB.symb
+
+	fun register f = localId(fn id => (add (id, f); id))
+	val signal_connect : GB.cptr -> string -> int -> bool -> int
+	                   = app4(symb"mgtk_signal_connect")
 
         (* UNSAFE: no error checking in the set and get functions! *)
         type 'a setter = GValue -> 'a -> unit
@@ -141,13 +145,11 @@ struct
         type 'a getter = GValues -> int -> 'a
         val getBool   : bool getter   = app2(symb "mgtk_get_pos_bool")
         val getInt    : int getter    = app2(symb "mgtk_get_pos_int")
-(*        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
+(*
+        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
         val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
         val getString : string getter = app2(symb "mgtk_get_pos_string")
 *)
-	fun register f = localId(fn id => (add (id, f); id))
-	val signal_connect : GB.cptr -> string -> int -> bool -> int
-	                   = app4(symb"mgtk_signal_connect")
     in
     datatype state = S of GValue * GValues * int * int
     type ('a, 'b) trans   = 'a * state -> 'b * state
@@ -163,8 +165,7 @@ struct
         if next < max  (* FIXME: it should be < but that gives problems with
                                   return_unit.  Currently unsafe! *)
         then (f (get arg next), S(ret, arg, max, next+1))
-        else (app print ["next = ", Int.toString next," max = ",Int.toString max, "\n"]; raise Subscript)
-
+        else raise Subscript
 
     fun drop (f, S(ret, arg, max, next)) = 
         if next < max then (f, S(ret, arg, max, next+1))
@@ -172,10 +173,7 @@ struct
 
     fun setter set (x, dummy as S(ret, arg, max, next)) =
         if next = max then (set ret x; ((),dummy))
-        else (app print ["next = ", 
-                         Int.toString next,
-                         " max = ",
-                         Int.toString max, "\n"]; raise Subscript)
+        else raise Subscript
 
     fun int x        = getter getInt x
     fun return_int x = setter setInt x
@@ -206,13 +204,6 @@ struct
         in  signal_connect (GB.repr wid) sign id after
         end
 
-    (* connect a callback with type unit -> unit *)
-    fun unit_connect wid sign cb =
-        ignore(connect wid (signal sign false (void --> return_void) cb))
-
-    (* connect a callback with type unit -> bool *)
-    fun bool_connect wid sign cb =
-        ignore(connect wid (signal sign true (unit --> return_bool) cb))
     end	
 end
 
@@ -243,18 +234,12 @@ struct
     type 'a t = 'a widget_t GtkBasis.Object
 
     open Dynlib
-    local 
-	val path = case Process.getEnv "MGTKHOME" of
-	               SOME p => Path.concat (p, "mgtk.so")
-		     | NONE   => "./mgtk.so"
-	val hdl  = dlopen {lib = path, flag = RTLD_LAZY, global = false}
-    in
-    val symb = dlsym hdl
-    end
     type cptr = GtkBasis.cptr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
 
     fun inherit w con = GtkBasis.inherit () con
-    fun toWidget obj = GtkBasis.inherit () (fn () => GtkBasis.repr obj)
+    fun toWidget obj = GtkBasis.inherit () (fn () => repr obj)
 
     val destroy_: cptr -> unit
         = app1(symb"mgtk_gtk_widget_destroy")
@@ -298,9 +283,9 @@ struct
     type 'a t = 'a container_t Widget.t
 
     open Dynlib
-    val symb = GtkBasis.symb
     type cptr = GtkBasis.cptr
-    val repr = GtkBasis.repr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
 
     fun inherit w con = Widget.inherit () con
 
@@ -342,9 +327,9 @@ struct
     type base = unit
 
     open Dynlib
-    val symb = GtkBasis.symb
     type cptr = GtkBasis.cptr
-    val repr = GtkBasis.repr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
 
     fun inherit w con = Container.inherit () con
     fun makeBut ptr = Container.inherit () (fn() => ptr)
@@ -384,9 +369,9 @@ struct
     type base = unit
 
     open Dynlib
-    val symb = GtkBasis.symb
     type cptr = GtkBasis.cptr
-    val repr = GtkBasis.repr
+    val symb  = GtkBasis.symb
+    val repr  = GtkBasis.repr
 
     fun inherit w con = Container.inherit () con
     fun makeWin ptr = Container.inherit () (fn() => ptr)

@@ -22,6 +22,12 @@
 /* TODO: 
 
    . Don't use void* so extensively.  Use the cast functions provided by gtk.
+     For instance, use #define GtkObj_val(x) ((G_OBJECT(FIELD(x,1))))
+     instead of the definition below. We might even want to declare widget
+     specific _val macros a la: 
+     #define GtkContainer_val(x) ((GTK_CONTAINER(Field(x,1))))
+
+   . Perhaps rename Val_GtkObj to make_GtkObj or something similar.
 
 */
 
@@ -33,7 +39,7 @@ static void ml_finalize_gtkobject (value val) {
   gtk_object_unref (GtkObj_val(val)); 
 }
 
-value Val_GtkObj (void* obj) { 
+static inline value Val_GtkObj (void* obj) { 
   value res; 
   gtk_object_ref(obj); 
   res = alloc_final (2, ml_finalize_gtkobject, 0, 1);
@@ -54,8 +60,9 @@ EXTERNML value mgtk_init(value args) { /* ML */
   argc = Wosize_val(args);
   argv = (char**) stat_alloc(sizeof(char*) * argc);
 
-  /* Assumes that gtk_init don't changes the strings; if it does we should use
-     toCstring instead of String_val */
+  /* Assumes that gtk_init doesn't change the strings; if it does we should use
+     copy_sml_string (Mosml C Integration tutorial, Sec 4.2) instead of
+     String_val. */
   for (i=0; i<argc; i++) {
     argv[i] = String_val(Field(args, i)); 
   }
@@ -117,7 +124,7 @@ EXTERNML value name (value gvalue, value mlvalue) {  /* ML */   \
 EXTERNML value name (value vargs, value pos) { /* ML */ \
   long p = Long_val(pos);                               \
   GValue* args = (GValue*) GValue_val(vargs);           \
-  return convml(gval_getter(&args[p]));                    \
+  return convml(gval_getter(&args[p]));                 \
 }
 
 
@@ -201,7 +208,7 @@ static inline GClosure* mgtk_closure_new(gpointer callback_id) {
 }
 
 
-/* ML type: gtkobj -> string -> clb -> bool -> int */
+/* ML type: cptr -> string -> clb -> bool -> int */
 EXTERNML value mgtk_signal_connect (value object, value name, value clb, value after){  /* ML */
   int res;
   GClosure *closure;
@@ -216,26 +223,27 @@ EXTERNML value mgtk_signal_connect (value object, value name, value clb, value a
                                   closure,
                                   Bool_val(after));
 
-  //  g_closure_unref(closure);
+  /*  g_closure_unref(closure);
+   */
   return Val_long(res);
 }
 
 /* *** Widget stuff *** */
 
-/* ML type: gtkobj -> unit */
+/* ML type: cptr -> unit */
 EXTERNML value mgtk_gtk_widget_destroy(value widget) { /* ML */
   gtk_widget_destroy(GtkObj_val(widget));
   return Val_unit;
 }
 
-/* ML type: gtkobj -> unit */
+/* ML type: cptr -> unit */
 EXTERNML value mgtk_gtk_widget_show(value widget) { /* ML */
   gtk_widget_show(GtkObj_val(widget));
   return Val_unit;
 }
 
 
-/* ML type: gtkobj -> unit */
+/* ML type: cptr -> unit */
 EXTERNML value mgtk_gtk_widget_show_all(value widget) { /* ML */
   gtk_widget_show_all(GtkObj_val(widget));
   return Val_unit;
@@ -244,19 +252,19 @@ EXTERNML value mgtk_gtk_widget_show_all(value widget) { /* ML */
 
 /* *** Container stuff *** */
 
-/* ML type: gtkobj -> int -> unit */
+/* ML type: cptr -> int -> unit */
 EXTERNML value mgtk_gtk_container_set_border_width(value container, value border_width) { /* ML */
   gtk_container_set_border_width(GtkObj_val(container), Int_val(border_width));
   return Val_unit;
 }
 
-/* ML type: gtkobj -> gtkobj -> unit */
+/* ML type: cptr -> cptr -> unit */
 EXTERNML value mgtk_gtk_container_add(value container, value widget) { /* ML */
   gtk_container_add(GtkObj_val(container), GtkObj_val(widget));
   return Val_unit;
 }
 
-/* ML type: gtkobj -> gtkobj -> unit */
+/* ML type: cptr -> cptr -> unit */
 EXTERNML value mgtk_gtk_container_remove(value container, value widget) { /* ML */
   gtk_container_remove(GtkObj_val(container), GtkObj_val(widget));
   return Val_unit;
@@ -265,19 +273,19 @@ EXTERNML value mgtk_gtk_container_remove(value container, value widget) { /* ML 
 
 /* *** Button stuff *** */
 
-/* ML type: unit -> gtkobj */
+/* ML type: unit -> cptr */
 EXTERNML value mgtk_gtk_button_new(value dummy) { /* ML */
   return Val_GtkObj(gtk_button_new());
 }
 
-/* ML type: string -> gtkobj */
+/* ML type: string -> cptr */
 EXTERNML value mgtk_gtk_button_new_with_label(value label) { /* ML */
   return Val_GtkObj(gtk_button_new_with_label(String_val(label)));
 }
 
 /* *** Window stuff *** */
 
-/* ML type: int -> gtkobj */
+/* ML type: int -> cptr */
 EXTERNML value mgtk_gtk_window_new(value typ) { /* ML */
   return Val_GtkObj(gtk_window_new(Int_val(typ)));
 }

@@ -1,8 +1,12 @@
-#MOSMLRUNTIME=/home/kfl/utils/mosml2.0/include
-MOSMLHOME=/home/kfl/programming/ml/mosml
-MOSMLRUNTIME=$(MOSMLHOME)/include
-MOSMLBIN=$(MOSMLHOME)/bin
+# Ken's setup
+#MOSMLHOME=/home/kfl/programming/ml/mosml
+#MOSMLRUNTIME=$(MOSMLHOME)/include
+#MOSMLBIN=$(MOSMLHOME)/bin
 
+# Debian setup (mosml packages for Debian by JP Secher)
+MOSMLHOME=/usr/lib/mosml
+MOSMLRUNTIME=$(MOSMLHOME)/include
+MOSMLBIN=/usr/bin
 
 all: helloworld-new helloworld-flat mgtk.so
 
