@@ -13,9 +13,10 @@ Copyright (C) 2000, 2001 by Ken Friis Larsen and Henning Niss.
 CURRENT VERSION
 ---------------
 The current version is 
-    red-hens (or mgtk-beta-0.02)
+    pink-chickens (or mgtk-beta-0.03)
 
 Previous versions include
+    red-hens (or mgtk-beta-0.02)
     green-horses-and-blue-ducks (or mgtk-alpha-0.01)
 
 
@@ -31,6 +32,10 @@ in Gtk+.  Therefore, mGTK can only be used with Moscow ML (version
 1.44 or newer).  However, we are very interested if somebody wants to
 port mGTK to other SML systems and are willing to provide information
 and help.
+
+To subscribe to the mgtk-announce mailing list go to:
+        http://lists.sourceforge.net/lists/listinfo/mgtk-announce
+
 
 
 REQUIREMENTS
@@ -49,7 +54,7 @@ please send us an email with a description of the machine.
 
 The following versions of Moscow ML and Gtk+ are required:
 
-Moscow ML: Version 1.44 (or newer) compiled with dynlib support.  
+Moscow ML: Version 2.00 (or newer) compiled with dynlib support.  
        Moscow ML is available from:
 	      http://www.dina.kvl.dk/~sestoft/mosml.html
 

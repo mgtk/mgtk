@@ -1,7 +1,31 @@
 ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT
 
-This is the announcement of the second publicly available version of
-mGTK.  This version is called red-hens (or mgtk-beta-0.02).
+This is the announcement of the third publicly available version of
+mGTK.  This version is called pink-chickens (or mgtk-beta-0.03).  It
+is only a minor update of the previous version.
+
+
+News in the pink-chickens release
+---------------------------------
+Since the last release, red-hens, there are only minor changes (refer
+to the Changes file for details).  The reason for the change is that
+the red-hens release do not work well with Moscow ML 2.00 on Windows.
+Also, there is now rudimentary support for working with the CList
+widget.  Finally, mGTK is now on Sourceforge.
+
+
+Download
+--------
+mGTK can be obtained from the mGTK homepage at 
+
+     http://mgtk.sourceforge.net
+
+mGTK is distributed in source form, and is known to compile on Linux
+and Windows. In principle, mGTK should run on all platforms supported
+by Moscow ML and GTK+.
+
+We provide binaries for Windows to eliminate the need for a C
+compiler.
 
 
 What is mGTK? 
@@ -11,29 +35,6 @@ thereby providing a convenient interface for SML programmers to
 develop applications with a graphical user interface.
 
 For the moment only the Moscow ML compiler is supported. 
-
-
-Download
---------
-mGTK can be obtained from the mGTK homepage at 
-
-     http://www.it.edu/people/kfl/mgtk
-
-mGTK is distributed in source form, and is known to compile on Linux
-and Windows. In principle, mGTK should run on all platforms supported
-by Moscow ML and GTK+.
-
-We provide binaries for Windows in order to eliminate the need for a C
-compiler.
-
-
-News in the red-hens release
-----------------------------
-Since the last release, green-horses-and-blue-ducks (mgtk-alpha-0.01),
-a number of bugs have been fixed (refer to the Changes file for
-details), and more widgets and functions have been added.  Most
-importantly, however, a Windows port now exists! Thanks to Mike Thomas
-for providing this.
 
 
 Current Release
@@ -58,36 +59,21 @@ information about gtk+ refer to the gtk+ homepage at
 http://www.gtk.org
 
 
-What does mGTK provide?
------------------------
-Almost all of the mGTK library is machine generated, thus it supports
-nearly the whole of GTK+.  Last time we made statistics the count was:
-
-* 88 widgets
-* 768 functions
-* 156 signals
-
-(an earlier count mentioned more widgets and functions --- the numbers
-were inaccurate as they included some commented-out parts of mGTK.)
-
-Unfortunately, no real documentation describing mGTK exists at the
-moment.
-
-
 Contact information
 -------------------
 If you have comments, bug reports, feature request, or just wants to
 say that that you think that mGTK is cool, then please send an email
 to: mgtk@it.edu
 
-We do not have any mailing lists yet but if you want be sure to be
-informed when the next release of mGTK is ready, then send a mail to
-mgtk@it.edu with subject: mgtk-announce subscribe
+We have a low trafic moderated mailing list for announcements of new
+releases of mGTK.  To subscribe to the mgtk-announce mailing list go
+to:
+        http://lists.sourceforge.net/lists/listinfo/mgtk-announce
 
 
 Helping out
 -----------
-When you have played a bit with this release we would be must grateful
+When you have played a bit with this release we would be most grateful
 if you would help us answer the following questions (this is your
 change to have some influence):
 
@@ -126,12 +112,12 @@ mGTK was developed by
 * Ken Friis Larsen (http://www.it.edu/people/kfl)
 * Henning Niss (http://www.diku.dk/users/hniss)
 
-in our free time.
+in our spare time.
 
 
 Contributors
 ------------
-* Mike Thomas provided the Win32 port.
+* Mike Thomas helped with the Win32 port.
 
 
 

@@ -16,9 +16,14 @@ Huskeseddel til release red-hens
     DTU:
        hans, mrh
     Brugere:
+       admin/mgtk-announce
        miketh@ptmnet.com (Mike Thomas) 
        niklas@canit.se (Niklas Höglund)
 
 * Remember to tag the cvs repository
+
+* Put release on Sourceforge
+
+* Make a news-item on Sourceforge
 
 -*- indented-text -*-

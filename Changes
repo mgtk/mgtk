@@ -4,6 +4,16 @@ Changes since mgtk-beta-0.02
 * Added the game of NIM (examples/nim.sml) contributed by Hans Rischel.
 
 ----------------------------------------------------------------------
+Changes since mgtk-beta-0.02
+
+* New binary distribution (for Windows) that works with Moscow ML 2.00 
+
+* The binary distribution for Windows includes a newer version of gtk+
+  (version 26/12-2000)
+
+* Support for working with the CList widget (including a small example).
+
+----------------------------------------------------------------------
 Changes since mgtk-alpha-0.01
 
 * Added a Win32 port (thanks to Mike Thomas!).
