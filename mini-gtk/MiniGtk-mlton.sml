@@ -20,17 +20,13 @@ struct
     type t = MLton.pointer
     val sub = _ffi "mgtk_stringsub" : t * int -> char;
 
+    fun toVector t =
+        let fun size i = if sub(t, i) = #"\000" then i
+                         else size(i+1)
+        in  CharVector.tabulate(size 0, fn i => sub(t, i))
+        end
 
-    fun toList t =
-        let fun loop i = 
-                let val c = sub(t, i) 
-                in  if c = #"\000" then []
-                    else c :: loop(i+1)
-                end
-        in  loop 0
-        end 
-
-    fun toString t = String.implode(toList t)
+    val toString = toVector
 
     val free = _ffi "free" : t -> unit;
 end
