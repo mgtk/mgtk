@@ -1,20 +1,20 @@
 -*- indented-text -*-
 
-Milestone 1 (red-hens alpha 0.02):
+Milestone 1 (red-hens beta 0.02):
 ----------------------------------
 v gtk_init fix (Ken) [May 1, 2000]
   + Make a better gtk_init fix (Ken)
-* Signals
+v Signals
   v What to do about duplicate signals (especially "activate" on menu
     items is missing). [Fixed (Henning, May 31, 2000). Such signals,
     that previously clashed, have their widget name as part of the
     SML connection function name.]
-* Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
-* Constructed data types in .defs file (GList's, arrays, etc.)
 * More functions from Sugar: latest comparison:
   + bitmaps / drawables
   + cursors
 v Incoporate Mike's Win32 port [Fixed: Henning, June 5, 2000]
+* Fix  mgtk_callback_destroy
+* Fix GC bugs.  I think there is one in mgtk_callback_dispatch
 
 Milestone 2 (release version 1.0):
 ----------------------------------
@@ -27,16 +27,20 @@ Milestone 2 (release version 1.0):
   + Type hacks
 * More functions from Sugar:
   + AccelGroups
+* Include mgtkgen
+* Split Gtk.s{ig,ml} into many files
+* Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
+* Constructed data types in .defs file (GList's, arrays, etc.)
+* ItemFactories
+* Robustify the GtkArg stuff
 
 
 Postpone for after version 1.0:
 -------------------------------
-* Split Gtk.s{ig,ml} into many files
 * Start to look at Gnome stuff
 * More functions from Sugar:
   + Drag'n'Drop
-  + ItemFactories
-
+* Review signal architecture
 
 
 Milestone in some distant future:
