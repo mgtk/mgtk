@@ -1,0 +1,183 @@
+structure Gtk :> Gtk = struct
+
+    signature Object = sig
+
+        type base
+        type 'a object_t
+        type 'a t = 'a object_t GObject.t
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+    end
+    structure Object :> Object = struct
+
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+        type base = unit
+        type 'a object_t = unit
+        type 'a t = 'a object_t GObject.t
+
+        fun inherit w con = GObject.inherit () con
+        fun makeObject ptr = GObject.inherit () (fn () => repr ptr)
+    end
+    signature Widget = sig
+
+        type base
+        type 'a widget_t
+        type 'a t = 'a widget_t Object.t
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+        val destroy : 'a Widget.t -> unit
+        val show : 'a Widget.t -> unit
+        val show_now : 'a Widget.t -> unit
+        val hide : 'a Widget.t -> unit
+        val show_all : 'a Widget.t -> unit
+        val hide_all : 'a Widget.t -> unit
+    end
+    structure Widget :> Widget = struct
+
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+        type base = unit
+        type 'a widget_t = unit
+        type 'a t = 'a widget_t Object.t
+
+        fun inherit w con = Object.inherit () con
+        fun makeWidget ptr = Object.inherit () (fn () => repr ptr)
+        val destroy_ : cptr -> unit
+            = app1 (symb"mgtk_widget_destroy")
+        val destroy : 'a Widget.t -> unit
+            = fn self => destroy_ (repr self)
+        val show_ : cptr -> unit
+            = app1 (symb"mgtk_widget_show")
+        val show : 'a Widget.t -> unit
+            = fn self => show_ (repr self)
+        val show_now_ : cptr -> unit
+            = app1 (symb"mgtk_widget_show_now")
+        val show_now : 'a Widget.t -> unit
+            = fn self => show_now_ (repr self)
+        val hide_ : cptr -> unit
+            = app1 (symb"mgtk_widget_hide")
+        val hide : 'a Widget.t -> unit
+            = fn self => hide_ (repr self)
+        val show_all_ : cptr -> unit
+            = app1 (symb"mgtk_widget_show_all")
+        val show_all : 'a Widget.t -> unit
+            = fn self => show_all_ (repr self)
+        val hide_all_ : cptr -> unit
+            = app1 (symb"mgtk_widget_hide_all")
+        val hide_all : 'a Widget.t -> unit
+            = fn self => hide_all_ (repr self)
+    end
+    signature Container = sig
+
+        type base
+        type 'a container_t
+        type 'a t = 'a container_t Widget.t
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+        val set_border_width : 'a Container.t -> int -> unit
+        val get_border_width : 'a Container.t -> int
+        val add : 'a Container.t -> 'b Widget.t -> unit
+        val remove : 'a Container.t -> 'b Widget.t -> unit
+    end
+    structure Container :> Container = struct
+
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+        type base = unit
+        type 'a container_t = unit
+        type 'a t = 'a container_t Widget.t
+
+        fun inherit w con = Widget.inherit () con
+        fun makeContainer ptr = Widget.inherit () (fn () => repr ptr)
+        val set_border_width_ : cptr -> int -> unit
+            = app2 (symb"mgtk_container_set_border_width")
+        val set_border_width : 'a Container.t -> int -> unit
+            = fn self => fn border_width => set_border_width_ (repr self) border_width
+        val get_border_width_ : cptr -> int
+            = app1 (symb"mgtk_container_get_border_width")
+        val get_border_width : 'a Container.t -> int
+            = fn self => get_border_width_ (repr self)
+        val add_ : cptr -> cptr -> unit
+            = app2 (symb"mgtk_container_add")
+        val add : 'a Container.t -> 'b Widget.t -> unit
+            = fn self => fn widget => add_ (repr self) widget
+        val remove_ : cptr -> cptr -> unit
+            = app2 (symb"mgtk_container_remove")
+        val remove : 'a Container.t -> 'b Widget.t -> unit
+            = fn self => fn widget => remove_ (repr self) widget
+    end
+    signature Bin = sig
+
+        type base
+        type 'a bin_t
+        type 'a t = 'a bin_t Container.t
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+    end
+    structure Bin :> Bin = struct
+
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+        type base = unit
+        type 'a bin_t = unit
+        type 'a t = 'a bin_t Container.t
+
+        fun inherit w con = Container.inherit () con
+        fun makeBin ptr = Container.inherit () (fn () => repr ptr)
+    end
+    signature Button = sig
+
+        type base
+        type 'a button_t
+        type 'a t = 'a button_t Bin.t
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+        val get_type : unit -> 'a GType.t
+        val new : unit -> 'a Widget.t
+        val new_with_label : string -> 'a Widget.t
+        val set_label : 'a Button.t -> string -> unit
+        val get_label : 'a Button.t -> string
+    end
+    structure Button :> Button = struct
+
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+        type base = unit
+        type 'a button_t = unit
+        type 'a t = 'a button_t Bin.t
+
+        fun inherit w con = Bin.inherit () con
+        fun makeButton ptr = Bin.inherit () (fn () => repr ptr)
+        val get_type_ : unit -> cptr
+            = app1 (symb"mgtk_button_get_type")
+        val get_type : unit -> 'a GType.t
+            = fn dummy => get_type_ dummy
+        val new_ : unit -> cptr
+            = app1 (symb"mgtk_button_new")
+        val new : unit -> 'a Widget.t
+            = fn dummy => new_ dummy
+        val new_with_label_ : string -> cptr
+            = app1 (symb"mgtk_button_new_with_label")
+        val new_with_label : string -> 'a Widget.t
+            = fn label => new_with_label_ label
+        val set_label_ : cptr -> string -> unit
+            = app2 (symb"mgtk_button_set_label")
+        val set_label : 'a Button.t -> string -> unit
+            = fn self => fn label => set_label_ (repr self) label
+        val get_label_ : cptr -> string
+            = app1 (symb"mgtk_button_get_label")
+        val get_label : 'a Button.t -> string
+            = fn self => get_label_ (repr self)
+    end
+end

@@ -1,9 +1,16 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
 
-structure DefsParse = struct
+structure DefsParse :>
+    sig
+	val addPath : string -> unit (* add a path to the list of directories
+                                        searched when expanding includes *)
+	val parseFile : string -> Defs.definition list
+    end = 
+struct
 
     val pathList = ref []
+    fun addPath p = pathList := p :: !(pathList)
 
     open Parsercomb Defs
     infix 7 |>
@@ -16,26 +23,41 @@ structure DefsParse = struct
     fun id x = x
     fun tagFn tag (name,attribs) = (name, tag, attribs)
 
+
+    local structure IO = FileUtils(type instream = TextIO.instream
+                                   val openIn = TextIO.openIn)
+    in
     fun toStream file =
-	let open TextIO
-	    val _ = print("Reading " ^ file ^ "...")
-	    val inp = FileUtils.openIn (!pathList) file
-	    val sub = Substring.all(inputAll inp) before closeIn inp
+	let val _ = MsgUtil.print("Reading " ^ file ^ "...")
+	    val inp = IO.openIn (!pathList) file
+	    val sub = Substring.all(TextIO.inputAll inp) 
+		      before TextIO.closeIn inp
 	    val par = stream Substring.getc sub
-	    val _ = print " done!\n"
+	    val _ = MsgUtil.close " done!\n"
 	in  par
 	end
+    end
 
+    val toStream = Util.memoize String.compare toStream
+
+    val mkString = Substring.all o String.implode o rev
+    fun empty () = stream (fn _ => NONE) ()
     fun getLine strm0 =
 	let fun loop strm acc =
 		case getItem strm of
-		    SOME(c, rest) => if c = #"\n" 
-				     then let val l = String.implode (rev (#"\n"::acc))
-					  in  SOME(Substring.all l, rest)
-					  end
-				     else loop rest (c::acc)
-		  | NONE => NONE
+		    SOME(c, rest) => 
+		        if c = #"\n" then SOME(mkString (#"\n"::acc), rest)
+			else loop rest (c::acc)
+		  | NONE => if null acc then NONE else SOME(mkString acc,empty())
 	in  loop strm0 []
+	end
+    fun getBuf size strm0 =
+	let fun loop 0 strm acc = SOME(mkString acc,strm)
+	      | loop n strm acc =
+		case getItem strm of
+		    SOME(c, rest) => loop (n-1) rest (c::acc)
+		  | NONE => if null acc then NONE else SOME(mkString acc,empty())
+	in  loop size strm0 []
 	end
 
     (* BASIC THINGS *)
@@ -47,18 +69,12 @@ structure DefsParse = struct
       | wc c = not(Char.isSpace c)
     fun qc #"\"" = true
       | qc _ = false
-    val word       = getChars1 wc
+    val pureWord   = getChars1 wc
     val quotedWord = "\"" $-- getChars1 (not o qc) --$ "\""
+    val word       = pureWord || quotedWord
 
     (* PRE-LEXING *)
 
-(*  pyGtk
-    val incl = 
-	("(" $-- skipWS ("include" $-- skipWS (string --# skipWS ($")"))))
-*)
-
-(*  GtkMM
-*)
     val incl = 
 	("(" $-- skipWS ("include" $-- skipWS (word --# skipWS ($")"))))
     
@@ -79,6 +95,19 @@ structure DefsParse = struct
 	in  stream get ([], orig_src, NONE)
 	end
 
+    fun buffer size (src: char stream) : char stream =
+	let fun get (NONE, src) = (case getBuf size src of
+				       SOME (b,rest) => get (SOME b, rest)
+				     | NONE => NONE
+                                  )
+	      | get (SOME buf, src) = (case Substring.getc buf of
+					   SOME(c,b) => SOME(c,(SOME b,src))
+					 | NONE => get (NONE, src)
+                                      )
+	in  stream get (NONE, src)
+	end
+    val includer = buffer 4096 o includer
+
     fun show p src =
 	let val i = getItem src
 	in  Option.app (p o #1) i
@@ -98,7 +127,6 @@ structure DefsParse = struct
         (   $"("        |> LPAR_T
         ||  $")"        |> RPAR_T
 	||  word        >> WORD_T
-	||  quotedWord  >> WORD_T
         ||  $"'("       |> LPAR_T (* FIXME: Is this what we want? *)
         ||  white #-- token
         ||  comment
@@ -122,7 +150,10 @@ structure DefsParse = struct
 
     fun parens pf = LPAR_T %-- pf --% RPAR_T
     val word = getElem isWord >> wordOf
+(*
     val defWord = word >> (fn n => (TextIO.print(n^"\n"); n))
+*)
+    val defWord = word
 
     (* Type expressions and lists of types and names *)
     val typeID = word
@@ -211,11 +242,13 @@ structure DefsParse = struct
                           --% EOF_T
                       >> (List.mapPartial id o (op::))
 
-    fun parse file =
+    fun parseFile file =
 	let val stream = toStream file
 	    val included = includer stream
 	    val lexed = lexer included
-	in  #1 (Option.valOf(definitions lexed))
+	in  case definitions lexed of
+		SOME(res, _) => res
+	      | NONE => raise Fail("parsing failed")
 	end
 
 end (* structure DefsParse *)

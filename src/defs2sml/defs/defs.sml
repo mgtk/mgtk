@@ -28,6 +28,14 @@ structure Defs = struct
       | CallerOwnsReturn of bool
       | When of when
 
+    exception AttribNotFound of string
+
+    fun lookup attrib p =
+	let fun loop [] = raise AttribNotFound attrib
+	      | loop (a::ats) = case p a of SOME v => v | NONE => loop ats
+	in  loop
+	end
+
     datatype def_tag =
 	Object
       | Boxed
@@ -37,5 +45,47 @@ structure Defs = struct
       | Signal
 
     type definition = string * def_tag * attrib list
+
+    fun getTag (def: definition) = #2 def
+
+    fun getName (def: definition) = 
+	let val atts = #3 def
+	in  lookup "c-name" (fn (CName n) => SOME n | _ => NONE) atts
+	end
+    fun getModule (def: definition) =
+	let val atts = #3 def
+	in  lookup "in-module" (fn (Module n) => SOME n | _ => NONE) atts
+	end
+    fun getObject (def: definition) =
+	let val atts = #3 def
+	in  lookup "of-object" (fn (OfObject n) => SOME n | _ => NONE) atts
+	end
+    fun getParent (def: definition) =
+	let val atts = #3 def
+	in  lookup "parent" (fn (Parent n) => SOME n | _ => NONE) atts
+	end
+
+    fun getConstructor (def: definition) = 
+	let val atts = #3 def
+	in  lookup "constructor-of" 
+		   (fn (Constructor n) => SOME n | _ => NONE) atts
+	end
+    fun getReturnType  (def: definition) = 
+	let val atts = #3 def
+	in  lookup "return-type" (fn (ReturnType n) => SOME n | _ => NONE) atts
+	end
+    fun getParameters  (def: definition) = 
+	let val atts = #3 def
+	in  lookup "params"
+		   (fn (Params ps) => SOME (List.map(fn(t,n,f)=>(n,t))ps)
+		     | _ => NONE) atts
+	end
+    fun getValues  (def: definition) = 
+	let val atts = #3 def
+	in  lookup "value"
+		   (fn (Values vs) => SOME (List.map(fn(a,v)=>v)vs)
+		     | _ => NONE) atts
+	end
+
 
 end (* structure Defs *)

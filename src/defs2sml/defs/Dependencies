@@ -2,4 +2,4 @@
 # (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       
 
 defs: 
-defsparse: defs /util/parsercomb /util/fileutils
+defsparse: defs /util/

@@ -15,4 +15,14 @@ struct
 	    start ^ (str p l sep false) ^ finish
     end (* local *)
 
+    fun memoize cmp f =
+        let open Splaymap
+	    val dict = ref (mkDict cmp)
+	in  fn k => case peek(!dict,k) of
+			SOME x => x
+		      | NONE => let val x = f k
+				    val _ = dict := insert(!dict,k,x)
+				in  x end
+	end
+
 end (* structure Util *)

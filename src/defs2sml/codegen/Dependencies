@@ -1,11 +1,5 @@
 # mgtk --- an SML binding for GTK.                                          
 # (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       
 
-argparse:
-parsercomb:
-fileutils:
-util:
-msgutil:
-dyn:
-config: + dyn util
-. = argparse parsercomb util fileutils msgutil
+smltype: /ast/type /util/util /ast/name
+smlgen: /ast/ast /ast/name /ast/type /util/ smltype

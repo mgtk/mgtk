@@ -1,3 +1,7 @@
+(* defs2sml --- generate wrapper code from .defs file.                      *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000.                        *)
+(* This code: (c) Peter Sestoft.                                            *)
+
 signature ArgParse = (* From the MosML compiler. *)
 sig
 
@@ -7,8 +11,7 @@ sig
       | Unit    of (unit -> unit)
       | Real    of (real -> unit)
 
-    val parse : string list option
-	      -> (string * spec) list -> (string -> unit) -> unit;
+    val parse : (string * spec) list -> (string -> unit) -> unit;
 
     exception Bad of string
 
@@ -48,17 +51,9 @@ end
    anonymous arguments.  The functions are called in the same order as
    they appear on the command line.  The strings in the [(string *
    spec) list] are keywords and must start with a [-], else they are
-   ignored. Functions in [speclist] or [anonfun] can raise [Bad
+   ignored.  For the user to be able to specify anonymous arguments
+   starting with a [-], include for example [("--", String anonfun)]
+   in [speclist]. Functions in [speclist] or [anonfun] can raise [Bad
    message] to reject invalid arguments.
-
-   For keywords that consists of [-] and a single letter, the behavior
-   of standard Unix getopt() is emulated to some degree (i.e. if the
-   argument takes an option the space before it is optional, and
-   otherwise the space+dash arfter it is optional if more arguments
-   follow.
-			 
-   If one of the command line arguments is "--" the rest of the
-   command line is treated as anonymous arguments even if they
-   start with [-].
 
 *)

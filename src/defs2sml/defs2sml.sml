@@ -3,17 +3,39 @@
 
 fun main () =
     let val file = ref NONE
-	fun addPath p = DefsParse.pathList := p :: !(DefsParse.pathList)
 	fun setFile f = file := SOME f
 	fun getFile () = case !file of NONE=>raise Fail "no file" | SOME f=>f
-	val args = [("-I", ArgParse.String addPath)]
-	val _ = ArgParse.parse NONE args setFile
-	val _ = addPath (#dir (Path.splitDirFile (getFile())))
+	val outFile = ref NONE
+	fun setOutFile f = outFile := SOME f
+	val outFileSetup =  fn () =>
+	    case !outFile of 
+		NONE => (fn () => TextIO.stdOut, fn () => ())
+	      | SOME f => let val os = TextIO.openOut f
+			  in (fn () => os, fn () => TextIO.closeOut os) end
+		
+	val args = [("-I", ArgParse.String DefsParse.addPath),
+		    ("-o", ArgParse.String setOutFile)
+                   ]
+	val _ = ArgParse.parse args setFile
+	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
+	val (getOutFile,closeOutFile) = outFileSetup()
 
-	val defs = (TextIO.print "Parsing (defs)\n"; 
-		    DefsParse.parse (getFile ()) )
-	val _ = List.app (fn (name,_,_) => TextIO.print(name^"\n")) defs
-    in  ()
+	val defs = (MsgUtil.print "Parsing (defs)..."; 
+		    DefsParse.parseFile (getFile ()) 
+		    before
+		    MsgUtil.close "done\n")
+	val _ = MsgUtil.print ("Defs file with " ^ Int.toString (List.length defs) ^ " definitions\n")
+
+	val api = (ResolveTypes.resolve o ResolveNames.resolve)
+		      (FromDefs.fromDefs "Gtk" defs)
+
+	val (modules,values) = AST.fold (fn (mn,(m,v)) => (m+1,v), fn (mn,(m,v)) => (m,v+1)) (0,0) api
+	val _ = MsgUtil.close ("  corresponding to " ^ Int.toString modules ^ "(sub)modules with " ^ Int.toString values ^ " values\n")
+
+	val api' = GenSML.generate api
+	val _ = GenSML.print (getOutFile()) api'
+
+    in  closeOutFile()
     end
 
 val _ = main ()

@@ -1,14 +1,15 @@
+(* defs2sml --- generate wrapper code from .defs file.                      *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000.                        *)
+(* This code: (c) Peter Sestoft.                                            *)
+
 (* COMMAND-LINE PARSING
  *
  * From the MosML compiler.
  *
- * Author and copyright: Peter Sestoft.
+ * Author: Peter Sestoft.
  *
  * Changed to rely on the Standard Basis instead of 
  * compiler internals. (Henning Niss)
- *
- * Changed to not require space between options and argument if the
- * option consists only of a dash and a non-dash character. (Henning Makholm)
  *)
 
 structure ArgParse :> ArgParse =
@@ -28,68 +29,65 @@ datatype error =
     Unknown of string
   | Wrong of string * string * string  (* option, actual, expected *)
   | Missing of string
+  | Message of string
 
 fun stop error =
   let val progname = CommandLine.name()
       val message =
         case error of
-            Unknown s => "unknown option: \"" ^ s ^ "\"."
-          | Missing s => "option \"" ^ s ^ "\" needs an argument."
+            Unknown s =>
+              progname ^ ": unknown option: \"" ^ s ^ "\"."
+          | Missing s
+              => progname ^ ": option \"" ^ s ^ "\" needs an argument."
           | Wrong (opt, arg, expected)
-              => "wrong argument \"" ^ arg ^ "\"; option \""
+              => progname ^ ": wrong argument \"" ^ arg ^ "\"; option \""
                    ^ opt ^ "\" expects " ^ expected ^ "."
+          | Message s
+              => progname ^ ": " ^ s
   in
      raise Bad (message)
   end;
 
-fun lookup k [] = NONE
+fun lookup k [] = raise Subscript
   | lookup k ((a, v) :: xs) =
-    if k = a then SOME v else lookup k xs
+    if k = a then v else lookup k xs
 
-fun parse cmdline speclist anonfun =
+fun parse speclist anonfun =
   let fun p [] = ()
         | p (s::t) =
-            if size s > 1 andalso CharVector.sub(s, 0) = #"-"
-            then do_key s NONE t
-            else (anonfun s; p t)
-      and do_key "--" NONE l = app anonfun l
-      	| do_key s optarg l =
-        let fun argapply f = case (optarg,l)
-			     of (SOME a,l) => (f a; p l)
-			      | (NONE,a::l) => (f a; p l)
-			      | (NONE,[]) => stop (Missing s)
-     	in
-          (case lookup s speclist
-	   of SOME(Unit f) => (f (); p (case optarg
-				  of SOME s => "-" ^ s :: l
-				   | NONE => l))
-            | SOME(String f) => argapply f
-            | SOME(Int f) => argapply
- 		       (fn arg => case Int.fromString arg
- 		       		  of SOME i => f i
-                       		   | NONE
- 				     => stop (Wrong (s, arg, "an integer")))
-            | SOME(Real f) => argapply
- 			(fn arg => case Real.fromString arg
- 				   of SOME r => f r
-                       		    | NONE
- 				      => stop (Wrong (s, arg, "a real")))
-	    | NONE => if optarg = NONE andalso
-			      	  String.size s > 2 andalso
-			      	  String.sub(s,1) <> #"-"
-		      then do_key
- 		       	   (String.substring(s,0,2))
-		       	   (SOME(String.extract(s,2,NONE)))
-			   l
-		      else stop (Unknown s)
-          )
-	end
+            if size s >= 1 andalso CharVector.sub(s, 0) = #"-"
+            then do_key s t
+            else ((anonfun s; p t)
+                   handle Bad m => stop (Message m))
+      and do_key s l =
+        let val action =
+              lookup s speclist
+                handle Subscript => stop (Unknown s)
+        in
+          (case (action, l) of
+               (Unit f, l) => (f (); p l)
+             | (String f, arg::t) => (f arg; p t)
+             | (Int f, arg::t) =>
+                 let val arg_i =
+                       case Int.fromString arg of
+			   SOME i => i
+                       |   NONE =>
+                             stop (Wrong (s, arg, "an integer"))
+                 in f arg_i; p t end
+             | (Real f, arg::t) =>
+                 let val arg_r =
+                       case Real.fromString arg of
+			   SOME r => r
+                       |   NONE =>
+                             stop (Wrong (s, arg, "a real"))
+                 in f arg_r; p t end
+             | (_, []) => stop (Missing s)
+          ) handle Bad m => stop (Message m)
+        end
   in
-    case (case cmdline of NONE => CommandLine.arguments()
-    			| SOME line => line) of
+    case CommandLine.arguments() of
         [] => ()
       | ls => p ls
-  end
-
+  end;
 
 end (* structure Arg *)
