@@ -48,10 +48,12 @@ mgtk-mlton.o: $(MGTKHOME)/mgtk-mlton.c
 # cleaning
 clean:
 	rm -f *.{o,so,uo,ui} *~
-	rm -f helloworld-new helloworld-mlton
+	rm -f helloworld helloworld-mlton
 	rm -f buttons-galore buttons-galore-mlton
 	rm -f signup signup-mlton
 	rm -f listview listview-mlton
 	rm -f treeview treeview-mlton
+	rm -f editor editor-mlton
+	rm -f menus
 
 realclean: clean
