@@ -47,6 +47,8 @@ struct
     val defSignal = $ "define-signal"
     val defOptions = $ "options"
     val listQual = $ "list"
+    val arrayQual = $ "array"
+    val arrayMQual = $ "array-"
 
     (* word actually allows slightly more than we want --- words
        should not begin with a digit, underscore, or hypen. *)
@@ -68,8 +70,12 @@ struct
       | toType ((x1,x2), NONE) = (x1, x2)
 
     (* various *)
+    fun mkarray texp = TE.ARRAY(texp, true)
+    fun mkmarray texp = TE.ARRAY(texp, false)
     val typeExp =  (word >> PU.mkTypeExp)
                 || (parens (word --# listQual) >> (TE.LIST o PU.mkTypeExp))
+		|| (parens (word --# arrayQual) >> (mkarray o PU.mkTypeExp))
+		|| (parens (word --# arrayMQual) >> (mkmarray o PU.mkTypeExp))
 
     (* parameters *)
     val default = parens (equals #-- string)

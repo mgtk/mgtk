@@ -164,7 +164,8 @@ struct
       | mkCType (TE.OUTPUT t) = mkCType t
       | mkCType (tExp as TE.WIDGET ((path, wid),_)) = 
 	mkcpath path && $"GtkObject"
-      | mkCType (tExp as TE.POINTER ((path, boxed),_)) = CBoxedName tExp
+      | mkCType (tExp as TE.POINTER ((["Gdk"], ["Color"]),_))= CBoxedName tExp
+      | mkCType (tExp as TE.POINTER ((path, boxed),_))= CBoxedName tExp && $"*"
       | mkCType (tExp as TE.FLAG ((path, fName),_)) = CFlagName tExp
       | mkCType _ = U.notImplemented "mkCTypeType: not a type name"
 
@@ -203,6 +204,8 @@ struct
           | mkType nest ML_PRIM_TYPE tArg (TE.WIDGET _) =
 	    (fn argTyp => $"gtkobj") (tArg ()) 
           | mkType nest toType tArg (TE.LIST t) = 
+	    (mkType nest toType tArg t) && $" list"
+          | mkType nest toType tArg (TE.ARRAY(t,b)) = 
 	    (mkType nest toType tArg t) && $" list"
           | mkType nest ML_TYPE tArg (tExp as TE.FLAG (_,false)) = 
 	    MLFlagName tExp && $" list"
@@ -288,6 +291,12 @@ old*)
 	if isString typExp 
 	then $"mgtk_smllist_to_glist_string(" && name && $")"
 	else U.notImplemented "toCValue: can only handle lists of widgets or strings"
+      | toCValue (TE.ARRAY(typExp,length),name) =
+	if isString typExp 
+	then $"mgtk_smllist_to_string_array(" && name && $")" &&
+             ( if length then $", " && $"mgtk_list_length(" && name && $")"
+	       else Empty )
+	else U.notImplemented "toCValue: can only handle arrays of strings"
       | toCValue (typExp, name) = 
 	U.notImplemented ("toCValue: not a type name: " ^ TE.toString typExp)
 (*old
@@ -307,9 +316,12 @@ old*)
 	   |   _ => U.shouldntHappen "fromCValue: unknown primitive type"
 	)
       | fromCValue (TE.OUTPUT (widType as (TE.WIDGET _)), name) =
-	fromCValue (widType, $"&" && name)
-      | fromCValue (TE.OUTPUT (ptrType as (TE.POINTER _)), name) =
+	fromCValue (widType, name)
+      | fromCValue (TE.OUTPUT (ptrType as 
+			       (TE.POINTER((["Gdk"],["Color"]),_))), name) =
 	fromCValue (ptrType, $"&" && name)
+      | fromCValue (TE.OUTPUT (ptrType as (TE.POINTER _)), name) =
+	fromCValue (ptrType, name)
       | fromCValue (TE.OUTPUT (flagType as (TE.FLAG _)), name) = 
 	fromCValue (flagType, name)
       | fromCValue (TE.OUTPUT (tName as (TE.PRIMTYPE _)), name) = 

@@ -38,13 +38,14 @@ struct
       | allocExpression (TE.OUTPUT tExp) = allocExpression tExp
       | allocExpression _ = U.shouldntHappen "allocExpression: not a type name"
 
-    fun allocTuple name values =
+    fun allocTuple name cexp values =
 	let val values' = ListPair.zip (List.tabulate(length values, fn n=>n), values)
 	    val allocates = List.exists (allocExpression o #1) values
 	    val tupleName = if allocates then "r[0]" else "res"
 	    fun prValue (n, (t,v)) =
 		$$["  Field(",tupleName,", ",Int.toString n,") = "] && TI.fromCValue (t,v) && $";"
 	in  (if allocates then $"  Push_roots(r, 1);" && Nl else Empty)
+         && $"  " && cexp && $";" && Nl
          && $$["  ", tupleName, " = alloc_tuple(", Int.toString (List.length values), ");"] && Nl
          && prsep Nl prValue values'
          && Nl
@@ -207,11 +208,11 @@ struct
 	  U.shouldntHappen("mkReturn: multiple output parameters and return type is a type name")
       | mkReturn cExp (retType as (TE.TUPLE (tOuts as (t::_)), outPars)) =
 	if List.length tOuts = List.length outPars (* original return type was none *)
-	then    $"  " && cExp && $";" && Nl
-	     && allocTuple "res" (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) outPars)
+	then    allocTuple "res" cExp (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) outPars)
              && $"  return res;" && Nl
-	else    $"  value rescall = " && cExp && $";" && Nl
-             && allocTuple "res" (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) ((t,"call")::outPars))
+	else    $"  " && TI.mkCType t && $" rescall;" && Nl
+             && allocTuple "res" ($"rescall = " && cExp) 
+	                   (map (fn (tOut,nOut) => (tOut, mkOutName nOut)) ((t,"call")::outPars))
              && $"  return res;" && Nl
       | mkReturn cExp (TE.TUPLE _, _) = 
 	  U.shouldntHappen("mkReturn: return tuple with only one output type")
@@ -264,6 +265,8 @@ struct
     fun unwrapArg (TE.OPTION (TE.WIDGET _), name) =
 	$$["(unwrapObjOpt ", name, ")"]
       | unwrapArg (TE.LIST (TE.WIDGET _), name) =
+	$$["(map unwrap ", name, ")"]
+      | unwrapArg (TE.ARRAY (TE.WIDGET _,_), name) =
 	$$["(map unwrap ", name, ")"]
       | unwrapArg (TE.FLAG (_,false), name) = 
 	$$["(setFlags ", name, ")"]

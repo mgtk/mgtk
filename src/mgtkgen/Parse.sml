@@ -20,8 +20,10 @@ struct
 	in  case pf stream of
 	        SOME(res, strm) => 
 		    (case Parsercomb.getItem strm of
-			SOME (c,strm) => (* stream is non empty *)
-			    (SOME "The whole file didn't parse", NONE)
+			SOME (c,strm') => (* stream is non empty *)
+			    (SOME ("The whole file didn't parse: "^
+				   "last declaration " ^ AST.nameOf(hd(rev res))),
+			     NONE)
                        | NONE => (NONE, SOME res)
 		    )
 	      | NONE => (SOME "Syntax error", NONE)

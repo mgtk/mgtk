@@ -4,13 +4,13 @@
 
 
 # Toplevel directory of unpacked distribution
-TOPDIR=$(HOME)/programming/ml/mgtk
+TOPDIR=$(HOME)/mgtk
 
 # Where to install stuff
 MGTKHOME=$(HOME)/mgtk
 
 # Where MosML resides
-MOSMLHOME=$(HOME)/utils/mosml2.0
+MOSMLHOME=/usr/local/lib/mosml
 
 # Where the source files for the MosML runtime reside
 MOSMLRUNTIMESRC=$(MOSMLHOME)/include

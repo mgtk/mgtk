@@ -819,8 +819,9 @@ EXTERNML value mgtk_gdk_color_change(value colormap, value color) { /* ML */
 EXTERNML value mgtk_gdk_color_parse(value spec) { /* ML */
   value res;
   GdkColor rescolor;
-  value rescall = gdk_color_parse(String_val(spec), &rescolor);
+  int rescall;
   Push_roots(r, 1);
+  rescall = gdk_color_parse(String_val(spec), &rescolor);
   r[0] = alloc_tuple(2);
   Field(r[0], 0) = Val_bool(rescall);
   Field(r[0], 1) = Val_gdk_color(&rescolor);
@@ -5171,8 +5172,9 @@ EXTERNML value mgtk_gtk_clist_set_text(value clist, value row, value column, val
 EXTERNML value mgtk_gtk_clist_get_text(value clist, value row, value column) { /* ML */
   value res;
   char* restext;
-  value rescall = gtk_clist_get_text(GtkObj_val(clist), Int_val(row), Int_val(column), &restext);
+  int rescall;
   Push_roots(r, 1);
+  rescall = gtk_clist_get_text(GtkObj_val(clist), Int_val(row), Int_val(column), &restext);
   r[0] = alloc_tuple(2);
   Field(r[0], 0) = Val_int(rescall);
   Field(r[0], 1) = copy_string(restext);
@@ -5299,7 +5301,8 @@ EXTERNML value mgtk_gtk_clist_get_selection_info(value clist, value x, value y) 
   value res;
   int resrow;
   int rescolumn;
-  value rescall = gtk_clist_get_selection_info(GtkObj_val(clist), Int_val(x), Int_val(y), &resrow, &rescolumn);
+  int rescall;
+  rescall = gtk_clist_get_selection_info(GtkObj_val(clist), Int_val(x), Int_val(y), &resrow, &rescolumn);
   res = alloc_tuple(3);
   Field(res, 0) = Val_int(rescall);
   Field(res, 1) = Val_int(resrow);

@@ -1,7 +1,13 @@
 ----------------------------------------------------------------------
-Changes since mgtk-beta-0.02
+Changes since mgtk-beta-0.03
 
 * Added the game of NIM (examples/nim.sml) contributed by Hans Rischel.
+* Improved pixmap support (masks are now returned from pixmap_create_*)
+* Improvements (defs2sml)
+  - better list and array support
+* Bug fixes (defs2sml)
+  - output parameters declared correctly (used to have a wrong type)
+    and defined after Push_roots
 
 ----------------------------------------------------------------------
 Changes since mgtk-beta-0.02

@@ -27,8 +27,8 @@ fun attach table (widget,no) =
 
 fun pixmap widget =
     let	val gdkwindow = Gtk.widget_get_window widget
-	val gc = Gtk.widget_get_style_fg_gc widget (Gtk.widget_get_state widget)
-	val pix = Gtk.gdk_pixmap_create_from_xpm' gdkwindow "wheel.xpm"
+	val gc = Gtk.widget_get_style_gc widget Gtk.GC_TYPE_FG (Gtk.widget_get_state widget)
+	val (pix,mask) = Gtk.gdk_pixmap_create_from_xpm' gdkwindow "wheel.xpm"
     in  
 
         Gtk.gdk_gc_set_foreground gc yellow

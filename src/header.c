@@ -1,4 +1,7 @@
+#include <stdlib.h>
+
 /* GTK stuff */
+#include <gtk/gtk.h>
 #include <gtk/gtk.h>
 
 /* Mosml stuff */
@@ -237,6 +240,29 @@ EXTERNML value mgtk_signal_connect (value object, value name, value clb, value a
    carr[MGTK_SMLARRAY_I] = conv(Field(sarr, MGTK_SMLARRAY_I));  \
 }
 
+int mgtk_list_length(value sls) {
+  int MGTK_SMLLIST_LEN = 0;
+  value MGTK_SMLLIST_TEMP = sls;
+  while (Mgtk_isCons(MGTK_SMLLIST_TEMP)) {
+    MGTK_SMLLIST_TEMP = Mgtk_tail(MGTK_SMLLIST_TEMP);
+    MGTK_SMLLIST_LEN++;
+  }
+  return MGTK_SMLLIST_LEN;
+}
+
+#define Mgtk_SMLLIST_TO_CARRAY(sls, carr, csize, conv)                  \
+{int MGTK_SMLLIST_I = 0,                                                \
+     MGTK_SMLLIST_SZ = mgtk_list_length(sls);                           \
+ value MGTK_SMLLIST_TEMP = sls;                                         \
+ carr = malloc(MGTK_SMLLIST_SZ*csize);                                  \
+ /* FIXME: check result from malloc */                          \
+ while (Mgtk_isCons(MGTK_SMLLIST_TEMP)){                                \
+   value MGTK_SMLLIST_ELEM__TEMP = Mgtk_head(MGTK_SMLLIST_TEMP);        \
+   carr[MGTK_SMLLIST_I++] = conv(MGTK_SMLLIST_ELEM__TEMP);              \
+   MGTK_SMLLIST_TEMP = Mgtk_tail(MGTK_SMLLIST_TEMP);                    \
+ }                                                                      \
+}
+
 
 /* *** Glib stuff *** */
 
@@ -265,6 +291,18 @@ GList* mgtk_smllist_to_glist_object(value smllist) {
   return glist;
 }
 
+char** mgtk_smllist_to_string_array(value smllist) {
+  char **strs;
+  Mgtk_SMLLIST_TO_CARRAY(smllist, strs, sizeof(char*), String_val);
+  return strs;
+}
+
+char** mgtk_smlarray_to_string_array(value smlarray) {
+  char **strings;
+  Mgtk_SMLARRAY_TO_CARRAY(smlarray, strings, sizeof(char*), String_val);
+  return strings;
+}
+
 /* *** Access functions to internal widget data *** */
 
 GdkWindow *gtk_widget_get_window (GtkWidget *widget) {
@@ -283,8 +321,52 @@ void gtk_widget_get_allocation (GtkWidget *widget, int *width, int *height,
   *y = widget->allocation.y;
 }
 
-GdkGC *gtk_widget_get_style_fg_gc (GtkWidget *widget, GtkStateType state) {
-  return widget->style->fg_gc[state];
+typedef enum {
+  GTK_GC_TYPE_FG,
+  GTK_GC_TYPE_BG,
+  GTK_GC_TYPE_LIGHT,
+  GTK_GC_TYPE_DARK,
+  GTK_GC_TYPE_MID,
+  GTK_GC_TYPE_TEXT,
+  GTK_GC_TYPE_BASE,
+} GtkGCType;
+
+GdkGC *gtk_widget_get_style_gc (GtkWidget *widget, GtkStateType state,
+				GtkGCType typ) {
+  GdkGC *rv = widget->style->fg_gc[state];
+  switch (typ) {
+  case GTK_GC_TYPE_FG: rv = widget->style->fg_gc[state]; break;
+  case GTK_GC_TYPE_BG: rv = widget->style->bg_gc[state]; break;
+  case GTK_GC_TYPE_LIGHT: rv = widget->style->light_gc[state]; break;
+  case GTK_GC_TYPE_DARK: rv = widget->style->dark_gc[state]; break;
+  case GTK_GC_TYPE_MID: rv = widget->style->mid_gc[state]; break;
+  case GTK_GC_TYPE_TEXT: rv = widget->style->text_gc[state]; break;
+  case GTK_GC_TYPE_BASE: rv = widget->style->base_gc[state]; break;
+  }
+  return rv;
 }
 
+typedef enum {
+  GTK_COLOR_TYPE_FG,
+  GTK_COLOR_TYPE_BG,
+  GTK_COLOR_TYPE_LIGHT,
+  GTK_COLOR_TYPE_DARK,
+  GTK_COLOR_TYPE_MID,
+  GTK_COLOR_TYPE_TEXT,
+  GTK_COLOR_TYPE_BASE,
+} GtkColorType;
 
+void gtk_widget_get_style_color (GtkWidget *widget, GtkStateType state,
+				 GtkColorType typ,
+				 GdkColor *color) {
+  *color = widget->style->fg[state];
+  switch (typ) {
+  case GTK_COLOR_TYPE_FG: *color = widget->style->fg[state]; break;
+  case GTK_COLOR_TYPE_BG: *color = widget->style->bg[state]; break;
+  case GTK_COLOR_TYPE_LIGHT: *color = widget->style->light[state]; break;
+  case GTK_COLOR_TYPE_DARK: *color = widget->style->dark[state]; break;
+  case GTK_COLOR_TYPE_MID: *color = widget->style->mid[state]; break;
+  case GTK_COLOR_TYPE_TEXT: *color = widget->style->text[state]; break;
+  case GTK_COLOR_TYPE_BASE: *color = widget->style->base[state]; break;
+  }
+}

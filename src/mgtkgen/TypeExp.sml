@@ -25,6 +25,7 @@ struct
       | WIDGET of tname * inherits (* parent type *)
       | POINTER of tname * inherits option (* parent type *)
       | LIST of texp
+      | ARRAY of texp * bool (* include length? *)
 
     fun typeKind (PRIMTYPE _) = "type name"
       | typeKind (TUPLE _) = "tuple"
@@ -35,6 +36,7 @@ struct
       | typeKind (POINTER _) = "pointer"
       | typeKind (WIDGET _) = "widget"
       | typeKind (LIST _) = "list"
+      | typeKind (ARRAY _) = "array"
 
     fun toString (PRIMTYPE s) = s
       | toString (TUPLE args) = 
@@ -48,6 +50,8 @@ struct
       | toString (POINTER (name,inherits)) = NU.combine "_" name ^ " boxed"
       | toString (WIDGET (name,parent)) = NU.combine "" name ^ " widget"
       | toString (LIST texp) = toString texp ^ " list"
+      | toString (ARRAY(texp,b)) = toString texp ^ " array" ^
+				   (if b then "" else "-")
 
     fun equal_list eq ([], []) = true
       | equal_list eq (x::xs, y::ys) = 
@@ -79,6 +83,8 @@ struct
       | equal_texp (POINTER (name1,inh1), POINTER (name2,inh2)) =
 	equal_tname (name1, name2) andalso equal_opt equal_inherits (inh1,inh2)
       | equal_texp (LIST texp1, LIST texp2) = equal_texp (texp1,texp2)
+      | equal_texp (ARRAY(texp1,b1),ARRAY(texp2,b2)) = 
+	equal_texp (texp1,texp2) andalso b1 = b2
       | equal_texp _ = false
     and equal_par ((texp1, name1), (texp2,name2)) =
 	equal_texp (texp1, texp2) andalso name1=name2

@@ -34,8 +34,9 @@ value Val_gdk_color (void* obj) {
 EXTERNML value mgtk_gdk_color_parse(value name) { /* ML */
   value res;
   GdkColor rescolor;
-  value rescall = gdk_color_parse(String_val(name), &rescolor);
+  int rescall;
   Push_roots(r, 1);
+  rescall = gdk_color_parse(String_val(name), &rescolor);
   r[0] = alloc_tuple(2);
   Field(r[0], 0) = Val_bool(rescall);
   Field(r[0], 1) = Val_gdk_color(&rescolor);

@@ -23,6 +23,7 @@ sig
       | OPTION of texp
       | OUTPUT of texp
       | LIST of texp
+      | ARRAY of texp * bool (* include length? *)
 
     val toString: texp -> string
     val typeKind: texp -> string
