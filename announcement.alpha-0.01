@@ -48,9 +48,9 @@ What does mGTK provide?
 Almost all of the mGTK library is machine generated, thus it supports
 nearly the whole of gtk+.  Last time we made statistics the count was:
 
-* 87 widgets
-* 647 functions
-* 126 signals
+* 91 widgets
+* 706 functions
+* 162 signals
 
 But at the moment there exists no real documentation describing mGTK.
 
