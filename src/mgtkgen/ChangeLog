@@ -1,3 +1,18 @@
+2000-05-09  Henning Niss  <hniss@tyr.diku.dk>
+
+	* AST.sig: Prepared for the split into Gdk and Gtk: added a new
+	``long type'' with a path describing the modules of the real type.
+
+	* AST.sml: ditto.
+
+	* Parser.sml: ditto.
+
+	* Translate.sml: ditto.
+
+	* TypeInfo.sml: ditto.
+
+	* Util.sml: ditto.
+	
 2000-05-02  Henning Niss  <hniss@diku.dk>
 
 	* Combinators.sig: Added two functions skip and skipN
