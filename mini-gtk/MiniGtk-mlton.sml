@@ -75,7 +75,16 @@ struct
 
 
     fun withPtr (OBJ ptr, f) = F.withValue(ptr, f)
-    fun inherit _ con = OBJ(F.new(con()))
+
+    val object_ref = _ffi "g_object_ref" : cptr -> cptr;
+    val object_unref = _ffi "g_object_ref" : cptr -> unit;
+    
+    fun inherit _ con = let val ptr = object_ref(con())
+                            val obj = F.new ptr
+                        in  F.addFinalizer(obj, object_unref)
+                          ; OBJ obj
+                        end
+
     fun toObject (OBJ ptr) = OBJ ptr
 end
 
@@ -120,8 +129,8 @@ struct
         structure GO = GObject
         structure CT = Callbacktable
 
-        type GValues = word
-        type GValue = word
+        type GValues = MLton.pointer
+        type GValue = MLton.pointer
 
         type callback_data = GValue * GValues * int
 	type callback = callback_data -> unit
@@ -305,6 +314,10 @@ struct
     type cptr = GO.cptr
 
     fun inherit w con = GObject.inherit () con
+
+    (* HACK ALERT:  This is an incorrect way of using withPtr, 
+                    but it should be safe in this case
+    *)
     fun toWidget obj = 
         GObject.inherit () (fn () => GO.withPtr(obj, fn obj => obj))
 
@@ -352,7 +365,6 @@ struct
 
     val set_border_width_ = _ffi "gtk_container_set_border_width" 
                           : cptr * int -> unit;
-        
     val set_border_width: 'a t -> int -> unit
         = fn container => fn border_width => 
           GO.withPtr(container, fn container => 
