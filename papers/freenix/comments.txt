@@ -1,0 +1,301 @@
+Haven't heard from you in a while, so I'm not sure how the
+code is going.  What's the status there?
+
+I've gone ahead and attached some fairly detailed comments:
+we need to get going on the paper in parallel, assuming that
+the code will be updated by the time the paper is finally
+done.
+
+Let me know if you have any questions about these.  I've
+found your paper quite interesting as I've delved into it.
+Boy, is my ML rusty.
+
+    Bart Massey
+    bart@cs.pdx.edu
+
+General Comments
+
+The committee as a whole didn't have too much interesting to
+say about this paper.  Everyone agreed that the basic idea
+is interesting, and that C/C++ is a lousy language for
+writing GUIs (or much of anything, for that matter :-).
+
+There were concerns about filling this work out to a full
+paper.  I think that this is not a big concern.
+
+The work is of obvious benefit to SML programmers who want
+GUIs.  It also shows some nice tricks for interfacing
+functional code with OO systems.
+
+Abstract:
+
+Here's a suggested rewrite of the first few sentences: edit
+to fit.
+
+"We describe mGTK, a Standard ML language binding for the
+Gtk+ toolkit.  Gtk+ is a graphical toolkit for the X Window
+System, and provides an object-oriented C language API.
+Since ML is a mostly-functional language without object
+types, constructing a binding to Gtk+ is not a trivial
+task."
+
+Split the last sentence of the abstract in half.  You will
+also want to add a few sentences, describing the rest of the
+paper contents, and describing impacts and contributions of the work.
+
+Introduction:
+
+"...the program, because SML..." -> "the program. SML"  
+
+"...mathematical notation..." -> "mathematical notation (a
+"big step" structured operational semantics, plus type
+inference rules)" or whatever the correct parenthetical is.
+
+"...language, its existence is rather to provide..." ->
+"language.  Rather, it provides"
+
+"...which are not..." -> "that are not"
+
+"...specific compiler, also there are..." -> "specific
+compiler.  There are also"
+
+
+Continue this section with a tutorial introduction to SML of
+1+ page, including toy examples, and concentrating on the
+basic features needed to understand the rest of the paper,
+i.e. the type system, structures, etc.  This should be
+followed by your mGTK example as in the current abstract.
+
+Gtk+:
+
+"...is a library...It is licensed...LGPL..." -> "is an
+LGPL-licensed [cite LGPL] library for creating..."  i.e,
+fold second sentence in to first, and add LGPL cite.
+
+"It is the graphical toolkit used in the GNOME platform."
+Add more sentences to this to make a paragraph with a brief
+history of GIMP/GNOME/Gtk/Gtk+.
+
+"...than C."  Should section 4 material move here to
+describe the gtk.defs file?
+
+Running Example:
+
+What ML dialect is the example (specifically, CommandLine)
+in?  Presumably Moscow?
+
+The description of structures and signatures should move
+earlier, and should be read for clarity by someone who does
+not know SML.  I would suggest moving "foo" etc out of this
+paragraph: clean up the example code and refer directly to
+it for clarity.  Give the anonymous lambda a name, so that
+you don't have to explain => and so it's obvious what it
+does.  The non-SML reader can probably most easily (and
+fairly harmlessly) think of the unit value as the nullary
+tuple.  Note that :: is the module operator in C++ and
+friends; you might want to mention that things are different
+here.
+
+Explicitly say at some point that "The type of an object in
+a programming language is defined by the set of values it
+can contain."  This makes the par on base types clearer in
+my opinion.
+
+Give examples of building up derived types from base types:
+in particular, you need to talk about type definitions
+explicitly sometime before section 3.
+
+Encoding of classes:
+
+Should be "Encoding of Classes"
+
+"...trivially clear..." -> "easy to see" or similar
+
+Explain in a few sentences why OO class hierarchies can be
+thought of as having a subtype relationship.  Believe it or
+not, this won't be obvious to everyone.
+
+"...subtype-relations..." -> "subtype relations"
+
+"...to use _parametric polymorphism_..."  Get rid of the
+italics here, you've already explained this concept.
+
+"...classes; SubClassA..." -> "classes.  SubClassA"
+
+The names for the example class hierarchy are confusing.
+How about "A", "B1", "B2", and "C", or something similar?
+I know that this is a non-trivial change, but I'm getting
+lost in the whole "Super", "Sub", "SubSub" thing.  Also, for
+the purposes of the paper, you probably can get by with
+simply "A" "B" "C" and leave out the extra child?
+
+"...the SML convention..." -> "a popular SML convention"
+
+Subtyping/Inheritance: The first sentence has grammar
+issues.  Break it into multiple simpler sentences.
+
+Give some intuition, and preferably lots, about why *witness
+types* are necessary and are introduced.  All the magic is
+introduced right here: this section and the previous on
+class types should be expanded by about 0.5-1 page to
+explain clearly and thoroughly what's going on with the type
+system at this spot.  Note in particular that typing the
+running example into ML will result in an error, since type
+specifications are available only in signatures.  This is
+a bit confusing to even a knowledgeable reader (e.g. me :-).
+
+"...method is called" -> "method is called."
+
+
+"...any object which is a subclass of SubClassB and
+returns...": while this is technically correct, it might be
+less confusing to the OO types to simply say "an object of
+type SubClassB" since those folks usually regard subtypes of
+SubClassB as being included in that phrase.
+
+Why curry the methods rather than accepting argument tuples?
+I can think of at least one good reason (detachable
+methods): OTOH, the C is not curryable...
+
+Constructors: Explicitly show the introduction of "base",
+via
+   type base
+
+signatures vs structures --- make this clear.  I had to work
+a bunch of SML example---attached---on my own to figure out
+what's happening here.  Did I get the attached code right?
+
+Does the technique given here work for fields at all, or
+just for methods?  In other words, is it for general-purpose
+OO modeling or just for the Gtk+ case where all interesting
+bits are in methods?
+
+window and button types: they would normally be declared as
+  val window : base window
+  val button : base button
+correct?  If so, try to show the type equivalence between
+this and what is currently there.  Also, you may want to put
+the structure names in, no?
+
+Process:
+
+"...files; however..." -> "files.  However", then correct
+the 2nd sentence to something like "However, C headers are
+difficult to parse, whereas the defs format is
+straightforward."
+
+"...deal with, and it makes..." -> "deal with.  It also
+makes"
+
+"Of course..." strike
+
+"...the shape of widget specification..." clarify
+
+"...is constructor..." -> "is a constructor"
+
+"...specification of a signal on buttons." -> "specification
+of a signal generated by buttons."
+
+The mGTk binding
+
+Capitalize binding.
+
+The source code update needs to be done shortly.  The
+claimed benefits of retargeting are impossible to believe
+until the system has been retargeted.
+
+"A key aspect of a binding for SML..." -> "A key problem in
+producing SML bindings"
+
+"The process...SML implementations."  Replace with something
+like "The approache described in section 4 is largely implementation
+independent: the binding should be able to run in any
+conformant SML implementation."  CAML should be OK too, no?
+Oh, the related work mentions it---fwd ref here.
+
+"Combining...gives...programmer" sentence more like "One
+finds SML and Gtk+ implementations on a large variety of
+platforms.  Thus, the application programmer can achieve
+broad cross platform capability."
+
+"namely" strike
+
+This work vs SML/NJ?  Is this a replacement for Leung's
+system?  You need to cite [10] much earlier in the paper,
+and make it clear that you are not the only ones to use
+phantom types for this task.  In particular, I don't see how
+the claim that "the encoding of a single inheritance
+heirarchy as above is [new]." can be true, given that [10]
+appears to have a very similar system.  Do you predate this
+work?
+
+Conclusion: Contributions
+
+Get rid of the sub-headers Contributions and Future Work
+
+Tone down the claims here.  You have one of several
+interfaces, albeit a nice one.  You may claim completeness,
+portability (when demonstrated), and ease of use.
+
+Conclusion: Future Work
+
+Expand the discussion here substantially: it sounds
+interesting.  What will it take to write SML-GNOME apps?
+What parts will you replicate/replace?  What parts will you
+just interface to?
+
+Move the claims below the future work.
+
+(* Establish the GtkBasis equivalent *)
+signature sig_Core = sig
+  datatype base = BASE_T
+end
+
+structure Core : sig_Core = struct
+  datatype base = BASE_T
+end
+
+(* Now do the Super equivalent *)
+signature sig_A = sig
+  datatype 'path a = A_T of 'path
+  val mth1 : 'path a -> int
+  val new : unit -> Core.base a
+end
+
+structure A : sig_A  = struct
+  datatype 'path a = A_T of 'path
+  fun mth1 x = 0
+  fun new () = A_T Core.BASE_T
+end
+
+(* SubClassA (sorry about the name) *)
+signature sig_B = sig
+  datatype 'path b_t = B_T of 'path
+  type 'path b
+  val mth1 : 'path b -> int
+  val mth2 : 'path b -> int -> int
+  val mth3 : ('path b * int) -> int
+  val new : unit -> Core.base b
+end
+
+structure B : sig_B = struct
+  datatype 'path b_t = B_T of 'path
+  type 'path b = 'path b_t A.a
+  fun mth1 x = A.mth1 x
+  fun mth2 x k = k + A.mth1 x
+  fun mth3 (x, k) = k + A.mth1 x
+  fun new () = A.A_T (B_T Core.BASE_T)
+end
+
+(* SubClassB (sorry about the name) *)
+signature sig_C = sig
+  datatype 'path c_t = C_T of 'path
+  type 'path c
+  val new : unit -> Core.base c
+end
+
+structure C : sig_C = struct
+  datatype 'path c_t = C_T of 'path
+  type 'path c = 'path c_t B.b
+  fun new () = A.A_T (B.B_T (C_T Core.BASE_T))
+end
