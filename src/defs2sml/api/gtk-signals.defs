@@ -6305,6 +6305,13 @@
   (construct-only #f)
 )
 
+;HN;
+(define-signal changed
+  (of-object "GtkEditable")
+  (return-type "void")
+  (when "first")
+)
+
 ;; From GtkEntry
 
 (define-signal move-cursor

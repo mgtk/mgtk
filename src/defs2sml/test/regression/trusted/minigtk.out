@@ -319,7 +319,8 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toLabel obj = inherit () (fn () => repr obj)
 	val new_ : string -> cptr = app1 (symb"mgtk_gtk_label_new")
-	val new : string option -> base t = fn str => make (new_ str)
+	val new : string option -> base t
+	    = fn str => make (new_ (getOpt (str, "")))
 	val new' : unit -> base t = fn dummy => make (new_ "")
     end
 end

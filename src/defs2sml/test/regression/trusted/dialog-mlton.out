@@ -130,8 +130,11 @@ structure Gtk  = struct
 		 make (GObject.withOpt
 			 (parent, 
 			  fn parent => new_with_buttons_
-					 (title, parent, Flags.set flags, 
-					  first_button_text)))
+					 (CString.fromString
+					    (getOpt (title, "")), 
+					  parent, Flags.set flags, 
+					  CString.fromString
+					    (getOpt (first_button_text, "")))))
 	val new_with_buttons' : unit -> base t
 	    = fn dummy => make (new_with_buttons_ (CString.fromString "", 
 						   GObject.null, 0, 

@@ -34,15 +34,24 @@ structure FromDefs :> FromDefs = struct
 	let val md = Module{name=name,info=info,members=ref[]}
 	    val map = case parent of NONE => map
 				   | SOME p => insert map p (Sub md)
-	in  Map.insert(map, name, md) end
+	in  case Map.peek(map,name) of
+		NONE => Map.insert(map, name, md) 
+	      | SOME _ => ( TextIO.print("Already there - doing nothing\n")
+                          ; map )
+	end
 
     val demotedModuleName = "GtkDemoted"
 
-    fun transPhase1 top metadata (def, map) = 
+    fun lookupParent map default name=
+	case Map.peek(map,name) of
+	    SOME parent => parent
+	  | NONE => default
+
+    fun transPhase1 top (metadata as (typemap,parentmap)) (def, map) = 
 	let val name = getName def handle AttribNotFound _ => #1 def
 	in  case getTag def of
 		Object => 
-		   let val md = getModule def
+		   let val md = lookupParent parentmap (getModule def) name
 		       val parent = SOME(getParent def)
 			            handle AttribNotFound _ => NONE
 		       val implements = getImplements def
@@ -53,7 +62,7 @@ structure FromDefs :> FromDefs = struct
 
 		   end
 	      | Boxed => 
-		   let val md = getModule def
+		   let val md = lookupParent parentmap (getModule def) name
 		       val copyrel =
 			   SOME({copy=getCopyFunc def,release=getReleaseFunc def})
 			   handle AttribNotFound _ => NONE
@@ -64,7 +73,7 @@ structure FromDefs :> FromDefs = struct
 	      | _ => map
 	end
 
-    fun transPhase2 top metadata (def, map) =
+    fun transPhase2 top (typemap,parentmap) (def, map) =
 	let val name = getName def handle AttribNotFound _ => #1 def
 	    fun probableModule demote nothing split name = 
 		(* look for modules "matching" name:
@@ -88,7 +97,7 @@ structure FromDefs :> FromDefs = struct
 			  ; demotedModuleName)
 		    else module
 		end
-	    fun getMeta md = Map.peek(metadata, md^"."^name)
+	    fun getMeta md = Map.peek(typemap, md^"."^name)
 
 	in  case getTag def of
 		Function =>
@@ -183,23 +192,37 @@ structure FromDefs :> FromDefs = struct
 	    val params = map (fn(n,t,f)=>(n,applyFlags f (A.ApiTy t))) params
 	in  A.ArrowTy(nonempty(addself params), return) end
 
-    fun interpretMetadata defs =
-	let fun one (MetaOverride(name,attribs), map) =
+    fun interpretMetadata map defs =
+	let fun one (MetaOverride(name,attribs), ((typemap,parentmap),map)) =
 		let val obj = getMetaObject attribs
 		    val params = getMetaParams attribs 
 			         handle AttribNotFound _ => []
 		    val rettype = SOME(getMetaReturnType attribs)
 			          handle AttribNotFound _ => NONE
-		in  Map.insert(map, obj^"."^name, 
-			       {params=params,rettype=rettype})
+		in  ((Map.insert(typemap, obj^"."^name, 
+				 {params=params,rettype=rettype}),
+		      parentmap),
+		     map)
 		end
-	      | one (MetaExclude _, map) = map
-	in  List.foldl one (Map.mkDict String.compare) defs end
+	      | one (MetaExclude _, maps) = maps
+	      | one (MetaModule(name,parent,members),((typemap,parentmap),map))=
+		let val parentmap = Map.insert(parentmap,name,parent)
+		    val parentmap =
+			List.foldl (fn (mem,map) => Map.insert(map,mem,name))
+			           parentmap
+				   members
+		in  ((typemap, parentmap),new map name (SOME parent) NONE)
+		end
+	in  List.foldl one 
+	               ((Map.mkDict String.compare,Map.mkDict String.compare),
+			map)
+		       defs
+	end
 		     
     fun fromDefs top defs metadefs
 	: (string,module_info,member_info) AST.module =
-	let val md = interpretMetadata metadefs
-	    val map = new empty top NONE NONE
+	let val map = new empty top NONE NONE
+	    val (md,map) = interpretMetadata map metadefs
 	    val map = new map demotedModuleName (SOME top) NONE
 		      (* first look for all module definers *)
 	    val map = List.foldl (transPhase1 top md) map defs

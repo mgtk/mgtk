@@ -14,14 +14,22 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
 	case M.peek(deps,name) of
 	    NONE => emptySet
 	  | SOME d => d
-    fun add ((name,d),deps) = M.insert(deps,name,S.add(lookup deps name,d))
+    fun add deps (name,d) = M.insert(deps,name,S.add(lookup deps name,d))
+    fun addSet deps (name,d) = M.insert(deps,name,S.union(lookup deps name,d))
     fun addList ((name,ds),deps) = M.insert(deps,name,S.addList(lookup deps name, ds))
-	    
+    fun union (s,s') = S.union(s,s')
+
+    fun showdeps deps = Util.stringSep "{" "}\n" "," (fn s=>s) deps
+    fun showdepset deps = showdeps (S.listItems deps)
+
     fun dependencies module =
-	let fun loop (A.Module{name,info,members}, deps) = 
-		List.foldl (loop' name) deps members
-	    and loop' name (A.Sub module, deps) = loop (module, deps)
-	      | loop' name (A.Member{name=n,info}, deps) =
+	let fun loop (A.Module{name,info,members}, deps as (depmap,depset)) = 
+		let val (map,ds) = List.foldl loop' (depmap,emptySet) members
+		    val ds = S.difference(ds,S.singleton String.compare name)
+		in  (addSet map (name,ds), union(depset,ds))
+		end
+	    and loop' (A.Sub module, deps) = loop (module, deps)
+	      | loop' (A.Member{name=n,info}, deps as (depmap,depset)) =
 		let val freeTyNames = T.freeTyNames
 		    fun get (A.Method ty) = freeTyNames ty
 		      | get (A.Field ty) = freeTyNames ty
@@ -31,9 +39,8 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
 		      | get (A.Enum _ ) = []
 (*		      | get (A.Signal ty) = freeTyNames ty*)
 		      | get (A.Signal ty) = []
-		    val ds = List.map (fn dep => (name,dep)) (get info)
-		in  addList ((name,get info), deps) end
-	in  loop (module, empty) end
+		in  (depmap, S.addList(depset, get info)) end
+	in  #1(loop (module, (empty,emptySet))) end
 					
     fun build module =
 	let fun loop (m as A.Module{name,info,members}, map) =
@@ -50,8 +57,6 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
                    , ("GType",NONE)
                    ]
 	in  loop(module, initial) end
-
-    fun showdeps deps = Util.stringSep "{" "}\n" "," (fn s=>s) deps
 
     fun reorder module =
 	let 
@@ -75,17 +80,30 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
 		     SOME module => loop module
 		   | NONE => []
 		) handle M.NotFound => (MsgUtil.warning("Unbound dependency ("^name^")\n") ; [] )
-	in  case loop module of
-		[] => Util.abort 54321
-	      | [m] => m
-	      | ms =>
-		let val _ = MsgUtil.warning "Toplevel module depends on:\n"
-		    val deps = Util.stringSep "  {" "}\n" "," 
-					      (fn (A.Module{name,...}) => name)
-					      ms
-		    val _ = MsgUtil.warning deps
-		in  hd(rev ms)
-		end
+	    val A.Module{name,info=(done,info),members} = module
+	in  A.Module{name=name,info=info,
+		     members=List.concat(List.map loop' members)}
 	end
 
+    (* For debugging: *)
+    local open Pretty in
+    val reorder = fn module =>
+        let val pps = Pretty.ppString
+	    val pp = AST.ppAst pps (Type.pp pps (fn _ => empty))
+	    val module' = reorder module
+	in  if Debug.included "DependencyReorder.debug_deps" then
+		( print("Before reordering defs:\n")
+		; ppPlain (pp module) TextIO.stdOut
+		; print("After reordering defs:\n")
+		; ppPlain (pp module') TextIO.stdOut)
+	    else ()
+          ; module'
+        end
+    end (* local *)
+
 end (* structure DependencyReorder *)
+
+
+val _ = Debug.add {name="DependencyReorder.debug_deps",
+		   short_option="dep",long_option=SOME("debug-dependency"),
+		   included=false}

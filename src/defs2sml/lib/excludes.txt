@@ -426,8 +426,6 @@ gtk_file_chooser_add_filter
 gtk_file_chooser_remove_filter
 gtk_file_chooser_set_filter
 gtk_file_chooser_get_filter
-gtk_file_chooser_dialog_new
-gtk_file_chooser_widget_new
 gtk_message_dialog_new_with_markup
 gtk_tool_item_get_toolbar_style
 #ARRAYINRETURNVALUE

@@ -123,5 +123,7 @@ structure Defs = struct
     datatype metadata =
 	MetaExclude of string list
       | MetaOverride of string * override list
+      | MetaModule of string (* module name *) * string (* parent module *)
+                    * string list (* members *)
 
 end (* structure Defs *)

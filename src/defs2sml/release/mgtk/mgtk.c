@@ -6214,9 +6214,19 @@ EXTERNML value mgtk_gtk_expander_get_label_widget(value self) { /* ML */
 
 
 /* *** FileChooserDialog *** */
+/* ML type: string -> cptr -> int -> string -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_dialog_new(value title, value parent, value action, value first_button_text) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_dialog_new(String_val(title), GtkObj_val(parent), Int_val(action), String_val(first_button_text)));
+}
+
 
 
 /* *** FileChooserWidget *** */
+/* ML type: int -> cptr */
+EXTERNML value mgtk_gtk_file_chooser_widget_new(value action) { /* ML */
+    return Val_GtkObj(gtk_file_chooser_widget_new(Int_val(action)));
+}
+
 
 
 /* *** FileFilter *** */

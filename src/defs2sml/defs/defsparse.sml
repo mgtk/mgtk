@@ -284,7 +284,12 @@ structure DefsParse :> DEFSPARSE = struct
 	parens ("metadata-type" &-- defWord -- metaTypeAttribs) >> MetaType
 *)
 
-    val metadata = repeat1 (  exclude || override
+    val parent  = parens ( "of-module" &-- defWord )
+    val members = parens ( "members" &-- (repeat1 defWord >> (op::)) )
+    val modules = parens ( "define-module" &-- defWord -- parent -- members ) 
+                  >> (fn ((n,p),m) => MetaModule(n,p,m))
+
+    val metadata = repeat1 (  exclude || override || modules
                        ) --% EOF_T
                    >> (op ::)
 

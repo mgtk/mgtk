@@ -342,7 +342,8 @@ structure Gtk  = struct
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
 	val new_ : CString.cstring -> cptr
 	    = _import "gtk_label_new" : CString.cstring -> cptr;
-	val new : string option -> base t = fn str => make (new_ str)
+	val new : string option -> base t
+	    = fn str => make (new_ (CString.fromString (getOpt (str, ""))))
 	val new' : unit -> base t
 	    = fn dummy => make (new_ (CString.fromString ""))
     end
