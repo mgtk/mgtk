@@ -1,0 +1,45 @@
+2000-04-03  Henning Niss  <hniss@diku.dk>
+
+	* Util.sml: Added documentation.
+
+	* (all files): added copyright message.
+
+2000-03-28  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml: Fixed bug with short functions: some functions
+	weren't declared in the SML files (frame_new, for example), and
+	they had the wrong ``primitive'' type and a wrong argument list in
+	the C file.
+
+	* NameUtil.sml: Improved naming hack.
+
+2000-03-27  Henning Niss  <hniss@diku.dk>
+
+	* Main.sml: added no-footer option.
+
+2000-03-20  Henning Niss  <hniss@diku.dk>
+
+	* Combinators.sig: Added documentation of interface.
+
+	* AST.sml (new file AST.sig): ditto.
+
+	* Parse.sml: ditto.
+
+	* WSeq.sig: ditto.
+
+	* Lexer.sig: ditto.
+
+	* ArgParse.sig: ditto.
+
+	* Messages.sig: ditto.
+
+	* Stream.sig: ditto.
+
+	* NameUtil.sml (new file NameUtil.sig): Added documentation.
+
+	* Regression/: Added regression tests.
+	
+	* Makefile: ditto.
+
+
+	

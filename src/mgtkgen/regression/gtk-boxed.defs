@@ -1,0 +1,8 @@
+(define-boxed GdkFont
+  gdk_font_ref
+  gdk_font_unref)
+
+(define-boxed GdkColor
+  gdk_color_copy
+  gdk_color_free
+  "sizeof(GdkColor)")

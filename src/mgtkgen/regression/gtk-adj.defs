@@ -1,0 +1,17 @@
+(define-object GtkAdjustment (GtkData)
+  (fields
+   (float value)
+   (float lower)
+   (float upper)
+   (float step_increment)
+   (float page_increment)
+   (float page_size)))
+
+(define-func gtk_adjustment_new
+  GtkAdjustment
+  ((float valu)
+   (float lower)
+   (float upper)
+   (float step_increment)
+   (float page_increment)
+   (float page_size)))
