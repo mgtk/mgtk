@@ -98,6 +98,8 @@ fun setUpGui() =
             makeMenubar agrp
 
         val notebook = Notebook.new()
+        val buffers = ref[]
+
 
         fun openAction () =
             let val filename = getFile OPEN
@@ -128,6 +130,13 @@ fun setUpGui() =
                      end
             end
 
+        fun closeAction () =
+            let val n = Notebook.get_current_page notebook
+            in  if n >= 0 then Notebook.remove_page notebook n
+                else ()
+            end
+
+
         fun saveAsAction () =
             let val filename = getFile SAVE
             in  case filename of
@@ -137,6 +146,8 @@ fun setUpGui() =
                          val {dir, file} = OS.Path.splitDirFile path
                          val _ = OS.FileSys.chDir dir
                          val dev = TextIO.openOut file
+                         val i = Notebook.get_current_page notebook
+                         
                          val buffer = TextBuffer.new NONE
                          val (startIter, endIter) = TextBuffer.get_bounds buffer
                          val content = TextBuffer.get_text buffer startIter endIter (SOME false)
@@ -153,7 +164,7 @@ fun setUpGui() =
       ; Container.add w vbox
       ; Widget.show_all w
       ; connectOpen openAction
-      ; connectClose (fn () => say "Close")
+      ; connectClose closeAction
       ; connectSaveAs saveAsAction
     end
 
