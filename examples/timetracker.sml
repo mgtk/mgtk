@@ -1,8 +1,7 @@
 
 fun topwindow() =
     let val window = Gtk.window_new Gtk.WINDOW_TOPLEVEL
-    in  Gtk.connect_delete_event window (fn _ => false)
-      ; Gtk.connect_destroy window Gtk.main_quit
+    in  Gtk.connect_destroy window Gtk.main_quit
       ; window
     end
 
@@ -32,10 +31,10 @@ fun overview () =
 local infixr --> val op--> = Gtk.--> in
 val select_row = 
     Gtk.signal "select_row" false 
-    (Gtk.int --> Gtk.int --> Gtk.unit --> Gtk.return_unit)
+    (Gtk.int --> Gtk.int --> Gtk.unit --> Gtk.return_void)
 val unselect_row = 
     Gtk.signal "unselect_row" false 
-    (Gtk.int --> Gtk.int --> Gtk.unit --> Gtk.return_unit)
+    (Gtk.int --> Gtk.int --> Gtk.unit --> Gtk.return_void)
 end
 
 fun setTime clist t row = Gtk.clist_set_text clist row 1 (timeToString t)
@@ -61,8 +60,8 @@ fun main () =
                        | _            => true
 
                                          
-        fun select row _ _   = let val t = List.nth(!projects, row)
-                               in  current := SOME(t, row) end
+        fun select row _ _ = let val t = List.nth(!projects, row)
+                             in  current := SOME(t, row) end
 
         fun unselect _ _ _ = let val (t, row) = valOf(!current)
                              in  current  := NONE
@@ -71,9 +70,10 @@ fun main () =
 
         fun new () = 
             let val name = Gtk.entry_get_text proj
-            in  if name <> "" then (Gtk.clist_append overview [name, "0:00:00"]
-                                   ;projects := !projects @ [initTime]
-                                   )
+            in  if name <> "" 
+                then ( Gtk.clist_append overview [name, "0:00:00"]
+                     ; projects := !projects @ [initTime]
+                     )
                 else ()
             end
 
