@@ -2739,7 +2739,7 @@ structure Gtk  = struct
 		 GObject.withPtr
 		   (self, 
 		    fn self => set_search_path_
-				 (self, Array.fromList path, n_elements))
+				 (self, Array.fromList(List.map CString.fromString path), n_elements))
 	val append_search_path_ : cptr * CString.cstring -> unit
 	    = _import "gtk_icon_theme_append_search_path"
 		      : cptr * CString.cstring -> unit;
@@ -2903,7 +2903,7 @@ structure Gtk  = struct
 	    = _import "gtk_tree_path_compare" : cptr * cptr -> int;
 	val compare : 'a t -> 'b t -> int
 	    = fn self => fn b =>
-		 GObject.withPtr (self, fn self => compare_ (self, b))
+		 GObject.withPtr (self, fn self => GObject.withPtr (b, fn b => compare_ (self, b)))
 	val next_ : cptr -> unit = _import "gtk_tree_path_next" : cptr -> unit;
 	val next : 'a t -> unit
 	    = fn self => GObject.withPtr (self, fn self => next_ self)
@@ -3018,7 +3018,7 @@ structure Gtk  = struct
 	    = _import "gtk_tree_model_get_iter" : cptr * cptr * cptr -> bool;
 	val getiter : 'a t -> 'b TreePath.t -> bool * TreeIter.t
 	    = fn self => fn path =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self =>
@@ -3032,7 +3032,7 @@ structure Gtk  = struct
 		      : cptr * cptr * CString.cstring -> bool;
 	val getiter_from_string : 'a t -> string -> bool * TreeIter.t
 	    = fn self => fn path_string =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => getiter_from_string_
@@ -3053,7 +3053,7 @@ structure Gtk  = struct
 	    = _import "gtk_tree_model_get_iter_first" : cptr * cptr -> bool;
 	val getiter_first : 'a t -> bool * TreeIter.t
 	    = fn self =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, fn self => getiter_first_ (self, iter))
 		 in (ret, iter) end
@@ -3090,7 +3090,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr -> bool;
 	val iter_children : 'a t -> TreeIter.t option -> bool * TreeIter.t
 	    = fn self => fn parent =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => iter_children_
@@ -3098,7 +3098,7 @@ structure Gtk  = struct
 						getOpt (parent, GObject.null)))
 		 in (ret, iter) end
 	val iter_children' : 'a t -> bool * TreeIter.t
-	    = fn self => let val iter = alloc_GtkTreeIter ()
+	    = fn self => let val iter = TreeIter.alloc_GtkTreeIter ()
 			     val ret = GObject.withPtr
 					 (self, 
 					  fn self => iter_children_
@@ -3129,7 +3129,7 @@ structure Gtk  = struct
 	val iter_nth_child : 'a t -> TreeIter.t option -> int
 			     -> bool * TreeIter.t
 	    = fn self => fn parent => fn n =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self =>
@@ -3139,7 +3139,7 @@ structure Gtk  = struct
 		 in (ret, iter) end
 	val iter_nth_child' : 'a t -> int -> bool * TreeIter.t
 	    = fn self => fn n =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => iter_nth_child_
@@ -3150,7 +3150,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr -> bool;
 	val iter_parent : 'a t -> TreeIter.t -> bool * TreeIter.t
 	    = fn self => fn child =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => iter_parent_ (self, iter, child))
@@ -4207,6 +4207,7 @@ structure Gtk  = struct
 	val get_position : 'a t -> int
 	val set_editable : 'a t -> bool -> unit
 	val get_editable : 'a t -> bool
+	val changed_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -4292,6 +4293,11 @@ structure Gtk  = struct
 	    = _import "gtk_editable_get_editable" : cptr -> bool;
 	val get_editable : 'a t -> bool
 	    = fn self => GObject.withPtr (self, fn self => get_editable_ self)
+	local open Signal
+	      infixr -->
+	in val changed_sig : (unit -> unit) -> 'a t Signal.signal
+	       = fn f => signal "changed" false (void --> return_void) f
+	end
     end
     structure Container :>
       sig
@@ -8775,6 +8781,7 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toFileChooserDialog : 'a t -> base t
 	val asFileChooser : 'a t -> base FileChooser.t
+	val new : string -> 'a Window.t -> FileChooser.action -> string -> base t
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -8787,6 +8794,16 @@ structure Gtk  = struct
 	fun asFileChooser obj
 	  = FileChooser.inherit
 	      () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val new_ : CString.cstring * cptr * FileChooser.action * CString.cstring -> cptr
+	    = _import "gtk_file_chooser_dialog_new"
+		      : CString.cstring * cptr * FileChooser.action * CString.cstring -> cptr;
+	val new : string -> 'a Window.t -> FileChooser.action -> string -> base t
+	    = fn title => fn parent => fn action => fn first_button_text =>
+		 make (GObject.withPtr
+			 (parent, 
+			  fn parent =>
+			     new_ (CString.fromString title, parent, action, 
+				   CString.fromString first_button_text)))
     end
     structure FileChooserWidget :>
       sig
@@ -8796,6 +8813,7 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toFileChooserWidget : 'a t -> base t
 	val asFileChooser : 'a t -> base FileChooser.t
+	val new : FileChooser.action -> base t
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -8808,6 +8826,9 @@ structure Gtk  = struct
 	fun asFileChooser obj
 	  = FileChooser.inherit
 	      () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val new_ : FileChooser.action -> cptr
+	    = _import "gtk_file_chooser_widget_new" : FileChooser.action -> cptr;
+	val new : FileChooser.action -> base t = fn action => make (new_ action)
     end
     structure FileFilter :>
       sig
@@ -10853,7 +10874,7 @@ structure Gtk  = struct
 	    = _import "gtk_list_store_insert" : cptr * cptr * int -> unit;
 	val insert : 'a t -> int -> TreeIter.t
 	    = fn self => fn position =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => insert_ (self, iter, position))
@@ -10863,7 +10884,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr -> unit;
 	val insert_before : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn sibling =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => insert_before_
@@ -10874,7 +10895,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr -> unit;
 	val insert_after : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn sibling =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => insert_after_
@@ -10884,7 +10905,7 @@ structure Gtk  = struct
 	    = _import "gtk_list_store_prepend" : cptr * cptr -> unit;
 	val prepend : 'a t -> TreeIter.t
 	    = fn self =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, fn self => prepend_ (self, iter))
 		 in iter end
@@ -10892,7 +10913,7 @@ structure Gtk  = struct
 	    = _import "gtk_list_store_append" : cptr * cptr -> unit;
 	val append : 'a t -> TreeIter.t
 	    = fn self =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, fn self => append_ (self, iter))
 		 in iter end
@@ -13963,7 +13984,7 @@ structure Gtk  = struct
 		      : cptr * cptr * int * int -> unit;
 	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn line_number => fn char_offset =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => getiter_at_line_offset_
@@ -13975,7 +13996,7 @@ structure Gtk  = struct
 		      : cptr * cptr * int * int -> unit;
 	val getiter_at_line_index : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn line_number => fn byte_index =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => getiter_at_line_index_
@@ -13987,7 +14008,7 @@ structure Gtk  = struct
 		      : cptr * cptr * int -> unit;
 	val getiter_at_offset : 'a t -> int -> TextIter.t
 	    = fn self => fn char_offset =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => getiter_at_offset_
@@ -13998,7 +14019,7 @@ structure Gtk  = struct
 		      : cptr * cptr * int -> unit;
 	val getiter_at_line : 'a t -> int -> TextIter.t
 	    = fn self => fn line_number =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => getiter_at_line_
@@ -14008,7 +14029,7 @@ structure Gtk  = struct
 	    = _import "gtk_text_buffer_get_start_iter" : cptr * cptr -> unit;
 	val get_startiter : 'a t -> TextIter.t
 	    = fn self =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, fn self => get_startiter_ (self, iter))
 		 in iter end
@@ -14016,7 +14037,7 @@ structure Gtk  = struct
 	    = _import "gtk_text_buffer_get_end_iter" : cptr * cptr -> unit;
 	val get_enditer : 'a t -> TextIter.t
 	    = fn self =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, fn self => get_enditer_ (self, iter))
 		 in iter end
@@ -14024,8 +14045,8 @@ structure Gtk  = struct
 	    = _import "gtk_text_buffer_get_bounds"
 		      : cptr * cptr * cptr -> unit;
 	val get_bounds : 'a t -> TextIter.t * TextIter.t
-	    = fn self => let val (start, en) = (alloc_GtkTextIter (), 
-						alloc_GtkTextIter ())
+	    = fn self => let val (start, en) = (TextIter.alloc_GtkTextIter (), 
+						TextIter.alloc_GtkTextIter ())
 			     val ret = GObject.withPtr
 					 (self, 
 					  fn self => get_bounds_
@@ -14036,7 +14057,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr -> unit;
 	val getiter_at_mark : 'a t -> 'b TextMark.t -> TextIter.t
 	    = fn self => fn mark =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self =>
@@ -14051,7 +14072,7 @@ structure Gtk  = struct
 	val getiter_at_child_anchor
 	  : 'a t -> 'b TextChildAnchor.t -> TextIter.t
 	    = fn self => fn anchor =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => GObject.withPtr
@@ -14145,8 +14166,8 @@ structure Gtk  = struct
 	    = _import "gtk_text_buffer_get_selection_bounds"
 		      : cptr * cptr * cptr -> bool;
 	val get_selection_bounds : 'a t -> bool * TextIter.t * TextIter.t
-	    = fn self => let val (start, en) = (alloc_GtkTextIter (), 
-						alloc_GtkTextIter ())
+	    = fn self => let val (start, en) = (TextIter.alloc_GtkTextIter (), 
+						TextIter.alloc_GtkTextIter ())
 			     val ret = GObject.withPtr
 					 (self, 
 					  fn self => get_selection_bounds_
@@ -14406,7 +14427,7 @@ structure Gtk  = struct
 		      : cptr * cptr * int * int -> unit;
 	val getiter_at_location : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn x => fn y =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => getiter_at_location_
@@ -15062,7 +15083,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr -> unit;
 	val convert_childiter_toiter : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn child_iter =>
-		 let val sort_iter = alloc_GtkTreeIter ()
+		 let val sort_iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => convert_childiter_toiter_
@@ -15088,7 +15109,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr -> unit;
 	val convertiter_to_childiter : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn sorted_iter =>
-		 let val child_iter = alloc_GtkTreeIter ()
+		 let val child_iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => convertiter_to_childiter_
@@ -16334,7 +16355,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr * int -> unit;
 	val insert : 'a t -> TreeIter.t -> int -> TreeIter.t
 	    = fn self => fn parent => fn position =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => insert_ (self, iter, parent, 
@@ -16345,7 +16366,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr * cptr -> unit;
 	val insert_before : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent => fn sibling =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => insert_before_
@@ -16356,7 +16377,7 @@ structure Gtk  = struct
 		      : cptr * cptr * cptr * cptr -> unit;
 	val insert_after : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent => fn sibling =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => insert_after_
@@ -16366,7 +16387,7 @@ structure Gtk  = struct
 	    = _import "gtk_tree_store_prepend" : cptr * cptr * cptr -> unit;
 	val prepend : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => prepend_ (self, iter, parent))
@@ -16375,7 +16396,7 @@ structure Gtk  = struct
 	    = _import "gtk_tree_store_append" : cptr * cptr * cptr -> unit;
 	val append : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => append_ (self, iter, parent))
