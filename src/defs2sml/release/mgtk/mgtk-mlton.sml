@@ -1106,6 +1106,51 @@ structure Gtk  = struct
 	= _import "gtk_requisition_get_type" : unit -> GType.t;
     val requisition_get_type : unit -> GType.t
 	= fn dummy => requisition_get_type_ dummy
+    type file_chooser_action = int
+    val get_file_chooser_action_
+      : int ref * int ref * int ref * int ref -> unit
+	= _import "mgtk_get_gtk_file_chooser_action"
+		  : int ref * int ref * int ref * int ref -> unit;
+    val (FILE_CHOOSER_ACTION_OPEN, FILE_CHOOSER_ACTION_SAVE, 
+	 FILE_CHOOSER_ACTION_SELECT_FOLDER, FILE_CHOOSER_ACTION_CREATE_FOLDER)
+	= let val (x0, x1, x2, x3) = (ref 0, ref 0, ref 0, ref 0)
+	  in get_file_chooser_action_ (x0, x1, x2, x3)
+	   ; (!x0, !x1, !x2, !x3)
+	  end
+    type file_chooser_error = int
+    val get_file_chooser_error_ : int ref * int ref -> unit
+	= _import "mgtk_get_gtk_file_chooser_error"
+		  : int ref * int ref -> unit;
+    val (FILE_CHOOSER_ERROR_NONEXISTENT, FILE_CHOOSER_ERROR_BAD_FILENAME)
+	= let val (x0, x1) = (ref 0, ref 0) in get_file_chooser_error_ (x0, x1)
+					     ; (!x0, !x1)
+					    end
+    type file_filter_flags = int
+    val get_file_filter_flags_ : int ref * int ref * int ref * int ref -> unit
+	= _import "mgtk_get_gtk_file_filter_flags"
+		  : int ref * int ref * int ref * int ref -> unit;
+    val (FILE_FILTER_FILENAME, FILE_FILTER_URI, FILE_FILTER_DISPLAY_NAME, 
+	 FILE_FILTER_MIME_TYPE)
+	= let val (x0, x1, x2, x3) = (ref 0, ref 0, ref 0, ref 0)
+	  in get_file_filter_flags_ (x0, x1, x2, x3)
+	   ; (!x0, !x1, !x2, !x3)
+	  end
+    
+    val file_info_get_type_ : unit -> GType.t
+	= _import "gtk_file_info_get_type" : unit -> GType.t;
+    val file_info_get_type : unit -> GType.t
+	= fn dummy => file_info_get_type_ dummy
+    val file_system_get_type_ : unit -> GType.t
+	= _import "gtk_file_system_get_type" : unit -> GType.t;
+    val file_system_get_type : unit -> GType.t
+	= fn dummy => file_system_get_type_ dummy
+    val file_folder_get_type_ : unit -> GType.t
+	= _import "gtk_file_folder_get_type" : unit -> GType.t;
+    val file_folder_get_type : unit -> GType.t
+	= fn dummy => file_folder_get_type_ dummy
+    
+    
+    
     structure AccelGroup :>
       sig
 	type base
@@ -12986,89 +13031,6 @@ structure Gtk  = struct
 				  fn self => set_preview_text_
 					       (self, CString.fromString text))
     end
-    structure FileSelection :>
-      sig
-	type base
-	type 'a fileselection_t
-	type 'a t = 'a fileselection_t Dialog.t
-	val inherit : 'a -> GObject.constructor -> 'a t
-	val toFileSelection : 'a t -> base t
-	val get_type : unit -> GType.t
-	val new : string option -> base t
-	val new' : unit -> base t
-	val set_filename : 'a t -> string -> unit
-	val get_filename : 'a t -> string
-	val complete : 'a t -> string -> unit
-	val show_fileop_buttons : 'a t -> unit
-	val hide_fileop_buttons : 'a t -> unit
-	val set_select_multiple : 'a t -> bool -> unit
-	val get_select_multiple : 'a t -> bool
-      end = struct
-	type cptr = GObject.cptr
-	type base = unit
-	type 'a fileselection_t = unit
-	type 'a t = 'a fileselection_t Dialog.t
-	fun inherit w con = Dialog.inherit () con
-	fun make ptr = inherit () (fn () => ptr)
-	fun toFileSelection obj
-	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
-	val get_type_ : unit -> GType.t
-	    = _import "gtk_file_selection_get_type" : unit -> GType.t;
-	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
-	val new_ : CString.cstring -> cptr
-	    = _import "gtk_file_selection_new" : CString.cstring -> cptr;
-	val new : string option -> base t
-	    = fn title => make (new_ (CString.fromString (getOpt (title, ""))))
-	val new' : unit -> base t
-	    = fn dummy => make (new_ (CString.fromString ""))
-	val set_filename_ : cptr * CString.cstring -> unit
-	    = _import "gtk_file_selection_set_filename"
-		      : cptr * CString.cstring -> unit;
-	val set_filename : 'a t -> string -> unit
-	    = fn self => fn filename =>
-		 GObject.withPtr
-		   (self, 
-		    fn self => set_filename_
-				 (self, CString.fromString filename))
-	val get_filename_ : cptr -> CString.t
-	    = _import "gtk_file_selection_get_filename" : cptr -> CString.t;
-	val get_filename : 'a t -> string
-	    = fn self => GObject.withPtr
-			   (self, 
-			    fn self => let val t = get_filename_ self
-				       in CString.toString t end)
-	val complete_ : cptr * CString.cstring -> unit
-	    = _import "gtk_file_selection_complete"
-		      : cptr * CString.cstring -> unit;
-	val complete : 'a t -> string -> unit
-	    = fn self => fn pattern =>
-		 GObject.withPtr
-		   (self, 
-		    fn self => complete_ (self, CString.fromString pattern))
-	val show_fileop_buttons_ : cptr -> unit
-	    = _import "gtk_file_selection_show_fileop_buttons" : cptr -> unit;
-	val show_fileop_buttons : 'a t -> unit
-	    = fn self => GObject.withPtr
-			   (self, fn self => show_fileop_buttons_ self)
-	val hide_fileop_buttons_ : cptr -> unit
-	    = _import "gtk_file_selection_hide_fileop_buttons" : cptr -> unit;
-	val hide_fileop_buttons : 'a t -> unit
-	    = fn self => GObject.withPtr
-			   (self, fn self => hide_fileop_buttons_ self)
-	val set_select_multiple_ : cptr * bool -> unit
-	    = _import "gtk_file_selection_set_select_multiple"
-		      : cptr * bool -> unit;
-	val set_select_multiple : 'a t -> bool -> unit
-	    = fn self => fn select_multiple =>
-		 GObject.withPtr (self, 
-				  fn self => set_select_multiple_
-					       (self, select_multiple))
-	val get_select_multiple_ : cptr -> bool
-	    = _import "gtk_file_selection_get_select_multiple" : cptr -> bool;
-	val get_select_multiple : 'a t -> bool
-	    = fn self => GObject.withPtr
-			   (self, fn self => get_select_multiple_ self)
-    end
     structure ColorSelectionDialog :>
       sig
 	type base
@@ -13185,5 +13147,570 @@ structure Gtk  = struct
 	val wait_is_text_available : 'a t -> bool
 	    = fn self => GObject.withPtr
 			   (self, fn self => wait_is_text_available_ self)
+    end
+    structure FileChooser :>
+      sig
+	type base
+	type 'a filechooser_t
+	type 'a t = 'a filechooser_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileChooser : 'a t -> base t
+	val get_type : unit -> GType.t
+	val set_action : 'a t -> file_chooser_action -> unit
+	val get_action : 'a t -> file_chooser_action
+	val set_local_only : 'a t -> bool -> unit
+	val get_local_only : 'a t -> bool
+	val set_select_multiple : 'a t -> bool -> unit
+	val get_select_multiple : 'a t -> bool
+	val set_current_name : 'a t -> string -> unit
+	val get_filename : 'a t -> string
+	val set_filename : 'a t -> string -> bool
+	val select_filename : 'a t -> string -> bool
+	val unselect_filename : 'a t -> string -> unit
+	val select_all : 'a t -> unit
+	val unselect_all : 'a t -> unit
+	val set_current_folder : 'a t -> string -> bool
+	val get_current_folder : 'a t -> string
+	val get_uri : 'a t -> string
+	val set_uri : 'a t -> string -> bool
+	val select_uri : 'a t -> string -> bool
+	val unselect_uri : 'a t -> string -> unit
+	val set_current_folder_uri : 'a t -> string -> bool
+	val get_current_folder_uri : 'a t -> string
+	val set_preview_widget : 'a t -> 'b Widget.t -> unit
+	val get_preview_widget : 'a t -> base Widget.t
+	val set_preview_widget_active : 'a t -> bool -> unit
+	val get_preview_widget_active : 'a t -> bool
+	val set_use_preview_label : 'a t -> bool -> unit
+	val get_use_preview_label : 'a t -> bool
+	val get_preview_filename : 'a t -> string
+	val get_preview_uri : 'a t -> string
+	val set_extra_widget : 'a t -> 'b Widget.t -> unit
+	val get_extra_widget : 'a t -> base Widget.t
+	val add_filter : 'a t -> 'b t -> unit
+	val remove_filter : 'a t -> 'b t -> unit
+	val set_filter : 'a t -> 'b t -> unit
+	val get_filter : 'a t -> base t
+	val dialog_get_type : unit -> GType.t
+	val dialog_new_with_backend
+	  : string -> 'a Window.t -> file_chooser_action -> string -> string
+	    -> base t
+	val widget_get_type : unit -> GType.t
+	val widget_new_with_backend : file_chooser_action -> string -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a filechooser_t = unit
+	type 'a t = 'a filechooser_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileChooser obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_type_ : unit -> GType.t
+	    = _import "gtk_file_chooser_get_type" : unit -> GType.t;
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val set_action_ : cptr * int -> unit
+	    = _import "gtk_file_chooser_set_action" : cptr * int -> unit;
+	val set_action : 'a t -> file_chooser_action -> unit
+	    = fn self => fn action =>
+		 GObject.withPtr (self, fn self => set_action_ (self, action))
+	val get_action_ : cptr -> int
+	    = _import "gtk_file_chooser_get_action" : cptr -> int;
+	val get_action : 'a t -> file_chooser_action
+	    = fn self => GObject.withPtr (self, fn self => get_action_ self)
+	val set_local_only_ : cptr * bool -> unit
+	    = _import "gtk_file_chooser_set_local_only" : cptr * bool -> unit;
+	val set_local_only : 'a t -> bool -> unit
+	    = fn self => fn local_only =>
+		 GObject.withPtr
+		   (self, fn self => set_local_only_ (self, local_only))
+	val get_local_only_ : cptr -> bool
+	    = _import "gtk_file_chooser_get_local_only" : cptr -> bool;
+	val get_local_only : 'a t -> bool
+	    = fn self => GObject.withPtr
+			   (self, fn self => get_local_only_ self)
+	val set_select_multiple_ : cptr * bool -> unit
+	    = _import "gtk_file_chooser_set_select_multiple"
+		      : cptr * bool -> unit;
+	val set_select_multiple : 'a t -> bool -> unit
+	    = fn self => fn select_multiple =>
+		 GObject.withPtr (self, 
+				  fn self => set_select_multiple_
+					       (self, select_multiple))
+	val get_select_multiple_ : cptr -> bool
+	    = _import "gtk_file_chooser_get_select_multiple" : cptr -> bool;
+	val get_select_multiple : 'a t -> bool
+	    = fn self => GObject.withPtr
+			   (self, fn self => get_select_multiple_ self)
+	val set_current_name_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_chooser_set_current_name"
+		      : cptr * CString.cstring -> unit;
+	val set_current_name : 'a t -> string -> unit
+	    = fn self => fn name =>
+		 GObject.withPtr (self, 
+				  fn self => set_current_name_
+					       (self, CString.fromString name))
+	val get_filename_ : cptr -> CString.t
+	    = _import "gtk_file_chooser_get_filename" : cptr -> CString.t;
+	val get_filename : 'a t -> string
+	    = fn self => GObject.withPtr
+			   (self, 
+			    fn self => let val t = get_filename_ self
+				       in CString.toString t end)
+	val set_filename_ : cptr * CString.cstring -> bool
+	    = _import "gtk_file_chooser_set_filename"
+		      : cptr * CString.cstring -> bool;
+	val set_filename : 'a t -> string -> bool
+	    = fn self => fn filename =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => set_filename_
+				 (self, CString.fromString filename))
+	val select_filename_ : cptr * CString.cstring -> bool
+	    = _import "gtk_file_chooser_select_filename"
+		      : cptr * CString.cstring -> bool;
+	val select_filename : 'a t -> string -> bool
+	    = fn self => fn filename =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => select_filename_
+				 (self, CString.fromString filename))
+	val unselect_filename_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_chooser_unselect_filename"
+		      : cptr * CString.cstring -> unit;
+	val unselect_filename : 'a t -> string -> unit
+	    = fn self => fn filename =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => unselect_filename_
+				 (self, CString.fromString filename))
+	val select_all_ : cptr -> unit
+	    = _import "gtk_file_chooser_select_all" : cptr -> unit;
+	val select_all : 'a t -> unit
+	    = fn self => GObject.withPtr (self, fn self => select_all_ self)
+	val unselect_all_ : cptr -> unit
+	    = _import "gtk_file_chooser_unselect_all" : cptr -> unit;
+	val unselect_all : 'a t -> unit
+	    = fn self => GObject.withPtr (self, fn self => unselect_all_ self)
+	val set_current_folder_ : cptr * CString.cstring -> bool
+	    = _import "gtk_file_chooser_set_current_folder"
+		      : cptr * CString.cstring -> bool;
+	val set_current_folder : 'a t -> string -> bool
+	    = fn self => fn filename =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => set_current_folder_
+				 (self, CString.fromString filename))
+	val get_current_folder_ : cptr -> CString.t
+	    = _import "gtk_file_chooser_get_current_folder"
+		      : cptr -> CString.t;
+	val get_current_folder : 'a t -> string
+	    = fn self => GObject.withPtr
+			   (self, 
+			    fn self => let val t = get_current_folder_ self
+				       in CString.toString t end)
+	val get_uri_ : cptr -> CString.t
+	    = _import "gtk_file_chooser_get_uri" : cptr -> CString.t;
+	val get_uri : 'a t -> string
+	    = fn self => GObject.withPtr (self, 
+					  fn self => let val t = get_uri_ self
+						     in CString.toString t end)
+	val set_uri_ : cptr * CString.cstring -> bool
+	    = _import "gtk_file_chooser_set_uri"
+		      : cptr * CString.cstring -> bool;
+	val set_uri : 'a t -> string -> bool
+	    = fn self => fn uri =>
+		 GObject.withPtr
+		   (self, fn self => set_uri_ (self, CString.fromString uri))
+	val select_uri_ : cptr * CString.cstring -> bool
+	    = _import "gtk_file_chooser_select_uri"
+		      : cptr * CString.cstring -> bool;
+	val select_uri : 'a t -> string -> bool
+	    = fn self => fn uri =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => select_uri_ (self, CString.fromString uri))
+	val unselect_uri_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_chooser_unselect_uri"
+		      : cptr * CString.cstring -> unit;
+	val unselect_uri : 'a t -> string -> unit
+	    = fn self => fn uri =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => unselect_uri_ (self, CString.fromString uri))
+	val set_current_folder_uri_ : cptr * CString.cstring -> bool
+	    = _import "gtk_file_chooser_set_current_folder_uri"
+		      : cptr * CString.cstring -> bool;
+	val set_current_folder_uri : 'a t -> string -> bool
+	    = fn self => fn uri =>
+		 GObject.withPtr (self, 
+				  fn self => set_current_folder_uri_
+					       (self, CString.fromString uri))
+	val get_current_folder_uri_ : cptr -> CString.t
+	    = _import "gtk_file_chooser_get_current_folder_uri"
+		      : cptr -> CString.t;
+	val get_current_folder_uri : 'a t -> string
+	    = fn self => GObject.withPtr
+			   (self, 
+			    fn self => let val t = get_current_folder_uri_ self
+				       in CString.toString t end)
+	val set_preview_widget_ : cptr * cptr -> unit
+	    = _import "gtk_file_chooser_set_preview_widget"
+		      : cptr * cptr -> unit;
+	val set_preview_widget : 'a t -> 'b Widget.t -> unit
+	    = fn self => fn preview_widget =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => GObject.withPtr (preview_widget, 
+						fn preview_widget =>
+						   set_preview_widget_
+						     (self, preview_widget)))
+	val get_preview_widget_ : cptr -> cptr
+	    = _import "gtk_file_chooser_get_preview_widget" : cptr -> cptr;
+	val get_preview_widget : 'a t -> base Widget.t
+	    = fn self =>
+		 Widget.inherit
+		   ()
+		   (fn () => GObject.withPtr
+			       (self, fn self => get_preview_widget_ self))
+	val set_preview_widget_active_ : cptr * bool -> unit
+	    = _import "gtk_file_chooser_set_preview_widget_active"
+		      : cptr * bool -> unit;
+	val set_preview_widget_active : 'a t -> bool -> unit
+	    = fn self => fn active =>
+		 GObject.withPtr
+		   (self, fn self => set_preview_widget_active_ (self, active))
+	val get_preview_widget_active_ : cptr -> bool
+	    = _import "gtk_file_chooser_get_preview_widget_active"
+		      : cptr -> bool;
+	val get_preview_widget_active : 'a t -> bool
+	    = fn self => GObject.withPtr
+			   (self, fn self => get_preview_widget_active_ self)
+	val set_use_preview_label_ : cptr * bool -> unit
+	    = _import "gtk_file_chooser_set_use_preview_label"
+		      : cptr * bool -> unit;
+	val set_use_preview_label : 'a t -> bool -> unit
+	    = fn self => fn use_label =>
+		 GObject.withPtr
+		   (self, fn self => set_use_preview_label_ (self, use_label))
+	val get_use_preview_label_ : cptr -> bool
+	    = _import "gtk_file_chooser_get_use_preview_label" : cptr -> bool;
+	val get_use_preview_label : 'a t -> bool
+	    = fn self => GObject.withPtr
+			   (self, fn self => get_use_preview_label_ self)
+	val get_preview_filename_ : cptr -> CString.t
+	    = _import "gtk_file_chooser_get_preview_filename"
+		      : cptr -> CString.t;
+	val get_preview_filename : 'a t -> string
+	    = fn self => GObject.withPtr
+			   (self, 
+			    fn self => let val t = get_preview_filename_ self
+				       in CString.toString t end)
+	val get_preview_uri_ : cptr -> CString.t
+	    = _import "gtk_file_chooser_get_preview_uri" : cptr -> CString.t;
+	val get_preview_uri : 'a t -> string
+	    = fn self => GObject.withPtr
+			   (self, 
+			    fn self => let val t = get_preview_uri_ self
+				       in CString.toString t end)
+	val set_extra_widget_ : cptr * cptr -> unit
+	    = _import "gtk_file_chooser_set_extra_widget"
+		      : cptr * cptr -> unit;
+	val set_extra_widget : 'a t -> 'b Widget.t -> unit
+	    = fn self => fn extra_widget =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => GObject.withPtr (extra_widget, 
+						fn extra_widget =>
+						   set_extra_widget_
+						     (self, extra_widget)))
+	val get_extra_widget_ : cptr -> cptr
+	    = _import "gtk_file_chooser_get_extra_widget" : cptr -> cptr;
+	val get_extra_widget : 'a t -> base Widget.t
+	    = fn self =>
+		 Widget.inherit
+		   ()
+		   (fn () => GObject.withPtr
+			       (self, fn self => get_extra_widget_ self))
+	val add_filter_ : cptr * cptr -> unit
+	    = _import "gtk_file_chooser_add_filter" : cptr * cptr -> unit;
+	val add_filter : 'a t -> 'b t -> unit
+	    = fn self => fn filter =>
+		 GObject.withPtr
+		   (self, 
+		    fn self =>
+		       GObject.withPtr
+			 (filter, fn filter => add_filter_ (self, filter)))
+	val remove_filter_ : cptr * cptr -> unit
+	    = _import "gtk_file_chooser_remove_filter" : cptr * cptr -> unit;
+	val remove_filter : 'a t -> 'b t -> unit
+	    = fn self => fn filter =>
+		 GObject.withPtr
+		   (self, 
+		    fn self =>
+		       GObject.withPtr
+			 (filter, fn filter => remove_filter_ (self, filter)))
+	val set_filter_ : cptr * cptr -> unit
+	    = _import "gtk_file_chooser_set_filter" : cptr * cptr -> unit;
+	val set_filter : 'a t -> 'b t -> unit
+	    = fn self => fn filter =>
+		 GObject.withPtr
+		   (self, 
+		    fn self =>
+		       GObject.withPtr
+			 (filter, fn filter => set_filter_ (self, filter)))
+	val get_filter_ : cptr -> cptr
+	    = _import "gtk_file_chooser_get_filter" : cptr -> cptr;
+	val get_filter : 'a t -> base t
+	    = fn self => make (GObject.withPtr
+				 (self, fn self => get_filter_ self))
+	val dialog_get_type_ : unit -> GType.t
+	    = _import "gtk_file_chooser_dialog_get_type" : unit -> GType.t;
+	val dialog_get_type : unit -> GType.t
+	    = fn dummy => dialog_get_type_ dummy
+	val dialog_new_with_backend_ : CString.cstring * cptr * int 
+				     * CString.cstring * CString.cstring
+				       -> cptr
+	    = _import "gtk_file_chooser_dialog_new_with_backend"
+		      : CString.cstring * cptr * int * CString.cstring 
+		      * CString.cstring
+			-> cptr;
+	val dialog_new_with_backend
+	  : string -> 'a Window.t -> file_chooser_action -> string -> string
+	    -> base t
+	    = fn title => fn parent => fn action => fn backend => 
+	      fn first_button_text =>
+		 make (GObject.withPtr
+			 (parent, 
+			  fn parent =>
+			     dialog_new_with_backend_
+			       (CString.fromString title, parent, action, 
+				CString.fromString backend, 
+				CString.fromString first_button_text)))
+	val widget_get_type_ : unit -> GType.t
+	    = _import "gtk_file_chooser_widget_get_type" : unit -> GType.t;
+	val widget_get_type : unit -> GType.t
+	    = fn dummy => widget_get_type_ dummy
+	val widget_new_with_backend_ : int * CString.cstring -> cptr
+	    = _import "gtk_file_chooser_widget_new_with_backend"
+		      : int * CString.cstring -> cptr;
+	val widget_new_with_backend : file_chooser_action -> string -> base t
+	    = fn action => fn backend =>
+		 make (widget_new_with_backend_
+			 (action, CString.fromString backend))
+    end
+    structure FileChooserDialog :>
+      sig
+	type base
+	type 'a filechooserdialog_t
+	type 'a t = 'a filechooserdialog_t Dialog.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileChooserDialog : 'a t -> base t
+	val asFileChooser : 'a t -> base FileChooser.t
+	val new : string -> 'a Window.t option -> file_chooser_action 
+	       -> 'b Window.t option
+		  -> base t
+	val new' : string -> file_chooser_action -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a filechooserdialog_t = unit
+	type 'a t = 'a filechooserdialog_t Dialog.t
+	fun inherit w con = Dialog.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileChooserDialog obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	fun asFileChooser obj
+	  = FileChooser.inherit
+	      () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val new_ : CString.cstring * cptr * int * cptr -> cptr
+	    = _import "gtk_file_chooser_dialog_new"
+		      : CString.cstring * cptr * int * cptr -> cptr;
+	val new : string -> 'a Window.t option -> file_chooser_action 
+	       -> 'b Window.t option
+		  -> base t
+	    = fn title => fn parent => fn action => fn first_button_text =>
+		 make (GObject.withOpt
+			 (parent, 
+			  fn parent =>
+			     GObject.withOpt
+			       (first_button_text, 
+				fn first_button_text =>
+				   new_ (CString.fromString title, parent, 
+					 action, first_button_text))))
+	val new' : string -> file_chooser_action -> base t
+	    = fn title => fn action =>
+		 make (new_ (CString.fromString title, GObject.null, action, 
+			     GObject.null))
+    end
+    structure FileChooserWidget :>
+      sig
+	type base
+	type 'a filechooserwidget_t
+	type 'a t = 'a filechooserwidget_t VBox.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileChooserWidget : 'a t -> base t
+	val asFileChooser : 'a t -> base FileChooser.t
+	val new : file_chooser_action -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a filechooserwidget_t = unit
+	type 'a t = 'a filechooserwidget_t VBox.t
+	fun inherit w con = VBox.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileChooserWidget obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	fun asFileChooser obj
+	  = FileChooser.inherit
+	      () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val new_ : int -> cptr
+	    = _import "gtk_file_chooser_widget_new" : int -> cptr;
+	val new : file_chooser_action -> base t
+	    = fn action => make (new_ action)
+    end
+    structure FileFilter :>
+      sig
+	type base
+	type 'a filefilter_t
+	type 'a t = 'a filefilter_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileFilter : 'a t -> base t
+	val get_type : unit -> GType.t
+	val new : unit -> base t
+	val set_name : 'a t -> string -> unit
+	val get_name : 'a t -> string
+	val add_mime_type : 'a t -> string -> unit
+	val add_pattern : 'a t -> string -> unit
+	val get_needed : 'a t -> file_filter_flags list
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a filefilter_t = unit
+	type 'a t = 'a filefilter_t Object.t
+	fun inherit w con = Object.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileFilter obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_type_ : unit -> GType.t
+	    = _import "gtk_file_filter_get_type" : unit -> GType.t;
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val new_ : unit -> cptr = _import "gtk_file_filter_new" : unit -> cptr;
+	val new : unit -> base t = fn dummy => make (new_ dummy)
+	val set_name_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_filter_set_name"
+		      : cptr * CString.cstring -> unit;
+	val set_name : 'a t -> string -> unit
+	    = fn self => fn name =>
+		 GObject.withPtr
+		   (self, fn self => set_name_ (self, CString.fromString name))
+	val get_name_ : cptr -> CString.t
+	    = _import "gtk_file_filter_get_name" : cptr -> CString.t;
+	val get_name : 'a t -> string
+	    = fn self => GObject.withPtr (self, 
+					  fn self => let val t = get_name_ self
+						     in CString.toString t end)
+	val add_mime_type_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_filter_add_mime_type"
+		      : cptr * CString.cstring -> unit;
+	val add_mime_type : 'a t -> string -> unit
+	    = fn self => fn mime_type =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => add_mime_type_
+				 (self, CString.fromString mime_type))
+	val add_pattern_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_filter_add_pattern"
+		      : cptr * CString.cstring -> unit;
+	val add_pattern : 'a t -> string -> unit
+	    = fn self => fn pattern =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => add_pattern_ (self, CString.fromString pattern))
+	val get_needed_ : cptr -> int
+	    = _import "gtk_file_filter_get_needed" : cptr -> int;
+	val get_needed : 'a t -> file_filter_flags list
+	    = fn self => Flags.get (GObject.withPtr
+				      (self, fn self => get_needed_ self))
+    end
+    structure FileSelection :>
+      sig
+	type base
+	type 'a fileselection_t
+	type 'a t = 'a fileselection_t Dialog.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toFileSelection : 'a t -> base t
+	val get_type : unit -> GType.t
+	val new : string -> base t
+	val set_filename : 'a t -> string -> unit
+	val get_filename : 'a t -> string
+	val complete : 'a t -> string -> unit
+	val show_fileop_buttons : 'a t -> unit
+	val hide_fileop_buttons : 'a t -> unit
+	val set_select_multiple : 'a t -> bool -> unit
+	val get_select_multiple : 'a t -> bool
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a fileselection_t = unit
+	type 'a t = 'a fileselection_t Dialog.t
+	fun inherit w con = Dialog.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toFileSelection obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_type_ : unit -> GType.t
+	    = _import "gtk_file_selection_get_type" : unit -> GType.t;
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val new_ : CString.cstring -> cptr
+	    = _import "gtk_file_selection_new" : CString.cstring -> cptr;
+	val new : string -> base t
+	    = fn title => make (new_ (CString.fromString title))
+	val set_filename_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_selection_set_filename"
+		      : cptr * CString.cstring -> unit;
+	val set_filename : 'a t -> string -> unit
+	    = fn self => fn filename =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => set_filename_
+				 (self, CString.fromString filename))
+	val get_filename_ : cptr -> CString.t
+	    = _import "gtk_file_selection_get_filename" : cptr -> CString.t;
+	val get_filename : 'a t -> string
+	    = fn self => GObject.withPtr
+			   (self, 
+			    fn self => let val t = get_filename_ self
+				       in CString.toString t end)
+	val complete_ : cptr * CString.cstring -> unit
+	    = _import "gtk_file_selection_complete"
+		      : cptr * CString.cstring -> unit;
+	val complete : 'a t -> string -> unit
+	    = fn self => fn pattern =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => complete_ (self, CString.fromString pattern))
+	val show_fileop_buttons_ : cptr -> unit
+	    = _import "gtk_file_selection_show_fileop_buttons" : cptr -> unit;
+	val show_fileop_buttons : 'a t -> unit
+	    = fn self => GObject.withPtr
+			   (self, fn self => show_fileop_buttons_ self)
+	val hide_fileop_buttons_ : cptr -> unit
+	    = _import "gtk_file_selection_hide_fileop_buttons" : cptr -> unit;
+	val hide_fileop_buttons : 'a t -> unit
+	    = fn self => GObject.withPtr
+			   (self, fn self => hide_fileop_buttons_ self)
+	val set_select_multiple_ : cptr * bool -> unit
+	    = _import "gtk_file_selection_set_select_multiple"
+		      : cptr * bool -> unit;
+	val set_select_multiple : 'a t -> bool -> unit
+	    = fn self => fn select_multiple =>
+		 GObject.withPtr (self, 
+				  fn self => set_select_multiple_
+					       (self, select_multiple))
+	val get_select_multiple_ : cptr -> bool
+	    = _import "gtk_file_selection_get_select_multiple" : cptr -> bool;
+	val get_select_multiple : 'a t -> bool
+	    = fn self => GObject.withPtr
+			   (self, fn self => get_select_multiple_ self)
     end
 end

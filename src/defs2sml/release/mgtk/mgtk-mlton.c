@@ -633,6 +633,28 @@ EXTERNML void mgtk_get_gtk_text_window_type(int* x0, int* x1, int* x2, int* x3, 
   *x0 = GTK_TEXT_WINDOW_PRIVATE;
 }
 
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_file_chooser_action(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER;
+  *x2 = GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER;
+  *x1 = GTK_FILE_CHOOSER_ACTION_SAVE;
+  *x0 = GTK_FILE_CHOOSER_ACTION_OPEN;
+}
+
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_file_chooser_error(int* x0, int* x1) {
+  *x1 = GTK_FILE_CHOOSER_ERROR_BAD_FILENAME;
+  *x0 = GTK_FILE_CHOOSER_ERROR_NONEXISTENT;
+}
+
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_file_filter_flags(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_FILE_FILTER_MIME_TYPE;
+  *x2 = GTK_FILE_FILTER_DISPLAY_NAME;
+  *x1 = GTK_FILE_FILTER_URI;
+  *x0 = GTK_FILE_FILTER_FILENAME;
+}
+
 
 
 /* *** AccelGroup *** */
@@ -1171,9 +1193,6 @@ EXTERNML void mgtk_get_gtk_dialog_flags(int* x0, int* x1, int* x2) {
 /* *** FontSelectionDialog *** */
 
 
-/* *** FileSelection *** */
-
-
 /* *** ColorSelectionDialog *** */
 
 
@@ -1181,3 +1200,18 @@ EXTERNML void mgtk_get_gtk_dialog_flags(int* x0, int* x1, int* x2) {
 
 
 /* *** Clipboard *** */
+
+
+/* *** FileChooser *** */
+
+
+/* *** FileChooserDialog *** */
+
+
+/* *** FileChooserWidget *** */
+
+
+/* *** FileFilter *** */
+
+
+/* *** FileSelection *** */
