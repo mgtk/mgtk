@@ -241,6 +241,8 @@ struct
 				  info = StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))}
                            :: Member{name=Name.fromString "structureheader",
 				  info = StrOnly(TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"]))))}
+                           :: Member{name=Name.fromString "structureheader",
+				  info = Some(TypeDecl(([],["base"]),StrOnly UnitTy))}
 			   :: List.concat(List.map (generate_member tinfo) members)}
     end (* local *)
 

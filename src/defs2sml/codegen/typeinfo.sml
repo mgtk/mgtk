@@ -45,7 +45,8 @@ structure TypeInfo :> TypeInfo = struct
         ,("gdouble",   (fn _ => SMLType.RealTy,SMLType.RealTy,
 		        ccall"Double_val", ccall"copy_double", NONE))
         ,("ptr",       (fn _ => SMLType.TyApp([],["cptr"]),SMLType.TyApp([],["cptr"]),         (* FIXME *)
-		        fn e => e, fn e => e, NONE))
+		        fn e => TinyC.Cast(TinyC.TTyName "gpointer",e), 
+			fn e => TinyC.Cast(TinyC.TValue,e), NONE))
         ,("bool",      (fn _ => SMLType.BoolTy,SMLType.BoolTy,
 		        ccall"Bool_val", ccall"Val_bool", NONE))
         ,("GType",     (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)

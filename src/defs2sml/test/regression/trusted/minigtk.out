@@ -2,6 +2,7 @@ structure Gtk = struct
     open Dynlib
     val symb = GtkBasis.symb
     type cptr = GObject.cptr
+    type base = unit
     signature Object = sig
         type base
         type 'a object_t

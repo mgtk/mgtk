@@ -37,16 +37,35 @@ structure TinySML = struct
       | Open of string list
 
 
+    structure H = Polyhash
+    exception NotFound
+    val trans_table = H.mkPolyTable (17, NotFound)
+    val () =
+	List.app (fn (str, trans) => H.insert trans_table (str, trans))
+            [ ("and",  "an")
+            , ("case", "cas")
+	    , ("end",  "en")
+	    , ("open", "opn")
+	    , ("ref", "refe")
+            , ("type", "typ")
+            , ("val", "valu")
+	    , ("where", "wher")
+	    , ("with",  "wth")
+	    , ("NONE",  "NON")
+            ]
+    fun mlify str = H.find trans_table str
+		    handle NotFound => str
+
     fun toString (isStrMode,isSigMode) mode indent info =
 	let fun parens safe level s = if level > safe then "(" ^ s ^ ")"
 				      else s
 	    fun show_exp level exp =
 		case exp of
 		    Unit => "()"
-		  | Var x => x
+		  | Var x => mlify x
 		  | Long n => Name.toString n
 		  | Str s => "\"" ^ s ^ "\""
-		  | Fn(x,e) => parens 1 level ("fn " ^ x ^ " => " ^ show_exp 1 e)
+		  | Fn(x,e) => parens 1 level ("fn " ^ mlify x ^ " => " ^ show_exp 1 e)
 		  | App(Var "symb",[Str s]) => "(symb\""^s^"\")"
 		  | App(e,es) => parens 2 level 
 				    (show_exp 3 e ^ 
@@ -57,7 +76,7 @@ structure TinySML = struct
 	    val show_exp = fn exp => show_exp 1 exp
 	    fun show_pat pat =
 		case pat of
-		    VarPat x => x
+		    VarPat x => mlify x
 		  | TupPat ps => Util.stringSep "(" ")" "," show_pat ps
 	    fun show_type_incl sep None = "" 
 	      | show_type_incl sep (Some ty) = sep ^ SMLType.toString ty

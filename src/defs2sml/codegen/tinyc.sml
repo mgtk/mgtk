@@ -18,6 +18,7 @@ struct
 	   | TStruct of string
 	   | TFunc of ctype list * ctype
 *)
+	   | TTyName of string
 
     datatype expr =
 	     Var of var
@@ -71,6 +72,7 @@ struct
 		  | TValue => "value"
 		  | TVoid => "void"
 		  | TStar ty => showTy ty ^ "*"
+		  | TTyName tname => tname
 	    fun showExp exp =
 		case exp of
 		    Var x => x

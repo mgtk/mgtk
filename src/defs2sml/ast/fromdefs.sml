@@ -66,7 +66,10 @@ structure FromDefs :> FromDefs = struct
 		       handle AttribNotFound _ => 
 			  (* okay, so this isn't a constructor; look for
                              a probable module *)
-			  probableModule top Name.separateUnderscores name
+			  let val md = probableModule top Name.separateUnderscores name
+			  in  if md = top then (getObject def handle AttribNotFound _ => top)
+			      else md
+			  end
 		       val isConst = 
 			   (getConstructor def; true)
 			   handle AttribNotFound _ =>

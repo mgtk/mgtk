@@ -52,8 +52,13 @@ regcomp-%: reggen-%
            echo Ok ;\
         fi
 
-mgtk.c: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
-	./$(MAIN) -co mgtk.c -so mGtk.sml -cp lib/preamble.c api/pygtk/gtk.defs 
+mgtk.c mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
+	./$(MAIN) -co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gtk.defs 
 
-ctest: $(MAIN) mgtk.c
+compile: $(MAIN) mgtk.c mgtk.sml
+	mosmlc -toplevel -liberal -c mgtk.sml
 	gcc $(CINCLUDE) -c -o /dev/null mgtk.c > c.out 2>&1 
+
+realclean:
+	rm -f c.out mgtk.c mgtk.sml
+	rm -f typetable.txt

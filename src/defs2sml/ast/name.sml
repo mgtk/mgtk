@@ -12,6 +12,7 @@ structure Name :> NAME = struct
 	let fun loop [] = []
 	      (* Special-case some Gtk name patterns *)
 	      | loop ("get"::"type"::xs) = "get"::"type" :: loop xs
+	      | loop ("get"::"buffer"::xs) = "get"::"buffer" :: loop xs
 	      | loop ("Window"::"Type"::xs) = "Window"::"Type" :: loop xs
 	      | loop (x::"Type"::xs) = (x^"Type") :: loop xs
 	      | loop (x::"type"::xs) = (x^"type") :: loop xs
@@ -21,6 +22,7 @@ structure Name :> NAME = struct
 	      | loop (x::"renderer"::xs) = (x^"renderer") :: loop xs
 	      | loop (x::"Iter"::xs) = (x^"Iter") :: loop xs
 	      | loop (x::"iter"::xs) = (x^"iter") :: loop xs
+	      | loop ("Rc"::"Style"::xs) = "RcStyle" :: loop xs
 	      | loop (x::xs) = x :: loop xs
 	in  loop words end
 
@@ -169,9 +171,34 @@ structure Name :> NAME = struct
 	in  combine "_" (toLower(undSep path), toLower(undSep base))
 	end
 *)
+    local 
+	structure H = Polyhash
+	exception NotFound
+	val trans_table = H.mkPolyTable (17, NotFound)
+	val () =
+	    List.app (fn (str, trans) => H.insert trans_table (str, trans))
+		[ ("cellrenderer",  "cell_renderer")
+		, ("textbuffer", "text_buffer")
+		, ("withbuffer",  "with_buffer")
+		]
+	fun ify str = H.find trans_table str
+	              handle NotFound => str
+
+	fun ify [] acc = rev acc
+	  | ify ("CellRenderer"::rest) acc = ify rest ("Renderer"::"Cell"::acc)
+	  | ify ("TextBuffer"::rest) acc = ify rest ("Buffer"::"Text"::acc)
+	  | ify ("withbuffer"::rest) acc = ify rest ("buffer"::"with"::acc)
+	  | ify (w::rest) acc = ify rest (w::acc)	    
+    in
+    fun cify name =
+	fromPaths(ify (#fullpath name) [],
+		  ify (#path name) [],
+		  ify (#base name) [])
+    end (* local *)
+
     val asCEnum = asCName "_" toLower
     val asCBoxed = asCName "" (fn s=>s)
-    val asCFunc = asCName "_" toLower
+    val asCFunc = (asCName "_" toLower) o cify
     val asCEnumConst = asCName "_" toUpper
     fun asCStub name = "mgtk_" ^ asCName "_" toLower name
     fun asCGetEnum name = "mgtk_get_" ^ asCName "_" toLower name
