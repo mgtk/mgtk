@@ -94,9 +94,10 @@ fun main () =
 		    MsgUtil.close "done\n")
 	val _ = MsgUtil.print ("Defs file with " ^ Int.toString (List.length defs) ^ " definitions\n")
 
+	val toplevel = Name.capitalize(Path.base(Path.file (getFile())))
 
         (* 2. Build modules and exclude items*)
-	val api = FromDefs.fromDefs "Gtk" defs
+	val api = FromDefs.fromDefs toplevel defs
 	val exclude = 
 	    let fun read file =
 		    let val is = TextIO.openIn file
