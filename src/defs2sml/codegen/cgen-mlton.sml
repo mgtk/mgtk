@@ -51,6 +51,14 @@ functor GenCMLton(structure TypeInfo : TypeInfo)
 			  body),
 		      SOME ty)]
 		end
+	  | AST.Boxed(SOME{copy,...}) =>
+                let val ty = TTyName(Name.asCBoxed name)
+		    val body = Block(NONE,[VDecl("res",ty,NONE)], 
+				     [Return(Call(copy,NONE,[Call("&",NONE,[Var"res"])]))])
+		in  [(Fun(Proto(SOME"EXTERNML","alloc_"^Name.asCBoxed name,[],TStar ty),
+			  body),
+		      NONE)]
+		end
 
 (*
 val construct = List.foldl (fn (e,(c,i)) => (Ass(Call("Field", NONE, [Var "res", Int i]),TInt,Call("Val_int",NONE,[Var (Name.asCEnumConst e)]))::c,i+1)) ([],0) enums

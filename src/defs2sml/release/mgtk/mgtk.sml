@@ -341,7 +341,6 @@ structure Gtk  = struct
     type requisition = GObject.cptr
     type ctree_node = GObject.cptr
     type icon_set = GObject.cptr
-    type icon_source = GObject.cptr
     type selection_data = GObject.cptr
     type text_attributes = GObject.cptr
     type textiter = GObject.cptr
@@ -3523,7 +3522,6 @@ structure Gtk  = struct
 	val get_mode : 'a t -> selection_mode
 	val get_user_data : 'a t -> cptr
 	val get_treeview : 'a t -> base t
-	val get_selected : 'a t -> bool * base TreeModel.t * treeiter
 	val select_path : 'a t -> tree_path -> unit
 	val unselect_path : 'a t -> tree_path -> unit
 	val selectiter : 'a t -> treeiter -> unit
@@ -3564,12 +3562,6 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_tree_selection_get_tree_view")
 	val get_treeview : 'a t -> base t
 	    = fn self => make (get_treeview_ (repr self))
-	val get_selected_ : cptr -> bool * cptr * cptr
-	    = app1 (symb"mgtk_gtk_tree_selection_get_selected")
-	val get_selected : 'a t -> bool * base TreeModel.t * treeiter
-	    = fn self =>
-		 let val (res0, res1, res2) = get_selected_ (repr self)
-		 in (res0, TreeModel.inherit () (fn () => res1), res2) end
 	val select_path_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_tree_selection_select_path")
 	val select_path : 'a t -> tree_path -> unit
@@ -5783,7 +5775,6 @@ structure Gtk  = struct
 		      -> bool option
 			 -> unit
 	val set_cursor' : 'a t -> tree_path -> unit
-	val get_cursor : 'a t -> tree_path * base TreeViewColumn.t
 	val unset_rows_drag_source : 'a t -> unit
 	val unset_rows_drag_dest : 'a t -> unit
 	val set_drag_dest_row : 'a t -> tree_path -> drop_position -> unit
@@ -6012,12 +6003,6 @@ structure Gtk  = struct
 	val set_cursor' : 'a t -> tree_path -> unit
 	    = fn self => fn path =>
 		 set_cursor_ (repr self) path GObject.null false
-	val get_cursor_ : cptr -> cptr * cptr
-	    = app1 (symb"mgtk_gtk_tree_view_get_cursor")
-	val get_cursor : 'a t -> tree_path * base TreeViewColumn.t
-	    = fn self =>
-		 let val (res0, res1) = get_cursor_ (repr self)
-		 in (res0, TreeViewColumn.inherit () (fn () => res1)) end
 	val unset_rows_drag_source_ : cptr -> unit
 	    = app1 (symb"mgtk_gtk_tree_view_unset_rows_drag_source")
 	val unset_rows_drag_source : 'a t -> unit

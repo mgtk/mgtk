@@ -98,6 +98,10 @@ structure GValue :>
     type GValues
     type GValue
 
+    val int    : int    -> GValue
+    val string : string -> GValue
+    val real   : real   -> GValue
+
     type 'a setter = GValue -> 'a -> unit
     val setBool   : bool setter
     val setInt    : int setter
@@ -114,6 +118,13 @@ structure GValue :>
     type GValue = MLton.Pointer.t
 
     fun curry f x y = f(x,y)
+
+    val int    : int    -> GValue 
+      = _import "mgtk_g_value_set_int"    : int    -> GValue;
+    val string : string -> GValue 
+      = _import "mgtk_g_value_set_string" : string -> GValue;
+    val real   : real   -> GValue 
+      = _import "mgtk_g_value_set_real"   : real   -> GValue;
 
     (* UNSAFE: no error checking in the set and get functions! *)
     type 'a setter_ = GValue * 'a -> unit

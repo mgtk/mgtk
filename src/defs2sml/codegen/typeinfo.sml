@@ -5,8 +5,8 @@ signature PRIMTYPES = sig
     type exp = TinySML.exp
     type sml_ty = SMLType.ty
     type 'a ty = (Name.name, 'a) Type.ty
-    val mkArrowTy : ('a ty -> sml_ty) * ('a ty -> sml_ty) -> 
-		    'a ty list * 'a ty -> sml_ty
+    val mkArrowTy : ('a ty -> sml_ty) * ('a ty -> sml_ty) * ('a ty -> bool)
+		    -> 'a ty list * 'a ty -> sml_ty
     val mkArrayPrimTy : sml_ty -> sml_ty
     val stringTy : bool (*negative*) -> bool (*output*) -> sml_ty
     val outputPrimString : unit -> exp
@@ -26,7 +26,7 @@ structure MosmlPrimTypes : PRIMTYPES = struct
     fun appendTypes toprim (ty, []) = toprim ty
       | appendTypes toprim (Type.Void, tys) = SMLType.TupTy(map toprim tys)
       | appendTypes toprim (ty, tys) = SMLType.TupTy(map toprim (ty::tys))
-    fun mkArrowTy (toprim,toprimneg) (pars,ret) =
+    fun mkArrowTy (toprim,toprimneg,_) (pars,ret) =
 	let val params = List.filter (not o isOutOnly) pars
 	    val outputs = List.filter isOut pars
 	in  SMLType.ArrowTy(
@@ -47,11 +47,19 @@ structure MLtonPrimTypes : PRIMTYPES = struct
     type exp = TinySML.exp
     type sml_ty = SMLType.ty
     type 'a ty = (Name.name, 'a) Type.ty
-    fun mkType toprim (ty as Type.Output(_,ty')) = SMLType.RefTy(toprim ty)
-      | mkType toprim ty = toprim ty
-    fun mkArrowTy (toprim,toprimneg) (pars,ret) =
-	SMLType.ArrowTy([SMLType.TupTy(List.map (mkType toprim) pars)], 
-			mkType toprimneg ret)
+
+    fun isTname (Type.Tname _) = true
+      | isTname (Type.Output(_,t)) = isTname t
+      | isTname (Type.Ptr t) = isTname t
+      | isTname (Type.WithDefault(t,_)) = isTname t
+      | isTname _ = false
+    fun mkType (toprim,iswrapped) (ty as Type.Output(_,ty')) =
+	if isTname ty' andalso not(iswrapped ty') then toprim ty
+	else SMLType.RefTy(toprim ty)
+      | mkType (toprim,iswrapped) ty = toprim ty
+    fun mkArrowTy (toprim,toprimneg,iswrapped) (pars,ret) =
+	SMLType.ArrowTy([SMLType.TupTy(List.map (mkType (toprim,iswrapped)) pars)], 
+			mkType (toprimneg,iswrapped) ret)
     fun mkArrayPrimTy ty = SMLType.TyApp([ty],["array"])
     val stringTy = fn neg => fn output =>
 		      if neg orelse output
@@ -199,7 +207,9 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		        add(table,name,
 			    {kind = Boxed, toc=(Name.asCBoxed name^"_val"), 
 			     ctype = TinyC.TTyName(Name.asCType name),
-			     fromc=("Val_"^Name.asCBoxed name), default = Var"GObject.null",
+			     fromc=("Val_"^Name.asCBoxed name), 
+			     default = App(Var("alloc_"^Name.asCBoxed name),
+					   [Const "()"]),
 			     fromprim=id, toprim=NONE, wrapped = false,
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
@@ -347,7 +357,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Ptr ty => SMLType.TyApp([],["cptr"])
 	  | Type.Func(pars,ret) => 
 	       Prim.mkArrowTy 
-		   (toPrimType negative tinfo, toPrimType (not negative) tinfo)
+		   (toPrimType negative tinfo, toPrimType (not negative) tinfo, isWrapped tinfo)
 		   (List.map (#2) pars, ret)
 	  | Type.Array(ty) => Prim.mkArrayPrimTy(toPrimType negative tinfo ty)
     val toPrimType = fn tinfo => fn ty => toPrimType false tinfo ty

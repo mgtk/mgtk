@@ -18,6 +18,7 @@ signature PRIMITIVES = sig
     val mkOutputStub: bool -> TypeInfo.typeinfo -> ('a ty -> exp -> exp)
 		      -> (string * 'a ty) list -> 'a ty -> exp 
 		      -> (exp * (string * 'a ty) list * 'a ty list)
+    val boxedAlloc : Name.name -> TinySML.dec option
     val strHeader : TinySML.dec list
 end (* signature PRIMTIVES *)
 
@@ -79,6 +80,8 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 	     params, ret_ty)
 	end
 
+    fun boxedAlloc _ = NONE
+
     val strHeader =
         [ OpenDec["Dynlib"]
         , TypeDec(([],["cptr"]), SOME(TyApp([],["GObject.cptr"])))
@@ -90,7 +93,7 @@ end (* structure MosmlPrims *)
 
 functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES 
 = struct
-    structure TypeInfo = TypeInfo
+    structure TI = TypeInfo and TypeInfo = TypeInfo
     open TinySML SMLType
     type exp = TinySML.exp
     type 'a ty = (Name.name, 'a) Type.ty
@@ -132,25 +135,25 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 	      | unwrapper _                    = "GObject.withPtr"
 	    fun f ((Var "GObject.null",_), c) = c (* hack to avoid unwrapping with withPtr *)
 	      | f ((e,ty), c) =
-		if TypeInfo.isWrapped tinfo ty
+		if TI.isWrapped tinfo ty
 		then let val v = mk e
 		     in  App(Var(unwrapper ty), [Tup[e, Fn(v, c)]])
 		     end
 		else c
 	    fun g (e, Type.WithDefault(ty,def)) = 
-		if TypeInfo.isWrapped tinfo ty
+		if TI.isWrapped tinfo ty
 		then (* already handled by withOpt above *) e
-		else (if TypeInfo.isString tinfo ty
+		else (if TI.isString tinfo ty
 		      then toPrimString
 		      else fn e => e) 
 		     (App(Var"getOpt", [Tup[e, def]]))
 	      | g (e, Type.Output(Type.OUT, ty)) = e
 	      | g (e, ty) = 
-		if TypeInfo.isString tinfo ty
+		if TI.isString tinfo ty
 		then toPrimString e
 		else e
 	    val stub = App(Var(name^"_"), [Tup(List.map g pars)])
-	    val call = if TypeInfo.isString tinfo ret
+	    val call = if TI.isString tinfo ret
 		       then Let(ValDec(VarPat"t",NONE,stub),
 				App(Var"CString.toString",[Var"t"]))
 		       else stub
@@ -164,27 +167,39 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
          version of the function *)
     fun mkOutputStub withDefaults tinfo fromprim parsty ret call =
 	let 
-	    fun isOut p (par,ty) = TypeInfo.isOutput p tinfo ty
+	    fun isOut p (par,ty) = TI.isOutput p tinfo ty
 	    val isout     = isOut (fn _ => true)
 	    val isoutout  = isOut (fn Type.OUT => true  | Type.INOUT => false)
 	    val isinout   = isOut (fn Type.OUT => false | Type.INOUT => true )
 	    fun isdefault (p,t) = 
-		withDefaults andalso TypeInfo.isDefault tinfo t
+		withDefaults andalso TI.isDefault tinfo t
 
 	    val outputs = List.filter isout parsty
 	    val non = List.filter (not o isoutout) parsty
+	    fun isTname (Type.Tname _) = true
+	      | isTname (Type.Output(_,t)) = isTname t
+	      | isTname (Type.Ptr t) = isTname t
+	      | isTname (Type.WithDefault(t,_)) = isTname t
+	      | isTname _ = false
 	    fun refe e = App(Long(Name.fromString "ref"), [e])
+	    fun refe' t e = 
+		if isTname t andalso not(TI.isWrapped tinfo t) then e
+		else refe e
 	    fun deref e = App(Var("!"), [e])
+	    fun deref' t e = 
+		if isTname t andalso not(TI.isWrapped tinfo t) then e
+		else deref e
 	    fun inout (v,t) = 
-		if isinout (v,t) andalso not(isdefault (v,t)) then refe (Var v)
-		else refe (TypeInfo.defaultValue tinfo t)
+		if isinout (v,t) andalso not(isdefault (v,t)) 
+		then refe' t (Var v)
+		else refe' t (TI.defaultValue tinfo t)
 	    val ret_ty = (case ret of Type.Void => []
 				    | ty => [ty])
 			 @ (List.map #2 outputs)
 	    val ret_val = case ret of Type.Void => []
 				    | ty => [Var "ret"]
 	    fun fromprim' t e =
-		if TypeInfo.isString tinfo t 
+		if TI.isString tinfo t 
 		then App(Var"CString.toString",[Tup[fromprim t e]])
 		else fromprim t e
 	in  (Let(SeqDec
@@ -193,11 +208,17 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 		 , ValDec(VarPat "ret", NONE, call)
                  ],
 		 Tup(ret_val @ 
-		     List.map (fn (x,t) => fromprim' t (deref(Var x)))
+		     List.map (fn (x,t) => fromprim' t (deref' t (Var x)))
 			      outputs
 		    )
 		),
 	     non, ret_ty)
+	end
+
+    fun boxedAlloc name = 
+	let val n = "alloc_"^Name.asCBoxed name
+	    val ty = ArrowTy([UnitTy],TyApp([],[Name.asBoxed name]))
+	in  SOME(ValDec(VarPat n, NONE, Import(n, ty)))
 	end
 
     val strHeader = 
@@ -216,8 +237,10 @@ struct
     structure P = Prims
     structure TI = TypeInfo
 
-    infix ++
+    infix ++ +?
     fun d1 ++ d2 = SeqDec[d1,d2]
+    fun d1 +? (SOME d2) = SeqDec[d1,d2]
+      | d1 +? NONE = d1
 
     infix **
     fun s1 ** s2 = SeqSpec[s1,s2]
@@ -363,14 +386,6 @@ struct
 		    fun fromtype ty = fromtype' ty 
 
 		    val defpars = List.map (trans o default o var) parsty
-(*
-		    val defparams = 
-			List.map (fromtype o #2) 
-				 (List.filter (not o (TypeInfo.isDefault tinfo) o #2) parsty)
-		    val defparams = if List.length defparams = 0 then
-					[SMLType.UnitTy]
-				    else defparams
-*)
 		    val defpars' = List.filter (not o (TypeInfo.isDefault tinfo) o #2) parsty
 		    val defpars' = if List.length defpars' = 0 then
 				        [("dummy", Type.Void)]
@@ -432,8 +447,10 @@ struct
 		end
 
 	  | AST.Boxed funcs =>
-	        let val name = Name.asBoxed name
-		in  {stru=TypeDec(([],[name]), SOME(TyApp([],["GObject.cptr"]))),
+	        let val alloc = P.boxedAlloc name
+		    val name = Name.asBoxed name
+		in  {stru=TypeDec(([],[name]), SOME(TyApp([],["GObject.cptr"])))
+		          +? alloc,
 		     sign=TypeSpec(([],[name]),NONE)
                     }
 		end

@@ -116,6 +116,7 @@ gtk_text_view_get_line_at_y
 TEMPORARY
 gtk_tree_selection_get_selected
 gtk_tree_view_get_cursor
+GtkIconSource
 UNKNOWNTYPES
 gtk_widget_size_request
 ARRAYS

@@ -481,21 +481,6 @@ value Val_GtkIconSet(void* obj) {
   return res;
 }
 
-#define GtkIconSource_val(x) (((void*) Field(x, 1)))
-
-#define GtkIconSource_val_nocast(x) (Field(x, 1))
-
-static void ml_finalize_GtkIconSource(value val) {
-  gtk_icon_source_free(GtkIconSource_val(val));
-}
-
-value Val_GtkIconSource(void* obj) {
-  value res;
-  res = alloc_final(2, ml_finalize_GtkIconSource, 0, 1);
-  GtkIconSource_val_nocast(res) = (value) gtk_icon_source_copy(obj);
-  return res;
-}
-
 #define GtkSelectionData_val(x) (((void*) Field(x, 1)))
 
 #define GtkSelectionData_val_nocast(x) (Field(x, 1))
@@ -3470,20 +3455,6 @@ EXTERNML value mgtk_gtk_tree_selection_get_tree_view(value self) { /* ML */
     return Val_GtkObj(gtk_tree_selection_get_tree_view(GtkObj_val(self)));
 }
 
-/* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_tree_selection_get_selected(value self) { /* ML */
-    value result;
-    value res;
-    GtkTreeModel* model;
-    GtkTreeIter iter;
-    res = Val_bool(gtk_tree_selection_get_selected(GtkObj_val(self), &model, &iter));
-    result = alloc_tuple(3);
-    Field(result, 0) = res;
-    Field(result, 1) = Val_GtkObj(model);
-    Field(result, 2) = Val_GtkTreeIter(&iter);
-    return result;
-}
-
 /* ML type: cptr -> cptr -> unit */
 EXTERNML value mgtk_gtk_tree_selection_select_path(value self, value path) { /* ML */
     gtk_tree_selection_select_path(GtkObj_val(self), GtkTreePath_val(path));
@@ -5378,18 +5349,6 @@ EXTERNML value mgtk_gtk_tree_view_get_reorderable(value self) { /* ML */
 EXTERNML value mgtk_gtk_tree_view_set_cursor(value self, value path, value focus_column, value start_editing) { /* ML */
     gtk_tree_view_set_cursor(GtkObj_val(self), GtkTreePath_val(path), GtkObj_val(focus_column), Bool_val(start_editing));
     return Val_unit;
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_tree_view_get_cursor(value self) { /* ML */
-    value result;
-    GtkTreePath* path;
-    GtkTreeViewColumn* focus_column;
-    gtk_tree_view_get_cursor(GtkObj_val(self), &path, &focus_column);
-    result = alloc_tuple(2);
-    Field(result, 0) = Val_GtkTreePath(path);
-    Field(result, 1) = Val_GtkObj(focus_column);
-    return result;
 }
 
 /* ML type: cptr -> unit */
