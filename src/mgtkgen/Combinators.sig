@@ -21,6 +21,9 @@ sig
     val repeat : 'a parser -> ('a list) parser
     val optional : 'a parser -> ('a option) parser
 
+    val skip : (token -> bool) -> (token list) parser
+    val skipN : (token -> bool) -> int -> (token list) parser
+
     val $ : token -> token parser
     val $$ : string -> string parser
 
@@ -89,5 +92,16 @@ end
 
    [string] a parser that accepts a STRING token (see Lexer.sig). This
    is somewhat ugly for a general library of parser combinators.
+
+   [skip p] a parser that skips tokens until the second time a token
+   satisfies p. The parser returns a list of the skipped tokens (in
+   reverse). We use the second time, since the typical use of skip
+   is in a combination (p1 || skip p2) where p1 and p2 match the same
+   initial segment.
+
+   [skipN p n] a parser that behaves like skip (above), but inserts
+   the last n skipped tokens in front of the stream. A more compositional
+   approach would be to separate the ``unget'' functionality from the
+   skip functionality, but we haven't got a such a composition combinator.
 
 *)

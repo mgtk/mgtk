@@ -15,7 +15,7 @@ struct
 infix 6 $--
 infix 6 --$
 infix 5 --
-infix 3 >>
+infix 3 >> >>>
 infix 0 ||
 
 (* Parser combinators *)
@@ -111,5 +111,29 @@ fun $$ s tokenStream =
 	(s', tokenStream') =>
 	    if s = s' then (s, tokenStream')
 	    else raise SyntaxError (s ^ " expected", tokenStream)
+
+fun skip p tokenStream =
+    let fun loop first str acc =
+	    case Lexer.get str of
+		SOME (tok, str') => 
+		     if p tok then if first then loop false str' (tok::acc)
+				            else (tok::acc, str')
+		     else loop first str' (tok::acc)
+              | NONE => (acc, str)
+    in  if Stream.null tokenStream then ([], tokenStream)
+	else ( TextIO.output(TextIO.stdErr, "Syntax Error: skipping tokens!\n")
+	     ; loop true tokenStream []
+             )
+    end
+
+fun skipN p n tokenStream = 
+    let val (skipped, tokenStream') = skip p tokenStream
+	val unget = rev (List.take(skipped, n)) (* skip returns the tokens in reverse order! *)
+	            handle Subscript => raise SyntaxError ("Unexpected end of file (7)", tokenStream)
+	val skipped = List.drop(skipped, n)
+	              handle Subscript => raise SyntaxError ("Unexpected end of file (7)", tokenStream)
+    in  (skipped, Stream.putItems (unget, tokenStream'))
+    end
+
 
 end (* structure Combinators *)

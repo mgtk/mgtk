@@ -120,11 +120,16 @@ struct
     val signalDecl = parenthesized' (defSignal $-- word -- string --
 				     optional cbType)
 
-    val decl  = (fncDecl >> mkFunctionDecl)
+    val decl' = (fncDecl >> mkFunctionDecl)
              || (objDecl >> mkObjectDecl) 
              || (flagsDecl >> mkFlagsDecl)
              || (boxedDecl >> mkBoxedDecl)
              || (signalDecl >> mkSignalDecl)
+
+    fun definePred (Lexer.WORD (pos, str)) = String.isPrefix "define" str
+      | definePred _ = false
+
+    fun decl stream = (decl' || (skipN definePred 2 $-- decl)) stream
 
     val decls = decl -- (repeat decl) >> op::
 

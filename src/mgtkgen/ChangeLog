@@ -1,5 +1,13 @@
 2000-05-02  Henning Niss  <hniss@diku.dk>
 
+	* Combinators.sig: Added two functions skip and skipN
+	skipping tokens until a predicate is satified.
+
+	* Combinators.sml: ditto.
+
+	* Parser.sml: Added skip-to-next-declaration in case of
+	a syntax error.
+
 	* Translate.sml: Allowed for boxed types with no ref/unref
 	functions.
 
