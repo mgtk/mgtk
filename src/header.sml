@@ -107,3 +107,5 @@ struct
     type base = unit
     type 'a widget_t = base
     type 'a GtkWidget = 'a widget_t GtkObject
+
+    type gtk_type = int

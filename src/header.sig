@@ -13,3 +13,5 @@ sig
     type 'a GtkWidget = 'a widget_t GtkObject
     val toWidget: 'a GtkWidget -> base GtkWidget
     val toObject: 'a GtkWidget -> base GtkObject
+
+    type gtk_type
