@@ -3,7 +3,7 @@
                     Ken Friis Larsen <kfl@it.edu>
                      Henning Niss <hniss@it.edu>
 
-             Last modified: $Date: 2003/03/06 20:43:12 $
+             Last modified: $Date: 2003/03/10 13:36:10 $
 
 
 
@@ -18,9 +18,9 @@ atk,...).   For information about GNOME and gtk+ see:
 
 Summary of the needed features in order of importance:
 
-   * Callback (ie., call a SML function from C).  This has been
-     restricted so as only two specific SML functions need to be
-     called.  ESSENTIAL!
+   * Callback (ie., call a SML function from C).  We have designed
+     mGTK so that we only need to call two specific SML functions.
+     ESSENTIAL!
 
 
    * Finalized values.  We need a way to hook-up the memory management
