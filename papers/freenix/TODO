@@ -25,3 +25,49 @@ mGtk+:
 
 Henning: de fem første punkter.
 Ken: kigge på muck-up af "besværlige" treeview koncepter
+
+
+----------------------------------------------------------------------
+
+Deadline: 16. december
+Sidetal: 8-12 sider (10pt, 2 kolonner)
+
+"Kontekst" / motivation:
+
+   * Hvorfor er det et interessant problem?
+
+   * Hvorfor er det interessant at gøre det for Standard ML?
+     (Eksempler på andre bindinger og deres begrænsninger)
+
+Ikke objekt-orienteret sprog:
+
+   * Binde et objekt-lignende library til et ikke-objekt orienteret
+     sprog (repræsentation, typer for ikke-typenørder)
+
+"Process" (fra mini muck-up til maskingenereret kode):
+
+   * Nødvendig arbejdsgang i små projekter
+
+   * Flere forskellige oversættere (mosml, MLton, SML.NET m. Gtk#?)
+
+   * Brugbar teknik for andre library-projekter
+     (En oversætter/fortolker giver en fordel i at tilgængeligheden af
+      et library automatisk gavner alle; maskingenereret kode giver
+      den duale fordel: tilgængelighed for et større antal oversætter
+      ved konstruktion af en lille muck-up.)
+
+Visioner:
+
+   * Større platform (GNOME)
+
+Hvad har vi de andre ikke har:
+
+   * Ikke så meget rent teknisk
+   * Bedre forståelse af koncepterne og problemerne
+   * Bedre platform
+
+Hvad skal der til for at have noget de andre ikke har som vi kan
+dokumentere i en artikel (eller: hvilke artikler er der basis for):
+
+   * Lave Gtk-klasser i Standard ML (håndtere repr og typer).
+     ICFP 2004?
