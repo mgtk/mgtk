@@ -19,10 +19,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a object_t = unit
 	type 'a t = 'a object_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
@@ -49,10 +46,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a widget_t = unit
 	type 'a t = 'a widget_t Object.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Object.inherit witness con end
+	fun inherit w con = Object.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj = inherit () (fn () => repr obj)
 	val destroy_ : cptr -> unit = app1 (symb"mgtk_gtk_widget_destroy")
@@ -94,10 +88,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a container_t = unit
 	type 'a t = 'a container_t Widget.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Widget.inherit witness con end
+	fun inherit w con = Widget.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toContainer obj = inherit () (fn () => repr obj)
 	val set_border_width_ : cptr -> int -> unit
@@ -132,10 +123,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a bin_t = unit
 	type 'a t = 'a bin_t Container.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Container.inherit witness con end
+	fun inherit w con = Container.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toBin obj = inherit () (fn () => repr obj)
     end
@@ -151,7 +139,7 @@ structure Gtk  = struct
 	val POPUP : type_t
 	val new : type_t option -> base t
 	val new' : unit -> base t
-	val get_size : 'a t -> int -> int -> unit
+	val get_size : 'a t -> int * int
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -160,10 +148,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a window_t = unit
 	type 'a t = 'a window_t Bin.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Bin.inherit witness con end
+	fun inherit w con = Bin.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWindow obj = inherit () (fn () => repr obj)
 	type type_t = int
@@ -174,11 +159,12 @@ structure Gtk  = struct
 	val new : type_t option -> base t
 	    = fn typ => make (new_ (getOpt (typ, TOPLEVEL)))
 	val new' : unit -> base t = fn dummy => make (new_ TOPLEVEL)
-	val get_size_ : cptr -> int -> int -> unit
+	val get_size_ : cptr -> int ref -> int ref -> unit
 	    = app3 (symb"mgtk_gtk_window_get_size")
-	val get_size : 'a t -> int -> int -> unit
-	    = fn self => fn width => fn height =>
-		 get_size_ (repr self) width height
+	val get_size : 'a t -> int * int
+	    = fn self => let val (width, height) = (ref 0, ref 0)
+			     val ret = get_size_ (repr self) width height
+			 in (!width, !height) end
     end
     structure Button :>
       sig
@@ -201,10 +187,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a button_t = unit
 	type 'a t = 'a button_t Bin.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Bin.inherit witness con end
+	fun inherit w con = Bin.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toButton obj = inherit () (fn () => repr obj)
 	val get_type_ : unit -> GType.t = app1 (symb"mgtk_gtk_button_get_type")
@@ -244,10 +227,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a editable_t = unit
 	type 'a t = 'a editable_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toEditable obj = inherit () (fn () => repr obj)
 	val get_chars_ : cptr -> int -> int -> string
@@ -271,10 +251,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a celleditable_t = unit
 	type 'a t = 'a celleditable_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toCellEditable obj = inherit () (fn () => repr obj)
     end
@@ -282,9 +259,11 @@ structure Gtk  = struct
       sig
 	type base
 	type 'a entry_t
-	type 'a t = 'a entry_t Editable.t CellEditable.t Widget.t
+	type 'a t = 'a entry_t Widget.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toEntry : 'a t -> base t
+	val asEditable : 'a t -> base Editable.t
+	val asCellEditable : 'a t -> base CellEditable.t
 	val get_text : 'a t -> string
       end = struct
 	open Dynlib
@@ -293,15 +272,12 @@ structure Gtk  = struct
 	val symb = GtkBasis.symb
 	type base = unit
 	type 'a entry_t = unit
-	type 'a t = 'a entry_t Editable.t CellEditable.t Widget.t
-	fun inherit w con
-	  = let val con = let val ptr = con () in fn () => ptr end
-		val witness = ()
-		val witness = Editable.inherit witness con
-		val witness = CellEditable.inherit witness con
-	    in Widget.inherit witness con end
+	type 'a t = 'a entry_t Widget.t
+	fun inherit w con = Widget.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toEntry obj = inherit () (fn () => repr obj)
+	fun asEditable obj = Editable.inherit () (fn () => repr obj)
+	fun asCellEditable obj = CellEditable.inherit () (fn () => repr obj)
 	val get_text_ : cptr -> string = app1 (symb"mgtk_gtk_entry_get_text")
 	val get_text : 'a t -> string = fn self => get_text_ (repr self)
     end
@@ -320,10 +296,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a misc_t = unit
 	type 'a t = 'a misc_t Widget.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Widget.inherit witness con end
+	fun inherit w con = Widget.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toMisc obj = inherit () (fn () => repr obj)
     end
@@ -344,10 +317,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a label_t = unit
 	type 'a t = 'a label_t Misc.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Misc.inherit witness con end
+	fun inherit w con = Misc.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toLabel obj = inherit () (fn () => repr obj)
 	val new_ : string -> cptr = app1 (symb"mgtk_gtk_label_new")
@@ -446,9 +416,13 @@ EXTERNML value mgtk_gtk_window_new(value type) { /* ML */
     return Val_GtkObj(gtk_window_new(Int_val(type)));
 }
 
-/* ML type: cptr -> int -> int -> unit */
-EXTERNML value mgtk_gtk_window_get_size(value self, value width, value height) { /* ML */
-    gtk_window_get_size(GtkObj_val(self), Int_val(width), Int_val(height));
+/* ML type: cptr -> int ref -> int ref -> unit */
+EXTERNML value mgtk_gtk_window_get_size(value self, value width_ref, value height_ref) { /* ML */
+    int width = Int_val(GetRefVal(width_ref));
+    int height = Int_val(GetRefVal(height_ref));
+    gtk_window_get_size(GtkObj_val(self), &(width), &(height));
+    SetRefVal(width_ref, Val_int(width));
+    SetRefVal(height_ref, Val_int(height));
     return Val_unit;
 }
 

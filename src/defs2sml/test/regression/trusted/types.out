@@ -37,10 +37,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a settings_t = unit
 	type 'a t = 'a settings_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toSettings obj = inherit () (fn () => repr obj)
     end
@@ -59,10 +56,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a style_t = unit
 	type 'a t = 'a style_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toStyle obj = inherit () (fn () => repr obj)
     end
@@ -83,10 +77,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a rcstyle_t = unit
 	type 'a t = 'a rcstyle_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toRcStyle obj = inherit () (fn () => repr obj)
 	val rc_get_style_by_paths_
@@ -115,10 +106,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a object_t = unit
 	type 'a t = 'a object_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
@@ -138,10 +126,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a widget_t = unit
 	type 'a t = 'a widget_t Object.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Object.inherit witness con end
+	fun inherit w con = Object.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj = inherit () (fn () => repr obj)
 	val modify_style_ : cptr -> cptr -> unit
@@ -172,10 +157,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a calendar_t = unit
 	type 'a t = 'a calendar_t Widget.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Widget.inherit witness con end
+	fun inherit w con = Widget.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toCalendar obj = inherit () (fn () => repr obj)
 	type display_options = int

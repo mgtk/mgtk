@@ -19,10 +19,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a object_t = unit
 	type 'a t = 'a object_t GObject.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in GObject.inherit witness con end
+	fun inherit w con = GObject.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
@@ -45,10 +42,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a adjustment_t = unit
 	type 'a t = 'a adjustment_t Object.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Object.inherit witness con end
+	fun inherit w con = Object.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toAdjustment obj = inherit () (fn () => repr obj)
 	val new_ : real * real * real * real * real * real -> cptr
@@ -82,10 +76,7 @@ structure Gtk  = struct
 	type base = unit
 	type 'a widget_t = unit
 	type 'a t = 'a widget_t Object.t
-	fun inherit w con = let val con = let val ptr = con ()
-					  in fn () => ptr end
-				val witness = ()
-			    in Object.inherit witness con end
+	fun inherit w con = Object.inherit witness con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj = inherit () (fn () => repr obj)
 	val set_scroll_adjustments_ : cptr -> cptr -> cptr -> bool
