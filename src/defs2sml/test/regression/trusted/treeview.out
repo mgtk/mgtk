@@ -114,6 +114,29 @@ structure Gtk  = struct
 	val set_model' : 'a t -> unit
 	    = fn self => set_model_ (repr self) GObject.null
     end
+    structure TreePath :>
+      sig
+	type base
+	type 'a treepath_t
+	type 'a t = 'a treepath_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreePath : 'a t -> base t
+	val get_indices : 'a t -> int
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a treepath_t = unit
+	type 'a t = 'a treepath_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreePath obj = inherit () (fn () => repr obj)
+	val get_indices_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_tree_path_get_indices")
+	val get_indices : 'a t -> int = fn self => get_indices_ (repr self)
+    end
 end
 
 
@@ -142,5 +165,13 @@ EXTERNML value mgtk_gtk_tree_view_get_model(value self) { /* ML */
 EXTERNML value mgtk_gtk_tree_view_set_model(value self, value model) { /* ML */
     gtk_tree_view_set_model(GtkObj_val(self), GtkObj_val(model));
     return Val_unit;
+}
+
+
+
+/* *** TreePath *** */
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_tree_path_get_indices(value self) { /* ML */
+    return Val_int(gtk_tree_path_get_indices(GtkObj_val(self)));
 }
 

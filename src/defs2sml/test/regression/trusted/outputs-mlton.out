@@ -107,7 +107,7 @@ structure Gtk  = struct
 	type 'a t = 'a editable_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toEditable : 'a t -> base t
-	val insert_text : 'a t -> string -> int -> int option -> int
+	val insert_text : 'a t -> string -> int -> int -> int
 	val insert_text' : 'a t -> string -> int -> int
       end = struct
 	type cptr = GObject.cptr
@@ -121,7 +121,7 @@ structure Gtk  = struct
 	val insert_text_ : cptr * CString.cstring * int * int ref -> unit
 	    = _import "gtk_editable_insert_text"
 		      : cptr * CString.cstring * int * int ref -> unit;
-	val insert_text : 'a t -> string -> int -> int option -> int
+	val insert_text : 'a t -> string -> int -> int -> int
 	    = fn self => fn new_text => fn new_text_length => fn position =>
 		 let val position = ref position
 		     val ret = GObject.withPtr

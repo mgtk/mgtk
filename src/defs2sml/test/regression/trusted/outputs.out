@@ -90,7 +90,7 @@ structure Gtk  = struct
 	type 'a t = 'a editable_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toEditable : 'a t -> base t
-	val insert_text : 'a t -> string -> int -> int option -> int
+	val insert_text : 'a t -> string -> int -> int -> int
 	val insert_text' : 'a t -> string -> int -> int
       end = struct
 	open Dynlib
@@ -105,11 +105,10 @@ structure Gtk  = struct
 	fun toEditable obj = inherit () (fn () => repr obj)
 	val insert_text_ : cptr -> string -> int -> int -> int
 	    = app4 (symb"mgtk_gtk_editable_insert_text")
-	val insert_text : 'a t -> string -> int -> int option -> int
+	val insert_text : 'a t -> string -> int -> int -> int
 	    = fn self => fn new_text => fn new_text_length => fn position =>
-		 let val res0 = insert_text_ (repr self) new_text
-					     new_text_length
-					     (getOpt (position, 0))
+		 let val res0 = insert_text_
+				  (repr self) new_text new_text_length position
 		 in res0 end
 	val insert_text' : 'a t -> string -> int -> int
 	    = fn self => fn new_text => fn new_text_length =>

@@ -23,7 +23,7 @@ structure Gtk  = struct
 	type 'a t = 'a textbuffer_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTextBuffer : 'a t -> base t
-	val insert : 'a t -> TextIter.t -> string -> int option -> unit
+	val insert : 'a t -> TextIter.t -> string -> int -> unit
 	val insert' : 'a t -> TextIter.t -> string -> unit
       end = struct
 	open Dynlib
@@ -38,9 +38,9 @@ structure Gtk  = struct
 	fun toTextBuffer obj = inherit () (fn () => repr obj)
 	val insert_ : cptr -> cptr -> string -> int -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_insert")
-	val insert : 'a t -> TextIter.t -> string -> int option -> unit
+	val insert : 'a t -> TextIter.t -> string -> int -> unit
 	    = fn self => fn iter => fn text => fn len =>
-		 insert_ (repr self) iter text (getOpt (len, ~1))
+		 insert_ (repr self) iter text len
 	val insert' : 'a t -> TextIter.t -> string -> unit
 	    = fn self => fn iter => fn text => insert_ (repr self) iter text ~1
     end

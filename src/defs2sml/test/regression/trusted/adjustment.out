@@ -30,9 +30,7 @@ structure Gtk  = struct
 	type 'a t = 'a adjustment_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toAdjustment : 'a t -> base t
-	val new : real option -> real option -> real option -> real option 
-	       -> real option -> real option
-		  -> base t
+	val new : real -> real -> real -> real -> real -> real -> base t
 	val new' : unit -> base t
       end = struct
 	open Dynlib
@@ -47,14 +45,11 @@ structure Gtk  = struct
 	fun toAdjustment obj = inherit () (fn () => repr obj)
 	val new_ : real * real * real * real * real * real -> cptr
 	    = app1 (symb"mgtk_gtk_adjustment_new")
-	val new : real option -> real option -> real option -> real option 
-	       -> real option -> real option
-		  -> base t
+	val new : real -> real -> real -> real -> real -> real -> base t
 	    = fn value => fn lower => fn upper => fn step_incr => 
 	      fn page_incr => fn page_size =>
-		 make (new_ (getOpt (value, 0.0), getOpt (lower, 0.0), 
-			     getOpt (upper, 0.0), getOpt (step_incr, 0.0), 
-			     getOpt (page_incr, 0.0), getOpt (page_size, 0.0)))
+		 make (new_ (value, lower, upper, step_incr, page_incr, 
+			     page_size))
 	val new' : unit -> base t
 	    = fn dummy => make (new_ (0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     end

@@ -98,7 +98,7 @@ structure Gtk  = struct
 	val DESTROY_WITH_PARENT : flags
 	val NO_SEPARATOR : flags
 	val new_with_buttons : string option -> 'a Window.t option 
-			    -> flags list option -> string option
+			    -> flags list -> string option
 			       -> base t
 	val new_with_buttons' : unit -> base t
       end = struct
@@ -124,18 +124,14 @@ structure Gtk  = struct
 	    = _import "gtk_dialog_new_with_buttons"
 		      : CString.cstring * cptr * int * CString.cstring -> cptr;
 	val new_with_buttons : string option -> 'a Window.t option 
-			    -> flags list option -> string option
+			    -> flags list -> string option
 			       -> base t
 	    = fn title => fn parent => fn flags => fn first_button_text =>
 		 make (GObject.withOpt
 			 (parent, 
-			  fn parent =>
-			     new_with_buttons_
-			       (CString.fromString (getOpt (title, "")), 
-				parent, 
-				getOpt (Option.map Flags.set flags, 0), 
-				CString.fromString
-				  (getOpt (first_button_text, "")))))
+			  fn parent => new_with_buttons_
+					 (title, parent, Flags.set flags, 
+					  first_button_text)))
 	val new_with_buttons' : unit -> base t
 	    = fn dummy => make (new_with_buttons_ (CString.fromString "", 
 						   GObject.null, 0, 

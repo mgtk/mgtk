@@ -137,7 +137,7 @@ structure Gtk  = struct
 	type type_t
 	val TOPLEVEL : type_t
 	val POPUP : type_t
-	val new : type_t option -> base t
+	val new : type_t -> base t
 	val new' : unit -> base t
 	val get_size : 'a t -> int * int
       end = struct
@@ -156,8 +156,7 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_get_gtk_window_type")
 	val (TOPLEVEL, POPUP) = get_type_t_ ()
 	val new_ : int -> cptr = app1 (symb"mgtk_gtk_window_new")
-	val new : type_t option -> base t
-	    = fn typ => make (new_ (getOpt (typ, TOPLEVEL)))
+	val new : type_t -> base t = fn typ => make (new_ typ)
 	val new' : unit -> base t = fn dummy => make (new_ TOPLEVEL)
 	val get_size_ : cptr -> int * int
 	    = app1 (symb"mgtk_gtk_window_get_size")
@@ -320,8 +319,7 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toLabel obj = inherit () (fn () => repr obj)
 	val new_ : string -> cptr = app1 (symb"mgtk_gtk_label_new")
-	val new : string option -> base t
-	    = fn str => make (new_ (getOpt (str, "")))
+	val new : string option -> base t = fn str => make (new_ str)
 	val new' : unit -> base t = fn dummy => make (new_ "")
     end
 end

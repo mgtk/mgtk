@@ -147,7 +147,7 @@ structure Gtk  = struct
 	type type_t
 	val TOPLEVEL : type_t
 	val POPUP : type_t
-	val new : type_t option -> base t
+	val new : type_t -> base t
 	val new' : unit -> base t
 	val get_size : 'a t -> int * int
       end = struct
@@ -167,8 +167,7 @@ structure Gtk  = struct
 				 ; (!x0, !x1)
 				end
 	val new_ : int -> cptr = _import "gtk_window_new" : int -> cptr;
-	val new : type_t option -> base t
-	    = fn typ => make (new_ (getOpt (typ, TOPLEVEL)))
+	val new : type_t -> base t = fn typ => make (new_ typ)
 	val new' : unit -> base t = fn dummy => make (new_ TOPLEVEL)
 	val get_size_ : cptr * int ref * int ref -> unit
 	    = _import "gtk_window_get_size" : cptr * int ref * int ref -> unit;
@@ -343,8 +342,7 @@ structure Gtk  = struct
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
 	val new_ : CString.cstring -> cptr
 	    = _import "gtk_label_new" : CString.cstring -> cptr;
-	val new : string option -> base t
-	    = fn str => make (new_ (CString.fromString (getOpt (str, ""))))
+	val new : string option -> base t = fn str => make (new_ str)
 	val new' : unit -> base t
 	    = fn dummy => make (new_ (CString.fromString ""))
     end

@@ -107,6 +107,28 @@ structure Gtk  = struct
 	    = fn self => GObject.withPtr
 			   (self, fn self => set_model_ (self, GObject.null))
     end
+    structure TreePath :>
+      sig
+	type base
+	type 'a treepath_t
+	type 'a t = 'a treepath_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreePath : 'a t -> base t
+	val get_indices : 'a t -> int
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a treepath_t = unit
+	type 'a t = 'a treepath_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreePath obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_indices_ : cptr -> cptr
+	    = _import "gtk_tree_path_get_indices" : cptr -> cptr;
+	val get_indices : 'a t -> int
+	    = fn self => GObject.withPtr (self, fn self => get_indices_ self)
+    end
 end
 
 
@@ -126,3 +148,6 @@ end
 
 
 /* *** TreeView *** */
+
+
+/* *** TreePath *** */

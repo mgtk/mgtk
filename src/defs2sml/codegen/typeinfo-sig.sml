@@ -11,13 +11,13 @@ signature TypeInfo = sig
 
     exception Unbound of name
 
-    val toSMLType: typeinfo -> (unit->string) -> 'a ty -> SMLType.ty
-    val toSMLTypeSeq: typeinfo -> 'a ty -> SMLType.ty
+    val toSMLType: typeinfo -> (unit->string) -> name ty -> SMLType.ty
+    val toSMLTypeSeq: typeinfo -> name ty -> SMLType.ty
     val toPrimType: typeinfo -> 'a ty -> SMLType.ty
     val toSignalType: typeinfo -> 'a ty -> SMLType.ty
 
     val fromPrimValue: typeinfo -> 'a ty -> TinySML.exp -> TinySML.exp
-    val toPrimValue: typeinfo -> 'a ty -> TinySML.exp -> TinySML.exp
+    val toPrimValue: typeinfo -> name ty -> TinySML.exp -> TinySML.exp
 
     val isWrapped : typeinfo -> 'a ty -> bool
     val isDefault : typeinfo -> 'a ty -> bool

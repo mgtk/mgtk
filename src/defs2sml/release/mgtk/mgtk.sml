@@ -901,7 +901,7 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val get_owner : 'a t -> base GObject.t
 	val clear : 'a t -> unit
-	val set_text : 'a t -> string -> int option -> unit
+	val set_text : 'a t -> string -> int -> unit
 	val set_text' : 'a t -> string -> unit
 	val wait_for_text : 'a t -> string
 	val wait_is_text_available : 'a t -> bool
@@ -927,9 +927,8 @@ structure Gtk  = struct
 	val clear : 'a t -> unit = fn self => clear_ (repr self)
 	val set_text_ : cptr -> string -> int -> unit
 	    = app3 (symb"mgtk_gtk_clipboard_set_text")
-	val set_text : 'a t -> string -> int option -> unit
-	    = fn self => fn text => fn len =>
-		 set_text_ (repr self) text (getOpt (len, ~1))
+	val set_text : 'a t -> string -> int -> unit
+	    = fn self => fn text => fn len => set_text_ (repr self) text len
 	val set_text' : 'a t -> string -> unit
 	    = fn self => fn text => set_text_ (repr self) text ~1
 	val wait_for_text_ : cptr -> string
@@ -1815,7 +1814,7 @@ structure Gtk  = struct
 	val main_level : unit -> int
 	val main_quit : unit -> unit
 	val main_iteration : unit -> bool
-	val main_iteration_do : bool option -> bool
+	val main_iteration_do : bool -> bool
 	val main_iteration_do' : unit -> bool
 	val rc_add_default_file : string -> unit
 	val rc_get_style_by_paths
@@ -1879,8 +1878,8 @@ structure Gtk  = struct
 	val main_iteration : unit -> bool = fn dummy => main_iteration_ dummy
 	val main_iteration_do_ : bool -> bool
 	    = app1 (symb"mgtk_gtk_main_iteration_do")
-	val main_iteration_do : bool option -> bool
-	    = fn blocking => main_iteration_do_ (getOpt (blocking, true))
+	val main_iteration_do : bool -> bool
+	    = fn blocking => main_iteration_do_ blocking
 	val main_iteration_do' : unit -> bool
 	    = fn dummy => main_iteration_do_ true
 	val rc_add_default_file_ : string -> unit
@@ -2406,7 +2405,7 @@ structure Gtk  = struct
       sig
 	type t = GObject.cptr
 	type base
-	val set_text : t -> string -> int option -> bool
+	val set_text : t -> string -> int -> bool
 	val set_text' : t -> string -> bool
 	val targets_include_text : t -> bool
 	val get_type : unit -> GType.t
@@ -2425,9 +2424,8 @@ structure Gtk  = struct
 	type base = unit
 	val set_text_ : cptr -> string -> int -> bool
 	    = app3 (symb"mgtk_gtk_selection_data_set_text")
-	val set_text : t -> string -> int option -> bool
-	    = fn self => fn str => fn len =>
-		 set_text_ self str (getOpt (len, ~1))
+	val set_text : t -> string -> int -> bool
+	    = fn self => fn str => fn len => set_text_ self str len
 	val set_text' : t -> string -> bool
 	    = fn self => fn str => set_text_ self str ~1
 	val targets_include_text_ : cptr -> bool
@@ -3160,9 +3158,9 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toCellLayout : 'a t -> base t
 	val get_type : unit -> GType.t
-	val pack_start : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_start : 'a t -> 'b CellRenderer.t -> bool -> unit
 	val pack_start' : 'a t -> 'b CellRenderer.t -> unit
-	val pack_end : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_end : 'a t -> 'b CellRenderer.t -> bool -> unit
 	val pack_end' : 'a t -> 'b CellRenderer.t -> unit
 	val clear : 'a t -> unit
 	val set_attributes : 'a t -> 'b CellRenderer.t -> unit
@@ -3185,16 +3183,16 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val pack_start_ : cptr -> cptr -> bool -> unit
 	    = app3 (symb"mgtk_gtk_cell_layout_pack_start")
-	val pack_start : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_start : 'a t -> 'b CellRenderer.t -> bool -> unit
 	    = fn self => fn cell => fn expand =>
-		 pack_start_ (repr self) (repr cell) (getOpt (expand, true))
+		 pack_start_ (repr self) (repr cell) expand
 	val pack_start' : 'a t -> 'b CellRenderer.t -> unit
 	    = fn self => fn cell => pack_start_ (repr self) (repr cell) true
 	val pack_end_ : cptr -> cptr -> bool -> unit
 	    = app3 (symb"mgtk_gtk_cell_layout_pack_end")
-	val pack_end : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_end : 'a t -> 'b CellRenderer.t -> bool -> unit
 	    = fn self => fn cell => fn expand =>
-		 pack_end_ (repr self) (repr cell) (getOpt (expand, true))
+		 pack_end_ (repr self) (repr cell) expand
 	val pack_end' : 'a t -> 'b CellRenderer.t -> unit
 	    = fn self => fn cell => pack_end_ (repr self) (repr cell) true
 	val clear_ : cptr -> unit = app1 (symb"mgtk_gtk_cell_layout_clear")
@@ -4874,9 +4872,7 @@ structure Gtk  = struct
 	val toAspectFrame : 'a t -> base t
 	val get_type : unit -> GType.t
 	val new : string -> real -> real -> real -> bool -> base t
-	val set : 'a t -> real option -> real option -> real option 
-	       -> bool option
-		  -> unit
+	val set : 'a t -> real -> real -> real -> bool -> unit
 	val set' : 'a t -> unit
       end = struct
 	open Dynlib
@@ -4900,12 +4896,9 @@ structure Gtk  = struct
 		 make (new_ label xalign yalign ratio obey_child)
 	val set_ : cptr -> real -> real -> real -> bool -> unit
 	    = app5 (symb"mgtk_gtk_aspect_frame_set")
-	val set : 'a t -> real option -> real option -> real option 
-	       -> bool option
-		  -> unit
+	val set : 'a t -> real -> real -> real -> bool -> unit
 	    = fn self => fn xalign => fn yalign => fn ratio => fn obey_child =>
-		 set_ (repr self) (getOpt (xalign, 0.0)) (getOpt (yalign, 0.0))
-		      (getOpt (ratio, 1.0)) (getOpt (obey_child, true))
+		 set_ (repr self) xalign yalign ratio obey_child
 	val set' : 'a t -> unit = fn self => set_ (repr self) 0.0 0.0 1.0 true
     end
     structure Box :>
@@ -4916,13 +4909,9 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toBox : 'a t -> base t
 	val get_type : unit -> GType.t
-	val pack_start
-	  : 'a t -> 'b Widget.t -> bool option -> bool option -> int option
-	    -> unit
+	val pack_start : 'a t -> 'b Widget.t -> bool -> bool -> int -> unit
 	val pack_start' : 'a t -> 'b Widget.t -> unit
-	val pack_end : 'a t -> 'b Widget.t -> bool option -> bool option 
-		    -> int option
-		       -> unit
+	val pack_end : 'a t -> 'b Widget.t -> bool -> bool -> int -> unit
 	val pack_end' : 'a t -> 'b Widget.t -> unit
 	val set_homogeneous : 'a t -> bool -> unit
 	val get_homogeneous : 'a t -> bool
@@ -4946,23 +4935,17 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val pack_start_ : cptr -> cptr -> bool -> bool -> int -> unit
 	    = app5 (symb"mgtk_gtk_box_pack_start")
-	val pack_start
-	  : 'a t -> 'b Widget.t -> bool option -> bool option -> int option
-	    -> unit
+	val pack_start : 'a t -> 'b Widget.t -> bool -> bool -> int -> unit
 	    = fn self => fn child => fn expand => fn fill => fn padding =>
-		 pack_start_ (repr self) (repr child) (getOpt (expand, true))
-			     (getOpt (fill, true)) (getOpt (padding, 0))
+		 pack_start_ (repr self) (repr child) expand fill padding
 	val pack_start' : 'a t -> 'b Widget.t -> unit
 	    = fn self => fn child =>
 		 pack_start_ (repr self) (repr child) true true 0
 	val pack_end_ : cptr -> cptr -> bool -> bool -> int -> unit
 	    = app5 (symb"mgtk_gtk_box_pack_end")
-	val pack_end : 'a t -> 'b Widget.t -> bool option -> bool option 
-		    -> int option
-		       -> unit
+	val pack_end : 'a t -> 'b Widget.t -> bool -> bool -> int -> unit
 	    = fn self => fn child => fn expand => fn fill => fn padding =>
-		 pack_end_ (repr self) (repr child) (getOpt (expand, true))
-			   (getOpt (fill, true)) (getOpt (padding, 0))
+		 pack_end_ (repr self) (repr child) expand fill padding
 	val pack_end' : 'a t -> 'b Widget.t -> unit
 	    = fn self => fn child =>
 		 pack_end_ (repr self) (repr child) true true 0
@@ -5932,7 +5915,7 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val new : unit -> base t
 	val new_with_buttons : string option -> 'a Window.t option 
-			    -> flags list option -> string option
+			    -> flags list -> string option
 			       -> base t
 	val new_with_buttons' : unit -> base t
 	val add_action_widget : 'a t -> 'b Widget.t -> int -> unit
@@ -5968,14 +5951,13 @@ structure Gtk  = struct
 	val new_with_buttons_ : string -> cptr -> int -> string -> cptr
 	    = app4 (symb"mgtk_gtk_dialog_new_with_buttons")
 	val new_with_buttons : string option -> 'a Window.t option 
-			    -> flags list option -> string option
+			    -> flags list -> string option
 			       -> base t
 	    = fn title => fn parent => fn flags => fn first_button_text =>
 		 make (new_with_buttons_
 			 (getOpt (title, ""))
 			 (getOpt (Option.map repr parent, GObject.null))
-			 (getOpt (Option.map Flags.set flags, 0))
-			 (getOpt (first_button_text, "")))
+			 (Flags.set flags) (getOpt (first_button_text, "")))
 	val new_with_buttons' : unit -> base t
 	    = fn dummy => make (new_with_buttons_ "" GObject.null 0 "")
 	val add_action_widget_ : cptr -> cptr -> int -> unit
@@ -7325,9 +7307,9 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val add1 : 'a t -> 'b Widget.t -> unit
 	val add2 : 'a t -> 'b Widget.t -> unit
-	val pack1 : 'a t -> 'b Widget.t -> bool option -> bool option -> unit
+	val pack1 : 'a t -> 'b Widget.t -> bool -> bool -> unit
 	val pack1' : 'a t -> 'b Widget.t -> unit
-	val pack2 : 'a t -> 'b Widget.t -> bool option -> bool option -> unit
+	val pack2 : 'a t -> 'b Widget.t -> bool -> bool -> unit
 	val pack2' : 'a t -> 'b Widget.t -> unit
 	val get_position : 'a t -> int
 	val set_position : 'a t -> int -> unit
@@ -7361,18 +7343,16 @@ structure Gtk  = struct
 	    = fn self => fn child => add2_ (repr self) (repr child)
 	val pack1_ : cptr -> cptr -> bool -> bool -> unit
 	    = app4 (symb"mgtk_gtk_paned_pack1")
-	val pack1 : 'a t -> 'b Widget.t -> bool option -> bool option -> unit
+	val pack1 : 'a t -> 'b Widget.t -> bool -> bool -> unit
 	    = fn self => fn child => fn resize => fn shrink =>
-		 pack1_ (repr self) (repr child) (getOpt (resize, false))
-		        (getOpt (shrink, true))
+		 pack1_ (repr self) (repr child) resize shrink
 	val pack1' : 'a t -> 'b Widget.t -> unit
 	    = fn self => fn child => pack1_ (repr self) (repr child) false true
 	val pack2_ : cptr -> cptr -> bool -> bool -> unit
 	    = app4 (symb"mgtk_gtk_paned_pack2")
-	val pack2 : 'a t -> 'b Widget.t -> bool option -> bool option -> unit
+	val pack2 : 'a t -> 'b Widget.t -> bool -> bool -> unit
 	    = fn self => fn child => fn resize => fn shrink =>
-		 pack2_ (repr self) (repr child) (getOpt (resize, true))
-		        (getOpt (shrink, true))
+		 pack2_ (repr self) (repr child) resize shrink
 	val pack2' : 'a t -> 'b Widget.t -> unit
 	    = fn self => fn child => pack2_ (repr self) (repr child) true true
 	val get_position_ : cptr -> int
@@ -8798,10 +8778,10 @@ structure Gtk  = struct
 				-> int
 	val prepend_page_menu' : 'a t -> 'b Widget.t -> int
 	val insert_page
-	  : 'a t -> 'b Widget.t -> 'c Widget.t option -> int option -> int
+	  : 'a t -> 'b Widget.t -> 'c Widget.t option -> int -> int
 	val insert_page' : 'a t -> 'b Widget.t -> int
 	val insert_page_menu : 'a t -> 'b Widget.t -> 'c Widget.t option 
-			    -> 'd Widget.t option -> int option
+			    -> 'd Widget.t option -> int
 			       -> int
 	val insert_page_menu' : 'a t -> 'b Widget.t -> int
 	val remove_page : 'a t -> int -> unit
@@ -8911,27 +8891,25 @@ structure Gtk  = struct
 	val insert_page_ : cptr -> cptr -> cptr -> int -> int
 	    = app4 (symb"mgtk_gtk_notebook_insert_page")
 	val insert_page
-	  : 'a t -> 'b Widget.t -> 'c Widget.t option -> int option -> int
+	  : 'a t -> 'b Widget.t -> 'c Widget.t option -> int -> int
 	    = fn self => fn child => fn tab_label => fn position =>
-		 insert_page_ (repr self) (repr child)
-			      (getOpt (Option.map repr tab_label, 
-				       GObject.null))
-			      (getOpt (position, ~1))
+		 insert_page_
+		   (repr self) (repr child)
+		   (getOpt (Option.map repr tab_label, GObject.null)) position
 	val insert_page' : 'a t -> 'b Widget.t -> int
 	    = fn self => fn child =>
 		 insert_page_ (repr self) (repr child) GObject.null ~1
 	val insert_page_menu_ : cptr -> cptr -> cptr -> cptr -> int -> int
 	    = app5 (symb"mgtk_gtk_notebook_insert_page_menu")
 	val insert_page_menu : 'a t -> 'b Widget.t -> 'c Widget.t option 
-			    -> 'd Widget.t option -> int option
+			    -> 'd Widget.t option -> int
 			       -> int
 	    = fn self => fn child => fn tab_label => fn menu_label => 
 	      fn position =>
 		 insert_page_menu_
 		   (repr self) (repr child)
 		   (getOpt (Option.map repr tab_label, GObject.null))
-		   (getOpt (Option.map repr menu_label, GObject.null))
-		   (getOpt (position, ~1))
+		   (getOpt (Option.map repr menu_label, GObject.null)) position
 	val insert_page_menu' : 'a t -> 'b Widget.t -> int
 	    = fn self => fn child =>
 		 insert_page_menu_
@@ -10617,9 +10595,9 @@ structure Gtk  = struct
 	val get_char_count : 'a t -> int
 	val get_tag_table : 'a t -> base TextTagTable.t
 	val set_text : 'a t -> string -> int -> unit
-	val insert : 'a t -> TextIter.t -> string -> int option -> unit
+	val insert : 'a t -> TextIter.t -> string -> int -> unit
 	val insert' : 'a t -> TextIter.t -> string -> unit
-	val insert_at_cursor : 'a t -> string -> int option -> unit
+	val insert_at_cursor : 'a t -> string -> int -> unit
 	val insert_at_cursor' : 'a t -> string -> unit
 	val insert_interactive
 	  : 'a t -> TextIter.t -> string -> int -> bool -> bool
@@ -10636,16 +10614,14 @@ structure Gtk  = struct
 	val delete : 'a t -> TextIter.t -> TextIter.t -> unit
 	val delete_interactive
 	  : 'a t -> TextIter.t -> TextIter.t -> bool -> bool
-	val get_text
-	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
+	val get_text : 'a t -> TextIter.t -> TextIter.t -> bool -> string
 	val get_text' : 'a t -> TextIter.t -> TextIter.t -> string
-	val get_slice
-	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
+	val get_slice : 'a t -> TextIter.t -> TextIter.t -> bool -> string
 	val get_slice' : 'a t -> TextIter.t -> TextIter.t -> string
 	val insert_child_anchor
 	  : 'a t -> TextIter.t -> 'b TextChildAnchor.t -> unit
 	val create_child_anchor : 'a t -> TextIter.t -> base TextChildAnchor.t
-	val create_mark : 'a t -> string option -> TextIter.t -> bool option
+	val create_mark : 'a t -> string option -> TextIter.t -> bool
 			  -> base TextMark.t
 	val create_mark' : 'a t -> TextIter.t -> base TextMark.t
 	val move_mark : 'a t -> 'b TextMark.t -> TextIter.t -> unit
@@ -10742,16 +10718,16 @@ structure Gtk  = struct
 	    = fn self => fn text => fn len => set_text_ (repr self) text len
 	val insert_ : cptr -> cptr -> string -> int -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_insert")
-	val insert : 'a t -> TextIter.t -> string -> int option -> unit
+	val insert : 'a t -> TextIter.t -> string -> int -> unit
 	    = fn self => fn iter => fn text => fn len =>
-		 insert_ (repr self) iter text (getOpt (len, ~1))
+		 insert_ (repr self) iter text len
 	val insert' : 'a t -> TextIter.t -> string -> unit
 	    = fn self => fn iter => fn text => insert_ (repr self) iter text ~1
 	val insert_at_cursor_ : cptr -> string -> int -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_insert_at_cursor")
-	val insert_at_cursor : 'a t -> string -> int option -> unit
+	val insert_at_cursor : 'a t -> string -> int -> unit
 	    = fn self => fn text => fn len =>
-		 insert_at_cursor_ (repr self) text (getOpt (len, ~1))
+		 insert_at_cursor_ (repr self) text len
 	val insert_at_cursor' : 'a t -> string -> unit
 	    = fn self => fn text => insert_at_cursor_ (repr self) text ~1
 	val insert_interactive_ : cptr -> cptr -> string -> int -> bool -> bool
@@ -10809,21 +10785,17 @@ structure Gtk  = struct
 		   (repr self) start_iter end_iter default_editable
 	val get_text_ : cptr -> cptr -> cptr -> bool -> string
 	    = app4 (symb"mgtk_gtk_text_buffer_get_text")
-	val get_text
-	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
+	val get_text : 'a t -> TextIter.t -> TextIter.t -> bool -> string
 	    = fn self => fn start => fn en => fn include_hidden_chars =>
-		 get_text_ (repr self) start en
-			   (getOpt (include_hidden_chars, true))
+		 get_text_ (repr self) start en include_hidden_chars
 	val get_text' : 'a t -> TextIter.t -> TextIter.t -> string
 	    = fn self => fn start => fn en =>
 		 get_text_ (repr self) start en true
 	val get_slice_ : cptr -> cptr -> cptr -> bool -> string
 	    = app4 (symb"mgtk_gtk_text_buffer_get_slice")
-	val get_slice
-	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
+	val get_slice : 'a t -> TextIter.t -> TextIter.t -> bool -> string
 	    = fn self => fn start => fn en => fn include_hidden_chars =>
-		 get_slice_ (repr self) start en
-			    (getOpt (include_hidden_chars, true))
+		 get_slice_ (repr self) start en include_hidden_chars
 	val get_slice' : 'a t -> TextIter.t -> TextIter.t -> string
 	    = fn self => fn start => fn en =>
 		 get_slice_ (repr self) start en true
@@ -10841,13 +10813,13 @@ structure Gtk  = struct
 		   () (fn () => create_child_anchor_ (repr self) iter)
 	val create_mark_ : cptr -> string -> cptr -> bool -> cptr
 	    = app4 (symb"mgtk_gtk_text_buffer_create_mark")
-	val create_mark : 'a t -> string option -> TextIter.t -> bool option
+	val create_mark : 'a t -> string option -> TextIter.t -> bool
 			  -> base TextMark.t
 	    = fn self => fn mark_name => fn wher => fn left_gravity =>
 		 TextMark.inherit
 		   ()
 		   (fn () => create_mark_ (repr self) (getOpt (mark_name, ""))
-					  wher (getOpt (left_gravity, false)))
+					  wher left_gravity)
 	val create_mark' : 'a t -> TextIter.t -> base TextMark.t
 	    = fn self => fn wher =>
 		 TextMark.inherit
@@ -11095,13 +11067,11 @@ structure Gtk  = struct
 	val new_withbuffer : 'a TextBuffer.t -> base t
 	val setbuffer : 'a t -> 'b TextBuffer.t -> unit
 	val get_buffer : 'a t -> base TextBuffer.t
-	val scroll_toiter : 'a t -> TextIter.t -> real -> bool option 
-			 -> real option -> real option
-			    -> bool
+	val scroll_toiter
+	  : 'a t -> TextIter.t -> real -> bool -> real -> real -> bool
 	val scroll_toiter' : 'a t -> TextIter.t -> real -> bool
-	val scroll_to_mark : 'a t -> 'b TextMark.t -> real -> bool option 
-			  -> real option -> real option
-			     -> unit
+	val scroll_to_mark
+	  : 'a t -> 'b TextMark.t -> real -> bool -> real -> real -> unit
 	val scroll_to_mark' : 'a t -> 'b TextMark.t -> real -> unit
 	val scroll_mark_onscreen : 'a t -> 'b TextMark.t -> unit
 	val move_mark_onscreen : 'a t -> 'b TextMark.t -> bool
@@ -11193,28 +11163,24 @@ structure Gtk  = struct
 			   () (fn () => get_buffer_ (repr self))
 	val scroll_toiter_ : cptr * cptr * real * bool * real * real -> bool
 	    = app1 (symb"mgtk_gtk_text_view_scroll_to_iter")
-	val scroll_toiter : 'a t -> TextIter.t -> real -> bool option 
-			 -> real option -> real option
-			    -> bool
+	val scroll_toiter
+	  : 'a t -> TextIter.t -> real -> bool -> real -> real -> bool
 	    = fn self => fn iter => fn within_margin => fn use_align => 
 	      fn xalign => fn yalign =>
-		 scroll_toiter_ (repr self, iter, within_margin, 
-				 getOpt (use_align, false), 
-				 getOpt (xalign, 0.5), getOpt (yalign, 0.5))
+		 scroll_toiter_ (repr self, iter, within_margin, use_align, 
+				 xalign, yalign)
 	val scroll_toiter' : 'a t -> TextIter.t -> real -> bool
 	    = fn self => fn iter => fn within_margin =>
 		 scroll_toiter_
 		   (repr self, iter, within_margin, false, 0.5, 0.5)
 	val scroll_to_mark_ : cptr * cptr * real * bool * real * real -> unit
 	    = app1 (symb"mgtk_gtk_text_view_scroll_to_mark")
-	val scroll_to_mark : 'a t -> 'b TextMark.t -> real -> bool option 
-			  -> real option -> real option
-			     -> unit
+	val scroll_to_mark
+	  : 'a t -> 'b TextMark.t -> real -> bool -> real -> real -> unit
 	    = fn self => fn mark => fn within_margin => fn use_align => 
 	      fn xalign => fn yalign =>
 		 scroll_to_mark_ (repr self, repr mark, within_margin, 
-				  getOpt (use_align, false), 
-				  getOpt (xalign, 0.5), getOpt (yalign, 0.5))
+				  use_align, xalign, yalign)
 	val scroll_to_mark' : 'a t -> 'b TextMark.t -> real -> unit
 	    = fn self => fn mark => fn within_margin =>
 		 scroll_to_mark_
@@ -11786,9 +11752,9 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val new : unit -> base t
 	val new_with_attributes : string -> 'a CellRenderer.t -> base t
-	val pack_start : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_start : 'a t -> 'b CellRenderer.t -> bool -> unit
 	val pack_start' : 'a t -> 'b CellRenderer.t -> unit
-	val pack_end : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_end : 'a t -> 'b CellRenderer.t -> bool -> unit
 	val pack_end' : 'a t -> 'b CellRenderer.t -> unit
 	val clear : 'a t -> unit
 	val add_attribute : 'a t -> 'b CellRenderer.t -> string -> int -> unit
@@ -11865,16 +11831,16 @@ structure Gtk  = struct
 		 make (new_with_attributes_ title (repr cell))
 	val pack_start_ : cptr -> cptr -> bool -> unit
 	    = app3 (symb"mgtk_gtk_tree_view_column_pack_start")
-	val pack_start : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_start : 'a t -> 'b CellRenderer.t -> bool -> unit
 	    = fn self => fn cell => fn expand =>
-		 pack_start_ (repr self) (repr cell) (getOpt (expand, true))
+		 pack_start_ (repr self) (repr cell) expand
 	val pack_start' : 'a t -> 'b CellRenderer.t -> unit
 	    = fn self => fn cell => pack_start_ (repr self) (repr cell) true
 	val pack_end_ : cptr -> cptr -> bool -> unit
 	    = app3 (symb"mgtk_gtk_tree_view_column_pack_end")
-	val pack_end : 'a t -> 'b CellRenderer.t -> bool option -> unit
+	val pack_end : 'a t -> 'b CellRenderer.t -> bool -> unit
 	    = fn self => fn cell => fn expand =>
-		 pack_end_ (repr self) (repr cell) (getOpt (expand, true))
+		 pack_end_ (repr self) (repr cell) expand
 	val pack_end' : 'a t -> 'b CellRenderer.t -> unit
 	    = fn self => fn cell => pack_end_ (repr self) (repr cell) true
 	val clear_ : cptr -> unit
@@ -12101,8 +12067,7 @@ structure Gtk  = struct
 	val get_expander_column : 'a t -> base TreeViewColumn.t
 	val scroll_to_point : 'a t -> int -> int -> unit
 	val scroll_to_cell : 'a t -> 'b TreePath.t 
-			  -> 'c TreeViewColumn.t option -> bool option 
-			  -> real option -> real option
+			  -> 'c TreeViewColumn.t option -> bool -> real -> real
 			     -> unit
 	val scroll_to_cell' : 'a t -> 'b TreePath.t -> unit
 	val row_activated
@@ -12115,13 +12080,12 @@ structure Gtk  = struct
 	val row_expanded : 'a t -> 'b TreePath.t -> bool
 	val set_reorderable : 'a t -> bool -> unit
 	val get_reorderable : 'a t -> bool
-	val set_cursor : 'a t -> 'b TreePath.t -> 'c TreeViewColumn.t option 
-		      -> bool option
-			 -> unit
+	val set_cursor
+	  : 'a t -> 'b TreePath.t -> 'c TreeViewColumn.t option -> bool -> unit
 	val set_cursor' : 'a t -> 'b TreePath.t -> unit
 	val set_cursor_on_cell
 	  : 'a t -> 'b TreePath.t -> 'c TreeViewColumn.t option 
-	 -> 'd CellRenderer.t option -> bool option
+	 -> 'd CellRenderer.t option -> bool
 	    -> unit
 	val set_cursor_on_cell' : 'a t -> 'b TreePath.t -> unit
 	val unset_rows_drag_source : 'a t -> unit
@@ -12292,16 +12256,14 @@ structure Gtk  = struct
 	val scroll_to_cell_ : cptr * cptr * cptr * bool * real * real -> unit
 	    = app1 (symb"mgtk_gtk_tree_view_scroll_to_cell")
 	val scroll_to_cell : 'a t -> 'b TreePath.t 
-			  -> 'c TreeViewColumn.t option -> bool option 
-			  -> real option -> real option
+			  -> 'c TreeViewColumn.t option -> bool -> real -> real
 			     -> unit
 	    = fn self => fn path => fn column => fn use_align => 
 	      fn row_align => fn col_align =>
-		 scroll_to_cell_
-		   (repr self, repr path, 
-		    getOpt (Option.map repr column, GObject.null), 
-		    getOpt (use_align, false), getOpt (row_align, 0.0), 
-		    getOpt (col_align, 0.0))
+		 scroll_to_cell_ (repr self, repr path, 
+				  getOpt (Option.map repr column, 
+					  GObject.null), 
+				  use_align, row_align, col_align)
 	val scroll_to_cell' : 'a t -> 'b TreePath.t -> unit
 	    = fn self => fn path =>
 		 scroll_to_cell_
@@ -12346,14 +12308,13 @@ structure Gtk  = struct
 	    = fn self => get_reorderable_ (repr self)
 	val set_cursor_ : cptr -> cptr -> cptr -> bool -> unit
 	    = app4 (symb"mgtk_gtk_tree_view_set_cursor")
-	val set_cursor : 'a t -> 'b TreePath.t -> 'c TreeViewColumn.t option 
-		      -> bool option
-			 -> unit
+	val set_cursor
+	  : 'a t -> 'b TreePath.t -> 'c TreeViewColumn.t option -> bool -> unit
 	    = fn self => fn path => fn focus_column => fn start_editing =>
 		 set_cursor_ (repr self) (repr path)
 			     (getOpt (Option.map repr focus_column, 
 				      GObject.null))
-			     (getOpt (start_editing, false))
+			     start_editing
 	val set_cursor' : 'a t -> 'b TreePath.t -> unit
 	    = fn self => fn path =>
 		 set_cursor_ (repr self) (repr path) GObject.null false
@@ -12361,7 +12322,7 @@ structure Gtk  = struct
 	    = app5 (symb"mgtk_gtk_tree_view_set_cursor_on_cell")
 	val set_cursor_on_cell
 	  : 'a t -> 'b TreePath.t -> 'c TreeViewColumn.t option 
-	 -> 'd CellRenderer.t option -> bool option
+	 -> 'd CellRenderer.t option -> bool
 	    -> unit
 	    = fn self => fn path => fn focus_column => fn focus_cell => 
 	      fn start_editing =>
@@ -12369,7 +12330,7 @@ structure Gtk  = struct
 		   (repr self) (repr path)
 		   (getOpt (Option.map repr focus_column, GObject.null))
 		   (getOpt (Option.map repr focus_cell, GObject.null))
-		   (getOpt (start_editing, false))
+		   start_editing
 	val set_cursor_on_cell' : 'a t -> 'b TreePath.t -> unit
 	    = fn self => fn path =>
 		 set_cursor_on_cell_ (repr self) (repr path) GObject.null

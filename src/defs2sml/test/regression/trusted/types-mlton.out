@@ -222,7 +222,7 @@ structure Gtk  = struct
 	type 'a t = 'a entry_t Widget.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toEntry : 'a t -> base t
-	val new_with_max_length : int option -> base t
+	val new_with_max_length : int -> base t
 	val new_with_max_length' : unit -> base t
       end = struct
 	type cptr = GObject.cptr
@@ -235,8 +235,8 @@ structure Gtk  = struct
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
 	val new_with_max_length_ : int -> cptr
 	    = _import "gtk_entry_new_with_max_length" : int -> cptr;
-	val new_with_max_length : int option -> base t
-	    = fn max => make (new_with_max_length_ (getOpt (max, 0)))
+	val new_with_max_length : int -> base t
+	    = fn max => make (new_with_max_length_ max)
 	val new_with_max_length' : unit -> base t
 	    = fn dummy => make (new_with_max_length_ 0)
     end

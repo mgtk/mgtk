@@ -46,14 +46,18 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 
     fun defValue t p e = e
 
+    fun isOption (Var"GObject.null") = true (* YUCK *)
+      | isOption (Const"\"\"") = true
+      | isOption _ = false
+
     fun callStub tinfo name ret pars = 
 	let val isoutout = TypeInfo.isOutput (fn Type.OUT => true
 					       | Type.INOUT => false) tinfo
 	    val pars = List.filter (not o isoutout o #2) pars
 	    fun default (par,t as Type.WithDefault(ty, v)) = 
-		App(Var"getOpt", [Tup[par, v]])
+		if isOption v then App(Var"getOpt", [Tup[par, v]]) else par
 	      | default (par,t as Type.Output(_, Type.WithDefault(ty,v))) =
-		App(Var"getOpt", [Tup[par, v]])
+		if isOption v then App(Var"getOpt", [Tup[par, v]]) else par
 	      | default (par,ty) = par
 	in  App(Var(name^"_"),
 		if List.length pars > max_curried
@@ -140,9 +144,13 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 		     in  App(Var(unwrapper ty), [Tup[e, Fn(v, c)]])
 		     end
 		else c
+	    fun isOption (Var"GObject.null") = true (* YUCK *)
+	      | isOption (Const"\"\"") = true
+	      | isOption _ = false
 	    fun g (e, Type.WithDefault(ty,def)) = 
 		if TI.isWrapped tinfo ty
 		then (* already handled by withOpt above *) e
+		else if not(isOption def) then e
 		else (if TI.isString tinfo ty
 		      then toPrimString
 		      else fn e => e) 

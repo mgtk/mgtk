@@ -292,6 +292,8 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		SMLType.TyApp(alphas, path @ tyname)
 	  | _ => ty
 
+    fun isOption name = Name.toString name = "NULL"
+
     fun toSMLType negative tinfo fresh ty =
 	case ty of
 	    (* recognize standard "patterns" *)
@@ -302,8 +304,12 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
             (* then the general stuff *)
 	  | Type.Void => SMLType.UnitTy
 	  | Type.WithDefault(ty, default) => 
-               if negative then toSMLType negative tinfo fresh ty
-	       else SMLType.TyApp([toSMLType negative tinfo fresh ty], ["option"])
+	       let val ty' = toSMLType negative tinfo fresh ty
+	       in  if negative then ty'
+		   else if isOption default
+		   then SMLType.TyApp([ty'], ["option"])
+		   else ty'
+	       end
 	  | Type.Base n => 
 	       let val info: info = lookup tinfo n
 	       in  #stype info fresh end
@@ -395,7 +401,9 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    Type.WithDefault(ty,default) =>
 	       (case toprimvalue tinfo ty of
 		    NONE => id
-		  | SOME f => fn e => App(Var"Option.map", [Var f, e])
+		  | SOME f => fn e => 
+		       if isOption default then App(Var"Option.map", [Var f, e])
+		       else App(Var f, [e])
                )
 	  | Type.Output(pass,ty) => id
 	  | Type.Array ty => (fn e => Prim.toArrayPrim
