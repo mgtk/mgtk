@@ -111,7 +111,7 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   Field(res,0) = Val_GtkObj(object); // last because it allocates
 
   mvp = get_valueptr("mgtk_callback_dispatch"); 
-  if(mvp == NULL)
+  if(mvp == (value) NULL)
     failwith("Cannot find mgtk_callback_dispatch");
 
   //printf("callback id = %i\n",(int) data);
