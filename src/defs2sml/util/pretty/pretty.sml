@@ -136,14 +136,6 @@ struct
  							 ++ pp_val v) o
 				 Splaymap.listItems
 
-  fun ppCAnno ppR (cst,inp,outp)
-      = case List.mapPartial
-	     (fn (kw,[]) => NONE
-	       | (kw,rs) => SOME(kw ^+ ilist ",#" ppR rs))
-	     [("c: ",cst),("i: ",inp),("o: ",outp)]
-	of [] => ppString "[||]"
-	 | groups => bracket "[#]" (clist ";# " (fn t=>t) groups)
-
   fun ppBinary(t1,ope,t2) = break(1,0)(t1,ope ^+ " " ^+ t2)
 
   fun ppFold tree dev

@@ -39,7 +39,6 @@ sig
   val ppBool: bool pp
   val ppInt: int pp
   val ppOpt: 'a pp -> 'a option pp
-  val ppCAnno: 'r pp -> ('r list * 'r list * 'r list) pp
   val ppPair: 'a pp -> 'b pp -> ('a * 'b) pp
   val ppList : 'a pp -> 'a list pp (* with round parantheses and no space *)
   val ppSplaySet : 'a pp -> 'a Splayset.set pp

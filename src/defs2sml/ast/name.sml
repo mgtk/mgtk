@@ -101,6 +101,11 @@ structure Name :> NAME = struct
         ^ Util.stringSep "[" "]" "." (fn s=>s) (#fullpath name)
         ^ Util.stringSep "<" ">" "." (fn s=>s) (#base name)
 
+    (* FIXME: Do we wish to allow names to be broken apart? *)
+    fun pp name = Pretty.ppString(toString name) 
+    fun pp' name = Pretty.ppString(toString' name)
+
+        
 (*
     fun compare (n1, n2) =
 	case Util.listCmp String.compare (#path n1, #path n2) of

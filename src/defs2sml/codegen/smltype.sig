@@ -1,1 +1,1 @@
-structure SMLType : SMLType
+structure SMLType : SML_TYPE

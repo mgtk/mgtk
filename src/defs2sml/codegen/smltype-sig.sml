@@ -1,7 +1,7 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
-signature SMLType = sig
+signature SML_TYPE = sig
 
     type tyvar = string
     type tyname = string list

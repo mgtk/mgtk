@@ -12,8 +12,12 @@ signature NAME = sig
     val equal: name * name -> bool
     val compare: name * name -> order
 
+    val pp  : name Pretty.pp
+    val pp' : name Pretty.pp
+
     val toString: name -> string
     val toString': name -> string
+
     val fromString: string -> name
     val fromPaths: string list * string list * string list -> name
 

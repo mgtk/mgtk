@@ -141,22 +141,21 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	in  next
 	end
 
-    fun show os table =
-	let fun sinfo {stype,ptype,toc,fromc,super,fromprim,wrapped} = "ML"
-(* FIXME:
-		(SMLType.show ptype) ^ " x "  ^
-		(SMLType.show (stype (nextgen())))
-*)
-	in  List.app (fn (n,i) => 
-			 TextIO.output(os,Name.toString' n^" -> "^sinfo i^"\n"))
-		     (Splaymap.listItems table)
-	end
+    fun pp table =
+	let open Pretty
+	    fun ppinfo {stype,ptype,toc,fromc,super,fromprim,wrapped} = 
+		bracket "{#}" (
+		   ppBinary(SMLType.pp ptype, "x", 
+			    SMLType.pp (stype (nextgen())))
+                )
+	in  ppSplayMap Name.pp' ppinfo table end
 
     (* Debugging: *)
     val build = fn module =>
 		   let val table = build module
 		       val os = TextIO.openOut("typetable.txt")
-		   in  show os table
+		       val device = Pretty.plainOutput ("/*","*/")
+		   in  Pretty.ppPrint (pp table) device os
                      ; TextIO.closeOut os
 		     ; table
 		   end
