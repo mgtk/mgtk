@@ -178,7 +178,8 @@ structure TinySML :> TinySML = struct
 		case e of
                     (* special case some idioms *)
 		    App(Var "symb",[Str s]) => ppString("(symb\""^s^"\")")
-		  | App(Var "!", [e as Var v]) => "!" ^+ ppexp level e
+		  | App(Var "!", [e as Var v]) => 
+		      parens 2 level ("!" ^+ ppexp level e)
 
                     (* then the general stuff *)
 		  | Unit => ppString "()"

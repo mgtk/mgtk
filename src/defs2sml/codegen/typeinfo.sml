@@ -9,6 +9,7 @@ signature PRIMTYPES = sig
 		    'a ty list * 'a ty -> sml_ty
     val mkArrayPrimTy : sml_ty -> sml_ty
     val stringTy : bool -> sml_ty
+    val toPrimString : exp -> exp
     val unwrap : string option
     val toArrayPrim : exp -> exp
 end (* signature PRIMTYPES *)
@@ -37,6 +38,7 @@ structure MosmlPrimTypes : PRIMTYPES = struct
     val stringTy = fn _ => SMLType.StringTy
     val unwrap = SOME "repr"
     val toArrayPrim = (fn e => e)
+    val toPrimString = (fn e => e)
 end (* structure MosmlPrimTypes *)
 
 structure MLtonPrimTypes : PRIMTYPES = struct
@@ -54,6 +56,7 @@ structure MLtonPrimTypes : PRIMTYPES = struct
 		      else SMLType.TyApp([],["CString", "cstring"])
     val unwrap = NONE
     val toArrayPrim = fn e => TinySML.App(TinySML.Var"Array.fromList", [e])
+    val toPrimString = fn e => TinySML.App(TinySML.Var"CString.fromString", [e])
 
 end (* structure MosmlPrimTypes *)
 
@@ -402,7 +405,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    Type.Ptr(ty as Type.Base n) =>
                Name.asType n = "char"
 	  | Type.Const ty => isString tinfo ty
-	  | Type.Output(pass,ty) => isString tinfo ty
+	  | Type.Output(_,ty) => isString tinfo ty
 	  | Type.WithDefault(ty,default) => isString tinfo ty
 	  | _ => false
 
@@ -486,7 +489,10 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 
     fun defaultValue tinfo ty = (* FIXME *)
 	case ty of
-	    Type.Base tn => 
+	    Type.Ptr(ty as Type.Base n) => 
+	       if Name.asType n = "char" then Prim.toPrimString(Const"\"\"")
+	       else defaultValue tinfo ty
+	  | Type.Base tn => 
 	    let val info: info = lookup tinfo tn
 	    in  #default info end
 	  | Type.Tname tn => 

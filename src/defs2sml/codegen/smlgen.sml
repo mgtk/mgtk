@@ -182,13 +182,17 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 			 @ (List.map #2 outputs)
 	    val ret_val = case ret of Type.Void => []
 				    | ty => [Var "ret"]
+	    fun fromprim' t e =
+		if TypeInfo.isString tinfo t 
+		then App(Var"CString.toString",[Tup[fromprim t e]])
+		else fromprim t e
 	in  (Let(SeqDec
                  [ ValDec(TupPat(List.map (VarPat o #1) outputs), NONE, 
 			  Tup(List.map inout outputs))
 		 , ValDec(VarPat "ret", NONE, call)
                  ],
 		 Tup(ret_val @ 
-		     List.map (fn (x,t) => fromprim t (deref(Var x)))
+		     List.map (fn (x,t) => fromprim' t (deref(Var x)))
 			      outputs
 		    )
 		),

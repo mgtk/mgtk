@@ -88,14 +88,17 @@ structure Gtk  = struct
 	val path : 'a t -> int * string * string
 	    = fn self =>
 		 let val (path_length, path, path_reversed)
-			 = (ref 0, ref #" ", ref #" ")
+			 = (ref 0, ref (CString.fromString ""), 
+			    ref (CString.fromString ""))
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => path_ (self, path_length, 
 						    CString.fromString path, 
 						    CString.fromString
 						      path_reversed))
-		 in (!path_length, !path, !path_reversed) end
+		 in (!path_length, CString.toString (!path), 
+		     CString.toString (!path_reversed))
+		 end
     end
     structure Editable :>
       sig

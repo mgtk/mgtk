@@ -129,14 +129,14 @@ EXTERNML int mgtk_g_type_string (void) { /* ML */
 
 
 /* *** Gtk *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_accel_flags(int* x0, int* x1, int* x2) {
   *x2 = GTK_ACCEL_MASK;
   *x1 = GTK_ACCEL_LOCKED;
   *x0 = GTK_ACCEL_VISIBLE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_celltype(int* x0, int* x1, int* x2, int* x3, int* x4) {
   *x4 = GTK_CELL_WIDGET;
   *x3 = GTK_CELL_PIXTEXT;
@@ -145,7 +145,7 @@ EXTERNML void mgtk_get_gtk_celltype(int* x0, int* x1, int* x2, int* x3, int* x4)
   *x0 = GTK_CELL_EMPTY;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_debug_flag(int* x0, int* x1, int* x2, int* x3, int* x4) {
   *x4 = GTK_DEBUG_UPDATES;
   *x3 = GTK_DEBUG_TREE;
@@ -154,7 +154,7 @@ EXTERNML void mgtk_get_gtk_debug_flag(int* x0, int* x1, int* x2, int* x3, int* x
   *x0 = GTK_DEBUG_MISC;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_responsetype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10) {
   *x10 = GTK_RESPONSE_HELP;
   *x9 = GTK_RESPONSE_APPLY;
@@ -169,7 +169,7 @@ EXTERNML void mgtk_get_gtk_responsetype(int* x0, int* x1, int* x2, int* x3, int*
   *x0 = GTK_RESPONSE_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_dest_defaults(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_DEST_DEFAULT_ALL;
   *x2 = GTK_DEST_DEFAULT_DROP;
@@ -177,13 +177,13 @@ EXTERNML void mgtk_get_gtk_dest_defaults(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_DEST_DEFAULT_MOTION;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_target_flags(int* x0, int* x1) {
   *x1 = GTK_TARGET_SAME_WIDGET;
   *x0 = GTK_TARGET_SAME_APP;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_anchortype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15, int* x16) {
   *x16 = GTK_ANCHOR_E;
   *x15 = GTK_ANCHOR_W;
@@ -204,7 +204,7 @@ EXTERNML void mgtk_get_gtk_anchortype(int* x0, int* x1, int* x2, int* x3, int* x
   *x0 = GTK_ANCHOR_CENTER;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_arrowtype(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_ARROW_RIGHT;
   *x2 = GTK_ARROW_LEFT;
@@ -212,21 +212,21 @@ EXTERNML void mgtk_get_gtk_arrowtype(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_ARROW_UP;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_attach_options(int* x0, int* x1, int* x2) {
   *x2 = GTK_FILL;
   *x1 = GTK_SHRINK;
   *x0 = GTK_EXPAND;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_curvetype(int* x0, int* x1, int* x2) {
   *x2 = GTK_CURVE_TYPE_FREE;
   *x1 = GTK_CURVE_TYPE_SPLINE;
   *x0 = GTK_CURVE_TYPE_LINEAR;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_deletetype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7) {
   *x7 = GTK_DELETE_WHITESPACE;
   *x6 = GTK_DELETE_PARAGRAPHS;
@@ -238,7 +238,7 @@ EXTERNML void mgtk_get_gtk_deletetype(int* x0, int* x1, int* x2, int* x3, int* x
   *x0 = GTK_DELETE_CHARS;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_directiontype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5) {
   *x5 = GTK_DIR_RIGHT;
   *x4 = GTK_DIR_LEFT;
@@ -248,7 +248,7 @@ EXTERNML void mgtk_get_gtk_directiontype(int* x0, int* x1, int* x2, int* x3, int
   *x0 = GTK_DIR_TAB_FORWARD;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_expander_style(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_EXPANDER_EXPANDED;
   *x2 = GTK_EXPANDER_SEMI_EXPANDED;
@@ -256,7 +256,7 @@ EXTERNML void mgtk_get_gtk_expander_style(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_EXPANDER_COLLAPSED;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_ICON_SIZE_DIALOG;
   *x5 = GTK_ICON_SIZE_DND;
@@ -267,7 +267,7 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
   *x0 = GTK_ICON_SIZE_INVALID;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_sidetype(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_SIDE_RIGHT;
   *x2 = GTK_SIDE_LEFT;
@@ -275,14 +275,14 @@ EXTERNML void mgtk_get_gtk_sidetype(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_SIDE_TOP;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_text_direction(int* x0, int* x1, int* x2) {
   *x2 = GTK_TEXT_DIR_RTL;
   *x1 = GTK_TEXT_DIR_LTR;
   *x0 = GTK_TEXT_DIR_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_justification(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_JUSTIFY_FILL;
   *x2 = GTK_JUSTIFY_CENTER;
@@ -290,7 +290,7 @@ EXTERNML void mgtk_get_gtk_justification(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_JUSTIFY_LEFT;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_matchtype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5) {
   *x5 = GTK_MATCH_LAST;
   *x4 = GTK_MATCH_EXACT;
@@ -300,14 +300,14 @@ EXTERNML void mgtk_get_gtk_matchtype(int* x0, int* x1, int* x2, int* x3, int* x4
   *x0 = GTK_MATCH_ALL;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_metrictype(int* x0, int* x1, int* x2) {
   *x2 = GTK_CENTIMETERS;
   *x1 = GTK_INCHES;
   *x0 = GTK_PIXELS;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_movement_step(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8) {
   *x8 = GTK_MOVEMENT_BUFFER_ENDS;
   *x7 = GTK_MOVEMENT_PAGES;
@@ -320,13 +320,13 @@ EXTERNML void mgtk_get_gtk_movement_step(int* x0, int* x1, int* x2, int* x3, int
   *x0 = GTK_MOVEMENT_LOGICAL_POSITIONS;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_orientation(int* x0, int* x1) {
   *x1 = GTK_ORIENTATION_VERTICAL;
   *x0 = GTK_ORIENTATION_HORIZONTAL;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_cornertype(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_CORNER_BOTTOM_RIGHT;
   *x2 = GTK_CORNER_TOP_RIGHT;
@@ -334,13 +334,13 @@ EXTERNML void mgtk_get_gtk_cornertype(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_CORNER_TOP_LEFT;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_packtype(int* x0, int* x1) {
   *x1 = GTK_PACK_END;
   *x0 = GTK_PACK_START;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_path_prioritytype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5) {
   *x5 = GTK_PATH_PRIO_HIGHEST;
   *x4 = GTK_PATH_PRIO_RC;
@@ -350,21 +350,21 @@ EXTERNML void mgtk_get_gtk_path_prioritytype(int* x0, int* x1, int* x2, int* x3,
   *x0 = GTK_PATH_PRIO_LOWEST;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_pathtype(int* x0, int* x1, int* x2) {
   *x2 = GTK_PATH_CLASS;
   *x1 = GTK_PATH_WIDGET_CLASS;
   *x0 = GTK_PATH_WIDGET;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_policytype(int* x0, int* x1, int* x2) {
   *x2 = GTK_POLICY_NEVER;
   *x1 = GTK_POLICY_AUTOMATIC;
   *x0 = GTK_POLICY_ALWAYS;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_positiontype(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_POS_BOTTOM;
   *x2 = GTK_POS_TOP;
@@ -372,27 +372,27 @@ EXTERNML void mgtk_get_gtk_positiontype(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_POS_LEFT;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_previewtype(int* x0, int* x1) {
   *x1 = GTK_PREVIEW_GRAYSCALE;
   *x0 = GTK_PREVIEW_COLOR;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_relief_style(int* x0, int* x1, int* x2) {
   *x2 = GTK_RELIEF_NONE;
   *x1 = GTK_RELIEF_HALF;
   *x0 = GTK_RELIEF_NORMAL;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_resize_mode(int* x0, int* x1, int* x2) {
   *x2 = GTK_RESIZE_IMMEDIATE;
   *x1 = GTK_RESIZE_QUEUE;
   *x0 = GTK_RESIZE_PARENT;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_scrolltype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15) {
   *x15 = GTK_SCROLL_END;
   *x14 = GTK_SCROLL_START;
@@ -412,7 +412,7 @@ EXTERNML void mgtk_get_gtk_scrolltype(int* x0, int* x1, int* x2, int* x3, int* x
   *x0 = GTK_SCROLL_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_selection_mode(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_SELECTION_MULTIPLE;
   *x2 = GTK_SELECTION_BROWSE;
@@ -420,7 +420,7 @@ EXTERNML void mgtk_get_gtk_selection_mode(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_SELECTION_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_shadowtype(int* x0, int* x1, int* x2, int* x3, int* x4) {
   *x4 = GTK_SHADOW_ETCHED_OUT;
   *x3 = GTK_SHADOW_ETCHED_IN;
@@ -429,7 +429,7 @@ EXTERNML void mgtk_get_gtk_shadowtype(int* x0, int* x1, int* x2, int* x3, int* x
   *x0 = GTK_SHADOW_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_statetype(int* x0, int* x1, int* x2, int* x3, int* x4) {
   *x4 = GTK_STATE_INSENSITIVE;
   *x3 = GTK_STATE_SELECTED;
@@ -438,46 +438,46 @@ EXTERNML void mgtk_get_gtk_statetype(int* x0, int* x1, int* x2, int* x3, int* x4
   *x0 = GTK_STATE_NORMAL;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_submenu_direction(int* x0, int* x1) {
   *x1 = GTK_DIRECTION_RIGHT;
   *x0 = GTK_DIRECTION_LEFT;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_submenu_placement(int* x0, int* x1) {
   *x1 = GTK_LEFT_RIGHT;
   *x0 = GTK_TOP_BOTTOM;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_updatetype(int* x0, int* x1, int* x2) {
   *x2 = GTK_UPDATE_DELAYED;
   *x1 = GTK_UPDATE_DISCONTINUOUS;
   *x0 = GTK_UPDATE_CONTINUOUS;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_visibility(int* x0, int* x1, int* x2) {
   *x2 = GTK_VISIBILITY_FULL;
   *x1 = GTK_VISIBILITY_PARTIAL;
   *x0 = GTK_VISIBILITY_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_wrap_mode(int* x0, int* x1, int* x2) {
   *x2 = GTK_WRAP_WORD;
   *x1 = GTK_WRAP_CHAR;
   *x0 = GTK_WRAP_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_sorttype(int* x0, int* x1) {
   *x1 = GTK_SORT_DESCENDING;
   *x0 = GTK_SORT_ASCENDING;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_imagetype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_IMAGE_ANIMATION;
   *x5 = GTK_IMAGE_ICON_SET;
@@ -488,7 +488,7 @@ EXTERNML void mgtk_get_gtk_imagetype(int* x0, int* x1, int* x2, int* x3, int* x4
   *x0 = GTK_IMAGE_EMPTY;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_messagetype(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_MESSAGE_ERROR;
   *x2 = GTK_MESSAGE_QUESTION;
@@ -496,7 +496,7 @@ EXTERNML void mgtk_get_gtk_messagetype(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_MESSAGE_INFO;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_buttonstype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5) {
   *x5 = GTK_BUTTONS_OK_CANCEL;
   *x4 = GTK_BUTTONS_YES_NO;
@@ -506,7 +506,7 @@ EXTERNML void mgtk_get_gtk_buttonstype(int* x0, int* x1, int* x2, int* x3, int* 
   *x0 = GTK_BUTTONS_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_arg_flags(int* x0, int* x1, int* x2, int* x3, int* x4) {
   *x4 = GTK_ARG_CHILD_ARG;
   *x3 = GTK_ARG_CONSTRUCT_ONLY;
@@ -515,7 +515,7 @@ EXTERNML void mgtk_get_gtk_arg_flags(int* x0, int* x1, int* x2, int* x3, int* x4
   *x0 = GTK_ARG_READABLE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_rc_flags(int* x0, int* x1, int* x2, int* x3) {
   *x3 = GTK_RC_BASE;
   *x2 = GTK_RC_TEXT;
@@ -523,7 +523,7 @@ EXTERNML void mgtk_get_gtk_rc_flags(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_RC_FG;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_rc_tokentype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15, int* x16, int* x17, int* x18, int* x19, int* x20, int* x21, int* x22, int* x23, int* x24, int* x25, int* x26, int* x27, int* x28, int* x29, int* x30, int* x31, int* x32, int* x33, int* x34, int* x35, int* x36, int* x37) {
   *x37 = GTK_RC_TOKEN_LAST;
   *x36 = GTK_RC_TOKEN_RTL;
@@ -565,7 +565,7 @@ EXTERNML void mgtk_get_gtk_rc_tokentype(int* x0, int* x1, int* x2, int* x3, int*
   *x0 = GTK_RC_TOKEN_INVALID;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_spintype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_SPIN_USER_DEFINED;
   *x5 = GTK_SPIN_END;
@@ -576,13 +576,13 @@ EXTERNML void mgtk_get_gtk_spintype(int* x0, int* x1, int* x2, int* x3, int* x4,
   *x0 = GTK_SPIN_STEP_FORWARD;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_text_search_flags(int* x0, int* x1) {
   *x1 = GTK_TEXT_SEARCH_TEXT_ONLY;
   *x0 = GTK_TEXT_SEARCH_VISIBLE_ONLY;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_text_window_type(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_TEXT_WINDOW_BOTTOM;
   *x5 = GTK_TEXT_WINDOW_TOP;
@@ -602,7 +602,7 @@ EXTERNML void mgtk_get_gtk_text_window_type(int* x0, int* x1, int* x2, int* x3, 
 
 
 /* *** Object *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_object_flags(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_RESERVED_2;
     *x2 = GTK_RESERVED_1;
@@ -616,7 +616,7 @@ EXTERNML void mgtk_get_gtk_object_flags(int* x0, int* x1, int* x2, int* x3) {
 
 
 /* *** Widget *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_widget_flags(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15, int* x16, int* x17) {
     *x17 = GTK_DOUBLE_BUFFERED;
     *x16 = GTK_RECEIVES_DEFAULT;
@@ -638,7 +638,7 @@ EXTERNML void mgtk_get_gtk_widget_flags(int* x0, int* x1, int* x2, int* x3, int*
     *x0 = GTK_TOPLEVEL;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_widget_helptype(int* x0, int* x1) {
     *x1 = GTK_WIDGET_HELP_WHATS_THIS;
     *x0 = GTK_WIDGET_HELP_TOOLTIP;
@@ -662,7 +662,7 @@ EXTERNML void mgtk_get_gtk_widget_helptype(int* x0, int* x1) {
 
 
 /* *** CellRenderer *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_cellrenderer_state(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_CELL_RENDERER_SORTED;
     *x2 = GTK_CELL_RENDERER_INSENSITIVE;
@@ -670,7 +670,7 @@ EXTERNML void mgtk_get_gtk_cellrenderer_state(int* x0, int* x1, int* x2, int* x3
     *x0 = GTK_CELL_RENDERER_SELECTED;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_cellrenderer_mode(int* x0, int* x1, int* x2) {
     *x2 = GTK_CELL_RENDERER_MODE_EDITABLE;
     *x1 = GTK_CELL_RENDERER_MODE_ACTIVATABLE;
@@ -698,7 +698,7 @@ EXTERNML void mgtk_get_gtk_cellrenderer_mode(int* x0, int* x1, int* x2) {
 
 
 /* *** SizeGroup *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_size_group_mode(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_SIZE_GROUP_BOTH;
     *x2 = GTK_SIZE_GROUP_VERTICAL;
@@ -730,7 +730,7 @@ EXTERNML void mgtk_get_gtk_size_group_mode(int* x0, int* x1, int* x2, int* x3) {
 
 
 /* *** TreeModel *** */
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_treemodel_flags(int* x0, int* x1) {
     *x1 = GTK_TREE_MODEL_LIST_ONLY;
     *x0 = GTK_TREE_MODEL_ITERS_PERSIST;
@@ -760,7 +760,7 @@ EXTERNML void mgtk_get_gtk_treemodel_flags(int* x0, int* x1) {
 
 
 /* *** TreeViewColumn *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_treeviewcolumn_sizing(int* x0, int* x1, int* x2) {
     *x2 = GTK_TREE_VIEW_COLUMN_FIXED;
     *x1 = GTK_TREE_VIEW_COLUMN_AUTOSIZE;
@@ -812,13 +812,13 @@ EXTERNML void mgtk_get_gtk_treeviewcolumn_sizing(int* x0, int* x1, int* x2) {
 
 
 /* *** ProgressBar *** */
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_progressbar_style(int* x0, int* x1) {
     *x1 = GTK_PROGRESS_DISCRETE;
     *x0 = GTK_PROGRESS_CONTINUOUS;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_progressbar_orientation(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_PROGRESS_TOP_TO_BOTTOM;
     *x2 = GTK_PROGRESS_BOTTOM_TO_TOP;
@@ -859,7 +859,7 @@ EXTERNML void mgtk_get_gtk_progressbar_orientation(int* x0, int* x1, int* x2, in
 
 
 /* *** SpinButton *** */
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_spin_button_update_policy(int* x0, int* x1) {
     *x1 = GTK_UPDATE_IF_VALID;
     *x0 = GTK_UPDATE_ALWAYS;
@@ -877,7 +877,7 @@ EXTERNML void mgtk_get_gtk_spin_button_update_policy(int* x0, int* x1) {
 
 
 /* *** TreeView *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_treeview_drop_position(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_TREE_VIEW_DROP_INTO_OR_AFTER;
     *x2 = GTK_TREE_VIEW_DROP_INTO_OR_BEFORE;
@@ -888,7 +888,7 @@ EXTERNML void mgtk_get_gtk_treeview_drop_position(int* x0, int* x1, int* x2, int
 
 
 /* *** Toolbar *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_toolbar_style(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_TOOLBAR_BOTH_HORIZ;
     *x2 = GTK_TOOLBAR_BOTH;
@@ -896,7 +896,7 @@ EXTERNML void mgtk_get_gtk_toolbar_style(int* x0, int* x1, int* x2, int* x3) {
     *x0 = GTK_TOOLBAR_ICONS;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_toolbar_childtype(int* x0, int* x1, int* x2, int* x3, int* x4) {
     *x4 = GTK_TOOLBAR_CHILD_WIDGET;
     *x3 = GTK_TOOLBAR_CHILD_RADIOBUTTON;
@@ -905,7 +905,7 @@ EXTERNML void mgtk_get_gtk_toolbar_childtype(int* x0, int* x1, int* x2, int* x3,
     *x0 = GTK_TOOLBAR_CHILD_SPACE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_toolbar_space_style(int* x0, int* x1) {
     *x1 = GTK_TOOLBAR_SPACE_LINE;
     *x0 = GTK_TOOLBAR_SPACE_EMPTY;
@@ -932,7 +932,7 @@ EXTERNML void mgtk_get_gtk_toolbar_space_style(int* x0, int* x1) {
 
 
 /* *** Notebook *** */
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_notebook_tab(int* x0, int* x1) {
     *x1 = GTK_NOTEBOOK_TAB_LAST;
     *x0 = GTK_NOTEBOOK_TAB_FIRST;
@@ -944,7 +944,7 @@ EXTERNML void mgtk_get_gtk_notebook_tab(int* x0, int* x1) {
 
 
 /* *** Menu *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_menu_directiontype(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_MENU_DIR_PREV;
     *x2 = GTK_MENU_DIR_NEXT;
@@ -1015,7 +1015,7 @@ EXTERNML void mgtk_get_gtk_menu_directiontype(int* x0, int* x1, int* x2, int* x3
 
 
 /* *** Button *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_button_action(int* x0, int* x1, int* x2, int* x3) {
     *x3 = GTK_BUTTON_EXPANDS;
     *x2 = GTK_BUTTON_DRAGS;
@@ -1023,7 +1023,7 @@ EXTERNML void mgtk_get_gtk_button_action(int* x0, int* x1, int* x2, int* x3) {
     *x0 = GTK_BUTTON_IGNORED;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_button_box_style(int* x0, int* x1, int* x2, int* x3, int* x4) {
     *x4 = GTK_BUTTONBOX_END;
     *x3 = GTK_BUTTONBOX_START;
@@ -1080,7 +1080,7 @@ EXTERNML void mgtk_get_gtk_button_box_style(int* x0, int* x1, int* x2, int* x3, 
 
 
 /* *** Calendar *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_calendar_display_options(int* x0, int* x1, int* x2, int* x3, int* x4) {
     *x4 = GTK_CALENDAR_WEEK_START_MONDAY;
     *x3 = GTK_CALENDAR_SHOW_WEEK_NUMBERS;
@@ -1092,7 +1092,7 @@ EXTERNML void mgtk_get_gtk_calendar_display_options(int* x0, int* x1, int* x2, i
 
 
 /* *** Window *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_window_position(int* x0, int* x1, int* x2, int* x3, int* x4) {
     *x4 = GTK_WIN_POS_CENTER_ON_PARENT;
     *x3 = GTK_WIN_POS_CENTER_ALWAYS;
@@ -1101,7 +1101,7 @@ EXTERNML void mgtk_get_gtk_window_position(int* x0, int* x1, int* x2, int* x3, i
     *x0 = GTK_WIN_POS_NONE;
 }
 
-/* ML type: unit */
+/* ML type: int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_window_type(int* x0, int* x1) {
     *x1 = GTK_WINDOW_POPUP;
     *x0 = GTK_WINDOW_TOPLEVEL;
@@ -1113,7 +1113,7 @@ EXTERNML void mgtk_get_gtk_window_type(int* x0, int* x1) {
 
 
 /* *** Dialog *** */
-/* ML type: unit */
+/* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_dialog_flags(int* x0, int* x1, int* x2) {
     *x2 = GTK_DIALOG_NO_SEPARATOR;
     *x1 = GTK_DIALOG_DESTROY_WITH_PARENT;
