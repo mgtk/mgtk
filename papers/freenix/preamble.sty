@@ -23,12 +23,18 @@
 
 %% Types
 \let\typefont\textsf
+\let\typenamefont\texttt
 \newcommand\tUnit{\typefont{unit}}
 \newcommand\tInt{\typefont{int}}
 \newcommand\tBool{\typefont{bool}}
+\newcommand\tString{\typefont{string}}
 \newcommand\tList[1]{\ensuremath{{#1}\,\typefont{list}}}
 \newcommand\tArrow[2]{\ensuremath{{#1}\rightarrow{#2}}}
 
+\newcommand\tName[1]{\typenamefont{#1}}
+\newcommand\tBase{\tName{base}}
+\newcommand\tWitness[1]{\typenamefont{#1\_t}}
+\newcommand\tApp[2]{\ensuremath{#1}\,{#2}}
 
 
 %%% Local Variables: 

@@ -88,36 +88,27 @@ widely used for teaching and in reasearch.
 
 
 
-\section{Encoding of classes}
-\label{sec:encoding-classes}
-
-
-\begin{ednote}{Ken}
-  * Phantom types are inheritance paths.
-
-  * We have one witness type per subtype.
-  
-  * We get upcasts for free.
-  
-  * Use base for plumbing.
-
-  * Only single-inheritance is handled.
-\end{ednote}
-
-
-
-\section{Example}
+\section{Running Example}
 \label{sec:example}
 
-\begin{ednote}{}
-  Perhaps we can move this example further up the paper,
-  and thereby introduce SML lingo.
+\begin{ednote}{Henning}
+  I moved this section up a bit in order to introduce SML lingo
+  early on.
 \end{ednote}
 
-\begin{ednote}{}
-  Mini-mgtk and a hello-world example
+\begin{ednote}{Henning}
+  This ended up being to long, I think.
+  It is easier to just write stuff down now, and then shorten
+  afterwards.
 \end{ednote}
 
+Figure~\ref{fig:hello-world} shows a deliberately simple Hello World example
+using \mgtk. It illustrates (1) how to get the toolkit initialized
+using \texttt{GtkBasis.int} (from a module containing basic \gtk
+functionality not related to specific widgets), (2) how to construct
+new widgets (using module \texttt{Window} for the Window widget,
+and \texttt{Button} for the Button widget), and (3) how to conecct
+signals to widgets (using module \texttt{Signal}).
 \begin{figure*}[htbp]
 \begin{centering}
 \begin{verbatim}
@@ -138,11 +129,12 @@ fun main _ =
 
 val _ = main()
 \end{verbatim}
-\caption{Hello World in mGTK.\label{fig:hello-world}}
+\caption{Hello World in \mgtk.\label{fig:hello-world}}
 \end{centering}
 \end{figure*}
-In Figure~\ref{fig:hello-world} we use the following SML constructs
-(see a textbook on SML for further examples;
+
+In the figure we use the following \sml constructs
+(see a textbook on \sml for further examples;
 \cite{Hansen-Rischel:1999,Paulson:1996} for example). The construct
 \texttt{fun} \textit{foo} \textit{x} \texttt{=} \textit{exp} declares
 a function \textit{foo} that has one formal parameter \textit{x} and
@@ -191,12 +183,115 @@ $\alpha$ to {\tInt} and the occurrence of the function gets type
 \tArrow\tInt\tInt. The function is said to be (parametric) polymorphic
 because we can apply it to arguments of many shapes.
 
+\section{Encoding of classes}
+\label{sec:encoding-classes}
+
+
+\begin{ednote}{Ken}
+  * Phantom types are inheritance paths.
+
+  * We have one witness type per subtype.
+  
+  * We get upcasts for free.
+  
+  * Use base for plumbing.
+
+  * Only single-inheritance is handled.
+\end{ednote}
+
+
+Continuing our running example the two widgets
+\textit{window} and \textit{button} gets the following
+types
+\begin{displaymath}
+\tApp{(\tApp{(\tApp{\tApp{(\tApp{\tBase}{\tWitness{window}})}
+                   {\tWitness{container}}})}
+            {\tWitness{widget}})}
+     {\tName{t}}
+\end{displaymath}
+and
+\begin{displaymath}
+\tApp{(\tApp{(\tApp{(\tApp{\tBase}{\tWitness{button}})}
+                 {\tWitness{container}})}
+           {\tWitness{widget}})}
+     {\tName{t}}
+\end{displaymath}
+(parenthesized here for readability). This tells us, reading from left
+to right, that \textit{window} is a Window widget that extends the
+Container widget, which in turn extends the Widget widget; similarly
+for \textit{button}. It also tells us that \textit{window} and
+\textit{button} have a common ancestor, namely the Container widget.
+In particular, therefore, we can use both the window and the button in
+all contexts expecting a Container.
+
+For example, the function \texttt{Container.add} has type
+\begin{displaymath}\begin{array}{l}
+(\tApp{\tApp{\tApp{\alpha}{\tWitness{container}}}{\tWitness{widget}}}{\tName{t}})
+\rightarrow
+(\tApp{\tApp{\beta}{\tWitness{widget}}}{\tName{t}})
+\\
+\multicolumn{1}{r}{\rightarrow{\tUnit}}
+\end{array}\end{displaymath}
+from which we conclude that \texttt{Container.add} expects two arguments:
+one which has to be a sub-widget of Container, and one which has to be
+a sub-widget of Widget; the function returns the unit value. Considering
+the types of \textit{window} and \textit{button} above, we see that
+the application
+\begin{displaymath}
+\texttt{Container.add}\,\textit{window}\,\textit{button}
+\end{displaymath}
+is well-typed because \textit{window} is indeed a sub-widget of 
+Container, and \textit{button} is indeed a sub-widget of Widget.
+
+Consider now another function that only works on Buttons, \texttt{Button.set\_label}, with type
+\begin{displaymath}\begin{array}{l}
+(\tApp{\tApp{\tApp{\tApp{\alpha}{\tWitness{button}}}{\tWitness{container}}}{\tWitness{widget}}}{\tName{t}})
+\rightarrow
+\tString
+\\
+\multicolumn{1}{r}{\rightarrow\tUnit}
+\end{array}\end{displaymath}
+Thus \texttt{Button.set\_label} expects a sub-widget of Button and a string and returns unit.
+If we were to apply this function to \textit{window} as in
+\begin{displaymath}
+\texttt{Button.set\_label}\,\textit{window}
+\end{displaymath}
+we would get a (compile-time) type error saying (essentially) that
+a Window widget cannot be considered a Button widget because the
+inheritance paths do not match. Here is the concrete message output
+by the Moscow ML compiler
+\begin{verbatim}
+- Button.set_label window "New label";
+! Toplevel input:
+! Button.set_label window "New label";
+!                  ^^^^^^
+! Type clash: expression of type
+!   base window_t container_t widget_t t
+! cannot have type
+!   'a button_t container_t widget_t t
+\end{verbatim}
+
+
 \section{Process}
 \label{sec:process}
 
 \begin{ednote}{Henning}
   Fra mini muck-up til fuld toolkit
 \end{ednote}
+
+In constructing the \mgtk binding we leverage the foresightedness of
+the \gtk developers. Early on it was recognized that it would be
+important to have a machine-readable ``specification'' of the toolkit.
+Essentially the specification would specify the widget classes, the
+inheritance hierarchy, and methods and functions in the toolkit. The
+specification became known as the \texttt{gtk.defs} file. One could
+argue that it is simple enough to extract the same information from
+the C header files; however, that incurs an initial hurdle in the
+form of a suitable parser that is not present with the easily parsable
+defs-format.
+
+The bulk of the \mgtk binding is constructed automatically from the
+\texttt{gtk.defs} file. An important part of the process is to
 
 
 \subsection{Stubs and code generation}
