@@ -90,18 +90,6 @@ being statically typed, it is not necessary for the programmer to
 explicitly provide type annotations in the program, because \sml
 features \emph{type inference} which means that the compiler
 reconstructs type annotations as needed.
-%  \sml also features algebraic
-%datatypes, pattern-matching, tuples and records, first-class and
-%anonymous functions, exception handling, immutable data types and
-%updatable references, abstract data types, and parametric modules, but
-%it is outside the scope of this paper to introduce all these features,
-%instead we refer the interested reader to one of the fine textbooks
-%\cite{Hansen-Rischel:1999,Paulson:1996}.
-
-\begin{ednote}{Ken}
-  Skulle vi have et lille fac og fib eksempel?
-  (drop for extended abstract)
-\end{ednote}
 
 \sml is one of the few languages with a formal definition
 \cite{Milner:1997:Definition}.  The definition defines \sml in 93
@@ -116,10 +104,6 @@ interactive \emph{read--eval--print--loops} (REPLs) to aggressively
 optimizing whole-program compilers targeting native code.
 
 
-\begin{ednote}{Ken}
-  Introduce modules.  Just signatures and (nested) structures.
-  (måske drop for extended abstract)
-\end{ednote}
 
 
 \subsection{\gtk}
@@ -134,6 +118,42 @@ and practical to develop bindings for other programming languages than C.
 
 %\subsection{Overview of this paper}
 %\label{sec:overview-this-paper}
+
+
+
+\section{Brief Introduction to \sml{}}
+\label{sec:brief-intr-sml}
+
+This section gives a breif overview of some of the main features of
+\sml{}.  It is not enough to use the language in anger, but it should
+be sufficient to get an understanding of the examples in the rest of
+the paper.  We refer the interested reader to one of the fine textbooks
+\cite{Hansen-Rischel:1999,Paulson:1996} for more information about \sml{}.
+
+
+
+\sml{} is a two-level language, it consists of a \emph{core language}
+for programming in the small (that is, functions, data structures and
+algorithms), and a \emph{module language} for programming in the large.
+
+
+%  \sml also features algebraic
+%datatypes, pattern-matching, tuples and records, first-class and
+%anonymous functions, exception handling, immutable data types and
+%updatable references, abstract data types, and parametric modules, but
+%it is outside the scope of this paper to introduce all these features,
+%instead 
+
+\begin{ednote}{Ken}
+  Skulle vi have et lille fac og fib eksempel?
+  (drop for extended abstract)
+\end{ednote}
+
+\begin{ednote}{Ken}
+  Introduce modules.  Just signatures and (nested) structures.
+  (måske drop for extended abstract)
+\end{ednote}
+
 
 
 
