@@ -139,28 +139,64 @@ struct
         val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
         val getString : string getter = app2(symb "mgtk_get_pos_string")
 
-    in
 	fun register f = localId(fn id => (add (id, f); id))
-	fun reg_unit f = register(fn _ => f())
-	fun reg_bool f = register(fn (_,args,pos) => 
-				  setBool args pos (f()))
-
 	val signal_connect : gtkobj -> string -> int -> bool -> int
 	                   = app4(symb"mgtk_signal_connect")
+    in
+    datatype state = S of GtkArgs * int * int
+    type ('a, 'b) trans   = 'a * state -> 'b * state
+    type ('a, 'rest) read = ('a -> 'rest, 'rest) trans
+    type 'a return        = ('a, unit) trans
 
-    end	
+    fun getter get (f, S(arg, max, next)) = 
+        if next < max then (f (get arg next), S(arg, max, next+1))
+        else raise Subscript
+    fun setter set (x, dummy as S(arg, max, next)) =
+        if next = max then (set arg max x; ((),dummy))
+        else raise Subscript
 
-    (* connect a callback with return type unit *)
+    fun int x        = getter getInt x
+    fun return_int x = setter setInt x
+
+    fun bool x        = getter getBool x
+    fun return_bool x = setter setBool x
+
+    fun unit x       = getter (fn _ => fn _ => ()) x
+    fun return_unit x = setter (fn _ => fn _ => fn _ => ()) x
+               
+    infix --> 
+
+    fun (x --> y) arg = y (x arg)                        
+
+    fun signalConnect (OBJ wid) sign after conv f =
+        let val wrap = fn (_, arg, max) => ignore(conv (f, S(arg, max, 0)))
+            val id = register wrap
+        in  signal_connect wid sign id after
+        end
+
+
+    (* new formulations of the two old connect functions *)
+    (* connect a callback with type unit -> unit *)
+    fun unit_connect wid sign cb =
+        ignore(signalConnect wid sign false (unit --> return_unit) cb)
+
+    (* connect a callback with type unit -> bool *)
+    fun bool_connect wid sign cb =
+        ignore(signalConnect wid sign false (unit --> return_bool) cb)
+
+    (* old connect functions 
     fun unit_connect (OBJ wid) sign cb =
 	let val id = reg_unit cb
 	in  ignore(signal_connect wid sign id false)
 	end
-
-    (* connect a callback with return type bool *)
     fun bool_connect (OBJ wid) sign cb =
 	let val id = reg_bool cb
 	in  ignore(signal_connect wid sign id true)
 	end
+    *)
+
+
+    end	
 
     type base = unit
     type 'a widget_t = base
