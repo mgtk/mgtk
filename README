@@ -2,10 +2,10 @@ mGTK - SML bindings for gtk+
 ============================
 
 Homepage:
-    http://mgtk.sourceforge.net
+    http://mgtk.sourceforge.net/
 
 Authors:
-    Ken Friis Larsen <kfl@it.edu> and Henning Niss <hniss@diku.dk>
+    Ken Friis Larsen <ken@friislarsen.net> and Henning Niss <hniss@itu.dk>
 
 Copyright (C) 2000-2004 by Ken Friis Larsen and Henning Niss.
 
@@ -40,13 +40,13 @@ To subscribe to the mgtk-announce mailing list go to:
 REQUIREMENTS
 ------------
 
-mGTK should work on any platform supported by both Moscow ML or MLton, and
-Gtk+. We develop and test mGTK on Linux machines (running RedHat).
+mGTK should work on any platform supported by both Moscow ML or MLton,
+and Gtk+. We develop and test mGTK on Linux machines (running Debian).
 mGTK is known to run successfully on the following machines
 
 *   Linux, X86, Debian Sarge
 *   Windows, X86 (not in this pre-release)
-
+*   Mac OS X (not in this pre-release)
 
 If you have had any success running mGTK on some other platform,
 please send us an email with a description of the machine.
@@ -74,9 +74,9 @@ Gtk+: mGTK will only work with the 2.4.x series.  Check your Gtk+
 DOCUMENTATION
 -------------
 
-At this time there is no documentation for mGTK :-(
-However, it should be possible to use the documentation for the C
-interface to Gtk+ (available at the Gtk+ homepage; see above).
+At this time there is no documentation for mGTK :-( However, it should
+be possible to use the documentation for the C interface to Gtk+
+(available at the Gtk+ homepage; see above).
 
 Also, you can take a peek in the examples directory (remember to read
 the README file there).
