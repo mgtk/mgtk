@@ -16,9 +16,7 @@
 /*                                                                           */
 
 
-#define gdk_color_val(x) ((void*) Field(x, 1))
-
-#define gdk_color_val_nocast(x) (Field(x, 1))
+#define gdk_color_val(x) (((void*) Field(x, 1)))
 
 static void ml_finalize_gdk_color (value val) {
   gdk_color_free (gdk_color_val(val)); 
@@ -28,7 +26,7 @@ value Val_gdk_color (void* obj) {
   value res;
   void* copy = gdk_color_copy(obj);
   res = alloc_final (2, ml_finalize_gdk_color, 0, 1);
-  gdk_color_val_nocast(res) = (value) copy;
+  gdk_color_val(res) = copy;
   return res;
 }
 

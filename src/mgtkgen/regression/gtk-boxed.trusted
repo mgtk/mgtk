@@ -16,9 +16,7 @@
 /*                                                                           */
 
 
-#define gdk_font_val(x) ((void*) Field(x, 1))
-
-#define gdk_font_val_nocast(x) (Field(x, 1))
+#define gdk_font_val(x) (((void*) Field(x, 1)))
 
 static void ml_finalize_gdk_font (value val) {
   gdk_font_unref (gdk_font_val(val)); 
@@ -28,13 +26,11 @@ value Val_gdk_font (void* obj) {
   value res;
   gdk_font_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_font, 0, 1);
-  gdk_font_val_nocast(res) = (value) obj;
+  gdk_font_val(res) = obj;
   return res;
 }
 
-#define gdk_color_val(x) ((void*) Field(x, 1))
-
-#define gdk_color_val_nocast(x) (Field(x, 1))
+#define gdk_color_val(x) (((void*) Field(x, 1)))
 
 static void ml_finalize_gdk_color (value val) {
   gdk_color_free (gdk_color_val(val)); 
@@ -44,13 +40,11 @@ value Val_gdk_color (void* obj) {
   value res;
   void* copy = gdk_color_copy(obj);
   res = alloc_final (2, ml_finalize_gdk_color, 0, 1);
-  gdk_color_val_nocast(res) = (value) copy;
+  gdk_color_val(res) = copy;
   return res;
 }
 
-#define gdk_drawable_val(x) ((void*) Field(x, 1))
-
-#define gdk_drawable_val_nocast(x) (Field(x, 1))
+#define gdk_drawable_val(x) (((void*) Field(x, 1)))
 
 static void ml_finalize_gdk_drawable (value val) {
   gdk_window_unref (gdk_drawable_val(val)); 
@@ -60,13 +54,11 @@ value Val_gdk_drawable (void* obj) {
   value res;
   gdk_window_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_drawable, 0, 1);
-  gdk_drawable_val_nocast(res) = (value) obj;
+  gdk_drawable_val(res) = obj;
   return res;
 }
 
-#define gdk_window_val(x) ((void*) Field(x, 1))
-
-#define gdk_window_val_nocast(x) (Field(x, 1))
+#define gdk_window_val(x) (((void*) Field(x, 1)))
 
 static void ml_finalize_gdk_window (value val) {
   gdk_window_unref (gdk_window_val(val)); 
@@ -76,7 +68,7 @@ value Val_gdk_window (void* obj) {
   value res;
   gdk_window_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_window, 0, 1);
-  gdk_window_val_nocast(res) = (value) obj;
+  gdk_window_val(res) = obj;
   return res;
 }
 
