@@ -47,5 +47,6 @@ clean:
 	rm -f *.{o,so,uo,ui} *~
 	rm -f helloworld-new helloworld-mlton
 	rm -f buttons-galore buttons-galore-mlton
+	rm -f signup signup-mlton
 
 realclean: clean
