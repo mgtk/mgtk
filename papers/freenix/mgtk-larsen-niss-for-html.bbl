@@ -1,0 +1,101 @@
+\begin{thebibliography}{18}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{{\tt #1}}\fi
+
+\bibitem[Beazley(1996)]{Beazley:1996}
+David~M. Beazley.
+\newblock {SWIG}: {A}n easy to use tool for integrating scripting languages
+  with {C} and {C++}.
+\newblock In {\em Proceedings of 4th Annual USENIX Tcl/Tk Workshop}, pages
+  129--139. USENIX Association, 1996.
+
+\bibitem[Bloch(2001)]{bloch01:effective-java}
+Joshua Bloch.
+\newblock {\em Effective Java}.
+\newblock The Java Series. Addison-Wesley, 2001.
+
+\bibitem[Blume(2001)]{Blume:2001:nlffi}
+Matthias Blume.
+\newblock No-longer-foreign: Teaching an {ML} compiler to speak {C}
+  ``natively''.
+\newblock {\em Elec.\ Notes in Theo.\ Comp.\ Sci.}, 59\penalty0 (1), 2001.
+
+\bibitem[Finne et~al.(1999)Finne, Leijen, Meijer, and
+  Jones]{Finne:1999:CallingHellFromHeaven}
+Sigbjorn Finne, Daan Leijen, Erik Meijer, and Simon L.~Peyton Jones.
+\newblock Calling hell from heaven and heaven from hell.
+\newblock In {\em Int.\ Conf.\ on Func.\ Prog. (ICFP'99)}, pages 114--125,
+  1999.
+
+\bibitem[Fluet and Pucella(2002)]{Fluet-Pucella:2002}
+Matthew Fluet and Riccardo Pucella.
+\newblock Phantom types and subtyping.
+\newblock In {\em IFIP Theo.\ Comp.\ Sci. (TCS'02)}, pages 448--460, 2002.
+
+\bibitem[Foundation(1999)]{LGPL:1999}
+Free~Software Foundation.
+\newblock {GNU} {L}esser {G}eneral {P}ublic {L}icense ({LGPL}), 1999.
+\newblock URL \url{http://www.gnu.org/licenses/lgpl.html}.
+
+\bibitem[Garcia et~al.(2003)Garcia, Jarvi, Lumsdaine, Siek, and
+  Willcock]{garcia03:generics}
+Ronald Garcia, Jaakko Jarvi, Andrew Lumsdaine, Jeremy Siek, and Jeremiah
+  Willcock.
+\newblock A comparative study of language support for generic programming.
+\newblock In {\em Proceedings of the 18th ACM SIGPLAN conference on
+  Object-oriented programing, systems, languages, and applications (OOPSLA
+  2003)}, pages 115--134. ACM Press, 2003.
+
+\bibitem[Hansen and Rischel(1999)]{Hansen-Rischel:1999}
+Michael~R. Hansen and Hans Rischel.
+\newblock {\em Introduction to Programming using {SML}}.
+\newblock Addison-Wesley, 1999.
+
+\bibitem[Leung(2003)]{SML-Gtk-webpage:2003}
+Allen Leung.
+\newblock \texttt{SML-Gtk}: \gtk bindings for {Standard ML of New Jersey},
+  2003.
+\newblock URL
+  \url{http://www.cs.nyu.edu/phd_students/leunga/sml-gtk/sml-gtk.html}.
+
+\bibitem[Milner et~al.(1997)Milner, Tofte, Harper, and
+  MacQueen]{Milner:1997:Definition}
+Robin Milner, Mads Tofte, Robert Harper, and David MacQueen.
+\newblock {\em The Definition of Standard {ML} (Revised)}.
+\newblock The MIT Press, 1997.
+
+\bibitem[Paulson(1996)]{Paulson:1996}
+Larry Paulson.
+\newblock {\em ML for the Working Programmer (2nd edition)}.
+\newblock Cambridge University Press, 1996.
+
+\bibitem[Gtk(2004)]{Gtk-bindings-webpage:2004}
+The \gtk language bindings webpage, 2004.
+\newblock URL \url{http://www.gtk.org/bindings.html}.
+
+\bibitem[gtk(2004)]{gtk-reference-manual}
+The \gtk reference manual, 2004.
+\newblock URL \url{http://developer.gnome.org/doc/API/2.0/gtk/index.html}.
+
+\bibitem[Gtk(2004)]{Gtk-webpage:2004}
+The \gtk webpage, 2004.
+\newblock URL \url{http://www.gtk.org/}.
+
+\bibitem[MLK(2003)]{MLKit-webpage:2003}
+The {MLKit} web page, 2003.
+\newblock URL \url{http://www.it-c.dk/research/mlkit/}.
+
+\bibitem[MLt(2003)]{MLton-webpage:2003}
+The {MLton} web page, 2003.
+\newblock URL \url{http://www.mlton.org/}.
+
+\bibitem[Mos(2003)]{Mosml-webpage:2003}
+The {Moscow ML} web page, 2003.
+\newblock URL \url{http://www.dina.kvl.dk/~sestoft/mosml.html}.
+
+\bibitem[SML(2003)]{SML.NET-webpage:2003}
+The {SML.NET} web page, 2003.
+\newblock URL \url{http://www.cl.cam.ac.uk/Research/TSG/SMLNET/}.
+
+\end{thebibliography}
