@@ -52,9 +52,9 @@
   how it is possible to encode a single-inheritance class-hierarchy
   using \sml's type system. And we describe how we machine-generate
   most of the binding to best utilize the limited man-power of the
-  project.
+  project.  
 
-  \begin{ednote}{PC}
+  \begin{ednote}{Bart}
     You will also want to add a few sentences, describing the
   rest of the paper contents, and describing impacts and contributions
   of the work.
@@ -75,10 +75,16 @@ an overview of the rest of the paper.
   to start out with motivation and background.]}
 
 \begin{ednote}{Ken}
-  * Hvad med at motivere og forklare hvorfor vi vil have et grafisk lib
-  til SML.
+  We need to motivate and explain why it is interesting with a GUI lib
+  for SML.  That should be easy:  Because there currently isn't (a
+  standard industrial strenght) one.  On a long term basis,
+  when we have wrapped the whole GNOME platform, it is possible to SML
+  to make real applications without inventing the weel to many times.
 
-  * SML er ikke OO (tester Gtk+-folkenes "hypotese")
+  Second we need to explain why an SML binding is interestinf from a 
+  GTK point-of-view: Opens up the small, but important, marked of
+  teaching languages; tests the interfacability of GTK, as SML is
+  radically different than C (and most other mainstream languages). 
 \end{ednote}
 
 \subsection{Standard ML}
@@ -123,19 +129,19 @@ used in the \gnome platform.  \gtk is implemented in C, but from the
 beginning the \gtk developers have paid attention to making it feasible
 and practical to develop bindings for other programming languages than C.
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   "...is a library...It is licensed...LGPL..." -> "is an
   LGPL-licensed [cite LGPL] library for creating..."  i.e, fold
   second sentence in to first, and add LGPL cite.
 \end{ednote}
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
      "It is the graphical toolkit used in the GNOME platform."  Add more
    sentences to this to make a paragraph with a brief history of
    GIMP/GNOME/Gtk/Gtk+.
 \end{ednote}
 
-\begin{ednote}{}
+\begin{ednote}{Bart}
      "...than C."  Should section 4 material move here to
    describe the gtk.defs file?
 
@@ -349,7 +355,7 @@ the return value of purely side-effecting functions.  Finally,
 \textit{hd}\texttt{::}\textit{tl}.
 
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
      Give the anonymous lambda a name, so that you don't have to explain
    => and so it's obvious what it does.  The non-SML reader can probably
    most easily (and fairly harmlessly) think of the unit value as the
@@ -431,7 +437,7 @@ method on object, for instance, then the \sml compiler should give an
 type error (at compile-time).
 
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   Explain in a few sentences why OO class hierarchies can be
   thought of as having a subtype relationship.  Believe it or
   not, this won't be obvious to everyone.
@@ -491,7 +497,7 @@ subclasses.
 
 \item[Subtyping/Inheritance] 
 
-  \begin{ednote}{PC}
+  \begin{ednote}{Bart}
       Subtyping/Inheritance: The first sentence has grammar
   issues.  Break it into multiple simpler sentences.
 
@@ -516,7 +522,7 @@ we see that the type variable !'path! in the declaration of the type
 In the rest of the paper we shall use the convention that witness
 types ends with !_t!.
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
     Give some intuition, and preferably lots, about why *witness
   types* are necessary and are introduced.  All the magic is
   introduced right here: this section and the previous on
@@ -552,7 +558,7 @@ val set_title : 'path window -> string
 That is, !foo! takes two arguments: an object of type 
 \classname{Window} and a string, and returns !unit!.
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   
 Why curry the methods rather than accepting argument tuples?
 I can think of at least one good reason (detachable
@@ -573,7 +579,7 @@ val new : unit -> base label
 \end{SMLcode}
 The convention in \gtk is that constructors are named !new!.
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   Explicitly show the introduction of "base",
 via
    type base
@@ -609,7 +615,7 @@ the dummy type !base!.  In addition to the signature !Window! we also
 need a structure called !Window! that implements the actual calling of
 the relevant \gtk C functions.
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   
 signatures vs structures --- make this clear.  I had to work
 a bunch of SML example---attached---on my own to figure out
@@ -635,7 +641,7 @@ and \texttt{button} have a common ancestor, namely the Container
 widget.  In particular, therefore, we can use both the window and the
 button in all contexts expecting a Container.
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   window and button types: they would normally be declared as
   val window : base window
   val button : base button
@@ -718,7 +724,7 @@ argue that it is simple enough to extract the same information from
 the C header files. However, that incurs an initial hurdle in the
 form of a suitable parser that is not present with the easily parsable
 defs-format.
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   Correct the 2nd sentence to something like "However, C headers are
   difficult to parse, whereas the defs format is straightforward."
 \end{ednote}
@@ -773,7 +779,7 @@ shows three entries in the \texttt{gtk.defs} file.
 \end{centering}
 \end{figure}
 The first entry shows the shape of widget specification 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   "...the shape of widget specification..." clarify
 \end{ednote}
 (defining \texttt{Button} to be a sub-widget of \texttt{Bin}). The
@@ -831,7 +837,7 @@ compilers (in particular, the \emph{ML Kit with Regions}
 \cite{MLKit-webpage:2003} and \emph{SML.NET}
 \cite{SML.NET-webpage:2003} with \gtksharp).
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   "The process...SML implementations."  Replace with something like
   "The approache described in section 4 is largely implementation
   independent: the binding should be able to run in any conformant SML
@@ -840,7 +846,7 @@ compilers (in particular, the \emph{ML Kit with Regions}
 \end{ednote}
 
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   "Combining...gives...programmer" sentence more like "One finds SML
   and Gtk+ implementations on a large variety of platforms.  Thus, the
   application programmer can achieve broad cross platform capability."
@@ -851,14 +857,14 @@ binding apart from other \gtk bindings for \sml (notably, the
 \texttt{SML-Gtk} binding for the \sml of New Jersey \sml compiler;
 \cite{SML-Gtk-webpage:2003}).
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   The source code update needs to be done shortly.  The claimed
   benefits of retargeting are impossible to believe until the system
   has been retargeted.
 \end{ednote}
 
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   This work vs SML/NJ?  Is this a replacement for Leung's
 system?  You need to cite [10] much earlier in the paper,
 and make it clear that you are not the only ones to use
@@ -912,7 +918,8 @@ appropriate information from the C headers files of \gtk.
 
 From the outset the necessity of access to libraries has been realized
 in the functional programming community. Work in this area for \sml
-include \mosml's C-library support \cite{Larsen:2001} and 
+include 
+%\mosml's C-library support \cite{Larsen:2001} and 
 \smlnj's foreign function interface \cite{Blume:2001:nlffi};
 for Haskell it includes \cite{Finne:1999:CallingHellFromHeaven}.
 
@@ -921,7 +928,7 @@ for Haskell it includes \cite{Finne:1999:CallingHellFromHeaven}.
 \section{Conclusion}
 \label{sec:conclusion}
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   Get rid of the sub-headers Contributions and Future Work
 
 \end{ednote}
@@ -939,7 +946,7 @@ different from C in abstraction level and paradigm; finally, we think
 that we have demonstrated that it is indeed possible to bind the entire \gnome
 development platform, using mainly machine generated stub code.
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   Tone down the claims here.  You have one of several
 interfaces, albeit a nice one.  You may claim completeness,
 portability (when demonstrated), and ease of use.
@@ -947,7 +954,7 @@ portability (when demonstrated), and ease of use.
 \end{ednote}
 
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   
 Move the claims below the future work.
 
@@ -965,7 +972,7 @@ above) together with the more practical work of extending the code
 generator to handle such newly introduced representations.
 
 
-\begin{ednote}{PC}
+\begin{ednote}{Bart}
   Expand the discussion here substantially: it sounds
 interesting.  What will it take to write SML-GNOME apps?
 What parts will you replicate/replace?  What parts will you
