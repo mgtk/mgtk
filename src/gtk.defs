@@ -4323,7 +4323,7 @@
   ((int columns)))
 
 (define-func gtk_clist_new_with_titles
-  none
+  GtkCList
   ((int columns)
    ((string array-) titles)))
 
