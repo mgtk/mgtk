@@ -544,3 +544,123 @@ struct
     val new: unit -> base t
         = fn dummy => make(new_ false 10) 
 end
+
+signature TextIter =
+sig
+    type t
+    val copy : t -> t
+end
+
+structure TextIter :> TextIter =
+struct
+    prim_type t
+    open Dynlib
+    val symb  = GtkBasis.symb
+
+    val copy : t -> t 
+        = app1(symb"mgtk_gtk_text_iter_copy")
+end
+
+(*signature TextTag =
+sig
+
+end
+
+structure TextTag :> TextTag =
+struct
+
+end
+
+signature TextTagTable =
+sig
+
+end
+
+structure TextTagTable :> TextTagTable =
+struct
+
+end
+*)
+
+signature TextBuffer =
+sig
+    type base
+    type 'a text_buffer_t
+    type 'a t = 'a text_buffer_t GObject.t
+
+    (* val new : TextTagTable.t -> base t *)
+    val insert : 'a t -> TextIter.t -> string -> unit
+    val get_start_iter : 'a t -> TextIter.t
+    val get_end_iter   : 'a t -> TextIter.t
+
+    val inherit        : 'a -> GObject.constructor -> 'a t
+end
+
+structure TextBuffer :> TextBuffer =
+struct
+    type base = unit
+    type 'a text_buffer_t = unit
+    type 'a t = 'a text_buffer_t GObject.t
+
+    open Dynlib
+    val symb  = GtkBasis.symb
+    type cptr = GObject.cptr
+    val repr  = GObject.repr
+
+    val insert_: cptr -> TextIter.t -> string -> unit
+        = app3(symb"mgtk_gtk_text_buffer_insert")
+    val insert: 'a t -> TextIter.t -> string -> unit
+        = fn buffer => fn iter => fn string => insert_ (repr buffer) iter string
+
+    val get_start_iter_: cptr -> TextIter.t 
+        = app1(symb"mgtk_gtk_text_buffer_get_start_iter")
+    val get_start_iter: 'a t -> TextIter.t
+        = fn buffer => get_start_iter_ (repr buffer)
+
+    val get_end_iter_: cptr -> TextIter.t 
+        = app1(symb"mgtk_gtk_text_buffer_get_end_iter")
+    val get_end_iter: 'a t -> TextIter.t
+        = fn buffer => get_end_iter_ (repr buffer)
+
+    fun inherit w con = GObject.inherit () con
+end
+
+
+signature TextView =
+sig
+    type 'a text_view_t
+    type 'a t = 'a text_view_t Container.t
+    type base
+
+    val new : unit -> base t
+
+    val get_buffer : 'a t -> base TextBuffer.t
+end
+
+structure TextView :> TextView =
+struct
+
+    type 'a text_view_t = unit
+    type 'a t = 'a text_view_t Container.t
+    type base = unit
+
+    open Dynlib
+    type cptr = GObject.cptr
+    val symb  = GtkBasis.symb
+    val repr  = GObject.repr
+
+    fun inherit w con = Container.inherit () con
+    fun makeView ptr = Container.inherit () (fn() => ptr)
+
+    val new_: unit -> cptr
+        = app1(symb"mgtk_gtk_text_view_new")
+    val new: unit -> base t
+        = fn dummy => makeView(new_ dummy)
+
+    val get_buffer_ : cptr -> cptr 
+        = app1(symb"mgtk_gtk_text_view_get_buffer")
+    val get_buffer : 'a t -> base TextBuffer.t
+        = fn buffer => TextBuffer.inherit () 
+                                          (fn () => get_buffer_ (repr buffer))
+
+end

@@ -360,3 +360,54 @@ EXTERNML value mgtk_gtk_box_pack_start(value box, value child) { /* ML */
 EXTERNML value mgtk_gtk_vbox_new(value homogeneous, value spacing) { /* ML */
   return Val_GtkObj(gtk_vbox_new(Bool_val(homogeneous), Int_val(spacing)));
 }
+
+
+
+/* *** Text stuff *** */
+
+#define GtkTextIter_val(x) (((void*) Field(x, 1)))
+
+static void ml_finalize_gtktextiter (value val) {
+  gtk_text_iter_free (GtkTextIter_val(val)); 
+}
+
+static inline value Val_GtkTextIter (void* obj) { 
+  value res; 
+  res = alloc_final (2, ml_finalize_gtktextiter, 0, 1);
+  GtkObj_val(res) = gtk_text_iter_copy(obj);  
+  return res; 
+}
+
+/* ML type : cptr -> cptr */
+EXTERNML value mgtk_gtk_text_iter_copy(value iter) { /* ML */
+  return Val_GtkTextIter(GtkTextIter_val(iter));
+}
+
+/* ML type : cptr -> TextIter.t -> string -> unit */
+EXTERNML value mgtk_gtk_text_buffer_insert(value b, value i, value t){ /* ML */
+  gtk_text_buffer_insert(GtkObj_val(b), GtkTextIter_val(i), String_val(t), -1);
+  return Val_unit;
+}
+
+/* ML type : cptr -> TextIter.t */
+EXTERNML value mgtk_gtk_text_buffer_get_start_iter (value buffer) { /* ML */
+  GtkTextIter iter;
+  gtk_text_buffer_get_start_iter(GtkObj_val(buffer), &iter);
+  return Val_GtkTextIter(&iter);
+}
+
+/* ML type : cptr -> TextIter.t */
+EXTERNML value mgtk_gtk_text_buffer_get_end_iter (value buffer) { /* ML */
+  GtkTextIter iter;
+  gtk_text_buffer_get_end_iter(GtkObj_val(buffer), &iter);
+  return Val_GtkTextIter(&iter);
+}
+
+EXTERNML value mgtk_gtk_text_view_new(value dummy) { /* ML */
+  return Val_GtkObj(gtk_text_view_new());
+}
+
+
+EXTERNML value mgtk_gtk_text_view_get_buffer(value buffer) { /* ML */
+  return Val_GtkObj(gtk_text_view_get_buffer(GtkObj_val(buffer)));
+}
