@@ -119,7 +119,7 @@
 ;   (vseparator GTK_TYPE_VSEPARATOR)
 ;   (widget GTK_TYPE_WIDGET)
 ;   (window GTK_TYPE_WINDOW)
-   )
+;   )
 
 ; enumerations from "gtkaccelgroup.h"
 
