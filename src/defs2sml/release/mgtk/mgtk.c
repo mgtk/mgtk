@@ -439,6 +439,601 @@ EXTERNML value mgtk_g_type_string (value dummy) { /* ML */
 
 
 /* *** Gtk *** */
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_anchortype(value dummy) { /* ML */
+  value res = alloc_tuple(17);
+  Field(res, 0) = Val_int(GTK_ANCHOR_CENTER);
+  Field(res, 1) = Val_int(GTK_ANCHOR_NORTH);
+  Field(res, 2) = Val_int(GTK_ANCHOR_NORTH_WEST);
+  Field(res, 3) = Val_int(GTK_ANCHOR_NORTH_EAST);
+  Field(res, 4) = Val_int(GTK_ANCHOR_SOUTH);
+  Field(res, 5) = Val_int(GTK_ANCHOR_SOUTH_WEST);
+  Field(res, 6) = Val_int(GTK_ANCHOR_SOUTH_EAST);
+  Field(res, 7) = Val_int(GTK_ANCHOR_WEST);
+  Field(res, 8) = Val_int(GTK_ANCHOR_EAST);
+  Field(res, 9) = Val_int(GTK_ANCHOR_N);
+  Field(res, 10) = Val_int(GTK_ANCHOR_NW);
+  Field(res, 11) = Val_int(GTK_ANCHOR_NE);
+  Field(res, 12) = Val_int(GTK_ANCHOR_S);
+  Field(res, 13) = Val_int(GTK_ANCHOR_SW);
+  Field(res, 14) = Val_int(GTK_ANCHOR_SE);
+  Field(res, 15) = Val_int(GTK_ANCHOR_W);
+  Field(res, 16) = Val_int(GTK_ANCHOR_E);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_arrowtype(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_ARROW_UP);
+  Field(res, 1) = Val_int(GTK_ARROW_DOWN);
+  Field(res, 2) = Val_int(GTK_ARROW_LEFT);
+  Field(res, 3) = Val_int(GTK_ARROW_RIGHT);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_buttonstype(value dummy) { /* ML */
+  value res = alloc_tuple(6);
+  Field(res, 0) = Val_int(GTK_BUTTONS_NONE);
+  Field(res, 1) = Val_int(GTK_BUTTONS_OK);
+  Field(res, 2) = Val_int(GTK_BUTTONS_CLOSE);
+  Field(res, 3) = Val_int(GTK_BUTTONS_CANCEL);
+  Field(res, 4) = Val_int(GTK_BUTTONS_YES_NO);
+  Field(res, 5) = Val_int(GTK_BUTTONS_OK_CANCEL);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_celltype(value dummy) { /* ML */
+  value res = alloc_tuple(5);
+  Field(res, 0) = Val_int(GTK_CELL_EMPTY);
+  Field(res, 1) = Val_int(GTK_CELL_TEXT);
+  Field(res, 2) = Val_int(GTK_CELL_PIXMAP);
+  Field(res, 3) = Val_int(GTK_CELL_PIXTEXT);
+  Field(res, 4) = Val_int(GTK_CELL_WIDGET);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_cornertype(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_CORNER_TOP_LEFT);
+  Field(res, 1) = Val_int(GTK_CORNER_BOTTOM_LEFT);
+  Field(res, 2) = Val_int(GTK_CORNER_TOP_RIGHT);
+  Field(res, 3) = Val_int(GTK_CORNER_BOTTOM_RIGHT);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_curvetype(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_CURVE_TYPE_LINEAR);
+  Field(res, 1) = Val_int(GTK_CURVE_TYPE_SPLINE);
+  Field(res, 2) = Val_int(GTK_CURVE_TYPE_FREE);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_deletetype(value dummy) { /* ML */
+  value res = alloc_tuple(8);
+  Field(res, 0) = Val_int(GTK_DELETE_CHARS);
+  Field(res, 1) = Val_int(GTK_DELETE_WORD_ENDS);
+  Field(res, 2) = Val_int(GTK_DELETE_WORDS);
+  Field(res, 3) = Val_int(GTK_DELETE_DISPLAY_LINES);
+  Field(res, 4) = Val_int(GTK_DELETE_DISPLAY_LINE_ENDS);
+  Field(res, 5) = Val_int(GTK_DELETE_PARAGRAPH_ENDS);
+  Field(res, 6) = Val_int(GTK_DELETE_PARAGRAPHS);
+  Field(res, 7) = Val_int(GTK_DELETE_WHITESPACE);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_directiontype(value dummy) { /* ML */
+  value res = alloc_tuple(6);
+  Field(res, 0) = Val_int(GTK_DIR_TAB_FORWARD);
+  Field(res, 1) = Val_int(GTK_DIR_TAB_BACKWARD);
+  Field(res, 2) = Val_int(GTK_DIR_UP);
+  Field(res, 3) = Val_int(GTK_DIR_DOWN);
+  Field(res, 4) = Val_int(GTK_DIR_LEFT);
+  Field(res, 5) = Val_int(GTK_DIR_RIGHT);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
+  value res = alloc_tuple(7);
+  Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
+  Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
+  Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
+  Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
+  Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
+  Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
+  Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_imagetype(value dummy) { /* ML */
+  value res = alloc_tuple(7);
+  Field(res, 0) = Val_int(GTK_IMAGE_EMPTY);
+  Field(res, 1) = Val_int(GTK_IMAGE_PIXMAP);
+  Field(res, 2) = Val_int(GTK_IMAGE_IMAGE);
+  Field(res, 3) = Val_int(GTK_IMAGE_PIXBUF);
+  Field(res, 4) = Val_int(GTK_IMAGE_STOCK);
+  Field(res, 5) = Val_int(GTK_IMAGE_ICON_SET);
+  Field(res, 6) = Val_int(GTK_IMAGE_ANIMATION);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_im_preedit_style(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_IM_PREEDIT_NOTHING);
+  Field(res, 1) = Val_int(GTK_IM_PREEDIT_CALLBACK);
+  Field(res, 2) = Val_int(GTK_IM_PREEDIT_NONE);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_im_status_style(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_IM_STATUS_NOTHING);
+  Field(res, 1) = Val_int(GTK_IM_STATUS_CALLBACK);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_justification(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_JUSTIFY_LEFT);
+  Field(res, 1) = Val_int(GTK_JUSTIFY_RIGHT);
+  Field(res, 2) = Val_int(GTK_JUSTIFY_CENTER);
+  Field(res, 3) = Val_int(GTK_JUSTIFY_FILL);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_matchtype(value dummy) { /* ML */
+  value res = alloc_tuple(6);
+  Field(res, 0) = Val_int(GTK_MATCH_ALL);
+  Field(res, 1) = Val_int(GTK_MATCH_ALL_TAIL);
+  Field(res, 2) = Val_int(GTK_MATCH_HEAD);
+  Field(res, 3) = Val_int(GTK_MATCH_TAIL);
+  Field(res, 4) = Val_int(GTK_MATCH_EXACT);
+  Field(res, 5) = Val_int(GTK_MATCH_LAST);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_messagetype(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_MESSAGE_INFO);
+  Field(res, 1) = Val_int(GTK_MESSAGE_WARNING);
+  Field(res, 2) = Val_int(GTK_MESSAGE_QUESTION);
+  Field(res, 3) = Val_int(GTK_MESSAGE_ERROR);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_metrictype(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_PIXELS);
+  Field(res, 1) = Val_int(GTK_INCHES);
+  Field(res, 2) = Val_int(GTK_CENTIMETERS);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_movement_step(value dummy) { /* ML */
+  value res = alloc_tuple(10);
+  Field(res, 0) = Val_int(GTK_MOVEMENT_LOGICAL_POSITIONS);
+  Field(res, 1) = Val_int(GTK_MOVEMENT_VISUAL_POSITIONS);
+  Field(res, 2) = Val_int(GTK_MOVEMENT_WORDS);
+  Field(res, 3) = Val_int(GTK_MOVEMENT_DISPLAY_LINES);
+  Field(res, 4) = Val_int(GTK_MOVEMENT_DISPLAY_LINE_ENDS);
+  Field(res, 5) = Val_int(GTK_MOVEMENT_PARAGRAPHS);
+  Field(res, 6) = Val_int(GTK_MOVEMENT_PARAGRAPH_ENDS);
+  Field(res, 7) = Val_int(GTK_MOVEMENT_PAGES);
+  Field(res, 8) = Val_int(GTK_MOVEMENT_BUFFER_ENDS);
+  Field(res, 9) = Val_int(GTK_MOVEMENT_HORIZONTAL_PAGES);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_orientation(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_ORIENTATION_HORIZONTAL);
+  Field(res, 1) = Val_int(GTK_ORIENTATION_VERTICAL);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_packtype(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_PACK_START);
+  Field(res, 1) = Val_int(GTK_PACK_END);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_path_prioritytype(value dummy) { /* ML */
+  value res = alloc_tuple(6);
+  Field(res, 0) = Val_int(GTK_PATH_PRIO_LOWEST);
+  Field(res, 1) = Val_int(GTK_PATH_PRIO_GTK);
+  Field(res, 2) = Val_int(GTK_PATH_PRIO_APPLICATION);
+  Field(res, 3) = Val_int(GTK_PATH_PRIO_THEME);
+  Field(res, 4) = Val_int(GTK_PATH_PRIO_RC);
+  Field(res, 5) = Val_int(GTK_PATH_PRIO_HIGHEST);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_pathtype(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_PATH_WIDGET);
+  Field(res, 1) = Val_int(GTK_PATH_WIDGET_CLASS);
+  Field(res, 2) = Val_int(GTK_PATH_CLASS);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_policytype(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_POLICY_ALWAYS);
+  Field(res, 1) = Val_int(GTK_POLICY_AUTOMATIC);
+  Field(res, 2) = Val_int(GTK_POLICY_NEVER);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_positiontype(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_POS_LEFT);
+  Field(res, 1) = Val_int(GTK_POS_RIGHT);
+  Field(res, 2) = Val_int(GTK_POS_TOP);
+  Field(res, 3) = Val_int(GTK_POS_BOTTOM);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_previewtype(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_PREVIEW_COLOR);
+  Field(res, 1) = Val_int(GTK_PREVIEW_GRAYSCALE);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_rc_tokentype(value dummy) { /* ML */
+  value res = alloc_tuple(38);
+  Field(res, 0) = Val_int(GTK_RC_TOKEN_INVALID);
+  Field(res, 1) = Val_int(GTK_RC_TOKEN_INCLUDE);
+  Field(res, 2) = Val_int(GTK_RC_TOKEN_NORMAL);
+  Field(res, 3) = Val_int(GTK_RC_TOKEN_ACTIVE);
+  Field(res, 4) = Val_int(GTK_RC_TOKEN_PRELIGHT);
+  Field(res, 5) = Val_int(GTK_RC_TOKEN_SELECTED);
+  Field(res, 6) = Val_int(GTK_RC_TOKEN_INSENSITIVE);
+  Field(res, 7) = Val_int(GTK_RC_TOKEN_FG);
+  Field(res, 8) = Val_int(GTK_RC_TOKEN_BG);
+  Field(res, 9) = Val_int(GTK_RC_TOKEN_TEXT);
+  Field(res, 10) = Val_int(GTK_RC_TOKEN_BASE);
+  Field(res, 11) = Val_int(GTK_RC_TOKEN_XTHICKNESS);
+  Field(res, 12) = Val_int(GTK_RC_TOKEN_YTHICKNESS);
+  Field(res, 13) = Val_int(GTK_RC_TOKEN_FONT);
+  Field(res, 14) = Val_int(GTK_RC_TOKEN_FONTSET);
+  Field(res, 15) = Val_int(GTK_RC_TOKEN_FONT_NAME);
+  Field(res, 16) = Val_int(GTK_RC_TOKEN_BG_PIXMAP);
+  Field(res, 17) = Val_int(GTK_RC_TOKEN_PIXMAP_PATH);
+  Field(res, 18) = Val_int(GTK_RC_TOKEN_STYLE);
+  Field(res, 19) = Val_int(GTK_RC_TOKEN_BINDING);
+  Field(res, 20) = Val_int(GTK_RC_TOKEN_BIND);
+  Field(res, 21) = Val_int(GTK_RC_TOKEN_WIDGET);
+  Field(res, 22) = Val_int(GTK_RC_TOKEN_WIDGET_CLASS);
+  Field(res, 23) = Val_int(GTK_RC_TOKEN_CLASS);
+  Field(res, 24) = Val_int(GTK_RC_TOKEN_LOWEST);
+  Field(res, 25) = Val_int(GTK_RC_TOKEN_GTK);
+  Field(res, 26) = Val_int(GTK_RC_TOKEN_APPLICATION);
+  Field(res, 27) = Val_int(GTK_RC_TOKEN_THEME);
+  Field(res, 28) = Val_int(GTK_RC_TOKEN_RC);
+  Field(res, 29) = Val_int(GTK_RC_TOKEN_HIGHEST);
+  Field(res, 30) = Val_int(GTK_RC_TOKEN_ENGINE);
+  Field(res, 31) = Val_int(GTK_RC_TOKEN_MODULE_PATH);
+  Field(res, 32) = Val_int(GTK_RC_TOKEN_IM_MODULE_PATH);
+  Field(res, 33) = Val_int(GTK_RC_TOKEN_IM_MODULE_FILE);
+  Field(res, 34) = Val_int(GTK_RC_TOKEN_STOCK);
+  Field(res, 35) = Val_int(GTK_RC_TOKEN_LTR);
+  Field(res, 36) = Val_int(GTK_RC_TOKEN_RTL);
+  Field(res, 37) = Val_int(GTK_RC_TOKEN_LAST);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_relief_style(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_RELIEF_NORMAL);
+  Field(res, 1) = Val_int(GTK_RELIEF_HALF);
+  Field(res, 2) = Val_int(GTK_RELIEF_NONE);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_resize_mode(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_RESIZE_PARENT);
+  Field(res, 1) = Val_int(GTK_RESIZE_QUEUE);
+  Field(res, 2) = Val_int(GTK_RESIZE_IMMEDIATE);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_responsetype(value dummy) { /* ML */
+  value res = alloc_tuple(11);
+  Field(res, 0) = Val_int(GTK_RESPONSE_NONE);
+  Field(res, 1) = Val_int(GTK_RESPONSE_REJECT);
+  Field(res, 2) = Val_int(GTK_RESPONSE_ACCEPT);
+  Field(res, 3) = Val_int(GTK_RESPONSE_DELETE_EVENT);
+  Field(res, 4) = Val_int(GTK_RESPONSE_OK);
+  Field(res, 5) = Val_int(GTK_RESPONSE_CANCEL);
+  Field(res, 6) = Val_int(GTK_RESPONSE_CLOSE);
+  Field(res, 7) = Val_int(GTK_RESPONSE_YES);
+  Field(res, 8) = Val_int(GTK_RESPONSE_NO);
+  Field(res, 9) = Val_int(GTK_RESPONSE_APPLY);
+  Field(res, 10) = Val_int(GTK_RESPONSE_HELP);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_scroll_step(value dummy) { /* ML */
+  value res = alloc_tuple(6);
+  Field(res, 0) = Val_int(GTK_SCROLL_STEPS);
+  Field(res, 1) = Val_int(GTK_SCROLL_PAGES);
+  Field(res, 2) = Val_int(GTK_SCROLL_ENDS);
+  Field(res, 3) = Val_int(GTK_SCROLL_HORIZONTAL_STEPS);
+  Field(res, 4) = Val_int(GTK_SCROLL_HORIZONTAL_PAGES);
+  Field(res, 5) = Val_int(GTK_SCROLL_HORIZONTAL_ENDS);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_scrolltype(value dummy) { /* ML */
+  value res = alloc_tuple(16);
+  Field(res, 0) = Val_int(GTK_SCROLL_NONE);
+  Field(res, 1) = Val_int(GTK_SCROLL_JUMP);
+  Field(res, 2) = Val_int(GTK_SCROLL_STEP_BACKWARD);
+  Field(res, 3) = Val_int(GTK_SCROLL_STEP_FORWARD);
+  Field(res, 4) = Val_int(GTK_SCROLL_PAGE_BACKWARD);
+  Field(res, 5) = Val_int(GTK_SCROLL_PAGE_FORWARD);
+  Field(res, 6) = Val_int(GTK_SCROLL_STEP_UP);
+  Field(res, 7) = Val_int(GTK_SCROLL_STEP_DOWN);
+  Field(res, 8) = Val_int(GTK_SCROLL_PAGE_UP);
+  Field(res, 9) = Val_int(GTK_SCROLL_PAGE_DOWN);
+  Field(res, 10) = Val_int(GTK_SCROLL_STEP_LEFT);
+  Field(res, 11) = Val_int(GTK_SCROLL_STEP_RIGHT);
+  Field(res, 12) = Val_int(GTK_SCROLL_PAGE_LEFT);
+  Field(res, 13) = Val_int(GTK_SCROLL_PAGE_RIGHT);
+  Field(res, 14) = Val_int(GTK_SCROLL_START);
+  Field(res, 15) = Val_int(GTK_SCROLL_END);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_selection_mode(value dummy) { /* ML */
+  value res = alloc_tuple(5);
+  Field(res, 0) = Val_int(GTK_SELECTION_NONE);
+  Field(res, 1) = Val_int(GTK_SELECTION_SINGLE);
+  Field(res, 2) = Val_int(GTK_SELECTION_BROWSE);
+  Field(res, 3) = Val_int(GTK_SELECTION_MULTIPLE);
+  Field(res, 4) = Val_int(GTK_SELECTION_EXTENDED);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_shadowtype(value dummy) { /* ML */
+  value res = alloc_tuple(5);
+  Field(res, 0) = Val_int(GTK_SHADOW_NONE);
+  Field(res, 1) = Val_int(GTK_SHADOW_IN);
+  Field(res, 2) = Val_int(GTK_SHADOW_OUT);
+  Field(res, 3) = Val_int(GTK_SHADOW_ETCHED_IN);
+  Field(res, 4) = Val_int(GTK_SHADOW_ETCHED_OUT);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_sidetype(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_SIDE_TOP);
+  Field(res, 1) = Val_int(GTK_SIDE_BOTTOM);
+  Field(res, 2) = Val_int(GTK_SIDE_LEFT);
+  Field(res, 3) = Val_int(GTK_SIDE_RIGHT);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_sorttype(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_SORT_ASCENDING);
+  Field(res, 1) = Val_int(GTK_SORT_DESCENDING);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_spintype(value dummy) { /* ML */
+  value res = alloc_tuple(7);
+  Field(res, 0) = Val_int(GTK_SPIN_STEP_FORWARD);
+  Field(res, 1) = Val_int(GTK_SPIN_STEP_BACKWARD);
+  Field(res, 2) = Val_int(GTK_SPIN_PAGE_FORWARD);
+  Field(res, 3) = Val_int(GTK_SPIN_PAGE_BACKWARD);
+  Field(res, 4) = Val_int(GTK_SPIN_HOME);
+  Field(res, 5) = Val_int(GTK_SPIN_END);
+  Field(res, 6) = Val_int(GTK_SPIN_USER_DEFINED);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_statetype(value dummy) { /* ML */
+  value res = alloc_tuple(5);
+  Field(res, 0) = Val_int(GTK_STATE_NORMAL);
+  Field(res, 1) = Val_int(GTK_STATE_ACTIVE);
+  Field(res, 2) = Val_int(GTK_STATE_PRELIGHT);
+  Field(res, 3) = Val_int(GTK_STATE_SELECTED);
+  Field(res, 4) = Val_int(GTK_STATE_INSENSITIVE);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_submenu_direction(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_DIRECTION_LEFT);
+  Field(res, 1) = Val_int(GTK_DIRECTION_RIGHT);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_submenu_placement(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_TOP_BOTTOM);
+  Field(res, 1) = Val_int(GTK_LEFT_RIGHT);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_text_direction(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_TEXT_DIR_NONE);
+  Field(res, 1) = Val_int(GTK_TEXT_DIR_LTR);
+  Field(res, 2) = Val_int(GTK_TEXT_DIR_RTL);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_text_window_type(value dummy) { /* ML */
+  value res = alloc_tuple(7);
+  Field(res, 0) = Val_int(GTK_TEXT_WINDOW_PRIVATE);
+  Field(res, 1) = Val_int(GTK_TEXT_WINDOW_WIDGET);
+  Field(res, 2) = Val_int(GTK_TEXT_WINDOW_TEXT);
+  Field(res, 3) = Val_int(GTK_TEXT_WINDOW_LEFT);
+  Field(res, 4) = Val_int(GTK_TEXT_WINDOW_RIGHT);
+  Field(res, 5) = Val_int(GTK_TEXT_WINDOW_TOP);
+  Field(res, 6) = Val_int(GTK_TEXT_WINDOW_BOTTOM);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_updatetype(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_UPDATE_CONTINUOUS);
+  Field(res, 1) = Val_int(GTK_UPDATE_DISCONTINUOUS);
+  Field(res, 2) = Val_int(GTK_UPDATE_DELAYED);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_visibility(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_VISIBILITY_NONE);
+  Field(res, 1) = Val_int(GTK_VISIBILITY_PARTIAL);
+  Field(res, 2) = Val_int(GTK_VISIBILITY_FULL);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_wrap_mode(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_WRAP_NONE);
+  Field(res, 1) = Val_int(GTK_WRAP_CHAR);
+  Field(res, 2) = Val_int(GTK_WRAP_WORD);
+  Field(res, 3) = Val_int(GTK_WRAP_WORD_CHAR);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_accel_flags(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_ACCEL_VISIBLE);
+  Field(res, 1) = Val_int(GTK_ACCEL_LOCKED);
+  Field(res, 2) = Val_int(GTK_ACCEL_MASK);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_arg_flags(value dummy) { /* ML */
+  value res = alloc_tuple(5);
+  Field(res, 0) = Val_int(GTK_ARG_READABLE);
+  Field(res, 1) = Val_int(GTK_ARG_WRITABLE);
+  Field(res, 2) = Val_int(GTK_ARG_CONSTRUCT);
+  Field(res, 3) = Val_int(GTK_ARG_CONSTRUCT_ONLY);
+  Field(res, 4) = Val_int(GTK_ARG_CHILD_ARG);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_attach_options(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_EXPAND);
+  Field(res, 1) = Val_int(GTK_SHRINK);
+  Field(res, 2) = Val_int(GTK_FILL);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_debug_flag(value dummy) { /* ML */
+  value res = alloc_tuple(7);
+  Field(res, 0) = Val_int(GTK_DEBUG_MISC);
+  Field(res, 1) = Val_int(GTK_DEBUG_PLUGSOCKET);
+  Field(res, 2) = Val_int(GTK_DEBUG_TEXT);
+  Field(res, 3) = Val_int(GTK_DEBUG_TREE);
+  Field(res, 4) = Val_int(GTK_DEBUG_UPDATES);
+  Field(res, 5) = Val_int(GTK_DEBUG_KEYBINDINGS);
+  Field(res, 6) = Val_int(GTK_DEBUG_MULTIHEAD);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_dest_defaults(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_DEST_DEFAULT_MOTION);
+  Field(res, 1) = Val_int(GTK_DEST_DEFAULT_HIGHLIGHT);
+  Field(res, 2) = Val_int(GTK_DEST_DEFAULT_DROP);
+  Field(res, 3) = Val_int(GTK_DEST_DEFAULT_ALL);
+  return res;
+}
+
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_icon_lookup_flags(value dummy) { /* ML */
+  value res = alloc_tuple(3);
+  Field(res, 0) = Val_int(GTK_ICON_LOOKUP_NO_SVG);
+  Field(res, 1) = Val_int(GTK_ICON_LOOKUP_FORCE_SVG);
+  Field(res, 2) = Val_int(GTK_ICON_LOOKUP_USE_BUILTIN);
+  return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_rc_flags(value dummy) { /* ML */
+  value res = alloc_tuple(4);
+  Field(res, 0) = Val_int(GTK_RC_FG);
+  Field(res, 1) = Val_int(GTK_RC_BG);
+  Field(res, 2) = Val_int(GTK_RC_TEXT);
+  Field(res, 3) = Val_int(GTK_RC_BASE);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_target_flags(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_TARGET_SAME_APP);
+  Field(res, 1) = Val_int(GTK_TARGET_SAME_WIDGET);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_text_search_flags(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_TEXT_SEARCH_VISIBLE_ONLY);
+  Field(res, 1) = Val_int(GTK_TEXT_SEARCH_TEXT_ONLY);
+  return res;
+}
+
 
 
 /* *** BindingSet *** */
@@ -466,6 +1061,16 @@ EXTERNML value mgtk_gtk_binding_set_add_path(value self, value path_type, value 
 
 
 /* *** Object *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_object_flags(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_IN_DESTRUCTION);
+    Field(res, 1) = Val_int(GTK_FLOATING);
+    Field(res, 2) = Val_int(GTK_RESERVED_1);
+    Field(res, 3) = Val_int(GTK_RESERVED_2);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_object_get_type(value dummy) { /* ML */
     return Val_int(gtk_object_get_type());
@@ -554,12 +1159,6 @@ EXTERNML value mgtk_gtk_icon_set_unref(value self) { /* ML */
 /* ML type: cptr -> cptr */
 EXTERNML value mgtk_gtk_icon_set_copy(value self) { /* ML */
     return Val_GtkIconSet(gtk_icon_set_copy(GtkIconSet_val(self)));
-}
-
-/* ML type: cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_icon_set_get_sizes(value self, value sizes, value n_sizes) { /* ML */
-    gtk_icon_set_get_sizes(GtkIconSet_val(self), Int_val(sizes), Int_val(n_sizes));
-    return Val_unit;
 }
 
 
@@ -678,11 +1277,6 @@ EXTERNML value mgtk_gtk_rc_style_get_type(value dummy) { /* ML */
     return Val_int(gtk_rc_style_get_type());
 }
 
-/* ML type: unit -> cptr */
-EXTERNML value mgtk_gtk_rc_style_new(value dummy) { /* ML */
-    return Val_GtkObj(gtk_rc_style_new());
-}
-
 /* ML type: cptr -> cptr */
 EXTERNML value mgtk_gtk_rc_style_copy(value self) { /* ML */
     return Val_GtkObj(gtk_rc_style_copy(GtkObj_val(self)));
@@ -736,6 +1330,39 @@ EXTERNML value mgtk_gtk_requisition_free(value self) { /* ML */
 
 
 /* *** Widget *** */
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_widget_helptype(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_WIDGET_HELP_TOOLTIP);
+    Field(res, 1) = Val_int(GTK_WIDGET_HELP_WHATS_THIS);
+    return res;
+}
+
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_widget_flags(value dummy) { /* ML */
+    value res = alloc_tuple(19);
+    Field(res, 0) = Val_int(GTK_TOPLEVEL);
+    Field(res, 1) = Val_int(GTK_NO_WINDOW);
+    Field(res, 2) = Val_int(GTK_REALIZED);
+    Field(res, 3) = Val_int(GTK_MAPPED);
+    Field(res, 4) = Val_int(GTK_VISIBLE);
+    Field(res, 5) = Val_int(GTK_SENSITIVE);
+    Field(res, 6) = Val_int(GTK_PARENT_SENSITIVE);
+    Field(res, 7) = Val_int(GTK_CAN_FOCUS);
+    Field(res, 8) = Val_int(GTK_HAS_FOCUS);
+    Field(res, 9) = Val_int(GTK_CAN_DEFAULT);
+    Field(res, 10) = Val_int(GTK_HAS_DEFAULT);
+    Field(res, 11) = Val_int(GTK_HAS_GRAB);
+    Field(res, 12) = Val_int(GTK_RC_STYLE);
+    Field(res, 13) = Val_int(GTK_COMPOSITE_CHILD);
+    Field(res, 14) = Val_int(GTK_NO_REPARENT);
+    Field(res, 15) = Val_int(GTK_APP_PAINTABLE);
+    Field(res, 16) = Val_int(GTK_RECEIVES_DEFAULT);
+    Field(res, 17) = Val_int(GTK_DOUBLE_BUFFERED);
+    Field(res, 18) = Val_int(GTK_NO_SHOW_ALL);
+    return res;
+}
+
 /* ML type: cptr -> int -> int -> int -> int -> bool */
 EXTERNML value mgtk_gtk_drag_check_threshold(value self, value start_x, value start_y, value current_x, value current_y) { /* ML */
     return Val_bool(gtk_drag_check_threshold(GtkObj_val(self), Int_val(start_x), Int_val(start_y), Int_val(current_x), Int_val(current_y)));
@@ -1340,994 +1967,9 @@ EXTERNML value mgtk_gtk_style_lookup_icon_set(value self, value stock_id) { /* M
 
 
 /* *** Demoted *** */
-/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_anchortype(value dummy) { /* ML */
-    value res = alloc_tuple(17);
-    Field(res, 0) = Val_int(GTK_ANCHOR_CENTER);
-    Field(res, 1) = Val_int(GTK_ANCHOR_NORTH);
-    Field(res, 2) = Val_int(GTK_ANCHOR_NORTH_WEST);
-    Field(res, 3) = Val_int(GTK_ANCHOR_NORTH_EAST);
-    Field(res, 4) = Val_int(GTK_ANCHOR_SOUTH);
-    Field(res, 5) = Val_int(GTK_ANCHOR_SOUTH_WEST);
-    Field(res, 6) = Val_int(GTK_ANCHOR_SOUTH_EAST);
-    Field(res, 7) = Val_int(GTK_ANCHOR_WEST);
-    Field(res, 8) = Val_int(GTK_ANCHOR_EAST);
-    Field(res, 9) = Val_int(GTK_ANCHOR_N);
-    Field(res, 10) = Val_int(GTK_ANCHOR_NW);
-    Field(res, 11) = Val_int(GTK_ANCHOR_NE);
-    Field(res, 12) = Val_int(GTK_ANCHOR_S);
-    Field(res, 13) = Val_int(GTK_ANCHOR_SW);
-    Field(res, 14) = Val_int(GTK_ANCHOR_SE);
-    Field(res, 15) = Val_int(GTK_ANCHOR_W);
-    Field(res, 16) = Val_int(GTK_ANCHOR_E);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_arrowtype(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_ARROW_UP);
-    Field(res, 1) = Val_int(GTK_ARROW_DOWN);
-    Field(res, 2) = Val_int(GTK_ARROW_LEFT);
-    Field(res, 3) = Val_int(GTK_ARROW_RIGHT);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_button_box_style(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_BUTTONBOX_DEFAULT_STYLE);
-    Field(res, 1) = Val_int(GTK_BUTTONBOX_SPREAD);
-    Field(res, 2) = Val_int(GTK_BUTTONBOX_EDGE);
-    Field(res, 3) = Val_int(GTK_BUTTONBOX_START);
-    Field(res, 4) = Val_int(GTK_BUTTONBOX_END);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_buttonstype(value dummy) { /* ML */
-    value res = alloc_tuple(6);
-    Field(res, 0) = Val_int(GTK_BUTTONS_NONE);
-    Field(res, 1) = Val_int(GTK_BUTTONS_OK);
-    Field(res, 2) = Val_int(GTK_BUTTONS_CLOSE);
-    Field(res, 3) = Val_int(GTK_BUTTONS_CANCEL);
-    Field(res, 4) = Val_int(GTK_BUTTONS_YES_NO);
-    Field(res, 5) = Val_int(GTK_BUTTONS_OK_CANCEL);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_cellrenderer_mode(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_CELL_RENDERER_MODE_INERT);
-    Field(res, 1) = Val_int(GTK_CELL_RENDERER_MODE_ACTIVATABLE);
-    Field(res, 2) = Val_int(GTK_CELL_RENDERER_MODE_EDITABLE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_celltype(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_CELL_EMPTY);
-    Field(res, 1) = Val_int(GTK_CELL_TEXT);
-    Field(res, 2) = Val_int(GTK_CELL_PIXMAP);
-    Field(res, 3) = Val_int(GTK_CELL_PIXTEXT);
-    Field(res, 4) = Val_int(GTK_CELL_WIDGET);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_clist_drag_pos(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_CLIST_DRAG_NONE);
-    Field(res, 1) = Val_int(GTK_CLIST_DRAG_BEFORE);
-    Field(res, 2) = Val_int(GTK_CLIST_DRAG_INTO);
-    Field(res, 3) = Val_int(GTK_CLIST_DRAG_AFTER);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_cornertype(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_CORNER_TOP_LEFT);
-    Field(res, 1) = Val_int(GTK_CORNER_BOTTOM_LEFT);
-    Field(res, 2) = Val_int(GTK_CORNER_TOP_RIGHT);
-    Field(res, 3) = Val_int(GTK_CORNER_BOTTOM_RIGHT);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_ctree_expander_style(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_CTREE_EXPANDER_NONE);
-    Field(res, 1) = Val_int(GTK_CTREE_EXPANDER_SQUARE);
-    Field(res, 2) = Val_int(GTK_CTREE_EXPANDER_TRIANGLE);
-    Field(res, 3) = Val_int(GTK_CTREE_EXPANDER_CIRCULAR);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_ctree_expansiontype(value dummy) { /* ML */
-    value res = alloc_tuple(6);
-    Field(res, 0) = Val_int(GTK_CTREE_EXPANSION_EXPAND);
-    Field(res, 1) = Val_int(GTK_CTREE_EXPANSION_EXPAND_RECURSIVE);
-    Field(res, 2) = Val_int(GTK_CTREE_EXPANSION_COLLAPSE);
-    Field(res, 3) = Val_int(GTK_CTREE_EXPANSION_COLLAPSE_RECURSIVE);
-    Field(res, 4) = Val_int(GTK_CTREE_EXPANSION_TOGGLE);
-    Field(res, 5) = Val_int(GTK_CTREE_EXPANSION_TOGGLE_RECURSIVE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_ctree_line_style(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_CTREE_LINES_NONE);
-    Field(res, 1) = Val_int(GTK_CTREE_LINES_SOLID);
-    Field(res, 2) = Val_int(GTK_CTREE_LINES_DOTTED);
-    Field(res, 3) = Val_int(GTK_CTREE_LINES_TABBED);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_ctree_pos(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_CTREE_POS_BEFORE);
-    Field(res, 1) = Val_int(GTK_CTREE_POS_AS_CHILD);
-    Field(res, 2) = Val_int(GTK_CTREE_POS_AFTER);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_curvetype(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_CURVE_TYPE_LINEAR);
-    Field(res, 1) = Val_int(GTK_CURVE_TYPE_SPLINE);
-    Field(res, 2) = Val_int(GTK_CURVE_TYPE_FREE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_deletetype(value dummy) { /* ML */
-    value res = alloc_tuple(8);
-    Field(res, 0) = Val_int(GTK_DELETE_CHARS);
-    Field(res, 1) = Val_int(GTK_DELETE_WORD_ENDS);
-    Field(res, 2) = Val_int(GTK_DELETE_WORDS);
-    Field(res, 3) = Val_int(GTK_DELETE_DISPLAY_LINES);
-    Field(res, 4) = Val_int(GTK_DELETE_DISPLAY_LINE_ENDS);
-    Field(res, 5) = Val_int(GTK_DELETE_PARAGRAPH_ENDS);
-    Field(res, 6) = Val_int(GTK_DELETE_PARAGRAPHS);
-    Field(res, 7) = Val_int(GTK_DELETE_WHITESPACE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_directiontype(value dummy) { /* ML */
-    value res = alloc_tuple(6);
-    Field(res, 0) = Val_int(GTK_DIR_TAB_FORWARD);
-    Field(res, 1) = Val_int(GTK_DIR_TAB_BACKWARD);
-    Field(res, 2) = Val_int(GTK_DIR_UP);
-    Field(res, 3) = Val_int(GTK_DIR_DOWN);
-    Field(res, 4) = Val_int(GTK_DIR_LEFT);
-    Field(res, 5) = Val_int(GTK_DIR_RIGHT);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_expander_style(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_EXPANDER_COLLAPSED);
-    Field(res, 1) = Val_int(GTK_EXPANDER_SEMI_COLLAPSED);
-    Field(res, 2) = Val_int(GTK_EXPANDER_SEMI_EXPANDED);
-    Field(res, 3) = Val_int(GTK_EXPANDER_EXPANDED);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_file_chooser_action(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_FILE_CHOOSER_ACTION_OPEN);
-    Field(res, 1) = Val_int(GTK_FILE_CHOOSER_ACTION_SAVE);
-    Field(res, 2) = Val_int(GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
-    Field(res, 3) = Val_int(GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_file_chooser_error(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_FILE_CHOOSER_ERROR_NONEXISTENT);
-    Field(res, 1) = Val_int(GTK_FILE_CHOOSER_ERROR_BAD_FILENAME);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
-    value res = alloc_tuple(7);
-    Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
-    Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
-    Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
-    Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
-    Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
-    Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
-    Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_imagetype(value dummy) { /* ML */
-    value res = alloc_tuple(7);
-    Field(res, 0) = Val_int(GTK_IMAGE_EMPTY);
-    Field(res, 1) = Val_int(GTK_IMAGE_PIXMAP);
-    Field(res, 2) = Val_int(GTK_IMAGE_IMAGE);
-    Field(res, 3) = Val_int(GTK_IMAGE_PIXBUF);
-    Field(res, 4) = Val_int(GTK_IMAGE_STOCK);
-    Field(res, 5) = Val_int(GTK_IMAGE_ICON_SET);
-    Field(res, 6) = Val_int(GTK_IMAGE_ANIMATION);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_im_preedit_style(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_IM_PREEDIT_NOTHING);
-    Field(res, 1) = Val_int(GTK_IM_PREEDIT_CALLBACK);
-    Field(res, 2) = Val_int(GTK_IM_PREEDIT_NONE);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_im_status_style(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_IM_STATUS_NOTHING);
-    Field(res, 1) = Val_int(GTK_IM_STATUS_CALLBACK);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_justification(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_JUSTIFY_LEFT);
-    Field(res, 1) = Val_int(GTK_JUSTIFY_RIGHT);
-    Field(res, 2) = Val_int(GTK_JUSTIFY_CENTER);
-    Field(res, 3) = Val_int(GTK_JUSTIFY_FILL);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_matchtype(value dummy) { /* ML */
-    value res = alloc_tuple(6);
-    Field(res, 0) = Val_int(GTK_MATCH_ALL);
-    Field(res, 1) = Val_int(GTK_MATCH_ALL_TAIL);
-    Field(res, 2) = Val_int(GTK_MATCH_HEAD);
-    Field(res, 3) = Val_int(GTK_MATCH_TAIL);
-    Field(res, 4) = Val_int(GTK_MATCH_EXACT);
-    Field(res, 5) = Val_int(GTK_MATCH_LAST);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_menu_directiontype(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_MENU_DIR_PARENT);
-    Field(res, 1) = Val_int(GTK_MENU_DIR_CHILD);
-    Field(res, 2) = Val_int(GTK_MENU_DIR_NEXT);
-    Field(res, 3) = Val_int(GTK_MENU_DIR_PREV);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_messagetype(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_MESSAGE_INFO);
-    Field(res, 1) = Val_int(GTK_MESSAGE_WARNING);
-    Field(res, 2) = Val_int(GTK_MESSAGE_QUESTION);
-    Field(res, 3) = Val_int(GTK_MESSAGE_ERROR);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_metrictype(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_PIXELS);
-    Field(res, 1) = Val_int(GTK_INCHES);
-    Field(res, 2) = Val_int(GTK_CENTIMETERS);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_movement_step(value dummy) { /* ML */
-    value res = alloc_tuple(10);
-    Field(res, 0) = Val_int(GTK_MOVEMENT_LOGICAL_POSITIONS);
-    Field(res, 1) = Val_int(GTK_MOVEMENT_VISUAL_POSITIONS);
-    Field(res, 2) = Val_int(GTK_MOVEMENT_WORDS);
-    Field(res, 3) = Val_int(GTK_MOVEMENT_DISPLAY_LINES);
-    Field(res, 4) = Val_int(GTK_MOVEMENT_DISPLAY_LINE_ENDS);
-    Field(res, 5) = Val_int(GTK_MOVEMENT_PARAGRAPHS);
-    Field(res, 6) = Val_int(GTK_MOVEMENT_PARAGRAPH_ENDS);
-    Field(res, 7) = Val_int(GTK_MOVEMENT_PAGES);
-    Field(res, 8) = Val_int(GTK_MOVEMENT_BUFFER_ENDS);
-    Field(res, 9) = Val_int(GTK_MOVEMENT_HORIZONTAL_PAGES);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_notebook_tab(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_NOTEBOOK_TAB_FIRST);
-    Field(res, 1) = Val_int(GTK_NOTEBOOK_TAB_LAST);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_orientation(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_ORIENTATION_HORIZONTAL);
-    Field(res, 1) = Val_int(GTK_ORIENTATION_VERTICAL);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_packtype(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_PACK_START);
-    Field(res, 1) = Val_int(GTK_PACK_END);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_path_prioritytype(value dummy) { /* ML */
-    value res = alloc_tuple(6);
-    Field(res, 0) = Val_int(GTK_PATH_PRIO_LOWEST);
-    Field(res, 1) = Val_int(GTK_PATH_PRIO_GTK);
-    Field(res, 2) = Val_int(GTK_PATH_PRIO_APPLICATION);
-    Field(res, 3) = Val_int(GTK_PATH_PRIO_THEME);
-    Field(res, 4) = Val_int(GTK_PATH_PRIO_RC);
-    Field(res, 5) = Val_int(GTK_PATH_PRIO_HIGHEST);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_pathtype(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_PATH_WIDGET);
-    Field(res, 1) = Val_int(GTK_PATH_WIDGET_CLASS);
-    Field(res, 2) = Val_int(GTK_PATH_CLASS);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_policytype(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_POLICY_ALWAYS);
-    Field(res, 1) = Val_int(GTK_POLICY_AUTOMATIC);
-    Field(res, 2) = Val_int(GTK_POLICY_NEVER);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_positiontype(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_POS_LEFT);
-    Field(res, 1) = Val_int(GTK_POS_RIGHT);
-    Field(res, 2) = Val_int(GTK_POS_TOP);
-    Field(res, 3) = Val_int(GTK_POS_BOTTOM);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_previewtype(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_PREVIEW_COLOR);
-    Field(res, 1) = Val_int(GTK_PREVIEW_GRAYSCALE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_progressbar_orientation(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_PROGRESS_LEFT_TO_RIGHT);
-    Field(res, 1) = Val_int(GTK_PROGRESS_RIGHT_TO_LEFT);
-    Field(res, 2) = Val_int(GTK_PROGRESS_BOTTOM_TO_TOP);
-    Field(res, 3) = Val_int(GTK_PROGRESS_TOP_TO_BOTTOM);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_progressbar_style(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_PROGRESS_CONTINUOUS);
-    Field(res, 1) = Val_int(GTK_PROGRESS_DISCRETE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_rc_tokentype(value dummy) { /* ML */
-    value res = alloc_tuple(38);
-    Field(res, 0) = Val_int(GTK_RC_TOKEN_INVALID);
-    Field(res, 1) = Val_int(GTK_RC_TOKEN_INCLUDE);
-    Field(res, 2) = Val_int(GTK_RC_TOKEN_NORMAL);
-    Field(res, 3) = Val_int(GTK_RC_TOKEN_ACTIVE);
-    Field(res, 4) = Val_int(GTK_RC_TOKEN_PRELIGHT);
-    Field(res, 5) = Val_int(GTK_RC_TOKEN_SELECTED);
-    Field(res, 6) = Val_int(GTK_RC_TOKEN_INSENSITIVE);
-    Field(res, 7) = Val_int(GTK_RC_TOKEN_FG);
-    Field(res, 8) = Val_int(GTK_RC_TOKEN_BG);
-    Field(res, 9) = Val_int(GTK_RC_TOKEN_TEXT);
-    Field(res, 10) = Val_int(GTK_RC_TOKEN_BASE);
-    Field(res, 11) = Val_int(GTK_RC_TOKEN_XTHICKNESS);
-    Field(res, 12) = Val_int(GTK_RC_TOKEN_YTHICKNESS);
-    Field(res, 13) = Val_int(GTK_RC_TOKEN_FONT);
-    Field(res, 14) = Val_int(GTK_RC_TOKEN_FONTSET);
-    Field(res, 15) = Val_int(GTK_RC_TOKEN_FONT_NAME);
-    Field(res, 16) = Val_int(GTK_RC_TOKEN_BG_PIXMAP);
-    Field(res, 17) = Val_int(GTK_RC_TOKEN_PIXMAP_PATH);
-    Field(res, 18) = Val_int(GTK_RC_TOKEN_STYLE);
-    Field(res, 19) = Val_int(GTK_RC_TOKEN_BINDING);
-    Field(res, 20) = Val_int(GTK_RC_TOKEN_BIND);
-    Field(res, 21) = Val_int(GTK_RC_TOKEN_WIDGET);
-    Field(res, 22) = Val_int(GTK_RC_TOKEN_WIDGET_CLASS);
-    Field(res, 23) = Val_int(GTK_RC_TOKEN_CLASS);
-    Field(res, 24) = Val_int(GTK_RC_TOKEN_LOWEST);
-    Field(res, 25) = Val_int(GTK_RC_TOKEN_GTK);
-    Field(res, 26) = Val_int(GTK_RC_TOKEN_APPLICATION);
-    Field(res, 27) = Val_int(GTK_RC_TOKEN_THEME);
-    Field(res, 28) = Val_int(GTK_RC_TOKEN_RC);
-    Field(res, 29) = Val_int(GTK_RC_TOKEN_HIGHEST);
-    Field(res, 30) = Val_int(GTK_RC_TOKEN_ENGINE);
-    Field(res, 31) = Val_int(GTK_RC_TOKEN_MODULE_PATH);
-    Field(res, 32) = Val_int(GTK_RC_TOKEN_IM_MODULE_PATH);
-    Field(res, 33) = Val_int(GTK_RC_TOKEN_IM_MODULE_FILE);
-    Field(res, 34) = Val_int(GTK_RC_TOKEN_STOCK);
-    Field(res, 35) = Val_int(GTK_RC_TOKEN_LTR);
-    Field(res, 36) = Val_int(GTK_RC_TOKEN_RTL);
-    Field(res, 37) = Val_int(GTK_RC_TOKEN_LAST);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_relief_style(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_RELIEF_NORMAL);
-    Field(res, 1) = Val_int(GTK_RELIEF_HALF);
-    Field(res, 2) = Val_int(GTK_RELIEF_NONE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_resize_mode(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_RESIZE_PARENT);
-    Field(res, 1) = Val_int(GTK_RESIZE_QUEUE);
-    Field(res, 2) = Val_int(GTK_RESIZE_IMMEDIATE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_responsetype(value dummy) { /* ML */
-    value res = alloc_tuple(11);
-    Field(res, 0) = Val_int(GTK_RESPONSE_NONE);
-    Field(res, 1) = Val_int(GTK_RESPONSE_REJECT);
-    Field(res, 2) = Val_int(GTK_RESPONSE_ACCEPT);
-    Field(res, 3) = Val_int(GTK_RESPONSE_DELETE_EVENT);
-    Field(res, 4) = Val_int(GTK_RESPONSE_OK);
-    Field(res, 5) = Val_int(GTK_RESPONSE_CANCEL);
-    Field(res, 6) = Val_int(GTK_RESPONSE_CLOSE);
-    Field(res, 7) = Val_int(GTK_RESPONSE_YES);
-    Field(res, 8) = Val_int(GTK_RESPONSE_NO);
-    Field(res, 9) = Val_int(GTK_RESPONSE_APPLY);
-    Field(res, 10) = Val_int(GTK_RESPONSE_HELP);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_scroll_step(value dummy) { /* ML */
-    value res = alloc_tuple(6);
-    Field(res, 0) = Val_int(GTK_SCROLL_STEPS);
-    Field(res, 1) = Val_int(GTK_SCROLL_PAGES);
-    Field(res, 2) = Val_int(GTK_SCROLL_ENDS);
-    Field(res, 3) = Val_int(GTK_SCROLL_HORIZONTAL_STEPS);
-    Field(res, 4) = Val_int(GTK_SCROLL_HORIZONTAL_PAGES);
-    Field(res, 5) = Val_int(GTK_SCROLL_HORIZONTAL_ENDS);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_scrolltype(value dummy) { /* ML */
-    value res = alloc_tuple(16);
-    Field(res, 0) = Val_int(GTK_SCROLL_NONE);
-    Field(res, 1) = Val_int(GTK_SCROLL_JUMP);
-    Field(res, 2) = Val_int(GTK_SCROLL_STEP_BACKWARD);
-    Field(res, 3) = Val_int(GTK_SCROLL_STEP_FORWARD);
-    Field(res, 4) = Val_int(GTK_SCROLL_PAGE_BACKWARD);
-    Field(res, 5) = Val_int(GTK_SCROLL_PAGE_FORWARD);
-    Field(res, 6) = Val_int(GTK_SCROLL_STEP_UP);
-    Field(res, 7) = Val_int(GTK_SCROLL_STEP_DOWN);
-    Field(res, 8) = Val_int(GTK_SCROLL_PAGE_UP);
-    Field(res, 9) = Val_int(GTK_SCROLL_PAGE_DOWN);
-    Field(res, 10) = Val_int(GTK_SCROLL_STEP_LEFT);
-    Field(res, 11) = Val_int(GTK_SCROLL_STEP_RIGHT);
-    Field(res, 12) = Val_int(GTK_SCROLL_PAGE_LEFT);
-    Field(res, 13) = Val_int(GTK_SCROLL_PAGE_RIGHT);
-    Field(res, 14) = Val_int(GTK_SCROLL_START);
-    Field(res, 15) = Val_int(GTK_SCROLL_END);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_selection_mode(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_SELECTION_NONE);
-    Field(res, 1) = Val_int(GTK_SELECTION_SINGLE);
-    Field(res, 2) = Val_int(GTK_SELECTION_BROWSE);
-    Field(res, 3) = Val_int(GTK_SELECTION_MULTIPLE);
-    Field(res, 4) = Val_int(GTK_SELECTION_EXTENDED);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_shadowtype(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_SHADOW_NONE);
-    Field(res, 1) = Val_int(GTK_SHADOW_IN);
-    Field(res, 2) = Val_int(GTK_SHADOW_OUT);
-    Field(res, 3) = Val_int(GTK_SHADOW_ETCHED_IN);
-    Field(res, 4) = Val_int(GTK_SHADOW_ETCHED_OUT);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_sidetype(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_SIDE_TOP);
-    Field(res, 1) = Val_int(GTK_SIDE_BOTTOM);
-    Field(res, 2) = Val_int(GTK_SIDE_LEFT);
-    Field(res, 3) = Val_int(GTK_SIDE_RIGHT);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_size_group_mode(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_SIZE_GROUP_NONE);
-    Field(res, 1) = Val_int(GTK_SIZE_GROUP_HORIZONTAL);
-    Field(res, 2) = Val_int(GTK_SIZE_GROUP_VERTICAL);
-    Field(res, 3) = Val_int(GTK_SIZE_GROUP_BOTH);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_sorttype(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_SORT_ASCENDING);
-    Field(res, 1) = Val_int(GTK_SORT_DESCENDING);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_spin_button_update_policy(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_UPDATE_ALWAYS);
-    Field(res, 1) = Val_int(GTK_UPDATE_IF_VALID);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_spintype(value dummy) { /* ML */
-    value res = alloc_tuple(7);
-    Field(res, 0) = Val_int(GTK_SPIN_STEP_FORWARD);
-    Field(res, 1) = Val_int(GTK_SPIN_STEP_BACKWARD);
-    Field(res, 2) = Val_int(GTK_SPIN_PAGE_FORWARD);
-    Field(res, 3) = Val_int(GTK_SPIN_PAGE_BACKWARD);
-    Field(res, 4) = Val_int(GTK_SPIN_HOME);
-    Field(res, 5) = Val_int(GTK_SPIN_END);
-    Field(res, 6) = Val_int(GTK_SPIN_USER_DEFINED);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_statetype(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_STATE_NORMAL);
-    Field(res, 1) = Val_int(GTK_STATE_ACTIVE);
-    Field(res, 2) = Val_int(GTK_STATE_PRELIGHT);
-    Field(res, 3) = Val_int(GTK_STATE_SELECTED);
-    Field(res, 4) = Val_int(GTK_STATE_INSENSITIVE);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_submenu_direction(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_DIRECTION_LEFT);
-    Field(res, 1) = Val_int(GTK_DIRECTION_RIGHT);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_submenu_placement(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_TOP_BOTTOM);
-    Field(res, 1) = Val_int(GTK_LEFT_RIGHT);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_text_direction(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_TEXT_DIR_NONE);
-    Field(res, 1) = Val_int(GTK_TEXT_DIR_LTR);
-    Field(res, 2) = Val_int(GTK_TEXT_DIR_RTL);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_text_window_type(value dummy) { /* ML */
-    value res = alloc_tuple(7);
-    Field(res, 0) = Val_int(GTK_TEXT_WINDOW_PRIVATE);
-    Field(res, 1) = Val_int(GTK_TEXT_WINDOW_WIDGET);
-    Field(res, 2) = Val_int(GTK_TEXT_WINDOW_TEXT);
-    Field(res, 3) = Val_int(GTK_TEXT_WINDOW_LEFT);
-    Field(res, 4) = Val_int(GTK_TEXT_WINDOW_RIGHT);
-    Field(res, 5) = Val_int(GTK_TEXT_WINDOW_TOP);
-    Field(res, 6) = Val_int(GTK_TEXT_WINDOW_BOTTOM);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_toolbar_childtype(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_TOOLBAR_CHILD_SPACE);
-    Field(res, 1) = Val_int(GTK_TOOLBAR_CHILD_BUTTON);
-    Field(res, 2) = Val_int(GTK_TOOLBAR_CHILD_TOGGLEBUTTON);
-    Field(res, 3) = Val_int(GTK_TOOLBAR_CHILD_RADIOBUTTON);
-    Field(res, 4) = Val_int(GTK_TOOLBAR_CHILD_WIDGET);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_toolbar_space_style(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_TOOLBAR_SPACE_EMPTY);
-    Field(res, 1) = Val_int(GTK_TOOLBAR_SPACE_LINE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_toolbar_style(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_TOOLBAR_ICONS);
-    Field(res, 1) = Val_int(GTK_TOOLBAR_TEXT);
-    Field(res, 2) = Val_int(GTK_TOOLBAR_BOTH);
-    Field(res, 3) = Val_int(GTK_TOOLBAR_BOTH_HORIZ);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_treeviewcolumn_sizing(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_TREE_VIEW_COLUMN_GROW_ONLY);
-    Field(res, 1) = Val_int(GTK_TREE_VIEW_COLUMN_AUTOSIZE);
-    Field(res, 2) = Val_int(GTK_TREE_VIEW_COLUMN_FIXED);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_treeview_drop_position(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_TREE_VIEW_DROP_BEFORE);
-    Field(res, 1) = Val_int(GTK_TREE_VIEW_DROP_AFTER);
-    Field(res, 2) = Val_int(GTK_TREE_VIEW_DROP_INTO_OR_BEFORE);
-    Field(res, 3) = Val_int(GTK_TREE_VIEW_DROP_INTO_OR_AFTER);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_updatetype(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_UPDATE_CONTINUOUS);
-    Field(res, 1) = Val_int(GTK_UPDATE_DISCONTINUOUS);
-    Field(res, 2) = Val_int(GTK_UPDATE_DELAYED);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_visibility(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_VISIBILITY_NONE);
-    Field(res, 1) = Val_int(GTK_VISIBILITY_PARTIAL);
-    Field(res, 2) = Val_int(GTK_VISIBILITY_FULL);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_widget_helptype(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_WIDGET_HELP_TOOLTIP);
-    Field(res, 1) = Val_int(GTK_WIDGET_HELP_WHATS_THIS);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_window_position(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_WIN_POS_NONE);
-    Field(res, 1) = Val_int(GTK_WIN_POS_CENTER);
-    Field(res, 2) = Val_int(GTK_WIN_POS_MOUSE);
-    Field(res, 3) = Val_int(GTK_WIN_POS_CENTER_ALWAYS);
-    Field(res, 4) = Val_int(GTK_WIN_POS_CENTER_ON_PARENT);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_window_type(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_WINDOW_TOPLEVEL);
-    Field(res, 1) = Val_int(GTK_WINDOW_POPUP);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_wrap_mode(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_WRAP_NONE);
-    Field(res, 1) = Val_int(GTK_WRAP_CHAR);
-    Field(res, 2) = Val_int(GTK_WRAP_WORD);
-    Field(res, 3) = Val_int(GTK_WRAP_WORD_CHAR);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_accel_flags(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_ACCEL_VISIBLE);
-    Field(res, 1) = Val_int(GTK_ACCEL_LOCKED);
-    Field(res, 2) = Val_int(GTK_ACCEL_MASK);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_arg_flags(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_ARG_READABLE);
-    Field(res, 1) = Val_int(GTK_ARG_WRITABLE);
-    Field(res, 2) = Val_int(GTK_ARG_CONSTRUCT);
-    Field(res, 3) = Val_int(GTK_ARG_CONSTRUCT_ONLY);
-    Field(res, 4) = Val_int(GTK_ARG_CHILD_ARG);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_attach_options(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_EXPAND);
-    Field(res, 1) = Val_int(GTK_SHRINK);
-    Field(res, 2) = Val_int(GTK_FILL);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_button_action(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_BUTTON_IGNORED);
-    Field(res, 1) = Val_int(GTK_BUTTON_SELECTS);
-    Field(res, 2) = Val_int(GTK_BUTTON_DRAGS);
-    Field(res, 3) = Val_int(GTK_BUTTON_EXPANDS);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_calendar_display_options(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_CALENDAR_SHOW_HEADING);
-    Field(res, 1) = Val_int(GTK_CALENDAR_SHOW_DAY_NAMES);
-    Field(res, 2) = Val_int(GTK_CALENDAR_NO_MONTH_CHANGE);
-    Field(res, 3) = Val_int(GTK_CALENDAR_SHOW_WEEK_NUMBERS);
-    Field(res, 4) = Val_int(GTK_CALENDAR_WEEK_START_MONDAY);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_cellrenderer_state(value dummy) { /* ML */
-    value res = alloc_tuple(5);
-    Field(res, 0) = Val_int(GTK_CELL_RENDERER_SELECTED);
-    Field(res, 1) = Val_int(GTK_CELL_RENDERER_PRELIT);
-    Field(res, 2) = Val_int(GTK_CELL_RENDERER_INSENSITIVE);
-    Field(res, 3) = Val_int(GTK_CELL_RENDERER_SORTED);
-    Field(res, 4) = Val_int(GTK_CELL_RENDERER_FOCUSED);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_debug_flag(value dummy) { /* ML */
-    value res = alloc_tuple(7);
-    Field(res, 0) = Val_int(GTK_DEBUG_MISC);
-    Field(res, 1) = Val_int(GTK_DEBUG_PLUGSOCKET);
-    Field(res, 2) = Val_int(GTK_DEBUG_TEXT);
-    Field(res, 3) = Val_int(GTK_DEBUG_TREE);
-    Field(res, 4) = Val_int(GTK_DEBUG_UPDATES);
-    Field(res, 5) = Val_int(GTK_DEBUG_KEYBINDINGS);
-    Field(res, 6) = Val_int(GTK_DEBUG_MULTIHEAD);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_dest_defaults(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_DEST_DEFAULT_MOTION);
-    Field(res, 1) = Val_int(GTK_DEST_DEFAULT_HIGHLIGHT);
-    Field(res, 2) = Val_int(GTK_DEST_DEFAULT_DROP);
-    Field(res, 3) = Val_int(GTK_DEST_DEFAULT_ALL);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_dialog_flags(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_DIALOG_MODAL);
-    Field(res, 1) = Val_int(GTK_DIALOG_DESTROY_WITH_PARENT);
-    Field(res, 2) = Val_int(GTK_DIALOG_NO_SEPARATOR);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_file_filter_flags(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_FILE_FILTER_FILENAME);
-    Field(res, 1) = Val_int(GTK_FILE_FILTER_URI);
-    Field(res, 2) = Val_int(GTK_FILE_FILTER_DISPLAY_NAME);
-    Field(res, 3) = Val_int(GTK_FILE_FILTER_MIME_TYPE);
-    return res;
-}
-
-/* ML type: unit -> int * int * int */
-EXTERNML value mgtk_get_gtk_icon_lookup_flags(value dummy) { /* ML */
-    value res = alloc_tuple(3);
-    Field(res, 0) = Val_int(GTK_ICON_LOOKUP_NO_SVG);
-    Field(res, 1) = Val_int(GTK_ICON_LOOKUP_FORCE_SVG);
-    Field(res, 2) = Val_int(GTK_ICON_LOOKUP_USE_BUILTIN);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_object_flags(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_IN_DESTRUCTION);
-    Field(res, 1) = Val_int(GTK_FLOATING);
-    Field(res, 2) = Val_int(GTK_RESERVED_1);
-    Field(res, 3) = Val_int(GTK_RESERVED_2);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int */
-EXTERNML value mgtk_get_gtk_rc_flags(value dummy) { /* ML */
-    value res = alloc_tuple(4);
-    Field(res, 0) = Val_int(GTK_RC_FG);
-    Field(res, 1) = Val_int(GTK_RC_BG);
-    Field(res, 2) = Val_int(GTK_RC_TEXT);
-    Field(res, 3) = Val_int(GTK_RC_BASE);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_target_flags(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_TARGET_SAME_APP);
-    Field(res, 1) = Val_int(GTK_TARGET_SAME_WIDGET);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_text_search_flags(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_TEXT_SEARCH_VISIBLE_ONLY);
-    Field(res, 1) = Val_int(GTK_TEXT_SEARCH_TEXT_ONLY);
-    return res;
-}
-
-/* ML type: unit -> int * int */
-EXTERNML value mgtk_get_gtk_treemodel_flags(value dummy) { /* ML */
-    value res = alloc_tuple(2);
-    Field(res, 0) = Val_int(GTK_TREE_MODEL_ITERS_PERSIST);
-    Field(res, 1) = Val_int(GTK_TREE_MODEL_LIST_ONLY);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_ui_manager_itemtype(value dummy) { /* ML */
-    value res = alloc_tuple(10);
-    Field(res, 0) = Val_int(GTK_UI_MANAGER_AUTO);
-    Field(res, 1) = Val_int(GTK_UI_MANAGER_MENUBAR);
-    Field(res, 2) = Val_int(GTK_UI_MANAGER_MENU);
-    Field(res, 3) = Val_int(GTK_UI_MANAGER_TOOLBAR);
-    Field(res, 4) = Val_int(GTK_UI_MANAGER_PLACEHOLDER);
-    Field(res, 5) = Val_int(GTK_UI_MANAGER_POPUP);
-    Field(res, 6) = Val_int(GTK_UI_MANAGER_MENUITEM);
-    Field(res, 7) = Val_int(GTK_UI_MANAGER_TOOLITEM);
-    Field(res, 8) = Val_int(GTK_UI_MANAGER_SEPARATOR);
-    Field(res, 9) = Val_int(GTK_UI_MANAGER_ACCELERATOR);
-    return res;
-}
-
-/* ML type: unit -> int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_widget_flags(value dummy) { /* ML */
-    value res = alloc_tuple(19);
-    Field(res, 0) = Val_int(GTK_TOPLEVEL);
-    Field(res, 1) = Val_int(GTK_NO_WINDOW);
-    Field(res, 2) = Val_int(GTK_REALIZED);
-    Field(res, 3) = Val_int(GTK_MAPPED);
-    Field(res, 4) = Val_int(GTK_VISIBLE);
-    Field(res, 5) = Val_int(GTK_SENSITIVE);
-    Field(res, 6) = Val_int(GTK_PARENT_SENSITIVE);
-    Field(res, 7) = Val_int(GTK_CAN_FOCUS);
-    Field(res, 8) = Val_int(GTK_HAS_FOCUS);
-    Field(res, 9) = Val_int(GTK_CAN_DEFAULT);
-    Field(res, 10) = Val_int(GTK_HAS_DEFAULT);
-    Field(res, 11) = Val_int(GTK_HAS_GRAB);
-    Field(res, 12) = Val_int(GTK_RC_STYLE);
-    Field(res, 13) = Val_int(GTK_COMPOSITE_CHILD);
-    Field(res, 14) = Val_int(GTK_NO_REPARENT);
-    Field(res, 15) = Val_int(GTK_APP_PAINTABLE);
-    Field(res, 16) = Val_int(GTK_RECEIVES_DEFAULT);
-    Field(res, 17) = Val_int(GTK_DOUBLE_BUFFERED);
-    Field(res, 18) = Val_int(GTK_NO_SHOW_ALL);
-    return res;
-}
-
 /* ML type: unit -> int */
 EXTERNML value mgtk_gtk_accelerator_get_default_mod_mask(value dummy) { /* ML */
     return Val_int(gtk_accelerator_get_default_mod_mask());
-}
-
-/* ML type: string -> unit */
-EXTERNML value mgtk_gtk_accel_map_load(value file_name) { /* ML */
-    gtk_accel_map_load(String_val(file_name));
-    return Val_unit;
-}
-
-/* ML type: string -> unit */
-EXTERNML value mgtk_gtk_accel_map_save(value file_name) { /* ML */
-    gtk_accel_map_save(String_val(file_name));
-    return Val_unit;
-}
-
-/* ML type: int -> unit */
-EXTERNML value mgtk_gtk_accel_map_load_fd(value fd) { /* ML */
-    gtk_accel_map_load_fd(Int_val(fd));
-    return Val_unit;
-}
-
-/* ML type: int -> unit */
-EXTERNML value mgtk_gtk_accel_map_save_fd(value fd) { /* ML */
-    gtk_accel_map_save_fd(Int_val(fd));
-    return Val_unit;
-}
-
-/* ML type: string -> unit */
-EXTERNML value mgtk_gtk_accel_map_lock_path(value accel_path) { /* ML */
-    gtk_accel_map_lock_path(String_val(accel_path));
-    return Val_unit;
-}
-
-/* ML type: string -> unit */
-EXTERNML value mgtk_gtk_accel_map_unlock_path(value accel_path) { /* ML */
-    gtk_accel_map_unlock_path(String_val(accel_path));
-    return Val_unit;
-}
-
-/* ML type: string -> unit */
-EXTERNML value mgtk_gtk_accel_map_add_filter(value filter_pattern) { /* ML */
-    gtk_accel_map_add_filter(String_val(filter_pattern));
-    return Val_unit;
-}
-
-/* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_accel_map_get_type(value dummy) { /* ML */
-    return Val_int(gtk_accel_map_get_type());
-}
-
-/* ML type: cptr -> int -> cptr -> cptr -> bool */
-EXTERNML value mgtk_gtk_icon_size_lookup_for_settings(value settings, value size, value width, value height) { /* ML */
-    return Val_bool(gtk_icon_size_lookup_for_settings(GtkObj_val(settings), Int_val(size), Int_val(width), Int_val(height)));
 }
 
 /* ML type: string -> int -> int -> int */
@@ -2586,14 +2228,6 @@ EXTERNML value mgtk_gtk_icon_theme_set_search_path(value self, value path_arr, v
     return Val_unit;
 }
 
-/* ML type: cptr -> cptr list -> cptr -> unit */
-EXTERNML value mgtk_gtk_icon_theme_get_search_path(value self, value path_arr, value n_elements) { /* ML */
-    char*** path;
-    list_to_array(char**, path, String_val, path_arr);
-    gtk_icon_theme_get_search_path(GtkObj_val(self), path, Int_val(n_elements));
-    return Val_unit;
-}
-
 /* ML type: cptr -> string -> unit */
 EXTERNML value mgtk_gtk_icon_theme_append_search_path(value self, value path) { /* ML */
     gtk_icon_theme_append_search_path(GtkObj_val(self), String_val(path));
@@ -2711,11 +2345,6 @@ EXTERNML value mgtk_gtk_tree_path_get_depth(value self) { /* ML */
     return Val_int(gtk_tree_path_get_depth(GtkObj_val(self)));
 }
 
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_tree_path_get_indices(value self) { /* ML */
-    return Val_int(gtk_tree_path_get_indices(GtkObj_val(self)));
-}
-
 /* ML type: cptr -> unit */
 EXTERNML value mgtk_gtk_tree_path_free(value self) { /* ML */
     gtk_tree_path_free(GtkObj_val(self));
@@ -2767,6 +2396,14 @@ EXTERNML value mgtk_gtk_tree_path_is_descendant(value self, value ancestor) { /*
 
 
 /* *** TreeModel *** */
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_treemodel_flags(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_TREE_MODEL_ITERS_PERSIST);
+    Field(res, 1) = Val_int(GTK_TREE_MODEL_LIST_ONLY);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_tree_model_get_type(value dummy) { /* ML */
     return Val_int(gtk_tree_model_get_type());
@@ -3079,45 +2716,6 @@ EXTERNML value mgtk_gtk_text_child_anchor_get_deleted(value self) { /* ML */
 
 
 
-/* *** TextMark *** */
-/* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_text_mark_get_type(value dummy) { /* ML */
-    return Val_int(gtk_text_mark_get_type());
-}
-
-/* ML type: cptr -> bool -> unit */
-EXTERNML value mgtk_gtk_text_mark_set_visible(value self, value setting) { /* ML */
-    gtk_text_mark_set_visible(GtkObj_val(self), Bool_val(setting));
-    return Val_unit;
-}
-
-/* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_text_mark_get_visible(value self) { /* ML */
-    return Val_bool(gtk_text_mark_get_visible(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> string */
-EXTERNML value mgtk_gtk_text_mark_get_name(value self) { /* ML */
-    return my_copy_string(gtk_text_mark_get_name(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_text_mark_get_deleted(value self) { /* ML */
-    return Val_bool(gtk_text_mark_get_deleted(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_text_mark_get_buffer(value self) { /* ML */
-    return Val_GtkObj(gtk_text_mark_get_buffer(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_text_mark_get_left_gravity(value self) { /* ML */
-    return Val_bool(gtk_text_mark_get_left_gravity(GtkObj_val(self)));
-}
-
-
-
 /* *** TextTag *** */
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_text_tag_get_type(value dummy) { /* ML */
@@ -3140,383 +2738,6 @@ EXTERNML value mgtk_gtk_text_tag_set_priority(value self, value priority) { /* M
     return Val_unit;
 }
 
-/* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_text_tag_table_get_type(value dummy) { /* ML */
-    return Val_int(gtk_text_tag_table_get_type());
-}
-
-
-
-/* *** TextTagTable *** */
-/* ML type: unit -> cptr */
-EXTERNML value mgtk_gtk_text_tag_table_new(value dummy) { /* ML */
-    return Val_GtkObj(gtk_text_tag_table_new());
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_tag_table_add(value self, value tag) { /* ML */
-    gtk_text_tag_table_add(GtkObj_val(self), GtkObj_val(tag));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_tag_table_remove(value self, value tag) { /* ML */
-    gtk_text_tag_table_remove(GtkObj_val(self), GtkObj_val(tag));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> cptr */
-EXTERNML value mgtk_gtk_text_tag_table_lookup(value self, value name) { /* ML */
-    return Val_GtkObj(gtk_text_tag_table_lookup(GtkObj_val(self), String_val(name)));
-}
-
-/* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_text_tag_table_get_size(value self) { /* ML */
-    return Val_int(gtk_text_tag_table_get_size(GtkObj_val(self)));
-}
-
-
-
-/* *** TextBuffer *** */
-/* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_text_buffer_get_type(value dummy) { /* ML */
-    return Val_int(gtk_text_buffer_get_type());
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_new(value table) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_new(GtkObj_val(table)));
-}
-
-/* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_text_buffer_get_line_count(value self) { /* ML */
-    return Val_int(gtk_text_buffer_get_line_count(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_text_buffer_get_char_count(value self) { /* ML */
-    return Val_int(gtk_text_buffer_get_char_count(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_get_tag_table(value self) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_get_tag_table(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> string -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_set_text(value self, value text, value len) { /* ML */
-    gtk_text_buffer_set_text(GtkObj_val(self), String_val(text), Int_val(len));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> string -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_insert(value self, value iter, value text, value len) { /* ML */
-    gtk_text_buffer_insert(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_insert_at_cursor(value self, value text, value len) { /* ML */
-    gtk_text_buffer_insert_at_cursor(GtkObj_val(self), String_val(text), Int_val(len));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> string -> int -> bool -> bool */
-EXTERNML value mgtk_gtk_text_buffer_insert_interactive(value self, value iter, value text, value len, value default_editable) { /* ML */
-    return Val_bool(gtk_text_buffer_insert_interactive(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len), Bool_val(default_editable)));
-}
-
-/* ML type: cptr -> string -> int -> bool -> bool */
-EXTERNML value mgtk_gtk_text_buffer_insert_interactive_at_cursor(value self, value text, value len, value default_editable) { /* ML */
-    return Val_bool(gtk_text_buffer_insert_interactive_at_cursor(GtkObj_val(self), String_val(text), Int_val(len), Bool_val(default_editable)));
-}
-
-/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_insert_range(value self, value iter, value start, value end) { /* ML */
-    gtk_text_buffer_insert_range(GtkObj_val(self), GtkTextIter_val(iter), GtkTextIter_val(start), GtkTextIter_val(end));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> cptr -> bool -> bool */
-EXTERNML value mgtk_gtk_text_buffer_insert_range_interactive(value self, value iter, value start, value end, value default_editable) { /* ML */
-    return Val_bool(gtk_text_buffer_insert_range_interactive(GtkObj_val(self), GtkTextIter_val(iter), GtkTextIter_val(start), GtkTextIter_val(end), Bool_val(default_editable)));
-}
-
-/* ML type: cptr -> cptr -> string -> int -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_insert_with_tags(value self, value iter, value text, value len, value first_tag) { /* ML */
-    gtk_text_buffer_insert_with_tags(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len), GtkObj_val(first_tag));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> string -> int -> string -> unit */
-EXTERNML value mgtk_gtk_text_buffer_insert_with_tags_by_name(value self, value iter, value text, value len, value first_tag_name) { /* ML */
-    gtk_text_buffer_insert_with_tags_by_name(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len), String_val(first_tag_name));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_delete(value self, value start, value end) { /* ML */
-    gtk_text_buffer_delete(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> bool -> bool */
-EXTERNML value mgtk_gtk_text_buffer_delete_interactive(value self, value start_iter, value end_iter, value default_editable) { /* ML */
-    return Val_bool(gtk_text_buffer_delete_interactive(GtkObj_val(self), GtkTextIter_val(start_iter), GtkTextIter_val(end_iter), Bool_val(default_editable)));
-}
-
-/* ML type: cptr -> cptr -> cptr -> bool -> string */
-EXTERNML value mgtk_gtk_text_buffer_get_text(value self, value start, value end, value include_hidden_chars) { /* ML */
-    return my_copy_string(gtk_text_buffer_get_text(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end), Bool_val(include_hidden_chars)));
-}
-
-/* ML type: cptr -> cptr -> cptr -> bool -> string */
-EXTERNML value mgtk_gtk_text_buffer_get_slice(value self, value start, value end, value include_hidden_chars) { /* ML */
-    return my_copy_string(gtk_text_buffer_get_slice(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end), Bool_val(include_hidden_chars)));
-}
-
-/* ML type: cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_insert_child_anchor(value self, value iter, value anchor) { /* ML */
-    gtk_text_buffer_insert_child_anchor(GtkObj_val(self), GtkTextIter_val(iter), GtkObj_val(anchor));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_create_child_anchor(value self, value iter) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_create_child_anchor(GtkObj_val(self), GtkTextIter_val(iter)));
-}
-
-/* ML type: cptr -> string -> cptr -> bool -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_create_mark(value self, value mark_name, value where, value left_gravity) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_create_mark(GtkObj_val(self), String_val(mark_name), GtkTextIter_val(where), Bool_val(left_gravity)));
-}
-
-/* ML type: cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_move_mark(value self, value mark, value where) { /* ML */
-    gtk_text_buffer_move_mark(GtkObj_val(self), GtkObj_val(mark), GtkTextIter_val(where));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_delete_mark(value self, value mark) { /* ML */
-    gtk_text_buffer_delete_mark(GtkObj_val(self), GtkObj_val(mark));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_get_mark(value self, value name) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_get_mark(GtkObj_val(self), String_val(name)));
-}
-
-/* ML type: cptr -> string -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_move_mark_by_name(value self, value name, value where) { /* ML */
-    gtk_text_buffer_move_mark_by_name(GtkObj_val(self), String_val(name), GtkTextIter_val(where));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> unit */
-EXTERNML value mgtk_gtk_text_buffer_delete_mark_by_name(value self, value name) { /* ML */
-    gtk_text_buffer_delete_mark_by_name(GtkObj_val(self), String_val(name));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_get_insert(value self) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_get_insert(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_get_selection_bound(value self) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_get_selection_bound(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_place_cursor(value self, value where) { /* ML */
-    gtk_text_buffer_place_cursor(GtkObj_val(self), GtkTextIter_val(where));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_select_range(value self, value ins, value bound) { /* ML */
-    gtk_text_buffer_select_range(GtkObj_val(self), GtkTextIter_val(ins), GtkTextIter_val(bound));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_apply_tag(value self, value tag, value start, value end) { /* ML */
-    gtk_text_buffer_apply_tag(GtkObj_val(self), GtkObj_val(tag), GtkTextIter_val(start), GtkTextIter_val(end));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_remove_tag(value self, value tag, value start, value end) { /* ML */
-    gtk_text_buffer_remove_tag(GtkObj_val(self), GtkObj_val(tag), GtkTextIter_val(start), GtkTextIter_val(end));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_apply_tag_by_name(value self, value name, value start, value end) { /* ML */
-    gtk_text_buffer_apply_tag_by_name(GtkObj_val(self), String_val(name), GtkTextIter_val(start), GtkTextIter_val(end));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_remove_tag_by_name(value self, value name, value start, value end) { /* ML */
-    gtk_text_buffer_remove_tag_by_name(GtkObj_val(self), String_val(name), GtkTextIter_val(start), GtkTextIter_val(end));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_remove_all_tags(value self, value start, value end) { /* ML */
-    gtk_text_buffer_remove_all_tags(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> string -> cptr */
-EXTERNML value mgtk_gtk_text_buffer_create_tag(value self, value tag_name, value first_property_name) { /* ML */
-    return Val_GtkObj(gtk_text_buffer_create_tag(GtkObj_val(self), String_val(tag_name), String_val(first_property_name)));
-}
-
-/* ML type: cptr -> int -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line_offset(value self, value line_number, value char_offset) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_iter_at_line_offset(GtkObj_val(self), &iter, Int_val(line_number), Int_val(char_offset));
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> int -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line_index(value self, value line_number, value byte_index) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_iter_at_line_index(GtkObj_val(self), &iter, Int_val(line_number), Int_val(byte_index));
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_iter_at_offset(value self, value char_offset) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_iter_at_offset(GtkObj_val(self), &iter, Int_val(char_offset));
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line(value self, value line_number) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_iter_at_line(GtkObj_val(self), &iter, Int_val(line_number));
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_start_iter(value self) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_start_iter(GtkObj_val(self), &iter);
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_end_iter(value self) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_end_iter(GtkObj_val(self), &iter);
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_bounds(value self) { /* ML */
-    value result;
-    GtkTextIter start;
-    GtkTextIter end;
-    gtk_text_buffer_get_bounds(GtkObj_val(self), &start, &end);
-    result = alloc_tuple(2);
-    Field(result, 0) = Val_GtkTextIter(&start);
-    Field(result, 1) = Val_GtkTextIter(&end);
-    return result;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_iter_at_mark(value self, value mark) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_iter_at_mark(GtkObj_val(self), &iter, GtkObj_val(mark));
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_iter_at_child_anchor(value self, value anchor) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_iter_at_child_anchor(GtkObj_val(self), &iter, GtkObj_val(anchor));
-    return Val_GtkTextIter(&iter);
-}
-
-/* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_text_buffer_get_modified(value self) { /* ML */
-    return Val_bool(gtk_text_buffer_get_modified(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> bool -> unit */
-EXTERNML value mgtk_gtk_text_buffer_set_modified(value self, value setting) { /* ML */
-    gtk_text_buffer_set_modified(GtkObj_val(self), Bool_val(setting));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_add_selection_clipboard(value self, value clipboard) { /* ML */
-    gtk_text_buffer_add_selection_clipboard(GtkObj_val(self), GtkObj_val(clipboard));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_remove_selection_clipboard(value self, value clipboard) { /* ML */
-    gtk_text_buffer_remove_selection_clipboard(GtkObj_val(self), GtkObj_val(clipboard));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> bool -> unit */
-EXTERNML value mgtk_gtk_text_buffer_cut_clipboard(value self, value clipboard, value default_editable) { /* ML */
-    gtk_text_buffer_cut_clipboard(GtkObj_val(self), GtkObj_val(clipboard), Bool_val(default_editable));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_copy_clipboard(value self, value clipboard) { /* ML */
-    gtk_text_buffer_copy_clipboard(GtkObj_val(self), GtkObj_val(clipboard));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> cptr -> bool -> unit */
-EXTERNML value mgtk_gtk_text_buffer_paste_clipboard(value self, value clipboard, value override_location, value default_editable) { /* ML */
-    gtk_text_buffer_paste_clipboard(GtkObj_val(self), GtkObj_val(clipboard), GtkTextIter_val(override_location), Bool_val(default_editable));
-    return Val_unit;
-}
-
-/* ML type: cptr -> bool */
-EXTERNML value mgtk_gtk_text_buffer_get_selection_bounds(value self) { /* ML */
-    value result;
-    value res;
-    GtkTextIter start;
-    GtkTextIter end;
-    res = Val_bool(gtk_text_buffer_get_selection_bounds(GtkObj_val(self), &start, &end));
-    result = alloc_tuple(3);
-    Field(result, 0) = res;
-    Field(result, 1) = Val_GtkTextIter(&start);
-    Field(result, 2) = Val_GtkTextIter(&end);
-    return result;
-}
-
-/* ML type: cptr -> bool -> bool -> bool */
-EXTERNML value mgtk_gtk_text_buffer_delete_selection(value self, value interactive, value default_editable) { /* ML */
-    return Val_bool(gtk_text_buffer_delete_selection(GtkObj_val(self), Bool_val(interactive), Bool_val(default_editable)));
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_begin_user_action(value self) { /* ML */
-    gtk_text_buffer_begin_user_action(GtkObj_val(self));
-    return Val_unit;
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_text_buffer_end_user_action(value self) { /* ML */
-    gtk_text_buffer_end_user_action(GtkObj_val(self));
-    return Val_unit;
-}
-
 
 
 /* *** TextIter *** */
@@ -3533,11 +2754,6 @@ value Val_GtkTextIter(void* obj) {
     res = alloc_final(2, ml_finalize_GtkTextIter, 0, 1);
     GtkTextIter_val_nocast(res) = (value) gtk_text_iter_copy(obj);
     return res;
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_textiter_get_buffer(value self) { /* ML */
-    return Val_GtkObj(gtk_textiter_get_buffer(GtkTextIter_val(self)));
 }
 
 /* ML type: cptr -> cptr */
@@ -4028,12 +3244,6 @@ EXTERNML value mgtk_gtk_tree_row_reference_deleted(value proxy, value path) { /*
     return Val_unit;
 }
 
-/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_tree_row_reference_reordered(value proxy, value path, value iter, value new_order) { /* ML */
-    gtk_tree_row_reference_reordered(GtkObj_val(proxy), GtkObj_val(path), GtkTreeIter_val(iter), Int_val(new_order));
-    return Val_unit;
-}
-
 
 
 /* *** CellEditable *** */
@@ -4057,6 +3267,26 @@ EXTERNML value mgtk_gtk_cell_editable_remove_widget(value self) { /* ML */
 
 
 /* *** CellRenderer *** */
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_cellrenderer_mode(value dummy) { /* ML */
+    value res = alloc_tuple(3);
+    Field(res, 0) = Val_int(GTK_CELL_RENDERER_MODE_INERT);
+    Field(res, 1) = Val_int(GTK_CELL_RENDERER_MODE_ACTIVATABLE);
+    Field(res, 2) = Val_int(GTK_CELL_RENDERER_MODE_EDITABLE);
+    return res;
+}
+
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_cellrenderer_state(value dummy) { /* ML */
+    value res = alloc_tuple(5);
+    Field(res, 0) = Val_int(GTK_CELL_RENDERER_SELECTED);
+    Field(res, 1) = Val_int(GTK_CELL_RENDERER_PRELIT);
+    Field(res, 2) = Val_int(GTK_CELL_RENDERER_INSENSITIVE);
+    Field(res, 3) = Val_int(GTK_CELL_RENDERER_SORTED);
+    Field(res, 4) = Val_int(GTK_CELL_RENDERER_FOCUSED);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_cell_renderer_get_type(value dummy) { /* ML */
     return Val_int(gtk_cell_renderer_get_type());
@@ -4215,47 +3445,6 @@ EXTERNML value mgtk_gtk_editable_set_editable(value self, value is_editable) { /
 /* ML type: cptr -> bool */
 EXTERNML value mgtk_gtk_editable_get_editable(value self) { /* ML */
     return Val_bool(gtk_editable_get_editable(GtkObj_val(self)));
-}
-
-
-
-/* *** FileFilter *** */
-/* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_file_filter_get_type(value dummy) { /* ML */
-    return Val_int(gtk_file_filter_get_type());
-}
-
-/* ML type: unit -> cptr */
-EXTERNML value mgtk_gtk_file_filter_new(value dummy) { /* ML */
-    return Val_GtkObj(gtk_file_filter_new());
-}
-
-/* ML type: cptr -> string -> unit */
-EXTERNML value mgtk_gtk_file_filter_set_name(value self, value name) { /* ML */
-    gtk_file_filter_set_name(GtkObj_val(self), String_val(name));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string */
-EXTERNML value mgtk_gtk_file_filter_get_name(value self) { /* ML */
-    return my_copy_string(gtk_file_filter_get_name(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> string -> unit */
-EXTERNML value mgtk_gtk_file_filter_add_mime_type(value self, value mime_type) { /* ML */
-    gtk_file_filter_add_mime_type(GtkObj_val(self), String_val(mime_type));
-    return Val_unit;
-}
-
-/* ML type: cptr -> string -> unit */
-EXTERNML value mgtk_gtk_file_filter_add_pattern(value self, value pattern) { /* ML */
-    gtk_file_filter_add_pattern(GtkObj_val(self), String_val(pattern));
-    return Val_unit;
-}
-
-/* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_file_filter_get_needed(value self) { /* ML */
-    return Val_int(gtk_file_filter_get_needed(GtkObj_val(self)));
 }
 
 
@@ -4440,6 +3629,25 @@ EXTERNML value mgtk_gtk_tooltips_force_window(value self) { /* ML */
 
 
 /* *** Window *** */
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_window_position(value dummy) { /* ML */
+    value res = alloc_tuple(5);
+    Field(res, 0) = Val_int(GTK_WIN_POS_NONE);
+    Field(res, 1) = Val_int(GTK_WIN_POS_CENTER);
+    Field(res, 2) = Val_int(GTK_WIN_POS_MOUSE);
+    Field(res, 3) = Val_int(GTK_WIN_POS_CENTER_ALWAYS);
+    Field(res, 4) = Val_int(GTK_WIN_POS_CENTER_ON_PARENT);
+    return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_window_type(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_WINDOW_TOPLEVEL);
+    Field(res, 1) = Val_int(GTK_WINDOW_POPUP);
+    return res;
+}
+
 /* ML type: cptr -> cptr -> cptr -> bool */
 EXTERNML value mgtk_gtk_tooltips_get_info_from_tip_window(value self, value tooltips, value current_widget) { /* ML */
     return Val_bool(gtk_tooltips_get_info_from_tip_window(GtkObj_val(self), GtkObj_val(tooltips), GtkObj_val(current_widget)));
@@ -4818,6 +4026,24 @@ EXTERNML value mgtk_gtk_window_add_embedded_xid(value self, value xid) { /* ML *
 
 
 /* *** FileChooser *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_file_chooser_action(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_FILE_CHOOSER_ACTION_OPEN);
+    Field(res, 1) = Val_int(GTK_FILE_CHOOSER_ACTION_SAVE);
+    Field(res, 2) = Val_int(GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+    Field(res, 3) = Val_int(GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER);
+    return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_file_chooser_error(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_FILE_CHOOSER_ERROR_NONEXISTENT);
+    Field(res, 1) = Val_int(GTK_FILE_CHOOSER_ERROR_BAD_FILENAME);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_file_chooser_get_type(value dummy) { /* ML */
     return Val_int(gtk_file_chooser_get_type());
@@ -4988,29 +4214,6 @@ EXTERNML value mgtk_gtk_file_chooser_set_extra_widget(value self, value extra_wi
 /* ML type: cptr -> cptr */
 EXTERNML value mgtk_gtk_file_chooser_get_extra_widget(value self) { /* ML */
     return Val_GtkObj(gtk_file_chooser_get_extra_widget(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_file_chooser_add_filter(value self, value filter) { /* ML */
-    gtk_file_chooser_add_filter(GtkObj_val(self), GtkObj_val(filter));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_file_chooser_remove_filter(value self, value filter) { /* ML */
-    gtk_file_chooser_remove_filter(GtkObj_val(self), GtkObj_val(filter));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_file_chooser_set_filter(value self, value filter) { /* ML */
-    gtk_file_chooser_set_filter(GtkObj_val(self), GtkObj_val(filter));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_file_chooser_get_filter(value self) { /* ML */
-    return Val_GtkObj(gtk_file_chooser_get_filter(GtkObj_val(self)));
 }
 
 /* ML type: unit -> GType.t */
@@ -5396,14 +4599,14 @@ EXTERNML value mgtk_gtk_action_set_accel_group(value self, value accel_group) { 
     return Val_unit;
 }
 
+
+
+/* *** ActionGroup *** */
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_action_group_get_type(value dummy) { /* ML */
     return Val_int(gtk_action_group_get_type());
 }
 
-
-
-/* *** ActionGroup *** */
 /* ML type: string -> cptr */
 EXTERNML value mgtk_gtk_action_group_new(value name) { /* ML */
     return Val_GtkObj(gtk_action_group_new(String_val(name)));
@@ -5659,6 +4862,27 @@ EXTERNML value mgtk_gtk_box_set_child_packing(value mgtk_params) { /* ML */
 
 
 /* *** Button *** */
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_button_box_style(value dummy) { /* ML */
+    value res = alloc_tuple(5);
+    Field(res, 0) = Val_int(GTK_BUTTONBOX_DEFAULT_STYLE);
+    Field(res, 1) = Val_int(GTK_BUTTONBOX_SPREAD);
+    Field(res, 2) = Val_int(GTK_BUTTONBOX_EDGE);
+    Field(res, 3) = Val_int(GTK_BUTTONBOX_START);
+    Field(res, 4) = Val_int(GTK_BUTTONBOX_END);
+    return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_button_action(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_BUTTON_IGNORED);
+    Field(res, 1) = Val_int(GTK_BUTTON_SELECTS);
+    Field(res, 2) = Val_int(GTK_BUTTON_DRAGS);
+    Field(res, 3) = Val_int(GTK_BUTTON_EXPANDS);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_button_box_get_type(value dummy) { /* ML */
     return Val_int(gtk_button_box_get_type());
@@ -5809,6 +5033,17 @@ EXTERNML value mgtk_gtk_button_box_set_child_secondary(value self, value child, 
 
 
 /* *** Calendar *** */
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_calendar_display_options(value dummy) { /* ML */
+    value res = alloc_tuple(5);
+    Field(res, 0) = Val_int(GTK_CALENDAR_SHOW_HEADING);
+    Field(res, 1) = Val_int(GTK_CALENDAR_SHOW_DAY_NAMES);
+    Field(res, 2) = Val_int(GTK_CALENDAR_NO_MONTH_CHANGE);
+    Field(res, 3) = Val_int(GTK_CALENDAR_SHOW_WEEK_NUMBERS);
+    Field(res, 4) = Val_int(GTK_CALENDAR_WEEK_START_MONDAY);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_calendar_get_type(value dummy) { /* ML */
     return Val_int(gtk_calendar_get_type());
@@ -6320,6 +5555,15 @@ EXTERNML value mgtk_gtk_color_selection_dialog_get_type(value dummy) { /* ML */
 
 
 /* *** Dialog *** */
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_dialog_flags(value dummy) { /* ML */
+    value res = alloc_tuple(3);
+    Field(res, 0) = Val_int(GTK_DIALOG_MODAL);
+    Field(res, 1) = Val_int(GTK_DIALOG_DESTROY_WITH_PARENT);
+    Field(res, 2) = Val_int(GTK_DIALOG_NO_SEPARATOR);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_dialog_get_type(value dummy) { /* ML */
     return Val_int(gtk_dialog_get_type());
@@ -6647,71 +5891,6 @@ EXTERNML value mgtk_gtk_curve_set_curve_type(value self, value type) { /* ML */
 
 
 
-/* *** EntryCompletion *** */
-/* ML type: unit -> cptr */
-EXTERNML value mgtk_gtk_entry_completion_new(value dummy) { /* ML */
-    return Val_GtkObj(gtk_entry_completion_new());
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_entry_completion_get_entry(value self) { /* ML */
-    return Val_GtkObj(gtk_entry_completion_get_entry(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_entry_completion_set_model(value self, value model) { /* ML */
-    gtk_entry_completion_set_model(GtkObj_val(self), GtkObj_val(model));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_entry_completion_get_model(value self) { /* ML */
-    return Val_GtkObj(gtk_entry_completion_get_model(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_entry_completion_set_minimum_key_length(value self, value length) { /* ML */
-    gtk_entry_completion_set_minimum_key_length(GtkObj_val(self), Int_val(length));
-    return Val_unit;
-}
-
-/* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_entry_completion_get_minimum_key_length(value self) { /* ML */
-    return Val_int(gtk_entry_completion_get_minimum_key_length(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> unit */
-EXTERNML value mgtk_gtk_entry_completion_complete(value self) { /* ML */
-    gtk_entry_completion_complete(GtkObj_val(self));
-    return Val_unit;
-}
-
-/* ML type: cptr -> int -> string -> unit */
-EXTERNML value mgtk_gtk_entry_completion_insert_action_text(value self, value index, value text) { /* ML */
-    gtk_entry_completion_insert_action_text(GtkObj_val(self), Int_val(index), String_val(text));
-    return Val_unit;
-}
-
-/* ML type: cptr -> int -> string -> unit */
-EXTERNML value mgtk_gtk_entry_completion_insert_action_markup(value self, value index, value markup) { /* ML */
-    gtk_entry_completion_insert_action_markup(GtkObj_val(self), Int_val(index), String_val(markup));
-    return Val_unit;
-}
-
-/* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_entry_completion_delete_action(value self, value index) { /* ML */
-    gtk_entry_completion_delete_action(GtkObj_val(self), Int_val(index));
-    return Val_unit;
-}
-
-/* ML type: cptr -> int -> unit */
-EXTERNML value mgtk_gtk_entry_completion_set_text_column(value self, value column) { /* ML */
-    gtk_entry_completion_set_text_column(GtkObj_val(self), Int_val(column));
-    return Val_unit;
-}
-
-
-
 /* *** Entry *** */
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_entry_get_type(value dummy) { /* ML */
@@ -6811,17 +5990,6 @@ EXTERNML value mgtk_gtk_entry_get_alignment(value self) { /* ML */
     return copy_double(gtk_entry_get_alignment(GtkObj_val(self)));
 }
 
-/* ML type: cptr -> cptr -> unit */
-EXTERNML value mgtk_gtk_entry_set_completion(value self, value completion) { /* ML */
-    gtk_entry_set_completion(GtkObj_val(self), GtkObj_val(completion));
-    return Val_unit;
-}
-
-/* ML type: cptr -> cptr */
-EXTERNML value mgtk_gtk_entry_get_completion(value self) { /* ML */
-    return Val_GtkObj(gtk_entry_get_completion(GtkObj_val(self)));
-}
-
 /* ML type: cptr -> int -> unit */
 EXTERNML value mgtk_gtk_entry_set_position(value self, value position) { /* ML */
     gtk_entry_set_position(GtkObj_val(self), Int_val(position));
@@ -6843,6 +6011,71 @@ EXTERNML value mgtk_gtk_entry_set_editable(value self, value editable) { /* ML *
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_entry_completion_get_type(value dummy) { /* ML */
     return Val_int(gtk_entry_completion_get_type());
+}
+
+
+
+/* *** EntryCompletion *** */
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_entry_completion_new(value dummy) { /* ML */
+    return Val_GtkObj(gtk_entry_completion_new());
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_entry_completion_get_entry(value self) { /* ML */
+    return Val_GtkObj(gtk_entry_completion_get_entry(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_entry_completion_set_model(value self, value model) { /* ML */
+    gtk_entry_completion_set_model(GtkObj_val(self), GtkObj_val(model));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_entry_completion_get_model(value self) { /* ML */
+    return Val_GtkObj(gtk_entry_completion_get_model(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_entry_completion_set_minimum_key_length(value self, value length) { /* ML */
+    gtk_entry_completion_set_minimum_key_length(GtkObj_val(self), Int_val(length));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_entry_completion_get_minimum_key_length(value self) { /* ML */
+    return Val_int(gtk_entry_completion_get_minimum_key_length(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_entry_completion_complete(value self) { /* ML */
+    gtk_entry_completion_complete(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int -> string -> unit */
+EXTERNML value mgtk_gtk_entry_completion_insert_action_text(value self, value index, value text) { /* ML */
+    gtk_entry_completion_insert_action_text(GtkObj_val(self), Int_val(index), String_val(text));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int -> string -> unit */
+EXTERNML value mgtk_gtk_entry_completion_insert_action_markup(value self, value index, value markup) { /* ML */
+    gtk_entry_completion_insert_action_markup(GtkObj_val(self), Int_val(index), String_val(markup));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_entry_completion_delete_action(value self, value index) { /* ML */
+    gtk_entry_completion_delete_action(GtkObj_val(self), Int_val(index));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_entry_completion_set_text_column(value self, value column) { /* ML */
+    gtk_entry_completion_set_text_column(GtkObj_val(self), Int_val(column));
+    return Val_unit;
 }
 
 
@@ -6883,6 +6116,16 @@ EXTERNML value mgtk_gtk_event_box_set_above_child(value self, value above_child)
 
 
 /* *** Expander *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_expander_style(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_EXPANDER_COLLAPSED);
+    Field(res, 1) = Val_int(GTK_EXPANDER_SEMI_COLLAPSED);
+    Field(res, 2) = Val_int(GTK_EXPANDER_SEMI_EXPANDED);
+    Field(res, 3) = Val_int(GTK_EXPANDER_EXPANDED);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_expander_get_type(value dummy) { /* ML */
     return Val_int(gtk_expander_get_type());
@@ -6967,17 +6210,58 @@ EXTERNML value mgtk_gtk_expander_get_label_widget(value self) { /* ML */
 
 
 /* *** FileChooserDialog *** */
-/* ML type: string -> cptr -> int -> string -> cptr */
-EXTERNML value mgtk_gtk_file_chooser_dialog_new(value title, value parent, value action, value first_button_text) { /* ML */
-    return Val_GtkObj(gtk_file_chooser_dialog_new(String_val(title), GtkObj_val(parent), Int_val(action), String_val(first_button_text)));
-}
-
 
 
 /* *** FileChooserWidget *** */
-/* ML type: int -> cptr */
-EXTERNML value mgtk_gtk_file_chooser_widget_new(value action) { /* ML */
-    return Val_GtkObj(gtk_file_chooser_widget_new(Int_val(action)));
+
+
+/* *** FileFilter *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_file_filter_flags(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_FILE_FILTER_FILENAME);
+    Field(res, 1) = Val_int(GTK_FILE_FILTER_URI);
+    Field(res, 2) = Val_int(GTK_FILE_FILTER_DISPLAY_NAME);
+    Field(res, 3) = Val_int(GTK_FILE_FILTER_MIME_TYPE);
+    return res;
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_file_filter_get_type(value dummy) { /* ML */
+    return Val_int(gtk_file_filter_get_type());
+}
+
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_file_filter_new(value dummy) { /* ML */
+    return Val_GtkObj(gtk_file_filter_new());
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_filter_set_name(value self, value name) { /* ML */
+    gtk_file_filter_set_name(GtkObj_val(self), String_val(name));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_file_filter_get_name(value self) { /* ML */
+    return my_copy_string(gtk_file_filter_get_name(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_filter_add_mime_type(value self, value mime_type) { /* ML */
+    gtk_file_filter_add_mime_type(GtkObj_val(self), String_val(mime_type));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_file_filter_add_pattern(value self, value pattern) { /* ML */
+    gtk_file_filter_add_pattern(GtkObj_val(self), String_val(pattern));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_file_filter_get_needed(value self) { /* ML */
+    return Val_int(gtk_file_filter_get_needed(GtkObj_val(self)));
 }
 
 
@@ -7786,6 +7070,11 @@ EXTERNML value mgtk_gtk_im_context_simple_new(value dummy) { /* ML */
 
 
 /* *** MenuShell *** */
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_menu_shell_get_type(value dummy) { /* ML */
+    return Val_int(gtk_menu_shell_get_type());
+}
+
 /* ML type: cptr -> cptr -> unit */
 EXTERNML value mgtk_gtk_menu_shell_append(value self, value child) { /* ML */
     gtk_menu_shell_append(GtkObj_val(self), GtkObj_val(child));
@@ -8140,6 +7429,16 @@ EXTERNML value mgtk_gtk_list_store_move_before(value self, value iter, value pos
 
 
 /* *** Menu *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_menu_directiontype(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_MENU_DIR_PARENT);
+    Field(res, 1) = Val_int(GTK_MENU_DIR_CHILD);
+    Field(res, 2) = Val_int(GTK_MENU_DIR_NEXT);
+    Field(res, 3) = Val_int(GTK_MENU_DIR_PREV);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_menu_get_type(value dummy) { /* ML */
     return Val_int(gtk_menu_get_type());
@@ -8257,11 +7556,6 @@ EXTERNML value mgtk_gtk_menu_item_get_type(value dummy) { /* ML */
     return Val_int(gtk_menu_item_get_type());
 }
 
-/* ML type: unit -> GType.t */
-EXTERNML value mgtk_gtk_menu_shell_get_type(value dummy) { /* ML */
-    return Val_int(gtk_menu_shell_get_type());
-}
-
 
 
 /* *** MenuBar *** */
@@ -8278,11 +7572,6 @@ EXTERNML value mgtk_gtk_message_dialog_get_type(value dummy) { /* ML */
     return Val_int(gtk_message_dialog_get_type());
 }
 
-/* ML type: cptr -> int -> int -> int -> string -> cptr */
-EXTERNML value mgtk_gtk_message_dialog_new_with_markup(value parent, value flags, value type, value buttons, value message_format) { /* ML */
-    return Val_GtkObj(gtk_message_dialog_new_with_markup(GtkObj_val(parent), Int_val(flags), Int_val(type), Int_val(buttons), String_val(message_format)));
-}
-
 /* ML type: cptr -> string -> unit */
 EXTERNML value mgtk_gtk_message_dialog_set_markup(value self, value str) { /* ML */
     gtk_message_dialog_set_markup(GtkObj_val(self), String_val(str));
@@ -8292,6 +7581,14 @@ EXTERNML value mgtk_gtk_message_dialog_set_markup(value self, value str) { /* ML
 
 
 /* *** Notebook *** */
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_notebook_tab(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_NOTEBOOK_TAB_FIRST);
+    Field(res, 1) = Val_int(GTK_NOTEBOOK_TAB_LAST);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_notebook_get_type(value dummy) { /* ML */
     return Val_int(gtk_notebook_get_type());
@@ -8591,6 +7888,24 @@ EXTERNML value mgtk_gtk_progress_get_type(value dummy) { /* ML */
 
 
 /* *** ProgressBar *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_progressbar_orientation(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_PROGRESS_LEFT_TO_RIGHT);
+    Field(res, 1) = Val_int(GTK_PROGRESS_RIGHT_TO_LEFT);
+    Field(res, 2) = Val_int(GTK_PROGRESS_BOTTOM_TO_TOP);
+    Field(res, 3) = Val_int(GTK_PROGRESS_TOP_TO_BOTTOM);
+    return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_progressbar_style(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_PROGRESS_CONTINUOUS);
+    Field(res, 1) = Val_int(GTK_PROGRESS_DISCRETE);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_progress_bar_get_type(value dummy) { /* ML */
     return Val_int(gtk_progress_bar_get_type());
@@ -8839,11 +8154,6 @@ EXTERNML value mgtk_gtk_tool_item_get_icon_size(value self) { /* ML */
 /* ML type: cptr -> int */
 EXTERNML value mgtk_gtk_tool_item_get_orientation(value self) { /* ML */
     return Val_int(gtk_tool_item_get_orientation(GtkObj_val(self)));
-}
-
-/* ML type: cptr -> int */
-EXTERNML value mgtk_gtk_tool_item_get_toolbar_style(value self) { /* ML */
-    return Val_int(gtk_tool_item_get_toolbar_style(GtkObj_val(self)));
 }
 
 /* ML type: cptr -> int */
@@ -9098,6 +8408,16 @@ EXTERNML value mgtk_gtk_separator_tool_item_set_draw(value self, value draw) { /
 
 
 /* *** SizeGroup *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_size_group_mode(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_SIZE_GROUP_NONE);
+    Field(res, 1) = Val_int(GTK_SIZE_GROUP_HORIZONTAL);
+    Field(res, 2) = Val_int(GTK_SIZE_GROUP_VERTICAL);
+    Field(res, 3) = Val_int(GTK_SIZE_GROUP_BOTH);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_size_group_get_type(value dummy) { /* ML */
     return Val_int(gtk_size_group_get_type());
@@ -9147,6 +8467,14 @@ EXTERNML value mgtk_gtk_socket_new(value dummy) { /* ML */
 
 
 /* *** SpinButton *** */
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_spin_button_update_policy(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_UPDATE_ALWAYS);
+    Field(res, 1) = Val_int(GTK_UPDATE_IF_VALID);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_spin_button_get_type(value dummy) { /* ML */
     return Val_int(gtk_spin_button_get_type());
@@ -9405,6 +8733,422 @@ EXTERNML value mgtk_gtk_tearoff_menu_item_get_type(value dummy) { /* ML */
 /* ML type: unit -> cptr */
 EXTERNML value mgtk_gtk_tearoff_menu_item_new(value dummy) { /* ML */
     return Val_GtkObj(gtk_tearoff_menu_item_new());
+}
+
+
+
+/* *** TextMark *** */
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_text_mark_get_type(value dummy) { /* ML */
+    return Val_int(gtk_text_mark_get_type());
+}
+
+/* ML type: cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_text_mark_set_visible(value self, value setting) { /* ML */
+    gtk_text_mark_set_visible(GtkObj_val(self), Bool_val(setting));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_text_mark_get_visible(value self) { /* ML */
+    return Val_bool(gtk_text_mark_get_visible(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string */
+EXTERNML value mgtk_gtk_text_mark_get_name(value self) { /* ML */
+    return my_copy_string(gtk_text_mark_get_name(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_text_mark_get_deleted(value self) { /* ML */
+    return Val_bool(gtk_text_mark_get_deleted(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_text_mark_get_buffer(value self) { /* ML */
+    return Val_GtkObj(gtk_text_mark_get_buffer(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_text_mark_get_left_gravity(value self) { /* ML */
+    return Val_bool(gtk_text_mark_get_left_gravity(GtkObj_val(self)));
+}
+
+
+
+/* *** TextTagTable *** */
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_text_tag_table_get_type(value dummy) { /* ML */
+    return Val_int(gtk_text_tag_table_get_type());
+}
+
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_text_tag_table_new(value dummy) { /* ML */
+    return Val_GtkObj(gtk_text_tag_table_new());
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_tag_table_add(value self, value tag) { /* ML */
+    gtk_text_tag_table_add(GtkObj_val(self), GtkObj_val(tag));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_tag_table_remove(value self, value tag) { /* ML */
+    gtk_text_tag_table_remove(GtkObj_val(self), GtkObj_val(tag));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> cptr */
+EXTERNML value mgtk_gtk_text_tag_table_lookup(value self, value name) { /* ML */
+    return Val_GtkObj(gtk_text_tag_table_lookup(GtkObj_val(self), String_val(name)));
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_text_tag_table_get_size(value self) { /* ML */
+    return Val_int(gtk_text_tag_table_get_size(GtkObj_val(self)));
+}
+
+
+
+/* *** TextBuffer *** */
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_text_buffer_get_type(value dummy) { /* ML */
+    return Val_int(gtk_text_buffer_get_type());
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_new(value table) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_new(GtkObj_val(table)));
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_text_buffer_get_line_count(value self) { /* ML */
+    return Val_int(gtk_text_buffer_get_line_count(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> int */
+EXTERNML value mgtk_gtk_text_buffer_get_char_count(value self) { /* ML */
+    return Val_int(gtk_text_buffer_get_char_count(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_get_tag_table(value self) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_get_tag_table(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> string -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_set_text(value self, value text, value len) { /* ML */
+    gtk_text_buffer_set_text(GtkObj_val(self), String_val(text), Int_val(len));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> string -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_insert(value self, value iter, value text, value len) { /* ML */
+    gtk_text_buffer_insert(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_insert_at_cursor(value self, value text, value len) { /* ML */
+    gtk_text_buffer_insert_at_cursor(GtkObj_val(self), String_val(text), Int_val(len));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> string -> int -> bool -> bool */
+EXTERNML value mgtk_gtk_text_buffer_insert_interactive(value self, value iter, value text, value len, value default_editable) { /* ML */
+    return Val_bool(gtk_text_buffer_insert_interactive(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len), Bool_val(default_editable)));
+}
+
+/* ML type: cptr -> string -> int -> bool -> bool */
+EXTERNML value mgtk_gtk_text_buffer_insert_interactive_at_cursor(value self, value text, value len, value default_editable) { /* ML */
+    return Val_bool(gtk_text_buffer_insert_interactive_at_cursor(GtkObj_val(self), String_val(text), Int_val(len), Bool_val(default_editable)));
+}
+
+/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_insert_range(value self, value iter, value start, value end) { /* ML */
+    gtk_text_buffer_insert_range(GtkObj_val(self), GtkTextIter_val(iter), GtkTextIter_val(start), GtkTextIter_val(end));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> cptr -> bool -> bool */
+EXTERNML value mgtk_gtk_text_buffer_insert_range_interactive(value self, value iter, value start, value end, value default_editable) { /* ML */
+    return Val_bool(gtk_text_buffer_insert_range_interactive(GtkObj_val(self), GtkTextIter_val(iter), GtkTextIter_val(start), GtkTextIter_val(end), Bool_val(default_editable)));
+}
+
+/* ML type: cptr -> cptr -> string -> int -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_insert_with_tags(value self, value iter, value text, value len, value first_tag) { /* ML */
+    gtk_text_buffer_insert_with_tags(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len), GtkObj_val(first_tag));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> string -> int -> string -> unit */
+EXTERNML value mgtk_gtk_text_buffer_insert_with_tags_by_name(value self, value iter, value text, value len, value first_tag_name) { /* ML */
+    gtk_text_buffer_insert_with_tags_by_name(GtkObj_val(self), GtkTextIter_val(iter), String_val(text), Int_val(len), String_val(first_tag_name));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_delete(value self, value start, value end) { /* ML */
+    gtk_text_buffer_delete(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> bool -> bool */
+EXTERNML value mgtk_gtk_text_buffer_delete_interactive(value self, value start_iter, value end_iter, value default_editable) { /* ML */
+    return Val_bool(gtk_text_buffer_delete_interactive(GtkObj_val(self), GtkTextIter_val(start_iter), GtkTextIter_val(end_iter), Bool_val(default_editable)));
+}
+
+/* ML type: cptr -> cptr -> cptr -> bool -> string */
+EXTERNML value mgtk_gtk_text_buffer_get_text(value self, value start, value end, value include_hidden_chars) { /* ML */
+    return my_copy_string(gtk_text_buffer_get_text(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end), Bool_val(include_hidden_chars)));
+}
+
+/* ML type: cptr -> cptr -> cptr -> bool -> string */
+EXTERNML value mgtk_gtk_text_buffer_get_slice(value self, value start, value end, value include_hidden_chars) { /* ML */
+    return my_copy_string(gtk_text_buffer_get_slice(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end), Bool_val(include_hidden_chars)));
+}
+
+/* ML type: cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_insert_child_anchor(value self, value iter, value anchor) { /* ML */
+    gtk_text_buffer_insert_child_anchor(GtkObj_val(self), GtkTextIter_val(iter), GtkObj_val(anchor));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_create_child_anchor(value self, value iter) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_create_child_anchor(GtkObj_val(self), GtkTextIter_val(iter)));
+}
+
+/* ML type: cptr -> string -> cptr -> bool -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_create_mark(value self, value mark_name, value where, value left_gravity) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_create_mark(GtkObj_val(self), String_val(mark_name), GtkTextIter_val(where), Bool_val(left_gravity)));
+}
+
+/* ML type: cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_move_mark(value self, value mark, value where) { /* ML */
+    gtk_text_buffer_move_mark(GtkObj_val(self), GtkObj_val(mark), GtkTextIter_val(where));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_delete_mark(value self, value mark) { /* ML */
+    gtk_text_buffer_delete_mark(GtkObj_val(self), GtkObj_val(mark));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_get_mark(value self, value name) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_get_mark(GtkObj_val(self), String_val(name)));
+}
+
+/* ML type: cptr -> string -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_move_mark_by_name(value self, value name, value where) { /* ML */
+    gtk_text_buffer_move_mark_by_name(GtkObj_val(self), String_val(name), GtkTextIter_val(where));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> unit */
+EXTERNML value mgtk_gtk_text_buffer_delete_mark_by_name(value self, value name) { /* ML */
+    gtk_text_buffer_delete_mark_by_name(GtkObj_val(self), String_val(name));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_get_insert(value self) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_get_insert(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_get_selection_bound(value self) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_get_selection_bound(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_place_cursor(value self, value where) { /* ML */
+    gtk_text_buffer_place_cursor(GtkObj_val(self), GtkTextIter_val(where));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_select_range(value self, value ins, value bound) { /* ML */
+    gtk_text_buffer_select_range(GtkObj_val(self), GtkTextIter_val(ins), GtkTextIter_val(bound));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_apply_tag(value self, value tag, value start, value end) { /* ML */
+    gtk_text_buffer_apply_tag(GtkObj_val(self), GtkObj_val(tag), GtkTextIter_val(start), GtkTextIter_val(end));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_remove_tag(value self, value tag, value start, value end) { /* ML */
+    gtk_text_buffer_remove_tag(GtkObj_val(self), GtkObj_val(tag), GtkTextIter_val(start), GtkTextIter_val(end));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_apply_tag_by_name(value self, value name, value start, value end) { /* ML */
+    gtk_text_buffer_apply_tag_by_name(GtkObj_val(self), String_val(name), GtkTextIter_val(start), GtkTextIter_val(end));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_remove_tag_by_name(value self, value name, value start, value end) { /* ML */
+    gtk_text_buffer_remove_tag_by_name(GtkObj_val(self), String_val(name), GtkTextIter_val(start), GtkTextIter_val(end));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_remove_all_tags(value self, value start, value end) { /* ML */
+    gtk_text_buffer_remove_all_tags(GtkObj_val(self), GtkTextIter_val(start), GtkTextIter_val(end));
+    return Val_unit;
+}
+
+/* ML type: cptr -> string -> string -> cptr */
+EXTERNML value mgtk_gtk_text_buffer_create_tag(value self, value tag_name, value first_property_name) { /* ML */
+    return Val_GtkObj(gtk_text_buffer_create_tag(GtkObj_val(self), String_val(tag_name), String_val(first_property_name)));
+}
+
+/* ML type: cptr -> int -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line_offset(value self, value line_number, value char_offset) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_iter_at_line_offset(GtkObj_val(self), &iter, Int_val(line_number), Int_val(char_offset));
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> int -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line_index(value self, value line_number, value byte_index) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_iter_at_line_index(GtkObj_val(self), &iter, Int_val(line_number), Int_val(byte_index));
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_iter_at_offset(value self, value char_offset) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_iter_at_offset(GtkObj_val(self), &iter, Int_val(char_offset));
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line(value self, value line_number) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_iter_at_line(GtkObj_val(self), &iter, Int_val(line_number));
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_start_iter(value self) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_start_iter(GtkObj_val(self), &iter);
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_end_iter(value self) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_end_iter(GtkObj_val(self), &iter);
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_bounds(value self) { /* ML */
+    value result;
+    GtkTextIter start;
+    GtkTextIter end;
+    gtk_text_buffer_get_bounds(GtkObj_val(self), &start, &end);
+    result = alloc_tuple(2);
+    Field(result, 0) = Val_GtkTextIter(&start);
+    Field(result, 1) = Val_GtkTextIter(&end);
+    return result;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_iter_at_mark(value self, value mark) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_iter_at_mark(GtkObj_val(self), &iter, GtkObj_val(mark));
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_iter_at_child_anchor(value self, value anchor) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_iter_at_child_anchor(GtkObj_val(self), &iter, GtkObj_val(anchor));
+    return Val_GtkTextIter(&iter);
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_text_buffer_get_modified(value self) { /* ML */
+    return Val_bool(gtk_text_buffer_get_modified(GtkObj_val(self)));
+}
+
+/* ML type: cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_text_buffer_set_modified(value self, value setting) { /* ML */
+    gtk_text_buffer_set_modified(GtkObj_val(self), Bool_val(setting));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_add_selection_clipboard(value self, value clipboard) { /* ML */
+    gtk_text_buffer_add_selection_clipboard(GtkObj_val(self), GtkObj_val(clipboard));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_remove_selection_clipboard(value self, value clipboard) { /* ML */
+    gtk_text_buffer_remove_selection_clipboard(GtkObj_val(self), GtkObj_val(clipboard));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_text_buffer_cut_clipboard(value self, value clipboard, value default_editable) { /* ML */
+    gtk_text_buffer_cut_clipboard(GtkObj_val(self), GtkObj_val(clipboard), Bool_val(default_editable));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_copy_clipboard(value self, value clipboard) { /* ML */
+    gtk_text_buffer_copy_clipboard(GtkObj_val(self), GtkObj_val(clipboard));
+    return Val_unit;
+}
+
+/* ML type: cptr -> cptr -> cptr -> bool -> unit */
+EXTERNML value mgtk_gtk_text_buffer_paste_clipboard(value self, value clipboard, value override_location, value default_editable) { /* ML */
+    gtk_text_buffer_paste_clipboard(GtkObj_val(self), GtkObj_val(clipboard), GtkTextIter_val(override_location), Bool_val(default_editable));
+    return Val_unit;
+}
+
+/* ML type: cptr -> bool */
+EXTERNML value mgtk_gtk_text_buffer_get_selection_bounds(value self) { /* ML */
+    value result;
+    value res;
+    GtkTextIter start;
+    GtkTextIter end;
+    res = Val_bool(gtk_text_buffer_get_selection_bounds(GtkObj_val(self), &start, &end));
+    result = alloc_tuple(3);
+    Field(result, 0) = res;
+    Field(result, 1) = Val_GtkTextIter(&start);
+    Field(result, 2) = Val_GtkTextIter(&end);
+    return result;
+}
+
+/* ML type: cptr -> bool -> bool -> bool */
+EXTERNML value mgtk_gtk_text_buffer_delete_selection(value self, value interactive, value default_editable) { /* ML */
+    return Val_bool(gtk_text_buffer_delete_selection(GtkObj_val(self), Bool_val(interactive), Bool_val(default_editable)));
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_begin_user_action(value self) { /* ML */
+    gtk_text_buffer_begin_user_action(GtkObj_val(self));
+    return Val_unit;
+}
+
+/* ML type: cptr -> unit */
+EXTERNML value mgtk_gtk_text_buffer_end_user_action(value self) { /* ML */
+    gtk_text_buffer_end_user_action(GtkObj_val(self));
+    return Val_unit;
 }
 
 
@@ -9681,6 +9425,35 @@ EXTERNML value mgtk_gtk_text_view_get_default_attributes(value self) { /* ML */
 
 
 /* *** Toolbar *** */
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_toolbar_childtype(value dummy) { /* ML */
+    value res = alloc_tuple(5);
+    Field(res, 0) = Val_int(GTK_TOOLBAR_CHILD_SPACE);
+    Field(res, 1) = Val_int(GTK_TOOLBAR_CHILD_BUTTON);
+    Field(res, 2) = Val_int(GTK_TOOLBAR_CHILD_TOGGLEBUTTON);
+    Field(res, 3) = Val_int(GTK_TOOLBAR_CHILD_RADIOBUTTON);
+    Field(res, 4) = Val_int(GTK_TOOLBAR_CHILD_WIDGET);
+    return res;
+}
+
+/* ML type: unit -> int * int */
+EXTERNML value mgtk_get_gtk_toolbar_space_style(value dummy) { /* ML */
+    value res = alloc_tuple(2);
+    Field(res, 0) = Val_int(GTK_TOOLBAR_SPACE_EMPTY);
+    Field(res, 1) = Val_int(GTK_TOOLBAR_SPACE_LINE);
+    return res;
+}
+
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_toolbar_style(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_TOOLBAR_ICONS);
+    Field(res, 1) = Val_int(GTK_TOOLBAR_TEXT);
+    Field(res, 2) = Val_int(GTK_TOOLBAR_BOTH);
+    Field(res, 3) = Val_int(GTK_TOOLBAR_BOTH_HORIZ);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_toolbar_get_type(value dummy) { /* ML */
     return Val_int(gtk_toolbar_get_type());
@@ -9888,6 +9661,15 @@ EXTERNML value mgtk_gtk_tree_model_sortiter_is_valid(value self, value iter) { /
 
 
 /* *** TreeViewColumn *** */
+/* ML type: unit -> int * int * int */
+EXTERNML value mgtk_get_gtk_treeviewcolumn_sizing(value dummy) { /* ML */
+    value res = alloc_tuple(3);
+    Field(res, 0) = Val_int(GTK_TREE_VIEW_COLUMN_GROW_ONLY);
+    Field(res, 1) = Val_int(GTK_TREE_VIEW_COLUMN_AUTOSIZE);
+    Field(res, 2) = Val_int(GTK_TREE_VIEW_COLUMN_FIXED);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_tree_view_column_get_type(value dummy) { /* ML */
     return Val_int(gtk_tree_view_column_get_type());
@@ -10158,6 +9940,16 @@ EXTERNML value mgtk_gtk_tree_view_column_cell_get_position(value self, value cel
 
 
 /* *** TreeView *** */
+/* ML type: unit -> int * int * int * int */
+EXTERNML value mgtk_get_gtk_treeview_drop_position(value dummy) { /* ML */
+    value res = alloc_tuple(4);
+    Field(res, 0) = Val_int(GTK_TREE_VIEW_DROP_BEFORE);
+    Field(res, 1) = Val_int(GTK_TREE_VIEW_DROP_AFTER);
+    Field(res, 2) = Val_int(GTK_TREE_VIEW_DROP_INTO_OR_BEFORE);
+    Field(res, 3) = Val_int(GTK_TREE_VIEW_DROP_INTO_OR_AFTER);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_tree_view_get_type(value dummy) { /* ML */
     return Val_int(gtk_tree_view_get_type());
@@ -10627,6 +10419,22 @@ EXTERNML value mgtk_gtk_tree_store_move_before(value self, value iter, value pos
 
 
 /* *** UIManager *** */
+/* ML type: unit -> int * int * int * int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_ui_manager_itemtype(value dummy) { /* ML */
+    value res = alloc_tuple(10);
+    Field(res, 0) = Val_int(GTK_UI_MANAGER_AUTO);
+    Field(res, 1) = Val_int(GTK_UI_MANAGER_MENUBAR);
+    Field(res, 2) = Val_int(GTK_UI_MANAGER_MENU);
+    Field(res, 3) = Val_int(GTK_UI_MANAGER_TOOLBAR);
+    Field(res, 4) = Val_int(GTK_UI_MANAGER_PLACEHOLDER);
+    Field(res, 5) = Val_int(GTK_UI_MANAGER_POPUP);
+    Field(res, 6) = Val_int(GTK_UI_MANAGER_MENUITEM);
+    Field(res, 7) = Val_int(GTK_UI_MANAGER_TOOLITEM);
+    Field(res, 8) = Val_int(GTK_UI_MANAGER_SEPARATOR);
+    Field(res, 9) = Val_int(GTK_UI_MANAGER_ACCELERATOR);
+    return res;
+}
+
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_ui_manager_get_type(value dummy) { /* ML */
     return Val_int(gtk_ui_manager_get_type());
@@ -10974,5 +10782,60 @@ EXTERNML value mgtk_gtk_file_folder_get_type(value dummy) { /* ML */
 /* ML type: unit -> GType.t */
 EXTERNML value mgtk_gtk_file_system_get_type(value dummy) { /* ML */
     return Val_int(gtk_file_system_get_type());
+}
+
+
+
+/* *** AccelMap *** */
+/* ML type: string -> unit */
+EXTERNML value mgtk_gtk_accel_map_load(value file_name) { /* ML */
+    gtk_accel_map_load(String_val(file_name));
+    return Val_unit;
+}
+
+/* ML type: string -> unit */
+EXTERNML value mgtk_gtk_accel_map_save(value file_name) { /* ML */
+    gtk_accel_map_save(String_val(file_name));
+    return Val_unit;
+}
+
+/* ML type: int -> unit */
+EXTERNML value mgtk_gtk_accel_map_load_fd(value fd) { /* ML */
+    gtk_accel_map_load_fd(Int_val(fd));
+    return Val_unit;
+}
+
+/* ML type: int -> unit */
+EXTERNML value mgtk_gtk_accel_map_save_fd(value fd) { /* ML */
+    gtk_accel_map_save_fd(Int_val(fd));
+    return Val_unit;
+}
+
+/* ML type: string -> unit */
+EXTERNML value mgtk_gtk_accel_map_lock_path(value accel_path) { /* ML */
+    gtk_accel_map_lock_path(String_val(accel_path));
+    return Val_unit;
+}
+
+/* ML type: string -> unit */
+EXTERNML value mgtk_gtk_accel_map_unlock_path(value accel_path) { /* ML */
+    gtk_accel_map_unlock_path(String_val(accel_path));
+    return Val_unit;
+}
+
+/* ML type: string -> unit */
+EXTERNML value mgtk_gtk_accel_map_add_filter(value filter_pattern) { /* ML */
+    gtk_accel_map_add_filter(String_val(filter_pattern));
+    return Val_unit;
+}
+
+/* ML type: unit -> GType.t */
+EXTERNML value mgtk_gtk_accel_map_get_type(value dummy) { /* ML */
+    return Val_int(gtk_accel_map_get_type());
+}
+
+/* ML type: unit -> cptr */
+EXTERNML value mgtk_gtk_accel_map_get(value dummy) { /* ML */
+    return Val_GtkObj(gtk_accel_map_get());
 }
 

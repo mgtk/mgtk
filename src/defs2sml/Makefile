@@ -31,6 +31,7 @@ REGOPTSMLTON=--mlton $(REGOPTS)
 REGCOMPOPTS=$(REGOPTS)
 REGCOMPOPTSMOS=$(REGCOMPOPTS) -sp lib/preamble.sml -cp lib/preamble.c
 REGCOMPOPTSMLTON=--mlton $(REGCOMPOPTS) -sp lib/preamble-mlton.sml -cp lib/preamble-mlton.c
+REGRESULTS=regression.log
 
 reggen-%: $(MAIN)
 	@echo -n "[REG]          $*.defs "; \
@@ -42,7 +43,7 @@ reggenmlton-%: $(MAIN)
 	@./$(MAIN) $(REGOPTSMLTON) -o $(REGOUT)/$*-mlton.out $(REGIN)/$*.defs
 
 regdiff-%: reggen-%
-	@if diff -Naur $(DIFFOPTIONS) $(REGTRS)/$*.out $(REGOUT)/$*.out ; then \
+	@if diff -Naur $(DIFFOPTIONS) $(REGTRS)/$*.out $(REGOUT)/$*.out | tee -a $(REGRESULTS) ; then \
            echo ok ;\
         fi
 
@@ -57,7 +58,10 @@ reg-%: regdiff-% regdiffmlton-%
 regmosml: $(MAIN) $(patsubst %.defs,regdiff-%,$(REGFILES))
 regmlton: $(MAIN) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
 
-regression: $(MAIN) $(patsubst %.defs,regdiff-%,$(REGFILES)) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
+regclean:
+	rm -f $(REGRESULTS)
+
+regression: $(MAIN) regclean $(patsubst %.defs,regdiff-%,$(REGFILES)) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
 
 regcompgen-%: $(MAIN)
 	@echo "[GEN]          $*.defs"; \

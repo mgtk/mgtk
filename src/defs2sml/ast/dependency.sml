@@ -51,6 +51,8 @@ structure DependencyReorder :> DEPENDENCY_REORDER = struct
                    ]
 	in  loop(module, initial) end
 
+    fun showdeps deps = Util.stringSep "{" "}\n" "," (fn s=>s) deps
+
     fun reorder module =
 	let 
 	    val module = A.map (fn i => (ref false,i), fn i => i) module

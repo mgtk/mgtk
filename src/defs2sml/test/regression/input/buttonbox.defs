@@ -1,0 +1,64 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+  (fields
+    '("guint8" "state")
+    '("guint8" "saved_state")
+    '("gchar*" "name")
+    '("GtkStyle*" "style")
+    '("GdkRectangle" "allocation")
+    '("GdkWindow*" "window")
+    '("GtkWidget*" "parent")
+  )
+)
+
+(define-object Container
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkContainer")
+  (gtype-id "GTK_TYPE_CONTAINER")
+  (fields
+    '("GtkWidget*" "focus_child")
+    '("guint" "border_width")
+    '("guint" "need_resize")
+    '("guint" "resize_mode")
+    '("guint" "reallocate_redraws")
+    '("guint" "has_focus_chain")    
+  )
+)
+
+(define-object Box
+  (in-module "Gtk")
+  (parent "GtkContainer")
+  (c-name "GtkBox")
+  (gtype-id "GTK_TYPE_BOX")
+)
+
+(define-enum ButtonBoxStyle
+  (in-module "Gtk")
+  (c-name "GtkButtonBoxStyle")
+  (gtype-id "GTK_TYPE_BUTTON_BOX_STYLE")
+  (values
+    '("default-style" "GTK_BUTTONBOX_DEFAULT_STYLE")
+    '("spread" "GTK_BUTTONBOX_SPREAD")
+    '("edge" "GTK_BUTTONBOX_EDGE")
+    '("start" "GTK_BUTTONBOX_START")
+    '("end" "GTK_BUTTONBOX_END")
+  )
+)
+
+(define-object ButtonBox
+  (in-module "Gtk")
+  (parent "GtkBox")
+  (c-name "GtkButtonBox")
+  (gtype-id "GTK_TYPE_BUTTON_BOX")
+)

@@ -3,11 +3,13 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     structure TextIter :>
       sig
-	type t
+	type t = GObject.cptr
+	type base
 	val alloc_GtkTextIter : unit -> t
       end = struct
 	type cptr = GObject.cptr
 	type t = GObject.cptr
+	type base = unit
 	val alloc_GtkTextIter = _import "alloc_GtkTextIter" : unit -> t;
     end
     structure TextBuffer :>

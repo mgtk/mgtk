@@ -38,9 +38,35 @@ structure FromDefs :> FromDefs = struct
 
     val demotedModuleName = "GtkDemoted"
 
-    fun trans top metadata (def, map) =
+    fun transPhase1 top metadata (def, map) = 
 	let val name = getName def handle AttribNotFound _ => #1 def
-	    fun probableModule nothing split name = 
+	in  case getTag def of
+		Object => 
+		   let val md = getModule def
+		       val parent = SOME(getParent def)
+			            handle AttribNotFound _ => NONE
+		       val implements = getImplements def
+		       val info = (name,parent,implements)
+		       val mem = Member{name=name,info=A.Object info}
+		   in  insert (new map name (SOME md) (* parent *) NONE)
+		              name mem
+
+		   end
+	      | Boxed => 
+		   let val md = getModule def
+		       val copyrel =
+			   SOME({copy=getCopyFunc def,release=getReleaseFunc def})
+			   handle AttribNotFound _ => NONE
+		       val mem = Member{name=name,info=A.Boxed copyrel}
+		   in  insert (new map name (SOME md) (* parent *) NONE)
+			      name mem
+		   end
+	      | _ => map
+	end
+
+    fun transPhase2 top metadata (def, map) =
+	let val name = getName def handle AttribNotFound _ => #1 def
+	    fun probableModule demote nothing split name = 
 		(* look for modules "matching" name:
 		   - functions beginning with xxx_yyy_zzz_... when
                      XxxYyyZzz is a known module matches that module
@@ -57,7 +83,7 @@ structure FromDefs :> FromDefs = struct
 			    else probable
 			end
 		    val module = loop (tl words) [Name.capitalize(hd words)]
-		in  if module = nothing then
+		in  if module = nothing andalso demote then
 			( MsgUtil.warning("Demoting "^name^" to top-level module " ^nothing)
 			  ; demotedModuleName)
 		    else module
@@ -65,25 +91,14 @@ structure FromDefs :> FromDefs = struct
 	    fun getMeta md = Map.peek(metadata, md^"."^name)
 
 	in  case getTag def of
-		Object => 
-		   let val md = getModule def
-		       val parent = SOME(getParent def)
-			            handle AttribNotFound _ => NONE
-		       val implements = getImplements def
-		       val info = (name,parent,implements)
-		       val mem = Member{name=name,info=A.Object info}
-		   in  insert (new map name (SOME md) (* parent *) NONE)
-		              name mem
-
-		   end
-	      | Function =>
+		Function =>
 		   (
 		   let val md = 
 		       (getConstructor def)
 		       handle AttribNotFound _ => 
 			  (* okay, so this isn't a constructor; look for
                              a probable module *)
-			  let val md = probableModule top Name.separateUnderscores name
+			  let val md = probableModule true top Name.separateUnderscores name
 			  in  if md = top then (getObject def handle AttribNotFound _ => top)
 			      else md
 			  end
@@ -118,7 +133,7 @@ structure FromDefs :> FromDefs = struct
 			      ; raise AttribNotFound msg)
                    )
 	      | Enum flag =>
-		   let val md = probableModule (getModule def) Name.separateWords name
+		   let val md = probableModule false (getModule def) Name.separateWords name
 		       val mem = Member{name=name,info=A.Enum(flag,getValues def handle AttribNotFound _ => [])}
 		   in  insert map md mem end
 	      | Signal =>
@@ -126,15 +141,7 @@ structure FromDefs :> FromDefs = struct
 		       val mem = Member{name=name,
 					info=A.Signal(functype (getMeta md) NONE NONE def)}
 		   in  insert map md mem end
-	      | Boxed => 
-		   let val md = getModule def
-		       val copyrel =
-			   SOME({copy=getCopyFunc def,release=getReleaseFunc def})
-			   handle AttribNotFound _ => NONE
-		       val mem = Member{name=name,info=A.Boxed copyrel}
-		   in  insert (new map name (SOME md) (* parent *) NONE)
-			      name mem
-		   end
+	      | _ => map
 	end
     and functype metadata self rettype def =
 	let fun addself ps = case self of NONE => ps
@@ -154,25 +161,7 @@ structure FromDefs :> FromDefs = struct
 		in  map one params end
 	    fun applyFlags fs ty =
 		let 
-(*
-		    fun loop [] (null,default,out) = 
-			(case default of SOME d => (SOME d,out)
-				       | NONE => (null,out))
-		      | loop (f::fs) (null,default,out) =
-			(case f of NullOk => loop fs (SOME "NULL",default,out)
-				 | Default v => loop fs (null, SOME v, out)
-				 | Output p => loop fs (null,default,SOME p)
-				 | Array => loop fs (null,default,out)
-			)
-*)
 		    fun mkPass (OUT) = A.OUT | mkPass (INOUT) = A.INOUT
-(*
-		    val (def,out) = loop fs (NONE,NONE,NONE)
-		    val ty = case def of SOME d => A.Defaulted(ty,d) 
-				       | NONE => ty
-		    val ty = case out of SOME p => A.Output(mkPass p,ty)
-				       | NONE => ty
-*)
 		    fun removedef ty =
 			case ty of
 			    A.ApiTy _ => ty
@@ -212,7 +201,10 @@ structure FromDefs :> FromDefs = struct
 	let val md = interpretMetadata metadefs
 	    val map = new empty top NONE NONE
 	    val map = new map demotedModuleName (SOME top) NONE
-	    val map = List.foldl (trans top md) map defs
+		      (* first look for all module definers *)
+	    val map = List.foldl (transPhase1 top md) map defs
+		      (* then populate the modules *)
+	    val map = List.foldl (transPhase2 top md) map defs
 	    fun convert (Module{name,members=mbs,info}) =
 		A.Module{name=name,info=info,
 			 members=List.map convert' (rev(!mbs))}

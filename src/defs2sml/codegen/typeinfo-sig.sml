@@ -23,6 +23,7 @@ signature TypeInfo = sig
     val isDefault : typeinfo -> 'a ty -> bool
     val isOutput  : (Type.pass -> bool) -> typeinfo -> 'a ty -> bool
     val isString  : typeinfo -> 'a ty -> bool
+    val isBool    : typeinfo -> 'a ty -> bool
 
     val toCType : typeinfo -> 'a ty -> TinyC.ctype
     val tocvalue: typeinfo -> 'a ty -> string

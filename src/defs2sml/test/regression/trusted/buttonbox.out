@@ -1,0 +1,143 @@
+structure Gtk  = struct
+    
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+    structure Object :>
+      sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj = inherit () (fn () => repr obj)
+    end
+    structure Widget :>
+      sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = Object.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj = inherit () (fn () => repr obj)
+    end
+    structure Container :>
+      sig
+	type base
+	type 'a container_t
+	type 'a t = 'a container_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toContainer : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a container_t = unit
+	type 'a t = 'a container_t Widget.t
+	fun inherit w con = Widget.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toContainer obj = inherit () (fn () => repr obj)
+    end
+    structure Box :>
+      sig
+	type base
+	type 'a box_t
+	type 'a t = 'a box_t Container.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toBox : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a box_t = unit
+	type 'a t = 'a box_t Container.t
+	fun inherit w con = Container.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toBox obj = inherit () (fn () => repr obj)
+    end
+    structure ButtonBox :>
+      sig
+	type base
+	type 'a buttonbox_t
+	type 'a t = 'a buttonbox_t Box.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toButtonBox : 'a t -> base t
+	type style
+	val BUTTONBOX_DEFAULT_STYLE : style
+	val BUTTONBOX_SPREAD : style
+	val BUTTONBOX_EDGE : style
+	val BUTTONBOX_START : style
+	val BUTTONBOX_END : style
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a buttonbox_t = unit
+	type 'a t = 'a buttonbox_t Box.t
+	fun inherit w con = Box.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toButtonBox obj = inherit () (fn () => repr obj)
+	type style = int
+	val get_style_ : unit -> int * int * int * int * int
+	    = app1 (symb"mgtk_get_gtk_button_box_style")
+	val (BUTTONBOX_DEFAULT_STYLE, BUTTONBOX_SPREAD, BUTTONBOX_EDGE, 
+	     BUTTONBOX_START, BUTTONBOX_END)
+	    = get_style_ ()
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** Container *** */
+
+
+/* *** Box *** */
+
+
+/* *** ButtonBox *** */
+/* ML type: unit -> int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_button_box_style(value dummy) { /* ML */
+    value res = alloc_tuple(5);
+    Field(res, 0) = Val_int(GTK_BUTTONBOX_DEFAULT_STYLE);
+    Field(res, 1) = Val_int(GTK_BUTTONBOX_SPREAD);
+    Field(res, 2) = Val_int(GTK_BUTTONBOX_EDGE);
+    Field(res, 3) = Val_int(GTK_BUTTONBOX_START);
+    Field(res, 4) = Val_int(GTK_BUTTONBOX_END);
+    return res;
+}
+

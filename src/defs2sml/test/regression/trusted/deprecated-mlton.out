@@ -1,0 +1,134 @@
+structure Gtk  = struct
+    
+    type cptr = GObject.cptr
+    structure Object :>
+      sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = GObject.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure Widget :>
+      sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = Object.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure Container :>
+      sig
+	type base
+	type 'a container_t
+	type 'a t = 'a container_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toContainer : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a container_t = unit
+	type 'a t = 'a container_t Widget.t
+	fun inherit w con = Widget.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toContainer obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure Box :>
+      sig
+	type base
+	type 'a box_t
+	type 'a t = 'a box_t Container.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toBox : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a box_t = unit
+	type 'a t = 'a box_t Container.t
+	fun inherit w con = Container.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toBox obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure ButtonBox :>
+      sig
+	type base
+	type 'a buttonbox_t
+	type 'a t = 'a buttonbox_t Box.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toButtonBox : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a buttonbox_t = unit
+	type 'a t = 'a buttonbox_t Box.t
+	fun inherit w con = Box.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toButtonBox obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure HButtonBox :>
+      sig
+	type base
+	type 'a hbuttonbox_t
+	type 'a t = 'a hbuttonbox_t ButtonBox.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toHButtonBox : 'a t -> base t
+	val get_type : unit -> GType.t
+	val new : unit -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a hbuttonbox_t = unit
+	type 'a t = 'a hbuttonbox_t ButtonBox.t
+	fun inherit w con = ButtonBox.inherit () con
+	fun make ptr = inherit () (fn () => ptr)
+	fun toHButtonBox obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_type_ : unit -> GType.t
+	    = _import "gtk_hbutton_box_get_type" : unit -> GType.t;
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val new_ : unit -> cptr = _import "gtk_hbutton_box_new" : unit -> cptr;
+	val new : unit -> base t = fn dummy => make (new_ dummy)
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** Container *** */
+
+
+/* *** Box *** */
+
+
+/* *** ButtonBox *** */
+
+
+/* *** HButtonBox *** */

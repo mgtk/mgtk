@@ -6,13 +6,15 @@ structure Gtk  = struct
     val symb = GtkBasis.symb
     structure TextIter :>
       sig
-	type t
+	type t = GObject.cptr
+	type base
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
 	val symb = GtkBasis.symb
 	type t = GObject.cptr
+	type base = unit
     end
     structure TextBuffer :>
       sig

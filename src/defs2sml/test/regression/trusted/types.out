@@ -4,6 +4,13 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
+    type icon_size = int
+    val get_icon_size_ : unit -> int * int * int * int * int * int * int
+	= app1 (symb"mgtk_get_gtk_icon_size")
+    val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
+	 ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
+	 ICON_SIZE_DIALOG)
+	= get_icon_size_ ()
     structure Settings :>
       sig
 	type base
@@ -44,14 +51,7 @@ structure Gtk  = struct
     end
     structure Demoted :>
       sig
-	type icon_size
-	val ICON_SIZE_INVALID : icon_size
-	val ICON_SIZE_MENU : icon_size
-	val ICON_SIZE_SMALL_TOOLBAR : icon_size
-	val ICON_SIZE_LARGE_TOOLBAR : icon_size
-	val ICON_SIZE_BUTTON : icon_size
-	val ICON_SIZE_DND : icon_size
-	val ICON_SIZE_DIALOG : icon_size
+	type base
 	val icon_size_register : string -> int -> int -> icon_size
 	val rc_get_style_by_paths
 	  : 'a Settings.t -> string -> string -> GType.t -> base Style.t
@@ -61,13 +61,7 @@ structure Gtk  = struct
 	type cptr = GObject.cptr
 	val repr = GObject.repr
 	val symb = GtkBasis.symb
-	type icon_size = int
-	val get_icon_size_ : unit -> int * int * int * int * int * int * int
-	    = app1 (symb"mgtk_get_gtk_icon_size")
-	val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
-	     ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
-	     ICON_SIZE_DIALOG)
-	    = get_icon_size_ ()
+	type base = unit
 	val icon_size_register_ : string -> int -> int -> int
 	    = app3 (symb"mgtk_gtk_icon_size_register")
 	val icon_size_register : string -> int -> int -> icon_size
@@ -91,13 +85,15 @@ structure Gtk  = struct
     end
     structure IconSet :>
       sig
-	type t
+	type t = GObject.cptr
+	type base
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
 	val symb = GtkBasis.symb
 	type t = GObject.cptr
+	type base = unit
     end
     structure RcStyle :>
       sig
@@ -144,7 +140,7 @@ structure Gtk  = struct
 	type 'a t = 'a widget_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWidget : 'a t -> base t
-	val modify_style : 'a t -> 'b Rc.Style.t -> unit
+	val modify_style : 'a t -> 'b RcStyle.t -> unit
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -158,7 +154,7 @@ structure Gtk  = struct
 	fun toWidget obj = inherit () (fn () => repr obj)
 	val modify_style_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_widget_modify_style")
-	val modify_style : 'a t -> 'b Rc.Style.t -> unit
+	val modify_style : 'a t -> 'b RcStyle.t -> unit
 	    = fn self => fn style => modify_style_ (repr self) (repr style)
     end
     structure Calendar :>
@@ -234,6 +230,19 @@ end
 
 
 /* *** Gtk *** */
+/* ML type: unit -> int * int * int * int * int * int * int */
+EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
+  value res = alloc_tuple(7);
+  Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
+  Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
+  Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
+  Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
+  Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
+  Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
+  Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
+  return res;
+}
+
 
 
 /* *** Settings *** */
@@ -243,19 +252,6 @@ end
 
 
 /* *** Demoted *** */
-/* ML type: unit -> int * int * int * int * int * int * int */
-EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
-    value res = alloc_tuple(7);
-    Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
-    Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
-    Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
-    Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
-    Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
-    Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
-    Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
-    return res;
-}
-
 /* ML type: string -> int -> int -> int */
 EXTERNML value mgtk_gtk_icon_size_register(value name, value width, value height) { /* ML */
     return Val_int(gtk_icon_size_register(String_val(name), Int_val(width), Int_val(height)));

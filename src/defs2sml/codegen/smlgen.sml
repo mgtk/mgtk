@@ -309,9 +309,15 @@ struct
 	    else if P.TypeInfo.isString tinfo ty andalso v = "NULL" 
 	         then Const "\"\"" (* converted to a primitive string in
                                       callStub *)
+	    else if P.TypeInfo.isBool tinfo ty then
+		       (if v = "TRUE" then Const("true")
+			else if v = "FALSE" then Const("false")
+			else if v = "0" then Const("false")
+			else case Int.fromString v of
+				 SOME i => Const(Bool.toString(not(i=0)))
+			       | NONE => Const v
+                       )
 	    else if v = "NULL" then Var("GObject.null")
-	    else if v = "TRUE" then Const("true")
-	    else if v = "FALSE" then Const("false")
 	    else if String.sub(v,0) = #"-" 
 	    then Const("~"^String.extract(v,1,NONE))
 	    else Const v
@@ -536,8 +542,10 @@ struct
 	  | AST.Boxed funcs =>
 	        let val alloc = P.boxedAlloc name
 		    val name = "t"
-		in  {stru=TypeDec(([],[name]), SOME(TyApp([],["GObject.cptr"]))),
-		     sign=TypeSpec(([],[name]),NONE)
+		in  {stru=TypeDec(([],[name]), SOME(TyApp([],["GObject.cptr"])))
+		       ++ TypeDec(([],["base"]),SOME UnitTy),
+		     sign=TypeSpec(([],[name]),SOME(TyApp([],["GObject.cptr"])))
+                       ** TypeSpec(([],["base"]),NONE)
                     }
                 :::? alloc
 		end
@@ -607,6 +615,15 @@ struct
 		val name = Name.asModule name
 		val contents = List.map (transMem named_sigs tinfo) members
 		val {stru=contstr,sign=contsig} = decUnzip contents
+		val (contstr,contsig) =
+		    if name="Demoted" then 
+			(CoreDec(TypeDec(([],["base"]),SOME(UnitTy)))
+			   :: contstr,
+			 SeqSpec
+                           [ TypeSpec(([],["base"]),NONE)
+			   , contsig]
+                        )
+		    else (contstr,contsig)
 		val sigexp = SigBasic(contsig)
 		val decs = CoreDec(SeqDec P.strHeader) :: contstr
 	    in  

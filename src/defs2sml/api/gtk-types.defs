@@ -2535,3 +2535,9 @@
   (parent "GObject")
   (c-name "GtkTreePath")
 )
+
+(define-object GtkAccelMap
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkAccelMap")
+)

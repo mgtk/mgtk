@@ -278,6 +278,14 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.WithDefault(ty,default) => isString tinfo ty
 	  | _ => false
 
+    fun isBool tinfo ty =
+	case ty of
+	    Type.Base n => Name.asType n = "bool"
+	  | Type.Const ty => isBool tinfo ty
+	  | Type.Output(_,ty) => isBool tinfo ty
+	  | Type.WithDefault(ty,default) => isBool tinfo ty
+	  | _ => false
+
     fun prependPath (path,base) ty =
 	case ty of
 	    SMLType.TyApp(alphas, tyname) =>
