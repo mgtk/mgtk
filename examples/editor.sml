@@ -36,10 +36,11 @@ fun makeMenubar agrp =
 		
 	val _ = MenuShell.append file_menu (SeparatorMenuItem.new())
 		
-        val quitItem = let val item = makeStockItem file_menu "gtk-quit"
-                       in  Signal.connect item (MenuItem.activate_sig GtkBasis.main_quit)
-                         ; item
-                       end
+        val quitItem = 
+            let val item = makeStockItem file_menu "gtk-quit"
+            in  Signal.connect item (MenuItem.activate_sig GtkBasis.main_quit)
+              ; item
+            end
 
         (* edit menu *)
 	val edit_menu = Menu.new ()
