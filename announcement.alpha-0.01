@@ -1,8 +1,8 @@
 ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT ANNOUNCEMENT
 
-This is the announcement of the first public-available version of
+This is the announcement of the first publicly available version of
 mGTK.  This version is called green-horses-and-blue-ducks (or
-mgtk-alpha-0.01). 
+mgtk-alpha-0.01).
 
 
 What is mGTK? 
@@ -54,12 +54,12 @@ When you have played a bit with this release we would be must grateful
 if you would help us answer the following questions (this is your
 change to have some influence):
 
-(1) ``Manuel'' or ``automatic'' initialization (should Gtk.init
-    be called explicit, or is it comfortable that the library takes
+(1) ``Manual'' or ``automatic'' initialization (should Gtk.init
+    be called explicitly, or is it comfortable that the library takes
     care of the initialization)?
 
-(2) Names for functions with optional parameters.  At the moment is
-    there two versions of functions that takes optional parameters:
+(2) Names for functions with optional parameters.  At the moment there
+    are two versions of functions that takes optional parameters:
     one with the normal gtk+ name, for example:
    
 	val text_new: 'a GtkAdjustment option -> 'b GtkAdjustment option
@@ -73,9 +73,10 @@ change to have some influence):
     all optional arguments set to NONE.
  
     Should this be the other way around?  That is, should the version
-    the the optional arguments be called name_full. 
+    with the optional arguments be called name_full, and the shorter
+    (default?) version be called name?
 
-(3) Should the functions that may fail return a option or should they
+(3) Should the functions that may fail return an option or should they
     raise an exception.
 
 
