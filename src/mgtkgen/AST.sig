@@ -25,6 +25,11 @@ sig
       | BOXED_DECL of pos * string * (string list) * string option
       | SIGNAL_DECL of pos * string * string * type_expression option
 
+    val isWidget: declaration -> bool
+    val isFunction: declaration -> bool
+    val isEnum: declaration -> bool
+    val isBoxed: declaration -> bool
+    val isSignal: declaration -> bool
 
     val nameOf: declaration -> string
     val typeOf: declaration -> string
@@ -52,6 +57,9 @@ end
    [typeClass typExp] returns a string explaining the ``kind'' of the
    type expression typExp.
 
+   [isXXX decl] returns true if decl is an XXX, where XXX can be
+   Widget, Function, Enum, Boxed, or Signal.
+
    [posOf decl] returns the position of the declaration in the .defs
    file.
 
@@ -64,7 +72,7 @@ end
    and decl2 are identical; false otherwise.
 
    [nameOrder (decl1, decl2)] compare decl1 and decl2 based on the
-   name the declare.
+   name they declare.
 
    [declOrder (decl1, decl2)] compare decl1 and decl2 based on the
    type of declaration (objects < functions < signals < enums < boxeds)

@@ -35,7 +35,18 @@ struct
       | FLAGS_DECL of pos * string * constructor list
       | BOXED_DECL of pos * string * (string list) * string option
       | SIGNAL_DECL of pos * string * string * type_expression option
-	
+
+    fun isWidget (OBJECT_DECL _) = true
+      | isWidget _ = false
+    fun isFunction (FUNCTION_DECL _) = true
+      | isFunction _ = false
+    fun isEnum (FLAGS_DECL _) = true
+      | isEnum _ = false
+    fun isBoxed (BOXED_DECL _) = true
+      | isBoxed _ = false
+    fun isSignal (SIGNAL_DECL _) = true
+      | isSignal _ = false
+
     fun nameOf (OBJECT_DECL (_, obj, _, _)) = obj
       | nameOf (FUNCTION_DECL (_, func, _, _)) = func
       | nameOf (FLAGS_DECL (_, flag, _)) = flag
