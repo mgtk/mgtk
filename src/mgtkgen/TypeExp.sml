@@ -8,7 +8,9 @@ struct
     datatype texp = 
 	PRIMTYPE of string
       | TUPLE of long_texp list
-      | ARROW of parlist (* parameters *) * parlist (* output parameters *) * parlist (* all parameters *)
+      | ARROW of (long_texp * string) list (* parameters *) 
+               * (long_texp * string) list (* output parameters *) 
+               * (long_texp * string) list (* all parameters *)
 	       * long_texp (* return type *)
       | OPTION of long_texp
       | OUTPUT of long_texp
@@ -17,7 +19,6 @@ struct
       | POINTER of string * inherits option (* parent *)
       | LIST of long_texp
     and long_texp = LONG of string list * texp
-    withtype parlist = (long_texp * string) list
 
     fun typeClass' (PRIMTYPE _) = "type name"
       | typeClass' (TUPLE _) = "tuple"
