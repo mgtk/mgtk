@@ -10,7 +10,7 @@ TRANSLATE=../`basename $(GENPROG)`
 REMOVE=rm -f
 
 all: quick gtk
-quick: gtk-adj gtk-fonts gtk-boxed gtk-output gtk-split-words
+quick: gtk-adj gtk-fonts gtk-boxed gtk-output gtk-split-words gtk-tooltips
 
 fresh: clean all
 

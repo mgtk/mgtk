@@ -1487,6 +1487,115 @@
    (int x)))
 
 
+; these are in gtkmain.h ...
+(define-func gtk_grab_add
+  none
+  ((GtkWidget widget)))
+
+(define-func gtk_grab_get_current
+  GtkWidget
+  ())
+
+(define-func gtk_grab_remove
+  none
+  ((GtkWidget widget)))
+
+;; dnd and selection stuff ...
+;;(include "gtkdnd.defs")
+; -*- scheme -*-
+
+;; DnD functions ...
+
+; Henning
+;(define-func gtk_drag_get_data
+;  none
+;  ((GtkWidget widget)
+;   (GdkDragContext context)
+;   (GdkAtom target)
+;   (uint time)))
+
+(define-func gtk_drag_finish
+  none
+  ((GdkDragContext context)
+   (bool success)
+   (bool del)
+   (uint time)))
+
+(define-func gtk_drag_get_source_widget
+  GtkWidget
+  ((GdkDragContext context)))
+
+(define-func gtk_drag_highlight
+  none
+  ((GtkWidget widget)))
+
+(define-func gtk_drag_unhighlight
+  none
+  ((GtkWidget widget)))
+
+;; gtk_drag_dest_set
+
+(define-func gtk_drag_dest_set_proxy
+  none
+  ((GtkWidget widget)
+   (GdkWindow proxy_window)
+   (GdkDragProtocol protocol)
+   (bool use_coordinates)))
+
+(define-func gtk_drag_dest_unset
+  none
+  ((GtkWidget widget)))
+
+;; gtk_drag_source_set
+
+(define-func gtk_drag_source_unset
+  none
+  ((GtkWidget widget)))
+
+(define-func gtk_drag_source_set_icon
+  none
+  ((GtkWidget widget)
+   (GdkColormap colormap)
+   (GdkPixmap pixmap)
+   (GdkBitmap mask)))
+
+;; gtk_drag_begin
+
+(define-func gtk_drag_set_icon_widget
+  none
+  ((GdkDragContext context)
+   (GtkWidget widget)
+   (int hot_x) (int hot_y)))
+
+(define-func gtk_drag_set_icon_pixmap
+  none
+  ((GdkDragContext context)
+   (GdkColormap colormap)
+   (GdkPixmap pixmap)
+   (GdkBitmap mask)
+   (int hot_x) (int hot_y)))
+
+(define-func gtk_drag_set_icon_default
+  none
+  ((GdkDragContext context)))
+
+(define-func gtk_drag_set_default_icon
+  none
+  ((GdkColormap colormap)
+   (GdkPixmap pixmap)
+   (GdkBitmap mask)
+   (int hot_x) (int hot_y)))
+
+;; Selection functions ...
+
+; Removed, Henning
+
+;; gtk_selection_data_set -- implemented as method in pygtk.
+
+(define-func gtk_selection_remove_all
+  none
+  ((GtkWidget widget)))
+
 ;; these two are used extensively -- define early
 ; GtkObject is currently handled specially,
 ; hence commented-out here, Henning
@@ -1498,32 +1607,6 @@
 ; here, Henning
 ;(define-object GtkWidget (GtkObject))
 
-
-;; Added a few functions accessing internal widget data, Henning
-(define-func gtk_widget_get_window
-  GdkWindow
-  ((GtkWidget widget)))
-
-(define-func gtk_widget_get_drawable
-  GdkDrawable
-  ((GtkWidget widget)))
-
-(define-func gtk_widget_get_state 
-  GtkStateType 
-  ((GtkWidget widget)))
-
-(define-func gtk_widget_get_allocation
-  none
-  ((GtkWidget widget)
-   (int width (output))
-   (int height (output))
-   (int x (output))
-   (int y (output))))
-
-(define-func gtk_widget_get_style_fg_gc
-  GdkGC
-  ((GtkWidget widget)
-   (GtkStateType state)))
 
 ; from gtktypeutils.h
 ; Removed, Henning
@@ -1572,6 +1655,34 @@
    (float valu)))
 
 ; gtkwidget.h
+
+(define-module Widget (submodule-of Gtk))
+
+;; Added a few functions accessing internal widget data, Henning
+(define-func gtk_widget_get_window
+  GdkWindow
+  ((GtkWidget widget)))
+
+(define-func gtk_widget_get_drawable
+  GdkDrawable
+  ((GtkWidget widget)))
+
+(define-func gtk_widget_get_state 
+  GtkStateType 
+  ((GtkWidget widget)))
+
+(define-func gtk_widget_get_allocation
+  none
+  ((GtkWidget widget)
+   (int width (output))
+   (int height (output))
+   (int x (output))
+   (int y (output))))
+
+(define-func gtk_widget_get_style_fg_gc
+  GdkGC
+  ((GtkWidget widget)
+   (GtkStateType state)))
 
 (define-func gtk_widget_destroy
   none
@@ -1882,116 +1993,6 @@
   ((GtkWidget widget)
    (GdkBitmap mask)
    (int ofs_x) (int ofs_y)))
-
-; these are in gtkmain.h ...
-(define-func gtk_grab_add
-  none
-  ((GtkWidget widget)))
-
-(define-func gtk_grab_get_current
-  GtkWidget
-  ())
-
-(define-func gtk_grab_remove
-  none
-  ((GtkWidget widget)))
-
-;; dnd and selection stuff ...
-;;(include "gtkdnd.defs")
-; -*- scheme -*-
-
-;; DnD functions ...
-
-; Henning
-;(define-func gtk_drag_get_data
-;  none
-;  ((GtkWidget widget)
-;   (GdkDragContext context)
-;   (GdkAtom target)
-;   (uint time)))
-
-(define-func gtk_drag_finish
-  none
-  ((GdkDragContext context)
-   (bool success)
-   (bool del)
-   (uint time)))
-
-(define-func gtk_drag_get_source_widget
-  GtkWidget
-  ((GdkDragContext context)))
-
-(define-func gtk_drag_highlight
-  none
-  ((GtkWidget widget)))
-
-(define-func gtk_drag_unhighlight
-  none
-  ((GtkWidget widget)))
-
-;; gtk_drag_dest_set
-
-(define-func gtk_drag_dest_set_proxy
-  none
-  ((GtkWidget widget)
-   (GdkWindow proxy_window)
-   (GdkDragProtocol protocol)
-   (bool use_coordinates)))
-
-(define-func gtk_drag_dest_unset
-  none
-  ((GtkWidget widget)))
-
-;; gtk_drag_source_set
-
-(define-func gtk_drag_source_unset
-  none
-  ((GtkWidget widget)))
-
-(define-func gtk_drag_source_set_icon
-  none
-  ((GtkWidget widget)
-   (GdkColormap colormap)
-   (GdkPixmap pixmap)
-   (GdkBitmap mask)))
-
-;; gtk_drag_begin
-
-(define-func gtk_drag_set_icon_widget
-  none
-  ((GdkDragContext context)
-   (GtkWidget widget)
-   (int hot_x) (int hot_y)))
-
-(define-func gtk_drag_set_icon_pixmap
-  none
-  ((GdkDragContext context)
-   (GdkColormap colormap)
-   (GdkPixmap pixmap)
-   (GdkBitmap mask)
-   (int hot_x) (int hot_y)))
-
-(define-func gtk_drag_set_icon_default
-  none
-  ((GdkDragContext context)))
-
-(define-func gtk_drag_set_default_icon
-  none
-  ((GdkColormap colormap)
-   (GdkPixmap pixmap)
-   (GdkBitmap mask)
-   (int hot_x) (int hot_y)))
-
-;; Selection functions ...
-
-; Removed, Henning
-
-;; gtk_selection_data_set -- implemented as method in pygtk.
-
-(define-func gtk_selection_remove_all
-  none
-  ((GtkWidget widget)))
-
 
 ;; descendents of GtkData (alignments, tooltips, etc)
 ;;(include "gtkdata.defs")

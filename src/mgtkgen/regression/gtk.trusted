@@ -2061,40 +2061,104 @@ EXTERNML value mgtk_gtk_draw_vline(value mgtk_params) { /* ML */
   return Val_unit;
 }
 
-/* ML type: gtkobj -> gdk_window */
-EXTERNML value mgtk_gtk_widget_get_window(value widget) { /* ML */
-  return Val_gdk_window(gtk_widget_get_window(GtkObj_val(widget)));
+/* ML type: gtkobj -> unit */
+EXTERNML value mgtk_gtk_grab_add(value widget) { /* ML */
+  gtk_grab_add(GtkObj_val(widget));
+  return Val_unit;
 }
 
-/* ML type: gtkobj -> gdk_drawable */
-EXTERNML value mgtk_gtk_widget_get_drawable(value widget) { /* ML */
-  return Val_gdk_drawable(gtk_widget_get_drawable(GtkObj_val(widget)));
+/* ML type: unit -> gtkobj */
+EXTERNML value mgtk_gtk_grab_get_current(value dummy) { /* ML */
+  return Val_GtkObj(gtk_grab_get_current());
 }
 
-/* ML type: gtkobj -> int */
-EXTERNML value mgtk_gtk_widget_get_state(value widget) { /* ML */
-  return Val_int(gtk_widget_get_state(GtkObj_val(widget)));
+/* ML type: gtkobj -> unit */
+EXTERNML value mgtk_gtk_grab_remove(value widget) { /* ML */
+  gtk_grab_remove(GtkObj_val(widget));
+  return Val_unit;
 }
 
-/* ML type: gtkobj -> int * int * int * int */
-EXTERNML value mgtk_gtk_widget_get_allocation(value widget) { /* ML */
-  value res;
-  int reswidth;
-  int resheight;
-  int resx;
-  int resy;
-  gtk_widget_get_allocation(GtkObj_val(widget), &reswidth, &resheight, &resx, &resy);
-  res = alloc_tuple(4);
-  Field(res, 0) = Val_int(reswidth);
-  Field(res, 1) = Val_int(resheight);
-  Field(res, 2) = Val_int(resx);
-  Field(res, 3) = Val_int(resy);
-  return res;
+/* ML type: gdk_drag_context -> bool -> bool -> word -> unit */
+EXTERNML value mgtk_gtk_drag_finish(value context, value success, value del, value time) { /* ML */
+  gtk_drag_finish(gdk_drag_context_val(context), Bool_val(success), Bool_val(del), Int_val(time));
+  return Val_unit;
 }
 
-/* ML type: gtkobj -> int -> gdk_gc */
-EXTERNML value mgtk_gtk_widget_get_style_fg_gc(value widget, value state) { /* ML */
-  return Val_gdk_gc(gtk_widget_get_style_fg_gc(GtkObj_val(widget), Int_val(state)));
+/* ML type: gdk_drag_context -> gtkobj */
+EXTERNML value mgtk_gtk_drag_get_source_widget(value context) { /* ML */
+  return Val_GtkObj(gtk_drag_get_source_widget(gdk_drag_context_val(context)));
+}
+
+/* ML type: gtkobj -> unit */
+EXTERNML value mgtk_gtk_drag_highlight(value widget) { /* ML */
+  gtk_drag_highlight(GtkObj_val(widget));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+EXTERNML value mgtk_gtk_drag_unhighlight(value widget) { /* ML */
+  gtk_drag_unhighlight(GtkObj_val(widget));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> gdk_window -> int -> bool -> unit */
+EXTERNML value mgtk_gtk_drag_dest_set_proxy(value widget, value proxy_window, value protocol, value use_coordinates) { /* ML */
+  gtk_drag_dest_set_proxy(GtkObj_val(widget), gdk_window_val(proxy_window), Int_val(protocol), Bool_val(use_coordinates));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+EXTERNML value mgtk_gtk_drag_dest_unset(value widget) { /* ML */
+  gtk_drag_dest_unset(GtkObj_val(widget));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+EXTERNML value mgtk_gtk_drag_source_unset(value widget) { /* ML */
+  gtk_drag_source_unset(GtkObj_val(widget));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit */
+EXTERNML value mgtk_gtk_drag_source_set_icon(value widget, value colormap, value pixmap, value mask) { /* ML */
+  gtk_drag_source_set_icon(GtkObj_val(widget), gdk_colormap_val(colormap), gdk_pixmap_val(pixmap), gdk_bitmap_val(mask));
+  return Val_unit;
+}
+
+/* ML type: gdk_drag_context -> gtkobj -> int -> int -> unit */
+EXTERNML value mgtk_gtk_drag_set_icon_widget(value context, value widget, value hot_x, value hot_y) { /* ML */
+  gtk_drag_set_icon_widget(gdk_drag_context_val(context), GtkObj_val(widget), Int_val(hot_x), Int_val(hot_y));
+  return Val_unit;
+}
+
+/* ML type: gdk_drag_context * gdk_colormap * gdk_pixmap * gdk_bitmap * int * int -> unit */
+EXTERNML value mgtk_gtk_drag_set_icon_pixmap(value mgtk_params) { /* ML */
+  value context = Field(mgtk_params, 0);
+  value colormap = Field(mgtk_params, 1);
+  value pixmap = Field(mgtk_params, 2);
+  value mask = Field(mgtk_params, 3);
+  value hot_x = Field(mgtk_params, 4);
+  value hot_y = Field(mgtk_params, 5);
+  gtk_drag_set_icon_pixmap(gdk_drag_context_val(context), gdk_colormap_val(colormap), gdk_pixmap_val(pixmap), gdk_bitmap_val(mask), Int_val(hot_x), Int_val(hot_y));
+  return Val_unit;
+}
+
+/* ML type: gdk_drag_context -> unit */
+EXTERNML value mgtk_gtk_drag_set_icon_default(value context) { /* ML */
+  gtk_drag_set_icon_default(gdk_drag_context_val(context));
+  return Val_unit;
+}
+
+/* ML type: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit */
+EXTERNML value mgtk_gtk_drag_set_default_icon(value colormap, value pixmap, value mask, value hot_x, value hot_y) { /* ML */
+  gtk_drag_set_default_icon(gdk_colormap_val(colormap), gdk_pixmap_val(pixmap), gdk_bitmap_val(mask), Int_val(hot_x), Int_val(hot_y));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+EXTERNML value mgtk_gtk_selection_remove_all(value widget) { /* ML */
+  gtk_selection_remove_all(GtkObj_val(widget));
+  return Val_unit;
 }
 
 /* *** Data stuff *** */
@@ -2171,6 +2235,42 @@ EXTERNML value mgtk_gtk_adjustment_clamp_page(value adjustment, value lower, val
 EXTERNML value mgtk_gtk_adjustment_set_value(value adjustment, value valu) { /* ML */
   gtk_adjustment_set_value(GtkObj_val(adjustment), Double_val(valu));
   return Val_unit;
+}
+
+/* ML type: gtkobj -> gdk_window */
+EXTERNML value mgtk_gtk_widget_get_window(value widget) { /* ML */
+  return Val_gdk_window(gtk_widget_get_window(GtkObj_val(widget)));
+}
+
+/* ML type: gtkobj -> gdk_drawable */
+EXTERNML value mgtk_gtk_widget_get_drawable(value widget) { /* ML */
+  return Val_gdk_drawable(gtk_widget_get_drawable(GtkObj_val(widget)));
+}
+
+/* ML type: gtkobj -> int */
+EXTERNML value mgtk_gtk_widget_get_state(value widget) { /* ML */
+  return Val_int(gtk_widget_get_state(GtkObj_val(widget)));
+}
+
+/* ML type: gtkobj -> int * int * int * int */
+EXTERNML value mgtk_gtk_widget_get_allocation(value widget) { /* ML */
+  value res;
+  int reswidth;
+  int resheight;
+  int resx;
+  int resy;
+  gtk_widget_get_allocation(GtkObj_val(widget), &reswidth, &resheight, &resx, &resy);
+  res = alloc_tuple(4);
+  Field(res, 0) = Val_int(reswidth);
+  Field(res, 1) = Val_int(resheight);
+  Field(res, 2) = Val_int(resx);
+  Field(res, 3) = Val_int(resy);
+  return res;
+}
+
+/* ML type: gtkobj -> int -> gdk_gc */
+EXTERNML value mgtk_gtk_widget_get_style_fg_gc(value widget, value state) { /* ML */
+  return Val_gdk_gc(gtk_widget_get_style_fg_gc(GtkObj_val(widget), Int_val(state)));
 }
 
 /* ML type: gtkobj -> unit */
@@ -2554,106 +2654,6 @@ EXTERNML value mgtk_gtk_widget_get_default_colormap(value dummy) { /* ML */
 /* ML type: gtkobj -> gdk_bitmap -> int -> int -> unit */
 EXTERNML value mgtk_gtk_widget_shape_combine_mask(value widget, value mask, value ofs_x, value ofs_y) { /* ML */
   gtk_widget_shape_combine_mask(GtkObj_val(widget), gdk_bitmap_val(mask), Int_val(ofs_x), Int_val(ofs_y));
-  return Val_unit;
-}
-
-/* ML type: gtkobj -> unit */
-EXTERNML value mgtk_gtk_grab_add(value widget) { /* ML */
-  gtk_grab_add(GtkObj_val(widget));
-  return Val_unit;
-}
-
-/* ML type: unit -> gtkobj */
-EXTERNML value mgtk_gtk_grab_get_current(value dummy) { /* ML */
-  return Val_GtkObj(gtk_grab_get_current());
-}
-
-/* ML type: gtkobj -> unit */
-EXTERNML value mgtk_gtk_grab_remove(value widget) { /* ML */
-  gtk_grab_remove(GtkObj_val(widget));
-  return Val_unit;
-}
-
-/* ML type: gdk_drag_context -> bool -> bool -> word -> unit */
-EXTERNML value mgtk_gtk_drag_finish(value context, value success, value del, value time) { /* ML */
-  gtk_drag_finish(gdk_drag_context_val(context), Bool_val(success), Bool_val(del), Int_val(time));
-  return Val_unit;
-}
-
-/* ML type: gdk_drag_context -> gtkobj */
-EXTERNML value mgtk_gtk_drag_get_source_widget(value context) { /* ML */
-  return Val_GtkObj(gtk_drag_get_source_widget(gdk_drag_context_val(context)));
-}
-
-/* ML type: gtkobj -> unit */
-EXTERNML value mgtk_gtk_drag_highlight(value widget) { /* ML */
-  gtk_drag_highlight(GtkObj_val(widget));
-  return Val_unit;
-}
-
-/* ML type: gtkobj -> unit */
-EXTERNML value mgtk_gtk_drag_unhighlight(value widget) { /* ML */
-  gtk_drag_unhighlight(GtkObj_val(widget));
-  return Val_unit;
-}
-
-/* ML type: gtkobj -> gdk_window -> int -> bool -> unit */
-EXTERNML value mgtk_gtk_drag_dest_set_proxy(value widget, value proxy_window, value protocol, value use_coordinates) { /* ML */
-  gtk_drag_dest_set_proxy(GtkObj_val(widget), gdk_window_val(proxy_window), Int_val(protocol), Bool_val(use_coordinates));
-  return Val_unit;
-}
-
-/* ML type: gtkobj -> unit */
-EXTERNML value mgtk_gtk_drag_dest_unset(value widget) { /* ML */
-  gtk_drag_dest_unset(GtkObj_val(widget));
-  return Val_unit;
-}
-
-/* ML type: gtkobj -> unit */
-EXTERNML value mgtk_gtk_drag_source_unset(value widget) { /* ML */
-  gtk_drag_source_unset(GtkObj_val(widget));
-  return Val_unit;
-}
-
-/* ML type: gtkobj -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit */
-EXTERNML value mgtk_gtk_drag_source_set_icon(value widget, value colormap, value pixmap, value mask) { /* ML */
-  gtk_drag_source_set_icon(GtkObj_val(widget), gdk_colormap_val(colormap), gdk_pixmap_val(pixmap), gdk_bitmap_val(mask));
-  return Val_unit;
-}
-
-/* ML type: gdk_drag_context -> gtkobj -> int -> int -> unit */
-EXTERNML value mgtk_gtk_drag_set_icon_widget(value context, value widget, value hot_x, value hot_y) { /* ML */
-  gtk_drag_set_icon_widget(gdk_drag_context_val(context), GtkObj_val(widget), Int_val(hot_x), Int_val(hot_y));
-  return Val_unit;
-}
-
-/* ML type: gdk_drag_context * gdk_colormap * gdk_pixmap * gdk_bitmap * int * int -> unit */
-EXTERNML value mgtk_gtk_drag_set_icon_pixmap(value mgtk_params) { /* ML */
-  value context = Field(mgtk_params, 0);
-  value colormap = Field(mgtk_params, 1);
-  value pixmap = Field(mgtk_params, 2);
-  value mask = Field(mgtk_params, 3);
-  value hot_x = Field(mgtk_params, 4);
-  value hot_y = Field(mgtk_params, 5);
-  gtk_drag_set_icon_pixmap(gdk_drag_context_val(context), gdk_colormap_val(colormap), gdk_pixmap_val(pixmap), gdk_bitmap_val(mask), Int_val(hot_x), Int_val(hot_y));
-  return Val_unit;
-}
-
-/* ML type: gdk_drag_context -> unit */
-EXTERNML value mgtk_gtk_drag_set_icon_default(value context) { /* ML */
-  gtk_drag_set_icon_default(gdk_drag_context_val(context));
-  return Val_unit;
-}
-
-/* ML type: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit */
-EXTERNML value mgtk_gtk_drag_set_default_icon(value colormap, value pixmap, value mask, value hot_x, value hot_y) { /* ML */
-  gtk_drag_set_default_icon(gdk_colormap_val(colormap), gdk_pixmap_val(pixmap), gdk_bitmap_val(mask), Int_val(hot_x), Int_val(hot_y));
-  return Val_unit;
-}
-
-/* ML type: gtkobj -> unit */
-EXTERNML value mgtk_gtk_selection_remove_all(value widget) { /* ML */
-  gtk_selection_remove_all(GtkObj_val(widget));
   return Val_unit;
 }
 
@@ -7505,11 +7505,22 @@ EXTERNML value mgtk_gtk_text_forward_delete(value text, value nchars) { /* ML */
     val draw_string: gtk_style -> gdk_window -> gtk_state_type -> int -> int -> string -> unit
     val draw_tab: gtk_style -> gdk_window -> gtk_state_type -> gtk_shadow_type -> int -> int -> int -> int -> unit
     val draw_vline: gtk_style -> gdk_window -> gtk_state_type -> int -> int -> int -> unit
-    val widget_get_window: 'a GtkWidget -> gdk_window
-    val widget_get_drawable: 'a GtkWidget -> gdk_drawable
-    val widget_get_state: 'a GtkWidget -> gtk_state_type
-    val widget_get_allocation: 'a GtkWidget -> int * int * int * int
-    val widget_get_style_fg_gc: 'a GtkWidget -> gtk_state_type -> gdk_gc
+    val grab_add: 'a GtkWidget -> unit
+    val grab_get_current: unit -> base GtkWidget
+    val grab_remove: 'a GtkWidget -> unit
+    val drag_finish: gdk_drag_context -> bool -> bool -> word -> unit
+    val drag_get_source_widget: gdk_drag_context -> base GtkWidget
+    val drag_highlight: 'a GtkWidget -> unit
+    val drag_unhighlight: 'a GtkWidget -> unit
+    val drag_dest_set_proxy: 'a GtkWidget -> gdk_window -> gdk_drag_protocol -> bool -> unit
+    val drag_dest_unset: 'a GtkWidget -> unit
+    val drag_source_unset: 'a GtkWidget -> unit
+    val drag_source_set_icon: 'a GtkWidget -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit
+    val drag_set_icon_widget: gdk_drag_context -> 'a GtkWidget -> int -> int -> unit
+    val drag_set_icon_pixmap: gdk_drag_context -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
+    val drag_set_icon_default: gdk_drag_context -> unit
+    val drag_set_default_icon: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
+    val selection_remove_all: 'a GtkWidget -> unit
 
     (* *** Data *** *)
 
@@ -7535,6 +7546,11 @@ EXTERNML value mgtk_gtk_text_forward_delete(value text, value nchars) { /* ML */
     val adjustment_value_changed: 'a GtkAdjustment -> unit
     val adjustment_clamp_page: 'a GtkAdjustment -> real -> real -> unit
     val adjustment_set_value: 'a GtkAdjustment -> real -> unit
+    val widget_get_window: 'a GtkWidget -> gdk_window
+    val widget_get_drawable: 'a GtkWidget -> gdk_drawable
+    val widget_get_state: 'a GtkWidget -> gtk_state_type
+    val widget_get_allocation: 'a GtkWidget -> int * int * int * int
+    val widget_get_style_fg_gc: 'a GtkWidget -> gtk_state_type -> gdk_gc
     val widget_destroy: 'a GtkWidget -> unit
     val widget_unparent: 'a GtkWidget -> unit
     val widget_show: 'a GtkWidget -> unit
@@ -7601,22 +7617,6 @@ EXTERNML value mgtk_gtk_text_forward_delete(value text, value nchars) { /* ML */
     val widget_get_default_style: unit -> gtk_style
     val widget_get_default_colormap: unit -> gdk_colormap
     val widget_shape_combine_mask: 'a GtkWidget -> gdk_bitmap -> int -> int -> unit
-    val grab_add: 'a GtkWidget -> unit
-    val grab_get_current: unit -> base GtkWidget
-    val grab_remove: 'a GtkWidget -> unit
-    val drag_finish: gdk_drag_context -> bool -> bool -> word -> unit
-    val drag_get_source_widget: gdk_drag_context -> base GtkWidget
-    val drag_highlight: 'a GtkWidget -> unit
-    val drag_unhighlight: 'a GtkWidget -> unit
-    val drag_dest_set_proxy: 'a GtkWidget -> gdk_window -> gdk_drag_protocol -> bool -> unit
-    val drag_dest_unset: 'a GtkWidget -> unit
-    val drag_source_unset: 'a GtkWidget -> unit
-    val drag_source_set_icon: 'a GtkWidget -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit
-    val drag_set_icon_widget: gdk_drag_context -> 'a GtkWidget -> int -> int -> unit
-    val drag_set_icon_pixmap: gdk_drag_context -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
-    val drag_set_icon_default: gdk_drag_context -> unit
-    val drag_set_default_icon: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
-    val selection_remove_all: 'a GtkWidget -> unit
 
     (* *** Tooltips *** *)
 
@@ -9903,30 +9903,85 @@ end
     val draw_vline: gtk_style -> gdk_window -> gtk_state_type -> int -> int -> int -> unit
         = fn style => fn window => fn state_type => fn y1 => fn y2 => fn x => draw_vline_ (style, window, state_type, y1, y2, x)
 
-    val widget_get_window_: gtkobj -> gdk_window
-        = app1(symb"mgtk_gtk_widget_get_window")
-    val widget_get_window: 'a GtkWidget -> gdk_window
-        = fn OBJ widget => widget_get_window_ widget
+    val grab_add_: gtkobj -> unit
+        = app1(symb"mgtk_gtk_grab_add")
+    val grab_add: 'a GtkWidget -> unit
+        = fn OBJ widget => grab_add_ widget
 
-    val widget_get_drawable_: gtkobj -> gdk_drawable
-        = app1(symb"mgtk_gtk_widget_get_drawable")
-    val widget_get_drawable: 'a GtkWidget -> gdk_drawable
-        = fn OBJ widget => widget_get_drawable_ widget
+    val grab_get_current_: unit -> gtkobj
+        = app1(symb"mgtk_gtk_grab_get_current")
+    val grab_get_current: unit -> base GtkWidget
+        = fn dummy => OBJ(grab_get_current_ dummy)
 
-    val widget_get_state_: gtkobj -> int
-        = app1(symb"mgtk_gtk_widget_get_state")
-    val widget_get_state: 'a GtkWidget -> gtk_state_type
-        = fn OBJ widget => widget_get_state_ widget
+    val grab_remove_: gtkobj -> unit
+        = app1(symb"mgtk_gtk_grab_remove")
+    val grab_remove: 'a GtkWidget -> unit
+        = fn OBJ widget => grab_remove_ widget
 
-    val widget_get_allocation_: gtkobj -> int * int * int * int
-        = app1(symb"mgtk_gtk_widget_get_allocation")
-    val widget_get_allocation: 'a GtkWidget -> int * int * int * int
-        = fn OBJ widget => widget_get_allocation_ widget
+    val drag_finish_: gdk_drag_context -> bool -> bool -> word -> unit
+        = app4(symb"mgtk_gtk_drag_finish")
+    val drag_finish: gdk_drag_context -> bool -> bool -> word -> unit
+        = fn context => fn success => fn del => fn time => drag_finish_ context success del time
 
-    val widget_get_style_fg_gc_: gtkobj -> int -> gdk_gc
-        = app2(symb"mgtk_gtk_widget_get_style_fg_gc")
-    val widget_get_style_fg_gc: 'a GtkWidget -> gtk_state_type -> gdk_gc
-        = fn OBJ widget => fn state => widget_get_style_fg_gc_ widget state
+    val drag_get_source_widget_: gdk_drag_context -> gtkobj
+        = app1(symb"mgtk_gtk_drag_get_source_widget")
+    val drag_get_source_widget: gdk_drag_context -> base GtkWidget
+        = fn context => OBJ(drag_get_source_widget_ context)
+
+    val drag_highlight_: gtkobj -> unit
+        = app1(symb"mgtk_gtk_drag_highlight")
+    val drag_highlight: 'a GtkWidget -> unit
+        = fn OBJ widget => drag_highlight_ widget
+
+    val drag_unhighlight_: gtkobj -> unit
+        = app1(symb"mgtk_gtk_drag_unhighlight")
+    val drag_unhighlight: 'a GtkWidget -> unit
+        = fn OBJ widget => drag_unhighlight_ widget
+
+    val drag_dest_set_proxy_: gtkobj -> gdk_window -> int -> bool -> unit
+        = app4(symb"mgtk_gtk_drag_dest_set_proxy")
+    val drag_dest_set_proxy: 'a GtkWidget -> gdk_window -> gdk_drag_protocol -> bool -> unit
+        = fn OBJ widget => fn proxy_window => fn protocol => fn use_coordinates => drag_dest_set_proxy_ widget proxy_window protocol use_coordinates
+
+    val drag_dest_unset_: gtkobj -> unit
+        = app1(symb"mgtk_gtk_drag_dest_unset")
+    val drag_dest_unset: 'a GtkWidget -> unit
+        = fn OBJ widget => drag_dest_unset_ widget
+
+    val drag_source_unset_: gtkobj -> unit
+        = app1(symb"mgtk_gtk_drag_source_unset")
+    val drag_source_unset: 'a GtkWidget -> unit
+        = fn OBJ widget => drag_source_unset_ widget
+
+    val drag_source_set_icon_: gtkobj -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit
+        = app4(symb"mgtk_gtk_drag_source_set_icon")
+    val drag_source_set_icon: 'a GtkWidget -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit
+        = fn OBJ widget => fn colormap => fn pixmap => fn mask => drag_source_set_icon_ widget colormap pixmap mask
+
+    val drag_set_icon_widget_: gdk_drag_context -> gtkobj -> int -> int -> unit
+        = app4(symb"mgtk_gtk_drag_set_icon_widget")
+    val drag_set_icon_widget: gdk_drag_context -> 'a GtkWidget -> int -> int -> unit
+        = fn context => fn OBJ widget => fn hot_x => fn hot_y => drag_set_icon_widget_ context widget hot_x hot_y
+
+    val drag_set_icon_pixmap_: gdk_drag_context * gdk_colormap * gdk_pixmap * gdk_bitmap * int * int -> unit
+        = app1(symb"mgtk_gtk_drag_set_icon_pixmap")
+    val drag_set_icon_pixmap: gdk_drag_context -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
+        = fn context => fn colormap => fn pixmap => fn mask => fn hot_x => fn hot_y => drag_set_icon_pixmap_ (context, colormap, pixmap, mask, hot_x, hot_y)
+
+    val drag_set_icon_default_: gdk_drag_context -> unit
+        = app1(symb"mgtk_gtk_drag_set_icon_default")
+    val drag_set_icon_default: gdk_drag_context -> unit
+        = fn context => drag_set_icon_default_ context
+
+    val drag_set_default_icon_: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
+        = app5(symb"mgtk_gtk_drag_set_default_icon")
+    val drag_set_default_icon: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
+        = fn colormap => fn pixmap => fn mask => fn hot_x => fn hot_y => drag_set_default_icon_ colormap pixmap mask hot_x hot_y
+
+    val selection_remove_all_: gtkobj -> unit
+        = app1(symb"mgtk_gtk_selection_remove_all")
+    val selection_remove_all: 'a GtkWidget -> unit
+        = fn OBJ widget => selection_remove_all_ widget
 
     (* *** Data *** *)
 
@@ -9994,6 +10049,31 @@ end
         = app2(symb"mgtk_gtk_adjustment_set_value")
     val adjustment_set_value: 'a GtkAdjustment -> real -> unit
         = fn OBJ adjustment => fn valu => adjustment_set_value_ adjustment valu
+
+    val widget_get_window_: gtkobj -> gdk_window
+        = app1(symb"mgtk_gtk_widget_get_window")
+    val widget_get_window: 'a GtkWidget -> gdk_window
+        = fn OBJ widget => widget_get_window_ widget
+
+    val widget_get_drawable_: gtkobj -> gdk_drawable
+        = app1(symb"mgtk_gtk_widget_get_drawable")
+    val widget_get_drawable: 'a GtkWidget -> gdk_drawable
+        = fn OBJ widget => widget_get_drawable_ widget
+
+    val widget_get_state_: gtkobj -> int
+        = app1(symb"mgtk_gtk_widget_get_state")
+    val widget_get_state: 'a GtkWidget -> gtk_state_type
+        = fn OBJ widget => widget_get_state_ widget
+
+    val widget_get_allocation_: gtkobj -> int * int * int * int
+        = app1(symb"mgtk_gtk_widget_get_allocation")
+    val widget_get_allocation: 'a GtkWidget -> int * int * int * int
+        = fn OBJ widget => widget_get_allocation_ widget
+
+    val widget_get_style_fg_gc_: gtkobj -> int -> gdk_gc
+        = app2(symb"mgtk_gtk_widget_get_style_fg_gc")
+    val widget_get_style_fg_gc: 'a GtkWidget -> gtk_state_type -> gdk_gc
+        = fn OBJ widget => fn state => widget_get_style_fg_gc_ widget state
 
     val widget_destroy_: gtkobj -> unit
         = app1(symb"mgtk_gtk_widget_destroy")
@@ -10324,86 +10404,6 @@ end
         = app4(symb"mgtk_gtk_widget_shape_combine_mask")
     val widget_shape_combine_mask: 'a GtkWidget -> gdk_bitmap -> int -> int -> unit
         = fn OBJ widget => fn mask => fn ofs_x => fn ofs_y => widget_shape_combine_mask_ widget mask ofs_x ofs_y
-
-    val grab_add_: gtkobj -> unit
-        = app1(symb"mgtk_gtk_grab_add")
-    val grab_add: 'a GtkWidget -> unit
-        = fn OBJ widget => grab_add_ widget
-
-    val grab_get_current_: unit -> gtkobj
-        = app1(symb"mgtk_gtk_grab_get_current")
-    val grab_get_current: unit -> base GtkWidget
-        = fn dummy => OBJ(grab_get_current_ dummy)
-
-    val grab_remove_: gtkobj -> unit
-        = app1(symb"mgtk_gtk_grab_remove")
-    val grab_remove: 'a GtkWidget -> unit
-        = fn OBJ widget => grab_remove_ widget
-
-    val drag_finish_: gdk_drag_context -> bool -> bool -> word -> unit
-        = app4(symb"mgtk_gtk_drag_finish")
-    val drag_finish: gdk_drag_context -> bool -> bool -> word -> unit
-        = fn context => fn success => fn del => fn time => drag_finish_ context success del time
-
-    val drag_get_source_widget_: gdk_drag_context -> gtkobj
-        = app1(symb"mgtk_gtk_drag_get_source_widget")
-    val drag_get_source_widget: gdk_drag_context -> base GtkWidget
-        = fn context => OBJ(drag_get_source_widget_ context)
-
-    val drag_highlight_: gtkobj -> unit
-        = app1(symb"mgtk_gtk_drag_highlight")
-    val drag_highlight: 'a GtkWidget -> unit
-        = fn OBJ widget => drag_highlight_ widget
-
-    val drag_unhighlight_: gtkobj -> unit
-        = app1(symb"mgtk_gtk_drag_unhighlight")
-    val drag_unhighlight: 'a GtkWidget -> unit
-        = fn OBJ widget => drag_unhighlight_ widget
-
-    val drag_dest_set_proxy_: gtkobj -> gdk_window -> int -> bool -> unit
-        = app4(symb"mgtk_gtk_drag_dest_set_proxy")
-    val drag_dest_set_proxy: 'a GtkWidget -> gdk_window -> gdk_drag_protocol -> bool -> unit
-        = fn OBJ widget => fn proxy_window => fn protocol => fn use_coordinates => drag_dest_set_proxy_ widget proxy_window protocol use_coordinates
-
-    val drag_dest_unset_: gtkobj -> unit
-        = app1(symb"mgtk_gtk_drag_dest_unset")
-    val drag_dest_unset: 'a GtkWidget -> unit
-        = fn OBJ widget => drag_dest_unset_ widget
-
-    val drag_source_unset_: gtkobj -> unit
-        = app1(symb"mgtk_gtk_drag_source_unset")
-    val drag_source_unset: 'a GtkWidget -> unit
-        = fn OBJ widget => drag_source_unset_ widget
-
-    val drag_source_set_icon_: gtkobj -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit
-        = app4(symb"mgtk_gtk_drag_source_set_icon")
-    val drag_source_set_icon: 'a GtkWidget -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit
-        = fn OBJ widget => fn colormap => fn pixmap => fn mask => drag_source_set_icon_ widget colormap pixmap mask
-
-    val drag_set_icon_widget_: gdk_drag_context -> gtkobj -> int -> int -> unit
-        = app4(symb"mgtk_gtk_drag_set_icon_widget")
-    val drag_set_icon_widget: gdk_drag_context -> 'a GtkWidget -> int -> int -> unit
-        = fn context => fn OBJ widget => fn hot_x => fn hot_y => drag_set_icon_widget_ context widget hot_x hot_y
-
-    val drag_set_icon_pixmap_: gdk_drag_context * gdk_colormap * gdk_pixmap * gdk_bitmap * int * int -> unit
-        = app1(symb"mgtk_gtk_drag_set_icon_pixmap")
-    val drag_set_icon_pixmap: gdk_drag_context -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
-        = fn context => fn colormap => fn pixmap => fn mask => fn hot_x => fn hot_y => drag_set_icon_pixmap_ (context, colormap, pixmap, mask, hot_x, hot_y)
-
-    val drag_set_icon_default_: gdk_drag_context -> unit
-        = app1(symb"mgtk_gtk_drag_set_icon_default")
-    val drag_set_icon_default: gdk_drag_context -> unit
-        = fn context => drag_set_icon_default_ context
-
-    val drag_set_default_icon_: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
-        = app5(symb"mgtk_gtk_drag_set_default_icon")
-    val drag_set_default_icon: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
-        = fn colormap => fn pixmap => fn mask => fn hot_x => fn hot_y => drag_set_default_icon_ colormap pixmap mask hot_x hot_y
-
-    val selection_remove_all_: gtkobj -> unit
-        = app1(symb"mgtk_gtk_selection_remove_all")
-    val selection_remove_all: 'a GtkWidget -> unit
-        = fn OBJ widget => selection_remove_all_ widget
 
     (* *** Tooltips *** *)
 
