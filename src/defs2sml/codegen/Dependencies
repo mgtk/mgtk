@@ -1,8 +1,0 @@
-# mgtk --- an SML binding for GTK.                                          
-# (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       
-
-smltype: /ast/type /util/util /ast/name
-tinyc: /util/util
-typeinfo: /util/util /ast/ast /ast/name /ast/type smltype tinyc 
-smlgen: /ast/ast /ast/name /ast/type /util/ smltype typeinfo
-cgen: /ast/ast /ast/name /ast/type tinyc smltype typeinfo
