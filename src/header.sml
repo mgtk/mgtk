@@ -78,6 +78,19 @@ struct
 	    in  List.filter isIn possible
 	    end
 
+	fun getFlags f =
+	    let val flag = W f
+		fun loop p acc = 
+		    let val acc = if (flag andb p) <> 0w0 
+				  then Word.toInt p :: acc
+				  else acc
+			val next = Word.<<(p, 0w1)
+		    in  if next = 0w0 then acc
+			else loop next acc
+		    end
+	    in  loop 0w1 []
+	    end
+
     end
 
     local
