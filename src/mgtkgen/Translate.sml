@@ -183,17 +183,19 @@ old*)
     (* indentation in ML files *)
     val indent = "    "
 
+    (* check if an expression, determined from the type of the expression,
+       allocates in the MosML sense *)
     fun allocExpression (AST.LONG(_, AST.TYPENAME tName)) =
 	let fun extractString (WSeq.$ s) = s
               | extractString (WSeq.Empty) = ""
-              | extractString _ = Util.notImplemented "allocExpression.extractString"
+              | extractString _ = Util.shouldntHappen "allocExpression.extractString"
             val mlPrimType = extractString o #mlPrimType o TypeInfo.lookupTypeName
 	    val primType = mlPrimType tName
 	in  (* choose the safe way out: *)
 	    not (primType="int" orelse primType="word" orelse primType="bool")
 	end
       | allocExpression (AST.LONG(_, AST.OUTPUT tExp)) = allocExpression tExp
-      | allocExpression _ = Util.notImplemented "allocExpression: not a type name"
+      | allocExpression _ = Util.shouldntHappen "allocExpression: not a type name"
 
     fun allocTuple name values =
 	let val values' = ListPair.zip (List.tabulate(List.length values, fn n=>n), values)
