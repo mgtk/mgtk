@@ -5,6 +5,7 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
         type cptr = GObject.cptr
@@ -14,6 +15,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toObject obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
     end
     signature Widget = sig
@@ -21,6 +23,7 @@ structure Gtk = struct
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toWidget : 'a t -> base t
     end
     structure Widget :> Widget = struct
         type cptr = GObject.cptr
@@ -30,6 +33,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toWidget obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
     end
     signature Container = sig
@@ -37,6 +41,7 @@ structure Gtk = struct
         type 'a container_t
         type 'a t = 'a container_t Widget.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toContainer : 'a t -> base t
     end
     structure Container :> Container = struct
         type cptr = GObject.cptr
@@ -46,6 +51,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Widget.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toContainer obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
     end
     signature TreeModel = sig
@@ -53,6 +59,7 @@ structure Gtk = struct
         type 'a treemodel_t
         type 'a t = 'a treemodel_t Widget.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toTreeModel : 'a t -> base t
     end
     structure TreeModel :> TreeModel = struct
         type cptr = GObject.cptr
@@ -62,6 +69,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Widget.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toTreeModel obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
     end
     signature TreeView = sig
@@ -69,6 +77,7 @@ structure Gtk = struct
         type 'a treeview_t
         type 'a t = 'a treeview_t Container.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toTreeView : 'a t -> base t
         val get_model : 'a t -> base TreeModel.t
         val set_model : 'a t -> 'b TreeModel.t option -> unit
         val set_model' : 'a t -> unit
@@ -81,6 +90,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Container.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toTreeView obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
         val get_model_ : cptr -> cptr
             = _import "gtk_tree_view_get_model" : cptr -> cptr;
@@ -89,9 +99,9 @@ structure Gtk = struct
         val set_model_ : cptr * cptr -> unit
             = _import "gtk_tree_view_set_model" : cptr * cptr -> unit;
         val set_model : 'a t -> 'b TreeModel.t option -> unit
-            = fn self => fn model => GObject.withPtr (self,fn self => set_model_ (self,getOpt (model,GObject.null)))
+            = fn self => fn model => GObject.withPtr (self,fn self => GObject.withOpt (model,fn model => set_model_ (self,model)))
         val set_model' : 'a t -> unit
-            = fn self => GObject.withPtr (self,fn self => GObject.withPtr (GObject.null,fn GObject.null => set_model_ (self,GObject.null)))
+            = fn self => GObject.withPtr (self,fn self => set_model_ (self,GObject.null))
     end
 end
 

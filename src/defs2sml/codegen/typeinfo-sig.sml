@@ -4,7 +4,7 @@
 signature TypeInfo = sig
 
     type name = Name.name
-    type ty = (name, name) Type.ty
+    type 'a ty = (name, 'a) Type.ty
 
     type info 
 (*
@@ -15,21 +15,22 @@ signature TypeInfo = sig
 	    fromprim: TinySML.exp->TinySML.exp, toprim: TinySML.exp->TinySML.exp}
 *)
     type typeinfo
-    val build: (name,(name * name option * name list)option,('a,ty) AST.api_info) AST.module 
+    val build: (name,(name * name option * name list)option,('a,'b ty) AST.api_info) AST.module 
 	       -> typeinfo
 
     exception Unbound of name
 
-    val toSMLType: typeinfo -> (unit->string) -> ty -> SMLType.ty
-    val toSMLTypeSeq: typeinfo -> ty -> SMLType.ty
-    val toPrimType: typeinfo -> ty -> SMLType.ty
+    val toSMLType: typeinfo -> (unit->string) -> 'a ty -> SMLType.ty
+    val toSMLTypeSeq: typeinfo -> 'a ty -> SMLType.ty
+    val toPrimType: typeinfo -> 'a ty -> SMLType.ty
 
-    val fromPrimValue: typeinfo -> ty -> TinySML.exp -> TinySML.exp
+    val fromPrimValue: typeinfo -> 'a ty -> TinySML.exp -> TinySML.exp
 
-    val isWrapped: typeinfo -> ty -> bool
-    val isString : typeinfo -> ty -> bool
+    val isWrapped: typeinfo -> 'a ty -> bool
+    val isDefault : typeinfo -> 'a ty -> bool
+    val isString : typeinfo -> 'a ty -> bool
 
-    val toCValue: typeinfo -> ty -> TinyC.expr -> TinyC.expr
-    val fromCValue: typeinfo -> ty -> TinyC.expr -> TinyC.expr
+    val toCValue: typeinfo -> 'a ty -> TinyC.expr -> TinyC.expr
+    val fromCValue: typeinfo -> 'a ty -> TinyC.expr -> TinyC.expr
 
 end

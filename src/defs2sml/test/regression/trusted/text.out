@@ -10,6 +10,7 @@ structure Gtk = struct
         type 'a textbuffer_t
         type 'a t = 'a textbuffer_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toTextBuffer : 'a t -> base t
         val insert : 'a t -> textiter -> string -> int option -> unit
         val insert' : 'a t -> textiter -> string -> unit
     end
@@ -25,6 +26,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toTextBuffer obj = inherit () (fn () => repr obj)
  
         val insert_ : cptr -> cptr -> string -> int -> unit
             = app4 (symb"mgtk_gtk_textbuffer_insert")

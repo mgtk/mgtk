@@ -1,6 +1,7 @@
 TESTING
 gtk_dummy_function
 THESE_SIMPLY_DO_NOT_WORK
+_gtk_rc_init
 _gtk_settings_handle_event
 _gtk_widget_peek_colormap
 _gtk_clist_create_cell_layout

@@ -9,6 +9,7 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
         open Dynlib
@@ -22,6 +23,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toObject obj = inherit () (fn () => repr obj)
  
     end
     signature CellRenderer = sig
@@ -29,6 +31,7 @@ structure Gtk = struct
         type 'a cellrenderer_t
         type 'a t = 'a cellrenderer_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toCellRenderer : 'a t -> base t
         val get_type : unit -> int
         val set_fixed_size : 'a t -> int -> int -> unit
     end
@@ -44,6 +47,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toCellRenderer obj = inherit () (fn () => repr obj)
  
         val get_type_ : unit -> int
             = app1 (symb"mgtk_gtk_cellrenderer_get_type")

@@ -9,6 +9,7 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
         open Dynlib
@@ -22,6 +23,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toObject obj = inherit () (fn () => repr obj)
  
     end
     signature Widget = sig
@@ -29,6 +31,7 @@ structure Gtk = struct
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toWidget : 'a t -> base t
     end
     structure Widget :> Widget = struct
         open Dynlib
@@ -42,6 +45,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toWidget obj = inherit () (fn () => repr obj)
  
     end
     signature Container = sig
@@ -49,6 +53,7 @@ structure Gtk = struct
         type 'a container_t
         type 'a t = 'a container_t Widget.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toContainer : 'a t -> base t
     end
     structure Container :> Container = struct
         open Dynlib
@@ -62,6 +67,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Widget.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toContainer obj = inherit () (fn () => repr obj)
  
     end
     signature TreeModel = sig
@@ -69,6 +75,7 @@ structure Gtk = struct
         type 'a treemodel_t
         type 'a t = 'a treemodel_t Widget.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toTreeModel : 'a t -> base t
     end
     structure TreeModel :> TreeModel = struct
         open Dynlib
@@ -82,6 +89,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Widget.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toTreeModel obj = inherit () (fn () => repr obj)
  
     end
     signature TreeView = sig
@@ -89,6 +97,7 @@ structure Gtk = struct
         type 'a treeview_t
         type 'a t = 'a treeview_t Container.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toTreeView : 'a t -> base t
         val get_model : 'a t -> base TreeModel.t
         val set_model : 'a t -> 'b TreeModel.t option -> unit
         val set_model' : 'a t -> unit
@@ -105,6 +114,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Container.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toTreeView obj = inherit () (fn () => repr obj)
  
         val get_model_ : cptr -> cptr
             = app1 (symb"mgtk_gtk_treeview_get_model")

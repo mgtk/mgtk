@@ -96,7 +96,7 @@ struct
 			in  Name.fromPaths(f,p,b) end
 		      | demod_ty (Type.Base _, tyname) = Name.fromPaths([],[],[tyname])
 		      | demod_ty (_,_) = raise Fail("resType: shouldn't happen")
-		    fun demod_def d = Name.fromPaths(toName id Name.separateUnderscores current d)
+		    fun demod_def (ty,d) = Name.fromPaths(toName id Name.separateUnderscores current d)
 		in  Type.mapiv demod_ty demod_def ty end
 	    and resType' cur ty =
 		let fun demod n =

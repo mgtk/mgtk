@@ -23,9 +23,9 @@ structure Type :> Type = struct
 				   mapiv f g ret)
 	  | Base n => Base (f(ty,n))
 	  | Tname n => Tname (f(ty, n))
- 	  | WithDefault(ty, d) => WithDefault(mapiv f g ty, g d)
+ 	  | WithDefault(ty, d) => WithDefault(mapiv f g ty, g(ty,d))
 
-    fun mapi f ty = mapiv f (fn d => d) ty
+    fun mapi f ty = mapiv f (fn (_,d) => d) ty
     fun map f ty = mapi (fn (_,n) => f n) ty
 
     val toUpper = String.map Char.toUpper
@@ -46,7 +46,8 @@ structure Type :> Type = struct
 				     (fn (p,t) => p^":"^shw t)
 				     pars
 	                ^ "-> " ^ shw ty
-		  | WithDefault(ty,d) => shw ty ^ " [" ^ show_default d ^ "]"
+		  | WithDefault(ty,d) => 
+		      "<" ^ shw ty ^ "> [" ^ show_default d ^ "]"
 	in  shw ty
 	end
 

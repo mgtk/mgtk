@@ -5,6 +5,7 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
         type cptr = GObject.cptr
@@ -14,6 +15,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toObject obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
     end
     signature Widget = sig
@@ -21,6 +23,7 @@ structure Gtk = struct
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toWidget : 'a t -> base t
     end
     structure Widget :> Widget = struct
         type cptr = GObject.cptr
@@ -30,6 +33,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toWidget obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
     end
     signature ItemFactory = sig
@@ -37,6 +41,7 @@ structure Gtk = struct
         type 'a itemfactory_t
         type 'a t = 'a itemfactory_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toItemFactory : 'a t -> base t
         val get_item : 'a t -> string -> base Widget.t
         val get_widget : 'a t -> string -> base Widget.t
     end
@@ -48,6 +53,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toItemFactory obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
         val get_item_ : cptr * CString.cstring -> cptr
             = _import "gtk_item_factory_get_item" : cptr * CString.cstring -> cptr;

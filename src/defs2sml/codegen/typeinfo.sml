@@ -30,7 +30,7 @@ end (* structure MosmlPrimTypes *)
 functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     
     type name = Name.name
-    type ty = (name,name) Type.ty
+    type 'a ty = (name,'a) Type.ty
 
     (* build a table mapping type names to
      *    SML types and SML primitive types
@@ -283,6 +283,13 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       )
 	  | Type.WithDefault(ty,default) => isWrapped tinfo ty
 	  | Type.Ptr ty => isWrapped tinfo ty
+	  | _ => false
+
+    fun isDefault tinfo ty =
+	case ty of
+	    Type.Ptr ty => isDefault tinfo ty
+	  | Type.Const ty => isDefault tinfo ty
+	  | Type.WithDefault(ty,default) => true
 	  | _ => false
 
     fun isString tinfo ty =

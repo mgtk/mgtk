@@ -18,6 +18,7 @@ structure Gtk = struct
         type 'a settings_t
         type 'a t = 'a settings_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toSettings : 'a t -> base t
     end
     structure Settings :> Settings = struct
         open Dynlib
@@ -31,6 +32,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toSettings obj = inherit () (fn () => repr obj)
  
     end
     signature Style = sig
@@ -38,6 +40,7 @@ structure Gtk = struct
         type 'a style_t
         type 'a t = 'a style_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toStyle : 'a t -> base t
     end
     structure Style :> Style = struct
         open Dynlib
@@ -51,6 +54,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toStyle obj = inherit () (fn () => repr obj)
  
     end
     signature RcStyle = sig
@@ -58,6 +62,7 @@ structure Gtk = struct
         type 'a rcstyle_t
         type 'a t = 'a rcstyle_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toRcStyle : 'a t -> base t
         val rc_get_style_by_paths : 'a Settings.t -> string -> string -> int -> base Style.t
     end
     structure RcStyle :> RcStyle = struct
@@ -72,6 +77,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toRcStyle obj = inherit () (fn () => repr obj)
  
         val rc_get_style_by_paths_ : cptr -> string -> string -> int -> cptr
             = app4 (symb"mgtk_gtk_rc_get_style_by_paths")
@@ -83,6 +89,7 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
         open Dynlib
@@ -96,6 +103,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toObject obj = inherit () (fn () => repr obj)
  
     end
     signature Widget = sig
@@ -103,6 +111,7 @@ structure Gtk = struct
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toWidget : 'a t -> base t
         val modify_style : 'a t -> 'b RcStyle.t -> unit
     end
     structure Widget :> Widget = struct
@@ -117,6 +126,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toWidget obj = inherit () (fn () => repr obj)
  
         val modify_style_ : cptr -> cptr -> unit
             = app2 (symb"mgtk_gtk_widget_modify_style")

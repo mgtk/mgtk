@@ -9,8 +9,9 @@ signature PRIMITIVES = sig
     val getEnums : string -> Name.name list -> TinySML.exp
     val unWrap: (Name.name, Name.name) Type.ty * TinySML.exp -> TinySML.exp
     val toPrimString : TinySML.exp -> TinySML.exp
+    val mkToFunc: unit -> TinySML.exp
     val callStub : TypeInfo.typeinfo -> string  -> (Name.name, Name.name) Type.ty
-		-> (TinySML.exp * (Name.name, Name.name) Type.ty) list -> TinySML.exp
+		-> (TinySML.exp * (Name.name, TinySML.exp) Type.ty) list -> TinySML.exp
     val strHeader : TinySML.decl list
 end (* signature PRIMTIVES *)
 
@@ -33,12 +34,19 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
       | unWrap (t,e) = App(Var "repr", [e])
     val toPrimString = fn e => e
 
+    fun mkToFunc () = 
+	App(Var"inherit", [Unit,Fn("()",App(Var"repr",[Var"obj"]))])
+
     fun callStub tinfo name ret pars = 
-	App(Var(name^"_"),
-	    if List.length pars > max_curried
-	    then [Tup(List.map #1 pars)]
-	    else List.map #1 pars
-           )
+	let fun default (par,t as Type.WithDefault(ty, v)) = 
+		App(Var"getOpt", [Tup[par, v]])
+	      | default (par,ty) = par
+	in  App(Var(name^"_"),
+		if List.length pars > max_curried
+		then [Tup(List.map default pars)]
+		else List.map default pars
+            )
+	end
 
     val strHeader =
         [ Open["Dynlib"]
@@ -73,18 +81,38 @@ functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
         fun toPrimString e = App(Var("CString.fromString"), [e])
     end
 
+    fun mkToFunc () = 
+	App(Var"inherit", 
+	    [Unit,Fn("()",App(Var"GObject.withPtr",
+			      [Tup[Var"obj",Fn("obj",Var"obj")]]))])
+
     fun callStub tinfo name ret pars = 
-	let fun f ((Var v,t), c) =
-		if TypeInfo.isWrapped tinfo t
-		then App(Var"GObject.withPtr", [Tup[Var v, Fn(v, c)]])
+	let val fresh = ref 0
+	    val next = fn () => (!fresh before fresh := !fresh + 1)
+	    fun mk (Var v) = v
+	      | mk e = "v"^Int.toString(next())
+	    fun unwrapper (Type.WithDefault _) = "GObject.withOpt"
+	      | unwrapper (Type.Ptr ty)        = unwrapper ty
+	      | unwrapper _                    = "GObject.withPtr"
+	    fun f ((Var "GObject.null",_), c) = c (* hack to avoid unwrapping with withPtr *)
+	      | f ((e,ty), c) =
+		if TypeInfo.isWrapped tinfo ty
+		then let val v = mk e
+		     in  App(Var(unwrapper ty), [Tup[e, Fn(v, c)]])
+		     end
 		else c
-	      | f ((Const v,t), c) = c
-	      | f ((e,t), c) = c
-		(* FIXME:
-		if TypeInfo.isWrapped tinfo t then raise Fail("oops")
-		else c
-                *)
-	    val stub = App(Var(name^"_"), [Tup(List.map #1 pars)])
+	    fun g (e, Type.WithDefault(ty,def)) = 
+		if TypeInfo.isWrapped tinfo ty
+		then (* already handled by withOpt above *) e
+		else (if TypeInfo.isString tinfo ty
+		      then toPrimString
+		      else fn e => e) 
+		     (App(Var"getOpt", [Tup[e, def]]))
+	      | g (e, ty) = 
+		if TypeInfo.isString tinfo ty
+		then toPrimString e
+		else e
+	    val stub = App(Var(name^"_"), [Tup(List.map g pars)])
 	    val call = if TypeInfo.isString tinfo ret
 		       then Let(ValDecl(VarPat"t",None,stub),
 				App(Var"CString.toString",[Var"t"]))
@@ -176,7 +204,8 @@ struct
 	let val v = Name.toString value (* FIXME: trim the string here *)
 	in  if String.size v = 0 then raise Fail("Unrecognized C value: "^Name.toString' value)
 	    else if Prims.TypeInfo.isString tinfo ty andalso v = "NULL" 
-	         then Prims.toPrimString(Const "\"\"")
+	         then Const "\"\"" (* converted to a primitive string in
+                                      callStub *)
 	    else if v = "NULL" then Var("GObject.null")
 	    else if v = "TRUE" then Const("true")
 	    else if v = "FALSE" then Const("false")
@@ -209,17 +238,23 @@ struct
 		      | isWidgetType (Type.Ptr t) = isWidgetType t
 		      | isWidgetType _ = false
 		    fun var (par,ty) = (Var par, ty)
-		    fun default (par,Type.WithDefault(ty, v)) = 
-			(App(Var"getOpt", [Tup[par, transCValue tinfo (ty,v)]]), ty)
+(*
+		    fun default (par,t as Type.WithDefault(ty, v)) = 
+			(App(Var"getOpt", [Tup[par, transCValue tinfo (ty,v)]]), t)
 		      | default (par,ty) = (par, ty)
+*)
 		    fun wrap (par,ty) =
 			(if TypeInfo.isWrapped tinfo ty
 			 then (Prims.unWrap (ty,par),ty)
+(* now handled by callStub
 			 else if TypeInfo.isString tinfo ty
 			 then (Prims.toPrimString (par),ty)
+*)
 			 else (par, ty))
 			handle TypeInfo.Unbound n => ubnd n
-		    val pars' = List.map (default o wrap o var) parsty
+		    fun trans (par, ty) = 
+			(par, Type.mapiv (fn (ty,n)=>n) (transCValue tinfo) ty)
+		    val pars' = List.map (trans o wrap o var) parsty
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 
 			fromtype' ty handle TypeInfo.Unbound n => ubnd n
@@ -243,10 +278,12 @@ struct
 		    fun fromtype ty = 
 			fromtype' ty handle TypeInfo.Unbound n => ubnd n
 
-		    fun default (_, Type.WithDefault(ty,v)) = 
+		    fun default (_, t as Type.WithDefault(ty,v)) = 
 			(transCValue tinfo (ty,v), ty)
+		                      (* the second ty above is correct here to
+				         avoid extra calls to withPtr *)
 		      | default (p, ty) = wrap (Var p, ty)
-		    val defpars = List.map default parsty
+		    val defpars = List.map (trans o default) parsty
 		    val defparams = 
 			List.map (fromtype o #2) 
 				 (List.filter (not o isDefault) params)
@@ -419,7 +456,7 @@ struct
 		    App(Var("inherit"),[Unit,Fn("()",Var"ptr")])))
 	 ++ Some(FunDecl("to"^Name.asModule name, [VarPat "obj"],
 	         Some([TyApp([TyVar "'a"],["t"])] ==> TyApp([TyVar "base"],["t"])),
-		 App(Var"inherit", [Unit,Fn("()",App(Var"repr",[Var"obj"]))])))
+		 Prims.mkToFunc ()))
          ++ StrOnly(Comment NONE)
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)

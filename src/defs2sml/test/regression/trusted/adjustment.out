@@ -9,6 +9,7 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
         open Dynlib
@@ -22,6 +23,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toObject obj = inherit () (fn () => repr obj)
  
     end
     signature Adjustment = sig
@@ -29,6 +31,7 @@ structure Gtk = struct
         type 'a adjustment_t
         type 'a t = 'a adjustment_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toAdjustment : 'a t -> base t
         val new : real option -> real option -> real option -> real option -> real option -> real option -> base t
         val new' : unit -> base t
     end
@@ -44,6 +47,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toAdjustment obj = inherit () (fn () => repr obj)
  
         val new_ : real * real * real * real * real * real -> cptr
             = app1 (symb"mgtk_gtk_adjustment_new")
@@ -57,6 +61,7 @@ structure Gtk = struct
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toWidget : 'a t -> base t
         val set_scroll_adjustments : 'a t -> 'b Adjustment.t option -> 'c Adjustment.t option -> bool
         val set_scroll_adjustments' : 'a t -> bool
     end
@@ -72,6 +77,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toWidget obj = inherit () (fn () => repr obj)
  
         val set_scroll_adjustments_ : cptr -> cptr -> cptr -> bool
             = app3 (symb"mgtk_gtk_widget_set_scroll_adjustments")

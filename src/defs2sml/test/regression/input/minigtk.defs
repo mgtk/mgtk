@@ -97,6 +97,29 @@
   (return-type "none")
 )
 
+(define-object Misc
+  (in-module "Gtk")
+  (parent "GtkWidget")
+  (c-name "GtkMisc")
+  (gtype-id "GTK_TYPE_MISC")
+)
+
+(define-object Label
+  (in-module "Gtk")
+  (parent "GtkMisc")
+  (c-name "GtkLabel")
+  (gtype-id "GTK_TYPE_LABEL")
+)
+
+(define-function gtk_label_new
+  (c-name "gtk_label_new")
+  (is-constructor-of GtkLabel)
+  (return-type "GtkWidget*")
+  (parameters
+    '("const-char*" "str" (null-ok) (default "NULL"))
+  )
+)
+
 (define-method set_border_width
   (of-object "GtkContainer")
   (c-name "gtk_container_set_border_width")

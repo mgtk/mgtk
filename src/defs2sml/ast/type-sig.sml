@@ -16,7 +16,7 @@ signature Type = sig
     val show: ('n -> string) -> ('v -> string) -> ('n,'v) ty -> string
     val map: ('n1 -> 'n2) -> ('n1,'v) ty -> ('n2,'v) ty
     val mapi: ((('n1,'v) ty * 'n1) -> 'n2) -> ('n1,'v) ty -> ('n2,'v) ty
-    val mapiv: ((('n1,'v1) ty * 'n1) -> 'n2) -> ('v1 -> 'v2)
+    val mapiv: ((('n1,'v1) ty * 'n1) -> 'n2) -> (('n1,'v1) ty * 'v1 -> 'v2)
              -> ('n1,'v1) ty -> ('n2,'v2) ty
 
     val getParams: ('n,'v) ty -> (string * ('n,'v) ty) list

@@ -5,6 +5,7 @@ structure Gtk = struct
         type 'a object_t
         type 'a t = 'a object_t GObject.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
         type cptr = GObject.cptr
@@ -14,6 +15,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in GObject.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toObject obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
     end
     signature Adjustment = sig
@@ -21,6 +23,7 @@ structure Gtk = struct
         type 'a adjustment_t
         type 'a t = 'a adjustment_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toAdjustment : 'a t -> base t
         val new : real option -> real option -> real option -> real option -> real option -> real option -> base t
         val new' : unit -> base t
     end
@@ -32,6 +35,7 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toAdjustment obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
         val new_ : real * real * real * real * real * real -> cptr
             = _import "gtk_adjustment_new" : real * real * real * real * real * real -> cptr;
@@ -45,6 +49,7 @@ structure Gtk = struct
         type 'a widget_t
         type 'a t = 'a widget_t Object.t
         val inherit : 'a -> GObject.constructor -> 'a t
+        val toWidget : 'a t -> base t
         val set_scroll_adjustments : 'a t -> 'b Adjustment.t option -> 'c Adjustment.t option -> bool
         val set_scroll_adjustments' : 'a t -> bool
     end
@@ -56,13 +61,14 @@ structure Gtk = struct
         fun inherit w con = let         val con = let         val ptr = con () in fn () => ptr end
         val witness = () in Object.inherit witness con end
         fun make ptr = inherit () (fn () => ptr)
+        fun toWidget obj = inherit () (fn () => GObject.withPtr (obj,fn obj => obj))
  
         val set_scroll_adjustments_ : cptr * cptr * cptr -> bool
             = _import "gtk_widget_set_scroll_adjustments" : cptr * cptr * cptr -> bool;
         val set_scroll_adjustments : 'a t -> 'b Adjustment.t option -> 'c Adjustment.t option -> bool
-            = fn self => fn hadjustment => fn vadjustment => GObject.withPtr (self,fn self => set_scroll_adjustments_ (self,getOpt (hadjustment,GObject.null),getOpt (vadjustment,GObject.null)))
+            = fn self => fn hadjustment => fn vadjustment => GObject.withPtr (self,fn self => GObject.withOpt (hadjustment,fn hadjustment => GObject.withOpt (vadjustment,fn vadjustment => set_scroll_adjustments_ (self,hadjustment,vadjustment))))
         val set_scroll_adjustments' : 'a t -> bool
-            = fn self => GObject.withPtr (self,fn self => GObject.withPtr (GObject.null,fn GObject.null => GObject.withPtr (GObject.null,fn GObject.null => set_scroll_adjustments_ (self,GObject.null,GObject.null))))
+            = fn self => GObject.withPtr (self,fn self => set_scroll_adjustments_ (self,GObject.null,GObject.null))
     end
 end
 

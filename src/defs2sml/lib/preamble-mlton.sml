@@ -70,6 +70,7 @@ sig
     val null : cptr
 
     val withPtr  : 'a t * (cptr -> 'b) -> 'b
+    val withOpt  : 'a t option * (cptr -> 'b) -> 'b
     val inherit  : 'a -> constructor -> 'a t
     val toObject : 'a t -> base t
 
@@ -79,8 +80,7 @@ end
 structure GObject :> GObject =
 struct
     structure F = MLton.Finalizable
-(*    structure FXP = FinalizableXP
-*)
+
     type cptr = MLton.Pointer.t
     type base = unit
 
@@ -91,6 +91,8 @@ struct
     val null = MLton.Pointer.null
 
     fun withPtr (OBJ ptr, f) = F.withValue(ptr, f)
+    fun withOpt (SOME(OBJ ptr), f) = F.withValue(ptr, f)
+      | withOpt (NONE, f)          = F.withValue(F.new null, f)
 
     val object_ref = _import "g_object_ref" : cptr -> cptr;
     val object_unref = _import "g_object_unref" : cptr -> unit;
