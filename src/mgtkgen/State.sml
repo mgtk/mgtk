@@ -1,21 +1,31 @@
 (* defs2sml --- generate wrapper code from .defs file.                      *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000.                        *)
 
+(* why is there a difference between string options and bool options? *)
+
 structure State =
 struct
 
     (* Options *)
     datatype origin = COMMAND_LINE | FROM_FILE
 
+    datatype opt = STRING of string option | BOOL of bool
     local
 	(* option_value represents the values stored with an option. *)
 	datatype option_value = 
-	    STRING of string
-          | BOOL of bool
+	    STR of string
+	  | BL of bool
 
-	fun getString (STRING s) = if s="" then NONE else SOME s
+	fun mkString (SOME s) = s
+	  | mkString NONE = ""
+	fun fromString "" = NONE
+          | fromString s = SOME s
+	fun mkOption (STRING s) = STR (mkString s)
+          | mkOption (BOOL b) = BL b
+        
+	fun getString (STR s) = if s="" then NONE else SOME s
           | getString _ = Util.shouldntHappen ("Not a string option")
-	fun getBool (BOOL b) = b
+	fun getBool (BL b) = b
           | getBool _ = Util.shouldntHappen ("Not a string option")
 
 
@@ -61,32 +71,26 @@ struct
 	    insert (name, originToInfo origin value)
 
     in 
-	fun addStringOption name default = 
-	    let val def = if default = NONE then "" else (valOf default)
-	    in  insert (name, DEF (STRING def))
-	    end
-	fun addBoolOption name default = insert (name, DEF (BOOL default))
 
-	fun setStringOption origin name value =
+	fun addOption name default =
+	    insert (name, DEF (mkOption default))
+
+	fun addStringOption name = (addOption name) o STRING
+	fun addBoolOption name = (addOption name) o BOOL
+
+	fun setOption origin name value =
 	    let val info = lookup name
-		val valu = if value = NONE then "" else (valOf value)
-	    in  if priority (origin, info) then set name (STRING valu) origin
-		else ()
-	    end
-	fun setBoolOption origin name value =
-	    let val info = lookup name
-	    in  if priority (origin, info) then set name (BOOL value) origin
+	    in  if priority (origin, info) then set name (mkOption value) origin
 		else ()
 	    end
 
-	fun getStringOption name =
-	    let val info = lookup name
-	    in  getString(getValueFromInfo info)
-	    end
-	fun getBoolOption name =
-	    let val info = lookup name
-	    in  getBool(getValueFromInfo info)
-	    end
+	fun setStringOption origin name = (setOption origin name) o STRING
+	fun setBoolOption origin name = (setOption origin name) o BOOL
+
+	fun getOption name = getValueFromInfo (lookup name)
+
+	val getStringOption = getString o getOption
+	val getBoolOption   = getBool o getOption
 
     end
 
@@ -94,22 +98,28 @@ end (* structure State *)
 
 (*
 
+    [addOption name value] declare a new option (type specified
+    by the value argument) with default value default.
+
     [addStringOption name default] declare a new string option name
     with default value default.
 
     [addBoolOption name default] declare a new string option name
     with default value default.
 
-    [setStringOption origin name value] set the string option name to
-    the value value provided values originating from origin takes
-    precedence over what is already stored for name. Everything take
-    precedence over default values and command-line parameters take
-    precedence over options specified in the .defs file.
+    [setOption origin name value] set the option name to the value
+    value PROVIDED values originating from origin takes precedence
+    over what is already stored for name. Everything take precedence
+    over default values and command-line parameters take precedence
+    over options specified in the .defs file.
 
-    [setBoolOption origin name value] set the string option name to
-    the value value provided values originating from origin takes
-    precedence over what is already stored for name. The precedence
-    rules are as for string options.
+    [setStringOption origin name value] set the string option name to
+    the value (under the rules for setOption).
+
+    [setBoolOption origin name value] set the bool option name to
+    the value (under the rules for setOption).
+
+    [getOption name] return the value stored for the option name.
 
     [getStringOption name] return the value stored for string option
     name.

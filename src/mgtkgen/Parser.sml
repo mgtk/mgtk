@@ -45,6 +45,7 @@ struct
     val defEnum =  $ "define-enum"
     val defBoxed = $ "define-boxed"
     val defSignal = $ "define-signal"
+    val defOptions = $ "options"
     val listQual = $ "list"
 
     (* word actually allows slightly more than we want --- words
@@ -137,6 +138,22 @@ struct
 	 -- optional cbType
 	)
 
+    (* options --- *will* take effect for the translation, even if they
+       are last in the .defs file, since they are first used durin
+       translation *)
+    val optionName = word
+    val optionValue = (  $ "true"  >> (fn _ => State.BOOL true)
+                      || $ "false" >> (fn _ => State.BOOL false)
+                      || optional string >> State.STRING
+                      )
+    val option = parens (optionName -- optionValue)
+	         >> (fn (name, opt) => State.setOption State.FROM_FILE name opt)
+    val optionsDecl = parens'
+	(   defOptions
+        #-- parens (repeat0 option)
+        ) 
+        >> (fn _ => ([]: AST.declaration list)) (* options do not lead to any declaration *)
+
     (* the various forms of declarations *)
     val decl' = (mdlDecl >> PU.mkModuleDecl)
              || (widDecl >> PU.mkWidgetDecl) 
@@ -145,6 +162,7 @@ struct
              || (flagsDecl >> PU.mkFlagsDecl false)
              || (boxedDecl >> PU.mkBoxedDecl)
              || (signalDecl >> PU.mkSignalDecl)
+             || optionsDecl
 
 (*
     fun definePred (Lexer.WORD (pos, str)) = String.isPrefix "define" str
