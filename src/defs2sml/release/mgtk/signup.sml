@@ -64,7 +64,7 @@ fun setUpGui() =
                 end
                     
         fun nameChanged () =
-            let val e = Entry.get_text firstname_entry ^
+            let val e = Entry.get_text firstname_entry ^ "."
                         Entry.get_text lastname_entry ^
                         "@example.net"
                 fun emailize c = if Char.isSpace c then #"_" 
