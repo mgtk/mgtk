@@ -6,6 +6,16 @@
 \RequirePackage{fancyvrb}
 \RequirePackage[numbers]{natbib}
 \RequirePackage{url}
+\RequirePackage{subfigure}
+
+\newbox\subfigbox
+\newenvironment{subfloat}%
+{\def\caption##1{\gdef\subcapsave{\relax##1}}%
+  \let\subcapsave\@empty%
+  \setbox\subfigbox\hbox%
+  \bgroup}%
+{\egroup%
+  \subfigure[\subcapsave]{\box\subfigbox}}%
 
 %% Font mucking
 \RequirePackage{mathptmx}

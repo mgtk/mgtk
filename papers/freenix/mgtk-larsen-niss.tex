@@ -139,7 +139,9 @@ algorithms), and a \emph{module language} for programming in the large.
 
 \begin{figure*}[thp]
 \mbox{}\hfill{}
-\begin{minipage}[t]{.46\linewidth}
+
+\begin{subfloat}
+\begin{minipage}[b]{.46\linewidth}
 \begin{verbatim}
 signature STACK = sig 
   type 'a stack
@@ -150,8 +152,11 @@ signature STACK = sig
 end
 \end{verbatim}
 \end{minipage}
-\hfill
-\begin{minipage}[t]{.46\linewidth}
+\caption{\label{fig:stack-sig}interface}
+\end{subfloat}
+\qquad
+\begin{subfloat}
+\begin{minipage}[b]{.46\linewidth}
 \begin{verbatim}
 structure Stack :> STACK =
 struct
@@ -170,13 +175,20 @@ struct
 end
 \end{verbatim}
 \end{minipage}
+\caption{\label{fig:stack-struct}implementation}
+\end{subfloat}
 \hfill\mbox{}
 \caption{Simple stack library implemented in SML.}
   \label{fig:stack-lib}
 \end{figure*}
 
 Figure~\ref{fig:stack-lib} show a small stack library implemented in
-SML.  This examples shows most of the important features of SML.
+SML.  This examples shows most of the important features of SML.  The
+library consists of two parts: an interface description, which is
+called a \emph{signature} in SML (Figure~\ref{fig:stack-sig}), and an
+implementation, which is called a \emph{structure} in SML
+(Figure~\ref{fig:stack-struct}).
+
 
 
 %  \sml also features algebraic
