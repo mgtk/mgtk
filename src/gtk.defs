@@ -23,6 +23,18 @@
 ; * stuff that Henning wants to reconsider have triple `;''s
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;(module Glib)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; [Ken] FIXME: is this the correct way to do this
+;(define-enum g_priority
+;  (high G_PRIORITY_HIGH)
+;  (default G_PRIORITY_DEFAULT)
+;  (high-idle G_PRIORITY_HIGH_IDLE)
+;  (default-idle G_PRIORITY_DEFAULT_IDLE)
+;  (low G_PRIORITY_LOW))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (module Gdk)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
