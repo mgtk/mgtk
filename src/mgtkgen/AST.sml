@@ -47,7 +47,7 @@ struct
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
       | FLAGS_DECL of pos * string * constructor list
       | BOXED_DECL of pos * string * (string list) * string option
-      | SIGNAL_DECL of pos * string * string * long_texp option
+      | SIGNAL_DECL of pos * string * string list * long_texp option
 
     fun isWidget (OBJECT_DECL _) = true
       | isWidget _ = false
@@ -60,11 +60,15 @@ struct
     fun isSignal (SIGNAL_DECL _) = true
       | isSignal _ = false
 
+    fun signalOf [n] = n
+      | signalOf [p,n] = n
+      | signalOf _ = Util.shouldntHappen "not a signal"
+
     fun nameOf (OBJECT_DECL (_, obj, _, _)) = obj
       | nameOf (FUNCTION_DECL (_, func, _, _)) = func
       | nameOf (FLAGS_DECL (_, flag, _)) = flag
       | nameOf (BOXED_DECL (_,typ, _, _)) = typ
-      | nameOf (SIGNAL_DECL (_, widget, signal, _)) = signal
+      | nameOf (SIGNAL_DECL (_, widget, signal, _)) = signalOf signal
 
     fun typeOf (OBJECT_DECL _) = "object"
       | typeOf (FUNCTION_DECL _) = "function"
@@ -118,8 +122,8 @@ struct
 	    flag1 = flag1 andalso equal_list equal_cons (cons1,cons2)
 	  | equal (BOXED_DECL(_,typ1,funcs1,_), BOXED_DECL(_,typ2,funcs2,_)) =
 	    typ1 = typ2 andalso equal_list (op =) (funcs1, funcs2)
-	  | equal (SIGNAL_DECL(_,signal1,wid1,cbType1), SIGNAL_DECL(_,signal2,wid2,cbType2)) =
-	    signal1 = signal2 andalso wid1 = wid2 andalso equal_opt equal_long_texp (cbType1, cbType2)
+	  | equal (SIGNAL_DECL(_,wid1,signal1,cbType1), SIGNAL_DECL(_,wid2,signal2,cbType2)) =
+	    wid1 = wid2 andalso equal_list (op =) (signal1,signal2) andalso equal_opt equal_long_texp (cbType1, cbType2)
 	  | equal _ = false
 	    
     end (* local *)

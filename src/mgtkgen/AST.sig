@@ -27,7 +27,7 @@ sig
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
       | FLAGS_DECL of pos * string * constructor list
       | BOXED_DECL of pos * string * (string list) * string option
-      | SIGNAL_DECL of pos * string * string * long_texp option
+      | SIGNAL_DECL of pos * string * string list * long_texp option
 
     val isWidget: declaration -> bool
     val isFunction: declaration -> bool
@@ -36,6 +36,7 @@ sig
     val isSignal: declaration -> bool
 
     val nameOf: declaration -> string
+    val signalOf: string list -> string
     val typeOf: declaration -> string
     val posOf: declaration -> pos
 
@@ -72,6 +73,8 @@ end
 
    [nameOf decl] returns the name of the object being declared by the
    declaration decl.
+
+   [signalOf signal] returns the Gtk-signal part of the signal signal.
 
    [typeOf decl] returns a string describing the type of declaration.
 

@@ -5119,6 +5119,10 @@
 
 (define-object GtkMenuShell (GtkContainer))
 
+(define-func gtk_menu_shell_get_type
+  GtkGtkType
+  ())
+
 (define-func gtk_menu_shell_append
   none
   ((GtkMenuShell menu_shell)
@@ -5158,6 +5162,10 @@
 
 (define-object GtkMenuBar (GtkMenuShell))
 
+(define-func gtk_menu_bar_get_type
+  GtkGtkType
+  ())
+
 (define-func gtk_menu_bar_new
   GtkMenuBar
   ())
@@ -5186,6 +5194,10 @@
 ; Menu
 
 (define-object GtkMenu (GtkMenuShell))
+
+(define-func gtk_menu_get_type
+  GtkGtkType
+  ())
 
 (define-func gtk_menu_new
   GtkMenu
@@ -5265,6 +5277,10 @@
 
 (define-object GtkMenuItem (GtkItem))
 
+(define-func gtk_menu_item_get_type
+  GtkGtkType
+  ())
+
 (define-func gtk_menu_item_new
   GtkMenuItem
   ())
@@ -5315,6 +5331,9 @@
   (fields
    (uint active))
 )
+(define-func gtk_check_menu_item_get_type
+  GtkGtkType
+  ())
 
 (define-func gtk_check_menu_item_new
   GtkCheckMenuItem
@@ -5342,6 +5361,10 @@
 
 (define-object GtkRadioMenuItem (GtkCheckMenuItem))
 
+(define-func gtk_radio_menu_item_get_type
+  GtkGtkType
+  ())
+
 ;;(define-func gtk_radio_menu_item_new_interp
 ;;  GtkRadioMenuItem
 ;;  ((GtkRadioMenuItem group (null-ok))))
@@ -5354,6 +5377,10 @@
 ; OptionMenu
 
 (define-object GtkOptionMenu (GtkButton))
+
+(define-func gtk_option_menu_get_type
+  GtkGtkType
+  ())
 
 (define-func gtk_option_menu_new
   GtkOptionMenu
@@ -5380,6 +5407,11 @@
 ; Tearoffs
 
 (define-object GtkTearoffMenuItem (GtkMenuItem))
+
+(define-func gtk_tearoff_menu_item_get_type
+  GtkGtkType
+  ())
+
 (define-func gtk_tearoff_menu_item_new
   GtkTearoffMenuItem
   ())
@@ -5388,11 +5420,11 @@
 
 (define-object GtkItemFactory (GtkObject))
 
-;(define-func gtk_item_factory_new
-;  GtkItemFactory
-;  ((GtkGtkType container_type)
-;   (string path)
-;   (GtkAccelGroup group)))
+(define-func gtk_item_factory_new
+  GtkItemFactory
+  ((int container_type)
+   (string path)
+   (GtkAccelGroup group)))
 
 (define-func gtk_item_factory_parse_rc
   none
@@ -5949,7 +5981,7 @@
 
 ;(define-signal GtkAccelGroup "add-accelerator")
 ;(define-signal GtkAccelGroup "remove-accelerator")
-;(define-signal GtkAdjustment "changed")
+(define-signal GtkAdjustment ("changed" "adjustment"))
 (define-signal GtkAdjustment "value_changed")
 (define-signal GtkButton "pressed")
 (define-signal GtkButton "released")
@@ -5963,36 +5995,36 @@
 (define-signal GtkCalendar "next_month")
 (define-signal GtkCalendar "prev_year")
 (define-signal GtkCalendar "next_year")
-;(define-signal GtkCheckMenuItem "toggled")
-;(define-signal GtkCList "set_scroll_adjustments")
+(define-signal GtkCheckMenuItem ("toggled" "check_menu_item"))
+(define-signal GtkCList ("set_scroll_adjustments" "clist"))
 (define-signal GtkCList "select_row")
 (define-signal GtkCList "unselect_row")
 (define-signal GtkCList "row_move")
 (define-signal GtkCList "click_column")
 (define-signal GtkCList "resize_column")
-;(define-signal GtkCList "toggle_focus_row")
-;(define-signal GtkCList "select_all")
-;(define-signal GtkCList "unselect_all")
-;(define-signal GtkCList "undo_selection")
-;(define-signal GtkCList "start_selection")
-;(define-signal GtkCList "end_selection")
-;(define-signal GtkCList "toggle_add_mode")
-;(define-signal GtkCList "extend_selection")
-;(define-signal GtkCList "scroll_vertical")
-;(define-signal GtkCList "scroll_horizontal")
-;(define-signal GtkCList "abort_column_resize")
+(define-signal GtkCList ("toggle_focus_row" "clist"))
+(define-signal GtkCList ("select_all" "clist"))
+(define-signal GtkCList ("unselect_all" "clist"))
+(define-signal GtkCList ("undo_selection" "clist"))
+(define-signal GtkCList ("start_selection" "clist"))
+(define-signal GtkCList ("end_selection" "clist"))
+(define-signal GtkCList ("toggle_add_mode" "clist"))
+(define-signal GtkCList ("extend_selection" "clist"))
+(define-signal GtkCList ("scroll_vertical" "clist"))
+(define-signal GtkCList ("scroll_horizontal" "clist"))
+(define-signal GtkCList ("abort_column_resize" "clist"))
 ;(define-signal GtkColorsel "color_changed")
 (define-signal GtkContainer "add")
 (define-signal GtkContainer "remove")
 (define-signal GtkContainer "check_resize")
 (define-signal GtkContainer "focus")
 (define-signal GtkContainer "set-focus-child")
-;(define-signal GtkCTree "tree_select_row")
-;(define-signal GtkCTree "tree_unselect_row")
-;(define-signal GtkCTree "tree_expand")
-;(define-signal GtkCTree "tree_collapse")
-;(define-signal GtkCTree "tree_move")
-;(define-signal GtkCTree "change_focus_row_expansion")
+(define-signal GtkCTree ("tree_select_row" "ctree"))
+(define-signal GtkCTree ("tree_unselect_row" "ctree"))
+(define-signal GtkCTree ("tree_expand" "ctree"))
+(define-signal GtkCTree ("tree_collapse" "ctree"))
+(define-signal GtkCTree ("tree_move" "ctree"))
+(define-signal GtkCTree ("change_focus_row_expansion" "ctree"))
 ;(define-signal GtkCurve "curve_type_changed")
 (define-signal GtkData "disconnect")
 (define-signal GtkEditable "changed")
@@ -6019,9 +6051,9 @@
 (define-signal GtkItem "deselect")
 (define-signal GtkItem "toggle")
 ;(define-signal GtkLayout "set_scroll_adjustments")
-;(define-signal GtkList "selection_changed")
-;(define-signal GtkList "select_child")
-;(define-signal GtkList "unselect_child")
+(define-signal GtkList ("selection_changed" "list"))
+(define-signal GtkList ("select_child" "list"))
+(define-signal GtkList ("unselect_child" "list"))
 (define-signal GtkListItem "toggle_focus_row")
 (define-signal GtkListItem "select_all")
 (define-signal GtkListItem "unselect_all")
@@ -6032,13 +6064,13 @@
 (define-signal GtkListItem "extend_selection")
 (define-signal GtkListItem "scroll_vertical")
 (define-signal GtkListItem "scroll_horizontal")
-;(define-signal GtkMenuItem "activate")
-;(define-signal GtkMenuItem "activate_item")
-;(define-signal GtkMenuShell "deactivate")
-;(define-signal GtkMenuShell "selection-done")
-;(define-signal GtkMenuShell "move_current")
-;(define-signal GtkMenuShell "activate_current")
-;(define-signal GtkMenuShell "cancel")
+(define-signal GtkMenuItem ("activate" "menu_item"))
+(define-signal GtkMenuItem ("activate_item" "menu_item"))
+(define-signal GtkMenuShell ("deactivate" "menu_shell"))
+(define-signal GtkMenuShell ("selection-done" "menu_shell"))
+(define-signal GtkMenuShell ("move_current" "menu_shell"))
+(define-signal GtkMenuShell ("activate_current" "menu_shell"))
+(define-signal GtkMenuShell ("cancel" "menu_shell"))
 (define-signal GtkNotebook "switch_page")
 (define-signal GtkObject "destroy")
 (define-signal GtkStatusbar "text_pushed")
@@ -6109,4 +6141,3 @@
 (define-signal GtkWidget "no_expose_event")
 (define-signal GtkWidget "debug_msg")
 (define-signal GtkWindow "set_focus")
-

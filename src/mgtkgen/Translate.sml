@@ -16,7 +16,13 @@ struct
        and the corresponding ML (type) names *)
     fun mlWidgetName typExp = NameUtil.removePrefix typExp
     fun mlFunName name = NameUtil.remove_prefix name
-    fun mlSignalName signal = String.map (fn #"-" => #"_" | ch => ch) signal
+    fun mlSignalName signal = 
+	let fun cnv signal = String.map (fn #"-" => #"_" | ch => ch) signal
+	in  case signal of
+	        [signal] => cnv signal
+              | [prefix,signal] => cnv (prefix ^ "_" ^ signal)
+              | _ => Util.shouldntHappen "Not a signal"
+        end
     fun mlFlagName name = NameUtil.remove_PREFIX name
     fun mlEnumName name = NameUtil.remove_PREFIX name
 
@@ -733,7 +739,7 @@ old*)
 	   in  mkValDecl ("connect_" ^ mlSignalName signal, 
 			  mkMLType(mlConnectType (name, cbType)),
 			  SOME($$["fn wid => fn cb => ", cnc_func,
-				  " wid \"", signal, "\" cb"]))
+				  " wid \"", AST.signalOf signal, "\" cb"]))
 	   end
       | mkMLStrdecl (AST.BOXED_DECL(pos, name, _, _)) =
 	   mkMLBoxedVal name

@@ -119,7 +119,9 @@ struct
     val cbType = parenthesized (typeExp -- (parList >> map #1))
                  >> mkFunType
 
-    val signalDecl = parenthesized' (defSignal $-- word -- string --
+    val signalName = (string >> (fn n => [n]) )
+                  || (parenthesized (string -- string) >> (fn (n,p) => [p,n]))
+    val signalDecl = parenthesized' (defSignal $-- word -- signalName --
 				     optional cbType)
 
     val decl' = (fncDecl >> mkFunctionDecl)

@@ -73,7 +73,8 @@ struct
 		("string",    stringInfo),
 		("static_string",    staticStringInfo),
                 ("GtkObject", objectInfo "GtkObject"),
-                ("GtkWidget", objectInfo "GtkWidget")
+                ("GtkWidget", objectInfo "GtkWidget"),
+                ("GtkGtkType", intInfo)
                ]
 
     val insert = Polyhash.insert table
