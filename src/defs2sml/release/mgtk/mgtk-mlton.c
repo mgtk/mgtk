@@ -154,75 +154,6 @@ EXTERNML int mgtk_g_type_string (void) { /* ML */
 
 
 /* *** Gtk *** */
-EXTERNML GtkSelectionData* alloc_GtkSelectionData() {
-  GtkSelectionData res;
-  return gtk_selection_data_copy(&res);
-}
-
-EXTERNML GtkTextIter* alloc_GtkTextIter() {
-  GtkTextIter res;
-  return gtk_text_iter_copy(&res);
-}
-
-EXTERNML GtkTreeIter* alloc_GtkTreeIter() {
-  GtkTreeIter res;
-  return gtk_tree_iter_copy(&res);
-}
-
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_accel_flags(int* x0, int* x1, int* x2) {
-  *x2 = GTK_ACCEL_MASK;
-  *x1 = GTK_ACCEL_LOCKED;
-  *x0 = GTK_ACCEL_VISIBLE;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_celltype(int* x0, int* x1, int* x2, int* x3, int* x4) {
-  *x4 = GTK_CELL_WIDGET;
-  *x3 = GTK_CELL_PIXTEXT;
-  *x2 = GTK_CELL_PIXMAP;
-  *x1 = GTK_CELL_TEXT;
-  *x0 = GTK_CELL_EMPTY;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_debug_flag(int* x0, int* x1, int* x2, int* x3, int* x4) {
-  *x4 = GTK_DEBUG_UPDATES;
-  *x3 = GTK_DEBUG_TREE;
-  *x2 = GTK_DEBUG_TEXT;
-  *x1 = GTK_DEBUG_PLUGSOCKET;
-  *x0 = GTK_DEBUG_MISC;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_responsetype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10) {
-  *x10 = GTK_RESPONSE_HELP;
-  *x9 = GTK_RESPONSE_APPLY;
-  *x8 = GTK_RESPONSE_NO;
-  *x7 = GTK_RESPONSE_YES;
-  *x6 = GTK_RESPONSE_CLOSE;
-  *x5 = GTK_RESPONSE_CANCEL;
-  *x4 = GTK_RESPONSE_OK;
-  *x3 = GTK_RESPONSE_DELETE_EVENT;
-  *x2 = GTK_RESPONSE_ACCEPT;
-  *x1 = GTK_RESPONSE_REJECT;
-  *x0 = GTK_RESPONSE_NONE;
-}
-
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_dest_defaults(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_DEST_DEFAULT_ALL;
-  *x2 = GTK_DEST_DEFAULT_DROP;
-  *x1 = GTK_DEST_DEFAULT_HIGHLIGHT;
-  *x0 = GTK_DEST_DEFAULT_MOTION;
-}
-
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_target_flags(int* x0, int* x1) {
-  *x1 = GTK_TARGET_SAME_WIDGET;
-  *x0 = GTK_TARGET_SAME_APP;
-}
-
 /* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_anchortype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15, int* x16) {
   *x16 = GTK_ANCHOR_E;
@@ -252,11 +183,31 @@ EXTERNML void mgtk_get_gtk_arrowtype(int* x0, int* x1, int* x2, int* x3) {
   *x0 = GTK_ARROW_UP;
 }
 
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_attach_options(int* x0, int* x1, int* x2) {
-  *x2 = GTK_FILL;
-  *x1 = GTK_SHRINK;
-  *x0 = GTK_EXPAND;
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_buttonstype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5) {
+  *x5 = GTK_BUTTONS_OK_CANCEL;
+  *x4 = GTK_BUTTONS_YES_NO;
+  *x3 = GTK_BUTTONS_CANCEL;
+  *x2 = GTK_BUTTONS_CLOSE;
+  *x1 = GTK_BUTTONS_OK;
+  *x0 = GTK_BUTTONS_NONE;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_celltype(int* x0, int* x1, int* x2, int* x3, int* x4) {
+  *x4 = GTK_CELL_WIDGET;
+  *x3 = GTK_CELL_PIXTEXT;
+  *x2 = GTK_CELL_PIXMAP;
+  *x1 = GTK_CELL_TEXT;
+  *x0 = GTK_CELL_EMPTY;
+}
+
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_cornertype(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_CORNER_BOTTOM_RIGHT;
+  *x2 = GTK_CORNER_TOP_RIGHT;
+  *x1 = GTK_CORNER_BOTTOM_LEFT;
+  *x0 = GTK_CORNER_TOP_LEFT;
 }
 
 /* ML type: int ref * int ref * int ref -> unit */
@@ -288,14 +239,6 @@ EXTERNML void mgtk_get_gtk_directiontype(int* x0, int* x1, int* x2, int* x3, int
   *x0 = GTK_DIR_TAB_FORWARD;
 }
 
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_expander_style(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_EXPANDER_EXPANDED;
-  *x2 = GTK_EXPANDER_SEMI_EXPANDED;
-  *x1 = GTK_EXPANDER_SEMI_COLLAPSED;
-  *x0 = GTK_EXPANDER_COLLAPSED;
-}
-
 /* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_ICON_SIZE_DIALOG;
@@ -307,19 +250,28 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
   *x0 = GTK_ICON_SIZE_INVALID;
 }
 
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_sidetype(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_SIDE_RIGHT;
-  *x2 = GTK_SIDE_LEFT;
-  *x1 = GTK_SIDE_BOTTOM;
-  *x0 = GTK_SIDE_TOP;
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_imagetype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
+  *x6 = GTK_IMAGE_ANIMATION;
+  *x5 = GTK_IMAGE_ICON_SET;
+  *x4 = GTK_IMAGE_STOCK;
+  *x3 = GTK_IMAGE_PIXBUF;
+  *x2 = GTK_IMAGE_IMAGE;
+  *x1 = GTK_IMAGE_PIXMAP;
+  *x0 = GTK_IMAGE_EMPTY;
 }
 
 /* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_text_direction(int* x0, int* x1, int* x2) {
-  *x2 = GTK_TEXT_DIR_RTL;
-  *x1 = GTK_TEXT_DIR_LTR;
-  *x0 = GTK_TEXT_DIR_NONE;
+EXTERNML void mgtk_get_gtk_im_preedit_style(int* x0, int* x1, int* x2) {
+  *x2 = GTK_IM_PREEDIT_NONE;
+  *x1 = GTK_IM_PREEDIT_CALLBACK;
+  *x0 = GTK_IM_PREEDIT_NOTHING;
+}
+
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_im_status_style(int* x0, int* x1) {
+  *x1 = GTK_IM_STATUS_CALLBACK;
+  *x0 = GTK_IM_STATUS_NOTHING;
 }
 
 /* ML type: int ref * int ref * int ref * int ref -> unit */
@@ -340,6 +292,14 @@ EXTERNML void mgtk_get_gtk_matchtype(int* x0, int* x1, int* x2, int* x3, int* x4
   *x0 = GTK_MATCH_ALL;
 }
 
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_messagetype(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_MESSAGE_ERROR;
+  *x2 = GTK_MESSAGE_QUESTION;
+  *x1 = GTK_MESSAGE_WARNING;
+  *x0 = GTK_MESSAGE_INFO;
+}
+
 /* ML type: int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_metrictype(int* x0, int* x1, int* x2) {
   *x2 = GTK_CENTIMETERS;
@@ -347,8 +307,9 @@ EXTERNML void mgtk_get_gtk_metrictype(int* x0, int* x1, int* x2) {
   *x0 = GTK_PIXELS;
 }
 
-/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_movement_step(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8) {
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_movement_step(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9) {
+  *x9 = GTK_MOVEMENT_HORIZONTAL_PAGES;
   *x8 = GTK_MOVEMENT_BUFFER_ENDS;
   *x7 = GTK_MOVEMENT_PAGES;
   *x6 = GTK_MOVEMENT_PARAGRAPH_ENDS;
@@ -364,14 +325,6 @@ EXTERNML void mgtk_get_gtk_movement_step(int* x0, int* x1, int* x2, int* x3, int
 EXTERNML void mgtk_get_gtk_orientation(int* x0, int* x1) {
   *x1 = GTK_ORIENTATION_VERTICAL;
   *x0 = GTK_ORIENTATION_HORIZONTAL;
-}
-
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_cornertype(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_CORNER_BOTTOM_RIGHT;
-  *x2 = GTK_CORNER_TOP_RIGHT;
-  *x1 = GTK_CORNER_BOTTOM_LEFT;
-  *x0 = GTK_CORNER_TOP_LEFT;
 }
 
 /* ML type: int ref * int ref -> unit */
@@ -418,151 +371,6 @@ EXTERNML void mgtk_get_gtk_previewtype(int* x0, int* x1) {
   *x0 = GTK_PREVIEW_COLOR;
 }
 
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_relief_style(int* x0, int* x1, int* x2) {
-  *x2 = GTK_RELIEF_NONE;
-  *x1 = GTK_RELIEF_HALF;
-  *x0 = GTK_RELIEF_NORMAL;
-}
-
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_resize_mode(int* x0, int* x1, int* x2) {
-  *x2 = GTK_RESIZE_IMMEDIATE;
-  *x1 = GTK_RESIZE_QUEUE;
-  *x0 = GTK_RESIZE_PARENT;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_scrolltype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15) {
-  *x15 = GTK_SCROLL_END;
-  *x14 = GTK_SCROLL_START;
-  *x13 = GTK_SCROLL_PAGE_RIGHT;
-  *x12 = GTK_SCROLL_PAGE_LEFT;
-  *x11 = GTK_SCROLL_STEP_RIGHT;
-  *x10 = GTK_SCROLL_STEP_LEFT;
-  *x9 = GTK_SCROLL_PAGE_DOWN;
-  *x8 = GTK_SCROLL_PAGE_UP;
-  *x7 = GTK_SCROLL_STEP_DOWN;
-  *x6 = GTK_SCROLL_STEP_UP;
-  *x5 = GTK_SCROLL_PAGE_FORWARD;
-  *x4 = GTK_SCROLL_PAGE_BACKWARD;
-  *x3 = GTK_SCROLL_STEP_FORWARD;
-  *x2 = GTK_SCROLL_STEP_BACKWARD;
-  *x1 = GTK_SCROLL_JUMP;
-  *x0 = GTK_SCROLL_NONE;
-}
-
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_selection_mode(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_SELECTION_MULTIPLE;
-  *x2 = GTK_SELECTION_BROWSE;
-  *x1 = GTK_SELECTION_SINGLE;
-  *x0 = GTK_SELECTION_NONE;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_shadowtype(int* x0, int* x1, int* x2, int* x3, int* x4) {
-  *x4 = GTK_SHADOW_ETCHED_OUT;
-  *x3 = GTK_SHADOW_ETCHED_IN;
-  *x2 = GTK_SHADOW_OUT;
-  *x1 = GTK_SHADOW_IN;
-  *x0 = GTK_SHADOW_NONE;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_statetype(int* x0, int* x1, int* x2, int* x3, int* x4) {
-  *x4 = GTK_STATE_INSENSITIVE;
-  *x3 = GTK_STATE_SELECTED;
-  *x2 = GTK_STATE_PRELIGHT;
-  *x1 = GTK_STATE_ACTIVE;
-  *x0 = GTK_STATE_NORMAL;
-}
-
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_submenu_direction(int* x0, int* x1) {
-  *x1 = GTK_DIRECTION_RIGHT;
-  *x0 = GTK_DIRECTION_LEFT;
-}
-
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_submenu_placement(int* x0, int* x1) {
-  *x1 = GTK_LEFT_RIGHT;
-  *x0 = GTK_TOP_BOTTOM;
-}
-
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_updatetype(int* x0, int* x1, int* x2) {
-  *x2 = GTK_UPDATE_DELAYED;
-  *x1 = GTK_UPDATE_DISCONTINUOUS;
-  *x0 = GTK_UPDATE_CONTINUOUS;
-}
-
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_visibility(int* x0, int* x1, int* x2) {
-  *x2 = GTK_VISIBILITY_FULL;
-  *x1 = GTK_VISIBILITY_PARTIAL;
-  *x0 = GTK_VISIBILITY_NONE;
-}
-
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_wrap_mode(int* x0, int* x1, int* x2) {
-  *x2 = GTK_WRAP_WORD;
-  *x1 = GTK_WRAP_CHAR;
-  *x0 = GTK_WRAP_NONE;
-}
-
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_sorttype(int* x0, int* x1) {
-  *x1 = GTK_SORT_DESCENDING;
-  *x0 = GTK_SORT_ASCENDING;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_imagetype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
-  *x6 = GTK_IMAGE_ANIMATION;
-  *x5 = GTK_IMAGE_ICON_SET;
-  *x4 = GTK_IMAGE_STOCK;
-  *x3 = GTK_IMAGE_PIXBUF;
-  *x2 = GTK_IMAGE_IMAGE;
-  *x1 = GTK_IMAGE_PIXMAP;
-  *x0 = GTK_IMAGE_EMPTY;
-}
-
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_messagetype(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_MESSAGE_ERROR;
-  *x2 = GTK_MESSAGE_QUESTION;
-  *x1 = GTK_MESSAGE_WARNING;
-  *x0 = GTK_MESSAGE_INFO;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_buttonstype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5) {
-  *x5 = GTK_BUTTONS_OK_CANCEL;
-  *x4 = GTK_BUTTONS_YES_NO;
-  *x3 = GTK_BUTTONS_CANCEL;
-  *x2 = GTK_BUTTONS_CLOSE;
-  *x1 = GTK_BUTTONS_OK;
-  *x0 = GTK_BUTTONS_NONE;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_arg_flags(int* x0, int* x1, int* x2, int* x3, int* x4) {
-  *x4 = GTK_ARG_CHILD_ARG;
-  *x3 = GTK_ARG_CONSTRUCT_ONLY;
-  *x2 = GTK_ARG_CONSTRUCT;
-  *x1 = GTK_ARG_WRITABLE;
-  *x0 = GTK_ARG_READABLE;
-}
-
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_rc_flags(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_RC_BASE;
-  *x2 = GTK_RC_TEXT;
-  *x1 = GTK_RC_BG;
-  *x0 = GTK_RC_FG;
-}
-
 /* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_rc_tokentype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15, int* x16, int* x17, int* x18, int* x19, int* x20, int* x21, int* x22, int* x23, int* x24, int* x25, int* x26, int* x27, int* x28, int* x29, int* x30, int* x31, int* x32, int* x33, int* x34, int* x35, int* x36, int* x37) {
   *x37 = GTK_RC_TOKEN_LAST;
@@ -605,6 +413,97 @@ EXTERNML void mgtk_get_gtk_rc_tokentype(int* x0, int* x1, int* x2, int* x3, int*
   *x0 = GTK_RC_TOKEN_INVALID;
 }
 
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_relief_style(int* x0, int* x1, int* x2) {
+  *x2 = GTK_RELIEF_NONE;
+  *x1 = GTK_RELIEF_HALF;
+  *x0 = GTK_RELIEF_NORMAL;
+}
+
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_resize_mode(int* x0, int* x1, int* x2) {
+  *x2 = GTK_RESIZE_IMMEDIATE;
+  *x1 = GTK_RESIZE_QUEUE;
+  *x0 = GTK_RESIZE_PARENT;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_responsetype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10) {
+  *x10 = GTK_RESPONSE_HELP;
+  *x9 = GTK_RESPONSE_APPLY;
+  *x8 = GTK_RESPONSE_NO;
+  *x7 = GTK_RESPONSE_YES;
+  *x6 = GTK_RESPONSE_CLOSE;
+  *x5 = GTK_RESPONSE_CANCEL;
+  *x4 = GTK_RESPONSE_OK;
+  *x3 = GTK_RESPONSE_DELETE_EVENT;
+  *x2 = GTK_RESPONSE_ACCEPT;
+  *x1 = GTK_RESPONSE_REJECT;
+  *x0 = GTK_RESPONSE_NONE;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_scroll_step(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5) {
+  *x5 = GTK_SCROLL_HORIZONTAL_ENDS;
+  *x4 = GTK_SCROLL_HORIZONTAL_PAGES;
+  *x3 = GTK_SCROLL_HORIZONTAL_STEPS;
+  *x2 = GTK_SCROLL_ENDS;
+  *x1 = GTK_SCROLL_PAGES;
+  *x0 = GTK_SCROLL_STEPS;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_scrolltype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15) {
+  *x15 = GTK_SCROLL_END;
+  *x14 = GTK_SCROLL_START;
+  *x13 = GTK_SCROLL_PAGE_RIGHT;
+  *x12 = GTK_SCROLL_PAGE_LEFT;
+  *x11 = GTK_SCROLL_STEP_RIGHT;
+  *x10 = GTK_SCROLL_STEP_LEFT;
+  *x9 = GTK_SCROLL_PAGE_DOWN;
+  *x8 = GTK_SCROLL_PAGE_UP;
+  *x7 = GTK_SCROLL_STEP_DOWN;
+  *x6 = GTK_SCROLL_STEP_UP;
+  *x5 = GTK_SCROLL_PAGE_FORWARD;
+  *x4 = GTK_SCROLL_PAGE_BACKWARD;
+  *x3 = GTK_SCROLL_STEP_FORWARD;
+  *x2 = GTK_SCROLL_STEP_BACKWARD;
+  *x1 = GTK_SCROLL_JUMP;
+  *x0 = GTK_SCROLL_NONE;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_selection_mode(int* x0, int* x1, int* x2, int* x3, int* x4) {
+  *x4 = GTK_SELECTION_EXTENDED;
+  *x3 = GTK_SELECTION_MULTIPLE;
+  *x2 = GTK_SELECTION_BROWSE;
+  *x1 = GTK_SELECTION_SINGLE;
+  *x0 = GTK_SELECTION_NONE;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_shadowtype(int* x0, int* x1, int* x2, int* x3, int* x4) {
+  *x4 = GTK_SHADOW_ETCHED_OUT;
+  *x3 = GTK_SHADOW_ETCHED_IN;
+  *x2 = GTK_SHADOW_OUT;
+  *x1 = GTK_SHADOW_IN;
+  *x0 = GTK_SHADOW_NONE;
+}
+
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_sidetype(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_SIDE_RIGHT;
+  *x2 = GTK_SIDE_LEFT;
+  *x1 = GTK_SIDE_BOTTOM;
+  *x0 = GTK_SIDE_TOP;
+}
+
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_sorttype(int* x0, int* x1) {
+  *x1 = GTK_SORT_DESCENDING;
+  *x0 = GTK_SORT_ASCENDING;
+}
+
 /* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
 EXTERNML void mgtk_get_gtk_spintype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
   *x6 = GTK_SPIN_USER_DEFINED;
@@ -616,10 +515,32 @@ EXTERNML void mgtk_get_gtk_spintype(int* x0, int* x1, int* x2, int* x3, int* x4,
   *x0 = GTK_SPIN_STEP_FORWARD;
 }
 
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_statetype(int* x0, int* x1, int* x2, int* x3, int* x4) {
+  *x4 = GTK_STATE_INSENSITIVE;
+  *x3 = GTK_STATE_SELECTED;
+  *x2 = GTK_STATE_PRELIGHT;
+  *x1 = GTK_STATE_ACTIVE;
+  *x0 = GTK_STATE_NORMAL;
+}
+
 /* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_text_search_flags(int* x0, int* x1) {
-  *x1 = GTK_TEXT_SEARCH_TEXT_ONLY;
-  *x0 = GTK_TEXT_SEARCH_VISIBLE_ONLY;
+EXTERNML void mgtk_get_gtk_submenu_direction(int* x0, int* x1) {
+  *x1 = GTK_DIRECTION_RIGHT;
+  *x0 = GTK_DIRECTION_LEFT;
+}
+
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_submenu_placement(int* x0, int* x1) {
+  *x1 = GTK_LEFT_RIGHT;
+  *x0 = GTK_TOP_BOTTOM;
+}
+
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_text_direction(int* x0, int* x1, int* x2) {
+  *x2 = GTK_TEXT_DIR_RTL;
+  *x1 = GTK_TEXT_DIR_LTR;
+  *x0 = GTK_TEXT_DIR_NONE;
 }
 
 /* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
@@ -633,34 +554,100 @@ EXTERNML void mgtk_get_gtk_text_window_type(int* x0, int* x1, int* x2, int* x3, 
   *x0 = GTK_TEXT_WINDOW_PRIVATE;
 }
 
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_updatetype(int* x0, int* x1, int* x2) {
+  *x2 = GTK_UPDATE_DELAYED;
+  *x1 = GTK_UPDATE_DISCONTINUOUS;
+  *x0 = GTK_UPDATE_CONTINUOUS;
+}
+
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_visibility(int* x0, int* x1, int* x2) {
+  *x2 = GTK_VISIBILITY_FULL;
+  *x1 = GTK_VISIBILITY_PARTIAL;
+  *x0 = GTK_VISIBILITY_NONE;
+}
+
 /* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_file_chooser_action(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER;
-  *x2 = GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER;
-  *x1 = GTK_FILE_CHOOSER_ACTION_SAVE;
-  *x0 = GTK_FILE_CHOOSER_ACTION_OPEN;
+EXTERNML void mgtk_get_gtk_wrap_mode(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_WRAP_WORD_CHAR;
+  *x2 = GTK_WRAP_WORD;
+  *x1 = GTK_WRAP_CHAR;
+  *x0 = GTK_WRAP_NONE;
+}
+
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_accel_flags(int* x0, int* x1, int* x2) {
+  *x2 = GTK_ACCEL_MASK;
+  *x1 = GTK_ACCEL_LOCKED;
+  *x0 = GTK_ACCEL_VISIBLE;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_arg_flags(int* x0, int* x1, int* x2, int* x3, int* x4) {
+  *x4 = GTK_ARG_CHILD_ARG;
+  *x3 = GTK_ARG_CONSTRUCT_ONLY;
+  *x2 = GTK_ARG_CONSTRUCT;
+  *x1 = GTK_ARG_WRITABLE;
+  *x0 = GTK_ARG_READABLE;
+}
+
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_attach_options(int* x0, int* x1, int* x2) {
+  *x2 = GTK_FILL;
+  *x1 = GTK_SHRINK;
+  *x0 = GTK_EXPAND;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_debug_flag(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
+  *x6 = GTK_DEBUG_MULTIHEAD;
+  *x5 = GTK_DEBUG_KEYBINDINGS;
+  *x4 = GTK_DEBUG_UPDATES;
+  *x3 = GTK_DEBUG_TREE;
+  *x2 = GTK_DEBUG_TEXT;
+  *x1 = GTK_DEBUG_PLUGSOCKET;
+  *x0 = GTK_DEBUG_MISC;
+}
+
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_dest_defaults(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_DEST_DEFAULT_ALL;
+  *x2 = GTK_DEST_DEFAULT_DROP;
+  *x1 = GTK_DEST_DEFAULT_HIGHLIGHT;
+  *x0 = GTK_DEST_DEFAULT_MOTION;
+}
+
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_icon_lookup_flags(int* x0, int* x1, int* x2) {
+  *x2 = GTK_ICON_LOOKUP_USE_BUILTIN;
+  *x1 = GTK_ICON_LOOKUP_FORCE_SVG;
+  *x0 = GTK_ICON_LOOKUP_NO_SVG;
+}
+
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_rc_flags(int* x0, int* x1, int* x2, int* x3) {
+  *x3 = GTK_RC_BASE;
+  *x2 = GTK_RC_TEXT;
+  *x1 = GTK_RC_BG;
+  *x0 = GTK_RC_FG;
 }
 
 /* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_file_chooser_error(int* x0, int* x1) {
-  *x1 = GTK_FILE_CHOOSER_ERROR_BAD_FILENAME;
-  *x0 = GTK_FILE_CHOOSER_ERROR_NONEXISTENT;
+EXTERNML void mgtk_get_gtk_target_flags(int* x0, int* x1) {
+  *x1 = GTK_TARGET_SAME_WIDGET;
+  *x0 = GTK_TARGET_SAME_APP;
 }
 
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_file_filter_flags(int* x0, int* x1, int* x2, int* x3) {
-  *x3 = GTK_FILE_FILTER_MIME_TYPE;
-  *x2 = GTK_FILE_FILTER_DISPLAY_NAME;
-  *x1 = GTK_FILE_FILTER_URI;
-  *x0 = GTK_FILE_FILTER_FILENAME;
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_text_search_flags(int* x0, int* x1) {
+  *x1 = GTK_TEXT_SEARCH_TEXT_ONLY;
+  *x0 = GTK_TEXT_SEARCH_VISIBLE_ONLY;
 }
 
 
 
-/* *** AccelGroup *** */
-
-
-/* *** IconFactory *** */
+/* *** BindingSet *** */
 
 
 /* *** Object *** */
@@ -674,12 +661,37 @@ EXTERNML void mgtk_get_gtk_object_flags(int* x0, int* x1, int* x2, int* x3) {
 
 
 
+/* *** Settings *** */
+
+
+/* *** IconSet *** */
+
+
+/* *** AccelGroup *** */
+
+
 /* *** Adjustment *** */
 
 
+/* *** Clipboard *** */
+
+
+/* *** RcStyle *** */
+
+
+/* *** Requisition *** */
+
+
 /* *** Widget *** */
-/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_widget_flags(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15, int* x16, int* x17) {
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_widget_helptype(int* x0, int* x1) {
+    *x1 = GTK_WIDGET_HELP_WHATS_THIS;
+    *x0 = GTK_WIDGET_HELP_TOOLTIP;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_widget_flags(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9, int* x10, int* x11, int* x12, int* x13, int* x14, int* x15, int* x16, int* x17, int* x18) {
+    *x18 = GTK_NO_SHOW_ALL;
     *x17 = GTK_DOUBLE_BUFFERED;
     *x16 = GTK_RECEIVES_DEFAULT;
     *x15 = GTK_APP_PAINTABLE;
@@ -700,95 +712,48 @@ EXTERNML void mgtk_get_gtk_widget_flags(int* x0, int* x1, int* x2, int* x3, int*
     *x0 = GTK_TOPLEVEL;
 }
 
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_widget_helptype(int* x0, int* x1) {
-    *x1 = GTK_WIDGET_HELP_WHATS_THIS;
-    *x0 = GTK_WIDGET_HELP_TOOLTIP;
-}
-
-
-
-/* *** Editable *** */
-
-
-/* *** ItemFactory *** */
-
-
-/* *** IMContext *** */
-
-
-/* *** IMContextSimple *** */
-
-
-/* *** IMMulticontext *** */
-
-
-/* *** CellRenderer *** */
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_cellrenderer_state(int* x0, int* x1, int* x2, int* x3) {
-    *x3 = GTK_CELL_RENDERER_SORTED;
-    *x2 = GTK_CELL_RENDERER_INSENSITIVE;
-    *x1 = GTK_CELL_RENDERER_PRELIT;
-    *x0 = GTK_CELL_RENDERER_SELECTED;
-}
-
-/* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_cellrenderer_mode(int* x0, int* x1, int* x2) {
-    *x2 = GTK_CELL_RENDERER_MODE_EDITABLE;
-    *x1 = GTK_CELL_RENDERER_MODE_ACTIVATABLE;
-    *x0 = GTK_CELL_RENDERER_MODE_INERT;
-}
-
-
-
-/* *** CellEditable *** */
-
-
-/* *** CellRendererToggle *** */
-
-
-/* *** CellRendererText *** */
-
-
-/* *** CellRendererPixbuf *** */
-
-
-/* *** RcStyle *** */
-
-
-/* *** Settings *** */
-
-
-/* *** SizeGroup *** */
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_size_group_mode(int* x0, int* x1, int* x2, int* x3) {
-    *x3 = GTK_SIZE_GROUP_BOTH;
-    *x2 = GTK_SIZE_GROUP_VERTICAL;
-    *x1 = GTK_SIZE_GROUP_HORIZONTAL;
-    *x0 = GTK_SIZE_GROUP_NONE;
-}
-
 
 
 /* *** Style *** */
 
 
-/* *** TextBuffer *** */
+/* *** Demoted *** */
 
 
-/* *** TextChildAnchor *** */
+/* *** Border *** */
+EXTERNML GtkBorder* alloc_GtkBorder() {
+    GtkBorder res;
+    return gtk_border_copy(&res);
+}
 
 
-/* *** TextMark *** */
+
+/* *** IconInfo *** */
+EXTERNML GtkIconInfo* alloc_GtkIconInfo() {
+    GtkIconInfo res;
+    return gtk_icon_info_copy(&res);
+}
 
 
-/* *** TextTag *** */
+
+/* *** IconTheme *** */
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_icon_theme_error(int* x0, int* x1) {
+    *x1 = GTK_ICON_THEME_FAILED;
+    *x0 = GTK_ICON_THEME_NOT_FOUND;
+}
 
 
-/* *** TextTagTable *** */
+
+/* *** TreeIter *** */
+EXTERNML GtkTreeIter* alloc_GtkTreeIter() {
+    GtkTreeIter res;
+    return gtk_tree_iter_copy(&res);
+}
 
 
-/* *** Tooltips *** */
+
+/* *** TreePath *** */
 
 
 /* *** TreeModel *** */
@@ -800,357 +765,74 @@ EXTERNML void mgtk_get_gtk_treemodel_flags(int* x0, int* x1) {
 
 
 
-/* *** TreeDragSource *** */
+/* *** SelectionData *** */
+EXTERNML GtkSelectionData* alloc_GtkSelectionData() {
+    GtkSelectionData res;
+    return gtk_selection_data_copy(&res);
+}
 
 
-/* *** TreeDragDest *** */
+
+/* *** TextAttributes *** */
 
 
-/* *** TreeSortable *** */
+/* *** TextChildAnchor *** */
 
 
-/* *** ListStore *** */
+/* *** TextTag *** */
 
 
-/* *** TreeModelSort *** */
+/* *** TextIter *** */
+EXTERNML GtkTextIter* alloc_GtkTextIter() {
+    GtkTextIter res;
+    return gtk_text_iter_copy(&res);
+}
 
 
-/* *** TreeSelection *** */
+
+/* *** TreeRowReference *** */
+EXTERNML GtkTreeRowReference* alloc_GtkTreeRowReference() {
+    GtkTreeRowReference res;
+    return gtk_tree_row_reference_copy(&res);
+}
 
 
-/* *** TreeStore *** */
+
+/* *** CellEditable *** */
 
 
-/* *** TreeViewColumn *** */
+/* *** CellRenderer *** */
 /* ML type: int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_treeviewcolumn_sizing(int* x0, int* x1, int* x2) {
-    *x2 = GTK_TREE_VIEW_COLUMN_FIXED;
-    *x1 = GTK_TREE_VIEW_COLUMN_AUTOSIZE;
-    *x0 = GTK_TREE_VIEW_COLUMN_GROW_ONLY;
+EXTERNML void mgtk_get_gtk_cellrenderer_mode(int* x0, int* x1, int* x2) {
+    *x2 = GTK_CELL_RENDERER_MODE_EDITABLE;
+    *x1 = GTK_CELL_RENDERER_MODE_ACTIVATABLE;
+    *x0 = GTK_CELL_RENDERER_MODE_INERT;
+}
+
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_cellrenderer_state(int* x0, int* x1, int* x2, int* x3, int* x4) {
+    *x4 = GTK_CELL_RENDERER_FOCUSED;
+    *x3 = GTK_CELL_RENDERER_SORTED;
+    *x2 = GTK_CELL_RENDERER_INSENSITIVE;
+    *x1 = GTK_CELL_RENDERER_PRELIT;
+    *x0 = GTK_CELL_RENDERER_SELECTED;
 }
 
 
 
-/* *** Separator *** */
+/* *** CellLayout *** */
 
 
-/* *** VSeparator *** */
-
-
-/* *** HSeparator *** */
-
-
-/* *** Ruler *** */
-
-
-/* *** VRuler *** */
-
-
-/* *** HRuler *** */
-
-
-/* *** Range *** */
-
-
-/* *** Scrollbar *** */
-
-
-/* *** VScrollbar *** */
-
-
-/* *** HScrollbar *** */
-
-
-/* *** Scale *** */
-
-
-/* *** VScale *** */
-
-
-/* *** HScale *** */
-
-
-/* *** Progress *** */
-
-
-/* *** ProgressBar *** */
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_progressbar_style(int* x0, int* x1) {
-    *x1 = GTK_PROGRESS_DISCRETE;
-    *x0 = GTK_PROGRESS_CONTINUOUS;
-}
-
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_progressbar_orientation(int* x0, int* x1, int* x2, int* x3) {
-    *x3 = GTK_PROGRESS_TOP_TO_BOTTOM;
-    *x2 = GTK_PROGRESS_BOTTOM_TO_TOP;
-    *x1 = GTK_PROGRESS_RIGHT_TO_LEFT;
-    *x0 = GTK_PROGRESS_LEFT_TO_RIGHT;
-}
-
-
-
-/* *** Preview *** */
-
-
-/* *** OldEditable *** */
-
-
-/* *** Misc *** */
-
-
-/* *** Pixmap *** */
-
-
-/* *** Arrow *** */
-
-
-/* *** Image *** */
-
-
-/* *** Label *** */
-
-
-/* *** AccelLabel *** */
-
-
-/* *** Invisible *** */
-
-
-/* *** Entry *** */
-
-
-/* *** SpinButton *** */
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_spin_button_update_policy(int* x0, int* x1) {
-    *x1 = GTK_UPDATE_IF_VALID;
-    *x0 = GTK_UPDATE_ALWAYS;
-}
-
-
-
-/* *** DrawingArea *** */
-
-
-/* *** Curve *** */
+/* *** Editable *** */
 
 
 /* *** Container *** */
 
 
-/* *** TreeView *** */
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_treeview_drop_position(int* x0, int* x1, int* x2, int* x3) {
-    *x3 = GTK_TREE_VIEW_DROP_INTO_OR_AFTER;
-    *x2 = GTK_TREE_VIEW_DROP_INTO_OR_BEFORE;
-    *x1 = GTK_TREE_VIEW_DROP_AFTER;
-    *x0 = GTK_TREE_VIEW_DROP_BEFORE;
-}
-
-
-
-/* *** Toolbar *** */
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_toolbar_style(int* x0, int* x1, int* x2, int* x3) {
-    *x3 = GTK_TOOLBAR_BOTH_HORIZ;
-    *x2 = GTK_TOOLBAR_BOTH;
-    *x1 = GTK_TOOLBAR_TEXT;
-    *x0 = GTK_TOOLBAR_ICONS;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_toolbar_childtype(int* x0, int* x1, int* x2, int* x3, int* x4) {
-    *x4 = GTK_TOOLBAR_CHILD_WIDGET;
-    *x3 = GTK_TOOLBAR_CHILD_RADIOBUTTON;
-    *x2 = GTK_TOOLBAR_CHILD_TOGGLEBUTTON;
-    *x1 = GTK_TOOLBAR_CHILD_BUTTON;
-    *x0 = GTK_TOOLBAR_CHILD_SPACE;
-}
-
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_toolbar_space_style(int* x0, int* x1) {
-    *x1 = GTK_TOOLBAR_SPACE_LINE;
-    *x0 = GTK_TOOLBAR_SPACE_EMPTY;
-}
-
-
-
-/* *** TextView *** */
-
-
-/* *** Table *** */
-
-
-/* *** Socket *** */
-
-
-/* *** Paned *** */
-
-
-/* *** VPaned *** */
-
-
-/* *** HPaned *** */
-
-
-/* *** Notebook *** */
-/* ML type: int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_notebook_tab(int* x0, int* x1) {
-    *x1 = GTK_NOTEBOOK_TAB_LAST;
-    *x0 = GTK_NOTEBOOK_TAB_FIRST;
-}
-
-
-
-/* *** MenuShell *** */
-
-
-/* *** Menu *** */
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_menu_directiontype(int* x0, int* x1, int* x2, int* x3) {
-    *x3 = GTK_MENU_DIR_PREV;
-    *x2 = GTK_MENU_DIR_NEXT;
-    *x1 = GTK_MENU_DIR_CHILD;
-    *x0 = GTK_MENU_DIR_PARENT;
-}
-
-
-
-/* *** MenuBar *** */
-
-
-/* *** List *** */
-
-
-/* *** Layout *** */
-
-
-/* *** Fixed *** */
-
-
 /* *** Bin *** */
 
 
-/* *** Viewport *** */
-
-
-/* *** ScrolledWindow *** */
-
-
-/* *** Item *** */
-
-
-/* *** MenuItem *** */
-
-
-/* *** TearoffMenuItem *** */
-
-
-/* *** SeparatorMenuItem *** */
-
-
-/* *** CheckMenuItem *** */
-
-
-/* *** RadioMenuItem *** */
-
-
-/* *** ImageMenuItem *** */
-
-
-/* *** ListItem *** */
-
-
-/* *** HandleBox *** */
-
-
-/* *** Frame *** */
-
-
-/* *** AspectFrame *** */
-
-
-/* *** EventBox *** */
-
-
-/* *** Alignment *** */
-
-
-/* *** Button *** */
-/* ML type: int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_button_action(int* x0, int* x1, int* x2, int* x3) {
-    *x3 = GTK_BUTTON_EXPANDS;
-    *x2 = GTK_BUTTON_DRAGS;
-    *x1 = GTK_BUTTON_SELECTS;
-    *x0 = GTK_BUTTON_IGNORED;
-}
-
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_button_box_style(int* x0, int* x1, int* x2, int* x3, int* x4) {
-    *x4 = GTK_BUTTONBOX_END;
-    *x3 = GTK_BUTTONBOX_START;
-    *x2 = GTK_BUTTONBOX_EDGE;
-    *x1 = GTK_BUTTONBOX_SPREAD;
-    *x0 = GTK_BUTTONBOX_DEFAULT_STYLE;
-}
-
-
-
-/* *** ToggleButton *** */
-
-
-/* *** CheckButton *** */
-
-
-/* *** RadioButton *** */
-
-
-/* *** OptionMenu *** */
-
-
-/* *** Box *** */
-
-
-/* *** VBox *** */
-
-
-/* *** ColorSelection *** */
-
-
-/* *** FontSelection *** */
-
-
-/* *** GammaCurve *** */
-
-
-/* *** HBox *** */
-
-
-/* *** Statusbar *** */
-
-
-/* *** Combo *** */
-
-
-/* *** ButtonBox *** */
-
-
-/* *** VButtonBox *** */
-
-
-/* *** HButtonBox *** */
-
-
-/* *** Calendar *** */
-/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
-EXTERNML void mgtk_get_gtk_calendar_display_options(int* x0, int* x1, int* x2, int* x3, int* x4) {
-    *x4 = GTK_CALENDAR_WEEK_START_MONDAY;
-    *x3 = GTK_CALENDAR_SHOW_WEEK_NUMBERS;
-    *x2 = GTK_CALENDAR_NO_MONTH_CHANGE;
-    *x1 = GTK_CALENDAR_SHOW_DAY_NAMES;
-    *x0 = GTK_CALENDAR_SHOW_HEADING;
-}
-
+/* *** Tooltips *** */
 
 
 /* *** Window *** */
@@ -1171,7 +853,128 @@ EXTERNML void mgtk_get_gtk_window_type(int* x0, int* x1) {
 
 
 
-/* *** Plug *** */
+/* *** FileChooser *** */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_file_chooser_action(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER;
+    *x2 = GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER;
+    *x1 = GTK_FILE_CHOOSER_ACTION_SAVE;
+    *x0 = GTK_FILE_CHOOSER_ACTION_OPEN;
+}
+
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_file_chooser_error(int* x0, int* x1) {
+    *x1 = GTK_FILE_CHOOSER_ERROR_BAD_FILENAME;
+    *x0 = GTK_FILE_CHOOSER_ERROR_NONEXISTENT;
+}
+
+
+
+/* *** TreeDragDest *** */
+
+
+/* *** TreeDragSource *** */
+
+
+/* *** TreeSortable *** */
+
+
+/* *** Misc *** */
+
+
+/* *** Label *** */
+
+
+/* *** AccelLabel *** */
+
+
+/* *** Action *** */
+
+
+/* *** ActionGroup *** */
+
+
+/* *** Alignment *** */
+
+
+/* *** Arrow *** */
+
+
+/* *** Frame *** */
+
+
+/* *** AspectFrame *** */
+
+
+/* *** Box *** */
+
+
+/* *** Button *** */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_button_box_style(int* x0, int* x1, int* x2, int* x3, int* x4) {
+    *x4 = GTK_BUTTONBOX_END;
+    *x3 = GTK_BUTTONBOX_START;
+    *x2 = GTK_BUTTONBOX_EDGE;
+    *x1 = GTK_BUTTONBOX_SPREAD;
+    *x0 = GTK_BUTTONBOX_DEFAULT_STYLE;
+}
+
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_button_action(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_BUTTON_EXPANDS;
+    *x2 = GTK_BUTTON_DRAGS;
+    *x1 = GTK_BUTTON_SELECTS;
+    *x0 = GTK_BUTTON_IGNORED;
+}
+
+
+
+/* *** ButtonBox *** */
+
+
+/* *** Calendar *** */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_calendar_display_options(int* x0, int* x1, int* x2, int* x3, int* x4) {
+    *x4 = GTK_CALENDAR_WEEK_START_MONDAY;
+    *x3 = GTK_CALENDAR_SHOW_WEEK_NUMBERS;
+    *x2 = GTK_CALENDAR_NO_MONTH_CHANGE;
+    *x1 = GTK_CALENDAR_SHOW_DAY_NAMES;
+    *x0 = GTK_CALENDAR_SHOW_HEADING;
+}
+
+
+
+/* *** CellRendererPixbuf *** */
+
+
+/* *** CellRendererText *** */
+
+
+/* *** CellRendererToggle *** */
+
+
+/* *** ToggleButton *** */
+
+
+/* *** CheckButton *** */
+
+
+/* *** Item *** */
+
+
+/* *** MenuItem *** */
+
+
+/* *** CheckMenuItem *** */
+
+
+/* *** ColorButton *** */
+
+
+/* *** VBox *** */
+
+
+/* *** ColorSelection *** */
 
 
 /* *** Dialog *** */
@@ -1184,25 +987,45 @@ EXTERNML void mgtk_get_gtk_dialog_flags(int* x0, int* x1, int* x2) {
 
 
 
-/* *** MessageDialog *** */
-
-
-/* *** InputDialog *** */
-
-
-/* *** FontSelectionDialog *** */
-
-
 /* *** ColorSelectionDialog *** */
 
 
-/* *** WindowGroup *** */
+/* *** HBox *** */
 
 
-/* *** Clipboard *** */
+/* *** Combo *** */
 
 
-/* *** FileChooser *** */
+/* *** ComboBox *** */
+
+
+/* *** ComboBoxEntry *** */
+
+
+/* *** DrawingArea *** */
+
+
+/* *** Curve *** */
+
+
+/* *** Entry *** */
+
+
+/* *** EntryCompletion *** */
+
+
+/* *** EventBox *** */
+
+
+/* *** Expander *** */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_expander_style(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_EXPANDER_EXPANDED;
+    *x2 = GTK_EXPANDER_SEMI_EXPANDED;
+    *x1 = GTK_EXPANDER_SEMI_COLLAPSED;
+    *x0 = GTK_EXPANDER_COLLAPSED;
+}
+
 
 
 /* *** FileChooserDialog *** */
@@ -1212,6 +1035,363 @@ EXTERNML void mgtk_get_gtk_dialog_flags(int* x0, int* x1, int* x2) {
 
 
 /* *** FileFilter *** */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_file_filter_flags(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_FILE_FILTER_MIME_TYPE;
+    *x2 = GTK_FILE_FILTER_DISPLAY_NAME;
+    *x1 = GTK_FILE_FILTER_URI;
+    *x0 = GTK_FILE_FILTER_FILENAME;
+}
+
 
 
 /* *** FileSelection *** */
+
+
+/* *** Fixed *** */
+
+
+/* *** FontButton *** */
+
+
+/* *** FontSelection *** */
+
+
+/* *** FontSelectionDialog *** */
+
+
+/* *** GammaCurve *** */
+
+
+/* *** HandleBox *** */
+
+
+/* *** HButtonBox *** */
+
+
+/* *** Paned *** */
+
+
+/* *** HPaned *** */
+
+
+/* *** Ruler *** */
+
+
+/* *** HRuler *** */
+
+
+/* *** Range *** */
+
+
+/* *** Scale *** */
+
+
+/* *** HScale *** */
+
+
+/* *** Scrollbar *** */
+
+
+/* *** HScrollbar *** */
+
+
+/* *** Separator *** */
+
+
+/* *** HSeparator *** */
+
+
+/* *** IconFactory *** */
+
+
+/* *** Image *** */
+
+
+/* *** ImageMenuItem *** */
+
+
+/* *** IMContext *** */
+
+
+/* *** IMContextSimple *** */
+
+
+/* *** MenuShell *** */
+
+
+/* *** IMMulticontext *** */
+
+
+/* *** InputDialog *** */
+
+
+/* *** Invisible *** */
+
+
+/* *** ItemFactory *** */
+
+
+/* *** Layout *** */
+
+
+/* *** List *** */
+
+
+/* *** ListItem *** */
+
+
+/* *** ListStore *** */
+
+
+/* *** Menu *** */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_menu_directiontype(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_MENU_DIR_PREV;
+    *x2 = GTK_MENU_DIR_NEXT;
+    *x1 = GTK_MENU_DIR_CHILD;
+    *x0 = GTK_MENU_DIR_PARENT;
+}
+
+
+
+/* *** MenuBar *** */
+
+
+/* *** MessageDialog *** */
+
+
+/* *** Notebook *** */
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_notebook_tab(int* x0, int* x1) {
+    *x1 = GTK_NOTEBOOK_TAB_LAST;
+    *x0 = GTK_NOTEBOOK_TAB_FIRST;
+}
+
+
+
+/* *** OldEditable *** */
+
+
+/* *** OptionMenu *** */
+
+
+/* *** Pixmap *** */
+
+
+/* *** Plug *** */
+
+
+/* *** Preview *** */
+
+
+/* *** Progress *** */
+
+
+/* *** ProgressBar *** */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_progressbar_orientation(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_PROGRESS_TOP_TO_BOTTOM;
+    *x2 = GTK_PROGRESS_BOTTOM_TO_TOP;
+    *x1 = GTK_PROGRESS_RIGHT_TO_LEFT;
+    *x0 = GTK_PROGRESS_LEFT_TO_RIGHT;
+}
+
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_progressbar_style(int* x0, int* x1) {
+    *x1 = GTK_PROGRESS_DISCRETE;
+    *x0 = GTK_PROGRESS_CONTINUOUS;
+}
+
+
+
+/* *** ToggleAction *** */
+
+
+/* *** RadioAction *** */
+
+
+/* *** RadioButton *** */
+
+
+/* *** RadioMenuItem *** */
+
+
+/* *** ToolItem *** */
+
+
+/* *** ToolButton *** */
+
+
+/* *** ToggleToolButton *** */
+
+
+/* *** RadioToolButton *** */
+
+
+/* *** ScrolledWindow *** */
+
+
+/* *** SeparatorMenuItem *** */
+
+
+/* *** SeparatorToolItem *** */
+
+
+/* *** SizeGroup *** */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_size_group_mode(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_SIZE_GROUP_BOTH;
+    *x2 = GTK_SIZE_GROUP_VERTICAL;
+    *x1 = GTK_SIZE_GROUP_HORIZONTAL;
+    *x0 = GTK_SIZE_GROUP_NONE;
+}
+
+
+
+/* *** Socket *** */
+
+
+/* *** SpinButton *** */
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_spin_button_update_policy(int* x0, int* x1) {
+    *x1 = GTK_UPDATE_IF_VALID;
+    *x0 = GTK_UPDATE_ALWAYS;
+}
+
+
+
+/* *** Statusbar *** */
+
+
+/* *** Table *** */
+
+
+/* *** TearoffMenuItem *** */
+
+
+/* *** TextMark *** */
+
+
+/* *** TextTagTable *** */
+
+
+/* *** TextBuffer *** */
+
+
+/* *** TextView *** */
+
+
+/* *** Toolbar *** */
+/* ML type: int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_toolbar_childtype(int* x0, int* x1, int* x2, int* x3, int* x4) {
+    *x4 = GTK_TOOLBAR_CHILD_WIDGET;
+    *x3 = GTK_TOOLBAR_CHILD_RADIOBUTTON;
+    *x2 = GTK_TOOLBAR_CHILD_TOGGLEBUTTON;
+    *x1 = GTK_TOOLBAR_CHILD_BUTTON;
+    *x0 = GTK_TOOLBAR_CHILD_SPACE;
+}
+
+/* ML type: int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_toolbar_space_style(int* x0, int* x1) {
+    *x1 = GTK_TOOLBAR_SPACE_LINE;
+    *x0 = GTK_TOOLBAR_SPACE_EMPTY;
+}
+
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_toolbar_style(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_TOOLBAR_BOTH_HORIZ;
+    *x2 = GTK_TOOLBAR_BOTH;
+    *x1 = GTK_TOOLBAR_TEXT;
+    *x0 = GTK_TOOLBAR_ICONS;
+}
+
+
+
+/* *** TreeModelFilter *** */
+
+
+/* *** TreeModelSort *** */
+
+
+/* *** TreeViewColumn *** */
+/* ML type: int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_treeviewcolumn_sizing(int* x0, int* x1, int* x2) {
+    *x2 = GTK_TREE_VIEW_COLUMN_FIXED;
+    *x1 = GTK_TREE_VIEW_COLUMN_AUTOSIZE;
+    *x0 = GTK_TREE_VIEW_COLUMN_GROW_ONLY;
+}
+
+
+
+/* *** TreeView *** */
+/* ML type: int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_treeview_drop_position(int* x0, int* x1, int* x2, int* x3) {
+    *x3 = GTK_TREE_VIEW_DROP_INTO_OR_AFTER;
+    *x2 = GTK_TREE_VIEW_DROP_INTO_OR_BEFORE;
+    *x1 = GTK_TREE_VIEW_DROP_AFTER;
+    *x0 = GTK_TREE_VIEW_DROP_BEFORE;
+}
+
+
+
+/* *** TreeSelection *** */
+
+
+/* *** TreeStore *** */
+
+
+/* *** UIManager *** */
+/* ML type: int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref * int ref -> unit */
+EXTERNML void mgtk_get_gtk_ui_manager_itemtype(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6, int* x7, int* x8, int* x9) {
+    *x9 = GTK_UI_MANAGER_ACCELERATOR;
+    *x8 = GTK_UI_MANAGER_SEPARATOR;
+    *x7 = GTK_UI_MANAGER_TOOLITEM;
+    *x6 = GTK_UI_MANAGER_MENUITEM;
+    *x5 = GTK_UI_MANAGER_POPUP;
+    *x4 = GTK_UI_MANAGER_PLACEHOLDER;
+    *x3 = GTK_UI_MANAGER_TOOLBAR;
+    *x2 = GTK_UI_MANAGER_MENU;
+    *x1 = GTK_UI_MANAGER_MENUBAR;
+    *x0 = GTK_UI_MANAGER_AUTO;
+}
+
+
+
+/* *** VButtonBox *** */
+
+
+/* *** Viewport *** */
+
+
+/* *** VPaned *** */
+
+
+/* *** VRuler *** */
+
+
+/* *** VScale *** */
+
+
+/* *** VScrollbar *** */
+
+
+/* *** VSeparator *** */
+
+
+/* *** WindowGroup *** */
+
+
+/* *** CTreeNode *** */
+
+
+/* *** FileInfo *** */
+
+
+/* *** FileFolder *** */
+
+
+/* *** FileSystem *** */
+
+
+/* *** AccelMap *** */
