@@ -1,4 +1,5 @@
 (* Parsercomb -- parser combinators *)
+(* For copyright information,see parsercomb.sml *)
 
 signature Parsercomb =
 sig

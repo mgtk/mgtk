@@ -2,7 +2,7 @@
  *
  * From the MosML compiler.
  *
- * Author: Peter Sestoft.
+ * Author and copyright: Peter Sestoft.
  *
  * Changed to rely on the Standard Basis instead of 
  * compiler internals. (Henning Niss)
