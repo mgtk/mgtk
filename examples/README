@@ -52,6 +52,7 @@ menuexample.sml  | Shows how to use menus
 statusbar.sml    | Shows how to use statusbars
 stopwatch.sml    | Shows how to use timeouts
 timetracker.sml  | Shows how to use timeouts and CList
+idle.sml         | Shows how (not?) to use Gtk.idle_add
 moside/          | A larger example providing a small GUI for Moscow ML
                  | (This will probably not work under Windows!)
 
