@@ -33,6 +33,10 @@ and help.
 REQUIREMENTS
 ------------
 
+mGTK should work on any platform supported by both Moscow ML and
+gtk+. We develop and test mGTK on Linux machines (RedHat 6.1 and
+6.2). The following versions of Moscow ML and gtk+ are required:
+
 Moscow ML: Version 1.44 (or newer) compiled with dynlib support.  
        Moscow ML is available from:
 	      http://www.dina.kvl.dk/~sestoft/mosml.html
