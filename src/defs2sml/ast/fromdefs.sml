@@ -134,21 +134,39 @@ structure FromDefs :> FromDefs = struct
 				      in  (n,t,f) end
 		in  map one params end
 	    fun applyFlags fs ty =
-		let fun loop [] (null,default,out) = 
+		let 
+(*
+		    fun loop [] (null,default,out) = 
 			(case default of SOME d => (SOME d,out)
 				       | NONE => (null,out))
 		      | loop (f::fs) (null,default,out) =
 			(case f of NullOk => loop fs (SOME "NULL",default,out)
 				 | Default v => loop fs (null, SOME v, out)
 				 | Output p => loop fs (null,default,SOME p)
+				 | Array => loop fs (null,default,out)
 			)
+*)
 		    fun mkPass (OUT) = A.OUT | mkPass (INOUT) = A.INOUT
+(*
 		    val (def,out) = loop fs (NONE,NONE,NONE)
 		    val ty = case def of SOME d => A.Defaulted(ty,d) 
 				       | NONE => ty
 		    val ty = case out of SOME p => A.Output(mkPass p,ty)
 				       | NONE => ty
-		in  ty
+*)
+		    fun removedef ty =
+			case ty of
+			    A.ApiTy _ => ty
+			  | A.Defaulted(ty,v) => ty
+			  | A.Output(p,ty) => removedef ty
+			  | A.Array ty => removedef ty
+			  | A.ArrowTy _ => Util.abort 87456
+		    fun f (f, ty) = 
+			case f of NullOk => A.Defaulted(removedef ty,"NULL")
+				| Default v => A.Defaulted(removedef ty,v)
+				| Output p => A.Output(mkPass p, ty)
+				| Array => A.Array ty
+		in  List.foldl f ty fs
 		end
 	    val params = (getParameters def handle AttribNotFound _ => [])
 	    val params = case metadata of

@@ -1,0 +1,61 @@
+structure Gtk  = struct
+    
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+    structure ListStore :>
+      sig
+	type base
+	type 'a liststore_t
+	type 'a t = 'a liststore_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toListStore : 'a t -> base t
+	val newv : int -> GType.t list -> base t
+	val set_column_types : 'a t -> int -> GType.t list -> unit
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a liststore_t = unit
+	type 'a t = 'a liststore_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toListStore obj = inherit () (fn () => repr obj)
+	val newv_ : int -> GType.t list -> cptr
+	    = app2 (symb"mgtk_gtk_list_store_newv")
+	val newv : int -> GType.t list -> base t
+	    = fn n_columns => fn value => make (newv_ n_columns value)
+	val set_column_types_ : cptr -> int -> GType.t list -> unit
+	    = app3 (symb"mgtk_gtk_list_store_set_column_types")
+	val set_column_types : 'a t -> int -> GType.t list -> unit
+	    = fn self => fn n_columns => fn types =>
+		 set_column_types_ (repr self) n_columns types
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** ListStore *** */
+/* ML type: int -> GType.t list -> cptr */
+EXTERNML value mgtk_gtk_list_store_newv(value n_columns, value valu_arr) { /* ML */
+    GType* valu;
+    list_to_array(GType, valu, Int_val, valu_arr);
+    return Val_GtkObj(gtk_list_store_newv(Int_val(n_columns), (valu)));
+}
+
+/* ML type: cptr -> int -> GType.t list -> unit */
+EXTERNML value mgtk_gtk_list_store_set_column_types(value self, value n_columns, value types_arr) { /* ML */
+    GType* types;
+    list_to_array(GType, types, Int_val, types_arr);
+    gtk_list_store_set_column_types(GtkObj_val(self), Int_val(n_columns), (types));
+    return Val_unit;
+}
+

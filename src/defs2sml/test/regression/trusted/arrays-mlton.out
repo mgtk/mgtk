@@ -1,0 +1,46 @@
+structure Gtk  = struct
+    
+    type cptr = GObject.cptr
+    structure ListStore :>
+      sig
+	type base
+	type 'a liststore_t
+	type 'a t = 'a liststore_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toListStore : 'a t -> base t
+	val newv : int -> GType.t list -> base t
+	val set_column_types : 'a t -> int -> GType.t list -> unit
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a liststore_t = unit
+	type 'a t = 'a liststore_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toListStore obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val newv_ : int * GType.t array -> cptr
+	    = _import "gtk_list_store_newv" : int * GType.t array -> cptr;
+	val newv : int -> GType.t list -> base t
+	    = fn n_columns => fn value =>
+		 make (newv_ (n_columns, Array.fromList value))
+	val set_column_types_ : cptr * int * GType.t array -> unit
+	    = _import "gtk_list_store_set_column_types"
+		      : cptr * int * GType.t array -> unit;
+	val set_column_types : 'a t -> int -> GType.t list -> unit
+	    = fn self => fn n_columns => fn types =>
+		 GObject.withPtr (self, 
+				  fn self => set_column_types_
+					       (self, n_columns, 
+						Array.fromList types))
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** ListStore *** */

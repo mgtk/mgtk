@@ -37,6 +37,7 @@ sig
       | ArrowTy of (string * api_type) list * api_type
       | Defaulted of api_type * string
       | Output of pass * api_type
+      | Array of api_type
 
     type ('n,'t) ast_module = 
 	 ('n, 

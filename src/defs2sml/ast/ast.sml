@@ -82,6 +82,7 @@ struct
       | ArrowTy of (string * api_type) list * api_type
       | Defaulted of api_type * string
       | Output of pass * api_type
+      | Array of api_type
 
     type ('n,'t) ast_module = 
 	 ('n, 
@@ -111,6 +112,8 @@ struct
       | ppAstType (ArrowTy (pars,ret)) =
 	  let fun f (par,ty) = ppBinary(ppString par,":",ppAstType ty)
 	  in  ppBinary(ilist " #* " f pars, "->", ppAstType ret) end
+      | ppAstType (Array ty) =
+	  ppAstType ty +^ " array"
 
     fun ppAst ppn ppt =
 	let fun ppmodi NONE = empty

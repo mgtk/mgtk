@@ -154,13 +154,15 @@ structure DefsParse :> DEFSPARSE = struct
     val typeID = word
     val typeExp = word
 
-    val nullOk = parens (&"null-ok") |> NullOk
-    val default = parens ("default" &-- word) >> Default
-    val output = parens (&"output" |> Output OUT || &"inout" |> Output INOUT)
+    val nullOk  = parens (&"null-ok") |> NullOk
+    val default = parens ( "default" &-- word) >> Default
+    val output  = parens (&"output" |> Output OUT || &"inout" |> Output INOUT)
+    val array   = parens ( "array" &-- word) |> Array
     val typeName = (* too liberal since we use it also for fields *)
 	parens (typeExp -- word 
-                -- optional nullOk -- optional default -- optional output)
-        >> (fn ((((te,na),nu),d),out)=>(te,na,List.mapPartial id (nu::d::out::[])))
+                -- repeat0 (nullOk || default || output || array)
+               )
+        >> (fn ((te,na),flags)=>(te,na,flags))
     val typeNameList = repeat0 typeName
     
     (* Objects and boxed types *)

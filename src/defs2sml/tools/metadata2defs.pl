@@ -9,12 +9,22 @@ my( $api_file, $source_file ) = @ARGV;
 my $xpath = XML::XPath->new(filename => $source_file);
 my $apixpath = XML::XPath->new(filename => $api_file);
 
-my @nodes = $xpath->findnodes("/metadata/attr[\@name='pass_as']");
+my @nodes = $xpath->findnodes("/metadata/attr");
 NODE: foreach $node ( @nodes ) {
-    my $passas = $xpath->findvalue("text()", $node);
-    if($passas eq "ref") { $passas = "inout"; }
-    elsif($passas eq "out") { $passas = "output"; }
-    else { print STDERR "Unrecognized pass_as type: $passas\n"; next NODE; }
+    my $metadatatype = $xpath->findvalue("\@name", $node);
+    my $metadatavariant = $xpath->findvalue("text()", $node);
+    if($metadatatype eq "pass_as") {
+	if($metadatavariant eq "ref") { $paramvariant = "inout"; }
+	elsif($metadatavariant eq "out") { $paramvariant = "output"; }
+	else { print STDERR "Unrecognized pass_as type: $metadatavariant\n"; 
+	       next NODE; }
+    } elsif($metadatatype eq "array") {
+	$paramvariant = "array foo";
+    } elsif($metadatatype eq "null-ok") {
+	$paramvariant = "null-ok";
+    } else {
+	next NODE;
+    }
 
     my $path = $xpath->findvalue("\@path", $node);
     $_ = $path;
@@ -44,7 +54,7 @@ NODE: foreach $node ( @nodes ) {
 	my $type = $apixpath->findvalue("\@type", $par);
 #	print "   $sep(\"$type\" \"$name\" ($passas))\n";
 #	if($sep eq "'") { $sep = " "; }
-	$defs{$mname} .= "    (\"$type\" \"$name\" ($passas))\n";
+	$defs{$mname} .= "    (\"$type\" \"$name\" ($paramvariant))\n";
     }
 
 }

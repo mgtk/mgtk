@@ -25,6 +25,7 @@ signature TypeInfo = sig
     val isString  : typeinfo -> 'a ty -> bool
 
     val toCType : typeinfo -> 'a ty -> TinyC.ctype
+    val tocvalue: typeinfo -> 'a ty -> string
     val toCValue: typeinfo -> 'a ty -> TinyC.expr -> TinyC.expr
     val fromCValue: typeinfo -> 'a ty -> TinyC.expr -> TinyC.expr
 

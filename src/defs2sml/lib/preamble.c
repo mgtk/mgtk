@@ -81,7 +81,52 @@ static inline value make_cons(value elem, value tail) {
   return result;
 }
 
+static inline long length(value xs) {
+  long sum = 0;
+  while (IsCons(xs)) { 	           /* While non-Nil                      */
+    sum++;
+    xs = Tail(xs);                 /* The list tail = second arg of Cons */
+  }
+  return sum;  
+}
 
+/*
+static inline T* Array_val (value list, T (*conv_val)(value)) {
+  if (!IsCons(list)) {
+    return NULL;
+  } else {
+    int i = 0;
+    T* res = (T*) malloc(sizeof(T) * length(list));
+    Push_roots(tmp, 1);
+      tmp[0] = list;
+      while (IsCons(tmp[0])) {
+	res[i++] = conv_val(Head(tmp[0]));
+        tmp[0] = Tail(tmp[0]);
+      }
+    Pop_roots();
+    return res;
+  }
+}
+*/
+
+#define list_to_array(T, result, conv_val, list) {                        \
+  if (!IsCons(list)) {                                                    \
+    (result) = NULL;                                                      \
+  } else {                                                                \
+    int _i_ = 0;                                                          \
+    T* _res_ = (T*) malloc(sizeof(T) * length(list));                     \
+    Push_roots(_tmp_, 1); /* if conv_val allocates in the ML heap */      \
+      _tmp_[0] = (list);                                                  \
+      while (IsCons(_tmp_[0])) {                                          \
+	_res_[_i_++] = conv_val(Head(_tmp_[0]));                          \
+	_tmp_[0] = Tail(_tmp_[0]);                                        \
+      }                                                                   \
+    Pop_roots();                                                          \
+    (result) = _res_;                                                     \
+  }                                                                       \
+}
+    
+   
 /* Copy an SML string from the SML heap to the C heap 
  */
 static inline char* copy_sml_string(value s) {

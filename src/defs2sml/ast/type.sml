@@ -11,7 +11,7 @@ structure Type :> TYPE = struct
       | Tname of 'n
       | Ptr of ('n,'v) ty
       | Const of ('n,'v) ty
-      | Arr of int option * ('n,'v) ty
+      | Array of('n,'v) ty
       | Func of (string * ('n,'v) ty) list * ('n,'v) ty
       | WithDefault of ('n,'v) ty * 'v
       | Output of pass * ('n,'v) ty
@@ -21,7 +21,7 @@ structure Type :> TYPE = struct
 	    Void => Void
 	  | Ptr ty => Ptr(mapiv f g ty)
 	  | Const ty => Const(mapiv f g ty)
-	  | Arr(i,ty) => Arr(i,mapiv f g ty)
+	  | Array(ty) => Array(mapiv f g ty)
 	  | Func(pars,ret) => Func(List.map (fn (p,t) => (p,mapiv f g t)) pars,
 				   mapiv f g ret)
 	  | Base n => Base (f(ty,n))
@@ -45,10 +45,7 @@ structure Type :> TYPE = struct
 		    | Tname n => ppn n
 		    | Ptr ty => p safe ty +^ " ref"
 		    | Const ty => p safe ty +^ " const"
-		    | Arr(i,ty) =>
-		        (p safe ty +^ " array") ++
-			  (case i of NONE => empty | 
-				     SOME l => "[" ^+ ppInt l +^ "]")
+		    | Array(ty) => p safe ty +^ " array"
 		    | Func(pars,ty) =>
 		        let fun f (par,ty) = ppBinary(ppString par,":",p 2 ty)
 			in
@@ -60,6 +57,7 @@ structure Type :> TYPE = struct
 		    | Output(pass,ty) =>
 		        p safe ty ++ ("[" ^+ pppass pass +^ "]")
 	  in  p 0 ty end
+      fun toString ppn ppv = Pretty.ppToString o pp ppn ppv
     end (* local *)
 
     fun getParams(Func(pars,_)) = pars

@@ -13,6 +13,7 @@
 	* Flags (as specified in the gtk.defs file is now supported - use a
 	list of the flag you wishe to turn on).
 	* GType is now supported.
+	* Array type are now supported.
 	
 ============ Version 0.92
 

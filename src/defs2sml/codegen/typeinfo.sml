@@ -2,13 +2,17 @@
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
 signature PRIMTYPES = sig
+    type exp = TinySML.exp
     type ty = SMLType.ty
     val mkArrowTy : ty list * ty -> ty
+    val mkArrayPrimTy : ty -> ty
     val stringTy : bool -> ty
     val unwrap : string option
+    val toArrayPrim : exp -> exp
 end (* signature PRIMTYPES *)
 
 structure MosmlPrimTypes : PRIMTYPES = struct
+    type exp = TinySML.exp
     type ty = SMLType.ty
     fun mkArrowTy(pars,ret) =
 	SMLType.ArrowTy(
@@ -16,18 +20,24 @@ structure MosmlPrimTypes : PRIMTYPES = struct
 	   then [SMLType.TupTy pars]
 	   else pars
         ,  ret)
+    fun mkArrayPrimTy ty = SMLType.TyApp([ty],["list"])
     val stringTy = fn _ => SMLType.StringTy
     val unwrap = SOME "repr"
+    val toArrayPrim = (fn e => e)
 end (* structure MosmlPrimTypes *)
 
 structure MLtonPrimTypes : PRIMTYPES = struct
+    type exp = TinySML.exp
     type ty = SMLType.ty
     fun mkArrowTy(pars,ret) =
 	SMLType.ArrowTy([SMLType.TupTy pars], ret)
+    fun mkArrayPrimTy ty = SMLType.TyApp([ty],["array"])
     val stringTy = fn neg =>
 		      if neg then SMLType.TyApp([],["CString", "t"])
 		      else SMLType.TyApp([],["CString", "cstring"])
     val unwrap = NONE
+    val toArrayPrim = fn e => TinySML.App(TinySML.Var"Array.fromList", [e])
+
 end (* structure MosmlPrimTypes *)
 
 functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
@@ -105,7 +115,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		        "Bool_val", "Val_bool", TinyC.TInt, NONE, Const "true"))
         ,("GType",     (fn _ => SMLType.TyApp([],["GType","t"]),
 			SMLType.TyApp([],["GType","t"]),
-		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
+		        "Int_val", "Val_int", TinyC.TTyName "GType", NONE, Const"0"))
         ,("GtkType",   (fn _ => SMLType.TyApp([],["GType","t"]),
 			SMLType.TyApp([],["GType","t"]),
 		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
@@ -233,12 +243,9 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       SMLType.ArrowTy(List.map (toSMLType tinfo fresh o #2) pars,
 			       toSMLType tinfo fresh ret)
 	  | Type.Output(pass,ty) => toSMLType tinfo fresh ty
-	  | Type.Arr(len,ty) => 
-	       raise Fail("Not implemented: toSMLType(arr)")
-	       (* FIXME 
-	       SMLType.TyVar(SMLType.toString(toSMLType tinfo fresh ty)^"["^
-		     (case len of NONE => "" | SOME l => Int.toString l)^"]")
-               *)
+	  | Type.Array(ty) => 
+	       SMLType.TyApp([toSMLType tinfo fresh ty],["list"])
+
 
     fun toSMLTypeSeq tinfo = 
 	let val no = ref 0
@@ -269,7 +276,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Func(pars,ret) => 
 	       Prim.mkArrowTy(List.map (toPrimType negative tinfo o #2) pars,
 			      toPrimType (not negative) tinfo ret)
-	  | Type.Arr(len,ty) => SMLType.TyApp([],["..."]) (* FIXME *)
+	  | Type.Array(ty) => Prim.mkArrayPrimTy(toPrimType negative tinfo ty)
     val toPrimType = fn tinfo => fn ty => toPrimType false tinfo ty
 
     local open TinySML in
@@ -297,6 +304,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Ptr ty => toprimvalue tinfo ty (* FIXME: ? *)
 	  | Type.Const ty => toprimvalue tinfo ty
 	  | Type.Output(pass,ty) => toprimvalue tinfo ty
+	  | Type.Array ty => toprimvalue tinfo ty
 	  | _ => NONE
     local open TinySML in
     fun toPrimValue tinfo ty =
@@ -307,6 +315,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		  | SOME f => fn e => App(Var"Option.map", [Var f, e])
                )
 	  | Type.Output(pass,ty) => id
+	  | Type.Array ty => (fn e => Prim.toArrayPrim
+	       (case toprimvalue tinfo ty of
+		    NONE => e
+		  | SOME f => App(Var"List.map", [Var f, e])
+               ))
 	  | ty =>
 	       (case toprimvalue tinfo ty of
 		    NONE => id
@@ -377,6 +390,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Output(_, ty) => TinyC.TStar(toCType tinfo ty)
 	  | Type.WithDefault(ty,default) => toCType tinfo ty
 	  | Type.Const ty => toCType tinfo ty
+	  | Type.Array ty => TinyC.TStar(toCType tinfo ty)
 	  | _ => raise Fail("toCType: not implemented")
 
     fun tocvalue tinfo ty =
@@ -402,7 +416,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       in  #toc info end
 	  | Type.Ptr ty => tocvalue tinfo ty (* FIXME: ? *)
 	  | Type.Void => raise Fail "toCValue: shouldn't happen (Void)"
-	  | Type.Arr _ => raise Fail "toCValue: not implemented (Arr)"
+	  | Type.Array _ => ""
 	  | Type.Func _ => raise Fail "toCValue: shouldn't happen (Func)"
     fun toCValue tinfo ty exp = ccall (tocvalue tinfo ty) exp
     fun fromCValue tinfo ty =
@@ -421,7 +435,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
           | Type.Const ty => fromCValue tinfo ty
 	  | Type.Ptr ty => fromCValue tinfo ty
 	  | Type.Void => (fn e => e)
-	  | Type.Arr _ => raise Fail "fromCValue: not implemented (Arr)"
+	  | Type.Array _ => raise Fail "fromCValue: not implemented (Arr)"
 	  | Type.Func _ => raise Fail "fromCValue: shouldn't happen (Func)"
 
     fun toSignalType tinfo ty =
@@ -438,8 +452,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		  | Type.Base tn =>
 		    let val info: info = lookup tinfo tn
 		    in  #ptype info end
-		  | Type.Arr(i,ty) => 
-		    raise Fail("toSignalType(arr): not implemented")
+		  | Type.Array(ty) => raise Fail"toSignalType(array): not implemented"
 	    val ret = SMLType.TyApp([SMLType.TyApp([SMLType.TyVar "'a"], ["t"])], 
 				    ["Signal","signal"])
 	in  SMLType.ArrowTy([loop ty], ret) end
@@ -458,5 +471,5 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Output(pass,ty) => defaultValue tinfo ty
 	  | Type.Void => Const "()"
 	  | Type.Func _ => Util.abort 98342
-	  | Type.Arr _ => Util.abort 98343
+	  | Type.Array _ => Const "[]"
 end (* structure TypeInfo *)

@@ -1,0 +1,26 @@
+(define-object ListStore
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkListStore")
+  (gtype-id "GTK_TYPE_LIST_STORE")
+)
+
+(define-function gtk_list_store_newv
+  (c-name "gtk_list_store_newv")
+  (is-constructor-of GtkListStore)
+  (return-type "GtkListStore*")
+  (parameters
+    '("gint" "n_columns")
+    '("GType*" "value" (array "n_columns"))
+  )
+)
+
+(define-method set_column_types
+  (of-object "GtkListStore")
+  (c-name "gtk_list_store_set_column_types")
+  (return-type "none")
+  (parameters
+    '("gint" "n_columns")
+    '("GType*" "types" (array "n_columns"))
+  )
+)

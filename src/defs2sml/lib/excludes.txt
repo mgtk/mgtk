@@ -168,9 +168,6 @@ gtk_vbutton_box_set_layout_default
 gtk_button_box_get_layout
 gtk_button_box_set_layout
 #ARRAYS
-gtk_list_store_newv
-gtk_list_store_set_column_types
-gtk_tree_store_newv
 gtk_tree_store_set_column_types
 gtk_im_context_simple_add_table
 #DEPENDSONOTHERSTUFF

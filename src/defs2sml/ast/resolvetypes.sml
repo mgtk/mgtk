@@ -34,11 +34,13 @@ structure ResolveTypes :> ResolveTypes = struct
 
 	val simple = void || base || tname
 
+(*
 	val array = simple -- "[" $-- num --$ "]" 
 			>> (fn (ty,len) => Arr(SOME len, ty))
+*)
 	val pointer = simple --$ "*" >> Ptr
 
-	val unqualtyp = pointer || array || simple
+	val unqualtyp = pointer || simple
 
 	val const = "const-" $-- unqualtyp >> Const
 
@@ -51,17 +53,22 @@ structure ResolveTypes :> ResolveTypes = struct
 
     end (* structure Parse *)
 
+    val toString = Type.toString Pretty.ppString Pretty.ppString
+    fun removeStar msg ty =
+	case ty of 
+	    Ptr ty => ty 
+	  | Const(Ptr ty) => Const(ty)
+	  | _ => raise Fail(msg^": "^toString ty^" is not a pointer type")
     fun resTy ty = 
 	case ty of
 	    AST.ApiTy str => Parse.toType str
 	  | AST.Defaulted(ty, v) => WithDefault(resTy ty, v)
 	  | AST.Output(pass,ty) => 
-	    let val ty = resTy ty
-		val ty = case ty of Ptr ty => ty | _ => raise Fail("Not an output type")
-	    in  Output(case pass of AST.OUT => OUT | AST.INOUT => INOUT, ty)
-	    end
+	        Output(case pass of AST.OUT => OUT | AST.INOUT => INOUT,
+		       removeStar "resTy(output)" (resTy ty))
           | AST.ArrowTy(pars, ret) =>
 		Func(List.map (fn (n,t) => (n,resTy t)) pars,  resTy ret)
+	  | AST.Array ty => Array(removeStar "resTy(array)" (resTy ty))
     fun resTy' ty = 
 	case ty of 
 	    NONE => NONE

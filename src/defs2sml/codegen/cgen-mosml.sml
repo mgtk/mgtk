@@ -74,18 +74,29 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 			      | f (p,t) = NONE
 			in  ListPair.unzip(List.mapPartial f parsty) end
 			handle TypeInfo.Unbound n => ubnd "outputs" n
+		    val (arrays_decl,arrays_setup) = 
+			let fun f (p,t as Type.Array ty) =
+				let val ety = TypeInfo.toCType typeinfo ty 
+				    val cty = TypeInfo.toCType typeinfo t
+				in SOME(VDecl(p,cty,NONE),
+				     Exp(Call("list_to_array",NONE,
+					  [VerbExp(showTy ety),Var p,Var(TypeInfo.tocvalue typeinfo ty),Var (p^"_arr")])))
+				end
+			      | f (p,t) = NONE
+			in  ListPair.unzip(List.mapPartial f parsty) end
 		    val call = TypeInfo.fromCValue typeinfo ret (Call(Name.asCFunc name, NONE, parsty'))
 			       handle TypeInfo.Unbound n => ubnd "call" n
 		    val body = 
-			Block(NONE,extract@outputs,
+			Block(NONE,extract@outputs@arrays_decl,
 			  Comment "ML" ::
-                          (if isVoid ret then Exp(call) :: build @ [Return(Var("Val_unit"))]
-			   else [Return(call)])
+                          (if isVoid ret then arrays_setup @ [Exp(call)] @ build @ [Return(Var("Val_unit"))]
+			   else arrays_setup @ [Return(call)])
                         )
 		    fun f (par,ty) = 
-			(if TypeInfo.isOutput (fn _=>true) typeinfo ty
-			 then par^"_ref"
-			 else par,
+			(case ty of
+			     Type.Output _ => par^"_ref"
+			   | Type.Array _  => par^"_arr"
+			   | _             => par,
 			 TValue)
 		in  [(Fun(Proto(SOME"EXTERNML",Name.asCStub name, map f args, TValue), 
 			  body),

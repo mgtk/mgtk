@@ -11,12 +11,13 @@ signature TYPE = sig
       | Tname of 'n
       | Ptr of ('n,'v) ty
       | Const of ('n,'v) ty
-      | Arr of int option * ('n,'v) ty
+      | Array of ('n,'v) ty
       | Func of (string * ('n,'v) ty) list * ('n,'v) ty
       | WithDefault of ('n,'v) ty * 'v
       | Output of pass * ('n,'v) ty
 
     val pp : 'n Pretty.pp -> 'v Pretty.pp -> ('n,'v) ty Pretty.pp
+    val toString : 'n Pretty.pp -> 'v Pretty.pp -> ('n,'v) ty -> string
 
     val map: ('n1 -> 'n2) -> ('n1,'v) ty -> ('n2,'v) ty
     val mapi: ((('n1,'v) ty * 'n1) -> 'n2) -> ('n1,'v) ty -> ('n2,'v) ty

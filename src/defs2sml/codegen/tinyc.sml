@@ -15,8 +15,6 @@ struct
 	   | TVoid
 	   | TStar of ctype
 (*
-	   | TFloat
-	   | TChar
 	   | TWord
 	   | TStruct of string
 	   | TFunc of ctype list * ctype
@@ -68,17 +66,18 @@ struct
 	     Fun of prototype * stmt
 	   | Define of string * string
 
+    fun showTy ty =
+	case ty of 
+	    TInt => "int"
+	  | TChar => "char"
+	  | TFloat => "float"
+	  | TDouble => "double"
+	  | TValue => "value"
+	  | TVoid => "void"
+	  | TStar ty => showTy ty ^ "*"
+	  | TTyName tname => tname
     fun toString indent topdecl =
-	let fun showTy ty =
-		case ty of 
-		    TInt => "int"
-		  | TChar => "char"
-		  | TFloat => "float"
-		  | TDouble => "double"
-		  | TValue => "value"
-		  | TVoid => "void"
-		  | TStar ty => showTy ty ^ "*"
-		  | TTyName tname => tname
+	let 
 	    fun showExp exp =
 		case exp of
 		    Var x => x
