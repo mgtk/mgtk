@@ -1,4 +1,4 @@
-(* An example adopted from "Mono, A Developers Notebook" *)
+(* An example adopted from "Mono: A Developers Notebook" *)
 
 fun delete_event _ = ( GtkBasis.main_quit()
 		     ; true
@@ -25,8 +25,8 @@ fun setUpGui() =
 
         val l = let val l = Label.new (SOME("<span weight=\"bold\" size=\"larger\">" ^
 			   "Enter your name and preferred address</span>"))
-                in  (* l.xalign = 0.0 
-                   ; *) Label.set_use_markup l true
+                in   Misc.set_alignment l 0.0 0.5 (* Left align X and center i Y *)
+                   ; Label.set_use_markup l true
                    ; Box.pack_start outerv l (SOME false) (SOME false) (SOME 0)
                    ; l
                 end
@@ -45,9 +45,8 @@ fun setUpGui() =
 
         fun makeEntryLabel text entry =
             let val l = Label.new_with_mnemonic (SOME text)
-            in  (* l.xalign = 0.0 
-                 ; *) 
-                Box.pack_start v l (SOME true) (SOME false) (SOME 0)
+            in  Misc.set_alignment l 0.0 0.5 
+              ; Box.pack_start v l (SOME true) (SOME false) (SOME 0)
               ; Label.set_mnemonic_widget l entry
             end
 
@@ -65,8 +64,7 @@ fun setUpGui() =
                     
         fun nameChanged () =
             let val e = Entry.get_text firstname_entry ^ "." ^
-                        Entry.get_text lastname_entry ^
-                        "@example.net"
+                        Entry.get_text lastname_entry ^ "@example.net"
                 fun emailize c = if Char.isSpace c then #"_" 
                                  else Char.toLower c
             in  Entry.set_text email_entry (String.map emailize e)
