@@ -644,9 +644,8 @@ signature Window =
 sig
   type 'path window_t
   type 'path window = 
-         'path window_t Container.container
-  val new : unit 
-            -> GtkBasis.base window
+      'path window_t Container.container
+  val new : unit -> GtkBasis.base window
   val set_title : 'path window -> string 
                                  -> unit
 end
@@ -661,8 +660,8 @@ Now, does this encoding really allow all the things that the class
 hierarchy allows?  Yes, for example, the function
 \texttt{Container.add} has type:
 \begin{SMLcode}
-val add : 'path1 container -> 'path2 widget 
-                                    -> unit
+val add : 'p1 container -> 'p2 widget 
+                                 -> unit
 \end{SMLcode}
 From this type we can see that, if !label! is a value of type 
 %
@@ -677,7 +676,7 @@ is well-typed because: (1)~the type of !window! is just a abbreviation for
 %
 !base window_t container!,
 %
-thus, the type variable !'path1! can be instantiated to 
+thus, the type variable !'p1! can be instantiated to 
 %
 !base window_t!,
 % 
@@ -685,14 +684,13 @@ and (2)~the type of !label! is just an abbreviation of
 %
 !base label_t widget!,
 %
-thus, the type variable !'path2! can be instantiated to 
+thus, the type variable !'p2! can be instantiated to 
 %
 !base label_t!.
 
 Consider now the function !set_title! that only works on \classname{Window}s:
 \begin{SMLcode}
-val set_title : 'path window -> string 
-                               -> unit
+val set_title : 'p window -> string -> unit
 \end{SMLcode}
 If we, by mistake, attempt to use this function to set the text of the
 label !label! (with type !base label!) as in expression
@@ -761,55 +759,59 @@ of \gtk are produced. Most of the work in constructing the binding for
 the new release is over when the design of the small subset has been
 completed.
 
-\begin{ednote}{HN} Rework \end{ednote}
-
 Let us return to our running example, and look at some example
-specifications of widgets, functions, and signals. Figure~\ref{fig:gtk-defs}
-shows three entries in the \texttt{gtk.defs} file.
+specifications of widgets, functions/methods, and signals.
+Figure~\ref{fig:gtk-defs} shows three entries in the \texttt{gtk.defs}
+file.
 \begin{figure}[htbp]
 \begin{centering}
 \begin{verbatim}
-(define-object Button
+(define-object Container
   (in-module "Gtk")
-  (parent "GtkBin")
-  (c-name "GtkButton")
-  (gtype-id "GTK_TYPE_BUTTON")
+  (parent "GtkWidget")
+  (c-name "GtkContainer")
+  (gtype-id "GTK_TYPE_CONTAINER")
 )
-(define-function gtk_button_new_with_label
-  (c-name "gtk_button_new_with_label")
-  (return-type "GtkWidget*")
+
+(define-method gtk_container_add
+  (of-object "GtkContainer")
+  (c-name "gtk_container_add")
+  (return-type "none")
   (parameters
-    '("const-gchar*" "label")
+    '("GtkWidget*" "widget")
   )
 )
-(define-signal clicked
-  (of-object "GtkButton")
-  (return-type "void")
+
+(define-signal delete-event
+  (of-object "GtkWidget")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GdkEventAny*" "p0")
+  )
 )
 \end{verbatim}
 \caption{\texttt{gtk.defs} excerpt.\label{fig:gtk-defs}}
 \end{centering}
 \end{figure}
 The first entry shows a widget specification indicated by
-!define-object!. From the entry we see that the !GtkButton! widget
+!define-object!. From the entry we see that the !GtkContainer! widget
 (the name appearing right after !define-object! is a shorthand)
-inherits from !GtkBin!, and it belongs in the !Gtk! module.  We also
+inherits from !GtkWidget!, and it belongs in the !Gtk! module.  We also
 see the type assigned to instances of this widget in the \emph{\gtk type
 system} (which is completely unrelated to the \sml encoding given
 above).
 
-The next entry shows a function specification (that actually is a
-constructor for the \texttt{GtkButton} widget) with return type
-\texttt{GtkWidget*} (in the C implementation) and a string argument.
+The next entry shows a method specification for the method !add!
+which does takes a !GtkWidget*! (in the C implementation)
+argument, and returns nothing. Since it is a method, there is an
+implicit ``self'' argument of type !GtkContainer*!.
 
 The final entry shows a ``signal handler'' or (``callback'')
-specification. In this case, we specify the prototype for handlers
-of clicks on buttons. The signal handler for !clicked! for widget
-!GtkButton! does not accept any parameters, and does not return any
-values. Other signals includes parameters to, for example, specify
-which widget in a collection of widgets (for example in trees) the
-user clicked on. Others include return values to indicate, for example,
-whether to proceed or not.
+specification. In this case, we specify the prototype for handlers of
+delete events on widgets. The signal handler for !delete-event! for
+widget !GtkWidgets! accepts a parameter of type !GdkEventAny*!, and
+returns a value of type !gboolean!. 
 
 %\subsection{Stubs and code generation}
 %\label{sec:stubs-code-gener}
