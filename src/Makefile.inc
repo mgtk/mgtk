@@ -10,10 +10,10 @@ TOPDIR=${HOME}/mgtk
 MGTKHOME=${HOME}/mgtk
 
 # Where MosML resides
-MOSMLHOME=/usr/local/store
+MOSMLHOME=/usr/local/lib/mosml
 
 # Where the source files for the MosML runtime reside
-MOSMLRUNTIMESRC=/usr/local/store/store/master/mosml/src-1.44-linux/src/runtime/
+MOSMLRUNTIMESRC=/usr/local/src/mosml/src/runtime
 
 # Where GTK is installed
 GTKHOME=/usr

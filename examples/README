@@ -5,17 +5,19 @@ This directory contains a few example programs to get you started with
 mGtk.  In order to try the example programs, issue the following
 commands
 
-(1) make
+(1) Build mgtk as described in ../src/README
 
-(2) export MGTKHOME=../src  (when using bash)
+(2) make
+
+(3) export MGTKHOME=../src  (when using bash)
     setenv MGTKHOME ../src  (when using [t]csh)
 
-(3) mosml -I ../src
+(4) mosml -I ../src
 
-(4) load "<file>";  (where <file> is the name of the file
+(5) load "<file>";  (where <file> is the name of the file
                      *without* the .uo extension)
 
-(5) <file>.main();
+(6) <file>.main();
 
 
 Here is a list of the programs:
@@ -44,4 +46,4 @@ moside/          | A larger example providing a small GUI for MosML
 Enjoy!
 
 ----------------------------------------------------------------------
-                                          Henning Niss, April 11, 2000
+                                          Henning Niss, April 12, 2000
