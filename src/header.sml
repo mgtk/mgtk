@@ -115,7 +115,8 @@ struct
 
 	fun dispatch id data =
 	    case peek id of
-		SOME f => f data(* handle e => main_quit_with e)*)
+		SOME f => f data    (* FIXME: we need a handle here, but what 
+                                              should it do *)
 	      | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
 				     Int.toString id^")")
 
@@ -125,14 +126,24 @@ struct
                     ; Callback.register "mgtk_callback_destroy" destroy
 		    )
 
-	val set_bool_pos : GtkArgs -> int -> bool -> unit 
-                         = app3(symb "mgtk_set_pos_bool")
+        (* UNSAFE: no error checking in the set and get functions! *)
+        type 'a setter = GtkArgs -> int -> 'a -> unit
+        val set_bool : bool setter = app3(symb "mgtk_set_retpos_bool")
+        val set_int  : int setter  = app3(symb "mgtk_set_retpos_int")
+
+
+        type 'a getter = GtkArgs -> int -> 'a
+        val getBool   : bool getter   = app2(symb "mgtk_get_pos_bool")
+        val getInt    : int getter    = app2(symb "mgtk_get_pos_int")
+        val getLong   : int getter    = app2(symb "mgtk_get_pos_long")
+        val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
+        val getString : string getter = app2(symb "mgtk_get_pos_string")
 
     in
 	fun register f = localId(fn id => (add (id, f); id))
 	fun reg_unit f = register(fn _ => f())
 	fun reg_bool f = register(fn (_,args,pos) => 
-				  set_bool_pos args pos (f()))
+				  set_bool args pos (f()))
 
 	val signal_connect : gtkobj -> string -> int -> bool -> int
 	                   = app4(symb"mgtk_signal_connect")

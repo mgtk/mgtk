@@ -120,18 +120,66 @@ char *StringOption_nullok(value opt) {
   return res;
 }
 
+/* *** GtkArg stuff *** */
+
+#define GtkArg_val(arg) ( Field(arg, 0) )
+
+value wrap_GtkArg(GtkArg *args) {
+  value res = alloc(1, Abstract_tag);
+  Field(res, 0) = (value) args;
+  return res;
+}
+
+
+#define MGTK_MakeSetter(name, retloc, mlconv)                   \
+EXTERNML value name (value a, value pos, value val) {  /* ML */ \
+  long p = Long_val(pos);                                       \
+  GtkArg* args = (GtkArg*) GtkArg_val(a);                       \
+                                                                \
+  *retloc(args[p]) = mlconv(val);                               \
+  return Val_unit;                                              \
+}
+
+#define MGTK_MakeGetter(name, gtkvalue, convml)         \
+EXTERNML value name (value vargs, value pos) { /* ML */ \
+  long p = Long_val(pos);                               \
+  GtkArg* args = (GtkArg*) GtkArg_val(vargs);           \
+                                                        \
+  return convml(gtkvalue(args[p]));                     \
+}
+
+
+
+MGTK_MakeSetter(mgtk_set_retpos_bool, GTK_RETLOC_BOOL, Bool_val)
+MGTK_MakeSetter(mgtk_set_retpos_long, GTK_RETLOC_LONG, Long_val)
+MGTK_MakeSetter(mgtk_set_retpos_int, GTK_RETLOC_INT, Long_val)
+MGTK_MakeSetter(mgtk_set_retpos_uint, GTK_RETLOC_UINT, Long_val)
+MGTK_MakeSetter(mgtk_set_retpos_double, GTK_RETLOC_DOUBLE, Double_val)
+
+
+MGTK_MakeGetter(mgtk_get_pos_char, GTK_VALUE_CHAR, Val_long)
+MGTK_MakeGetter(mgtk_get_pos_uchar, GTK_VALUE_UCHAR, Val_long)
+MGTK_MakeGetter(mgtk_get_pos_bool, GTK_VALUE_BOOL, Val_bool)
+MGTK_MakeGetter(mgtk_get_pos_int, GTK_VALUE_INT, Val_long)
+MGTK_MakeGetter(mgtk_get_pos_uint, GTK_VALUE_UINT, Val_long)
+MGTK_MakeGetter(mgtk_get_pos_long, GTK_VALUE_LONG, Val_long)
+MGTK_MakeGetter(mgtk_get_pos_float, GTK_VALUE_FLOAT, copy_double)
+MGTK_MakeGetter(mgtk_get_pos_double, GTK_VALUE_DOUBLE, copy_double)
+MGTK_MakeGetter(mgtk_get_pos_string, GTK_VALUE_STRING, copy_string)
+
 /* *** Signal stuff *** */
 void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs, 
 			     GtkArg *args) {
   value res;
   valueptr mvp;
 
-  Push_roots(r, 1);  // because both alloc_tuple and Val_GtkObj allocates
-    r[0] = alloc_tuple(3);
-    Field(r[0],0) = Val_GtkObj(object);
-    Field(r[0],1) = (value) args;
-    Field(r[0],2) = Val_int(nargs);
-    res = r[0];
+  Push_roots(r, 2);  // because both alloc_tuple and Val_GtkObj allocates
+    r[0] = Val_GtkObj(object);
+    r[1] = wrap_GtkArg(args);
+    res  = alloc_tuple(3);
+    Field(res,0) = r[0]; 
+    Field(res,1) = r[1];
+    Field(res,2) = Val_int(nargs);   
   Pop_roots();
 
   mvp = get_valueptr("mgtk_callback_dispatch"); 
@@ -180,20 +228,6 @@ EXTERNML value mgtk_signal_connect (value object, value name, value clb, value a
 				 Bool_val(after));
   return Val_long(res);
 }
-
-/* *** GtkArg stuff *** */
-
-/* ML type : GtkArgs -> int -> bool -> unit */
-EXTERNML value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
-  int p = Int_val(pos);
-
-  if (GTK_FUNDAMENTAL_TYPE(args[p].type) != GTK_TYPE_BOOL)
-    failwith ("mgtk_set_pos_bool: argument type mismatch");
-  
-  *GTK_RETLOC_BOOL(args[p]) = Bool_val(val);
-  return Val_unit;
-}
-
 
 /* *** Convertion from ML to C *** */
 #define Mgtk_isCons(x) (Tag_val(x) != 0)
