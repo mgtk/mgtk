@@ -1,7 +1,7 @@
 Huskeseddel til release green-horses-and-blue-ducks
 ---------------------------------------------------
 
-kfl: Send announcement til
+* Send announcement til
      comp.lang.ml
      funtechs@it.edu
      Udvalgte personer:
@@ -14,6 +14,6 @@ kfl: Send announcement til
        DTU:
        hans, mrh
 
-kfl: Check .tar.gz igen :-)
+*: Check mgtk-alpha-0.01.tar.gz igen :-)
 
 -*- indented-text -*-
