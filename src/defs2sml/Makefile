@@ -33,8 +33,9 @@ REGCOMPOPTSMOS=$(REGCOMPOPTS) -sp lib/preamble.sml -cp lib/preamble.c
 REGCOMPOPTSMLTON=--mlton $(REGCOMPOPTS) -sp lib/preamble-mlton.sml -cp lib/preamble-mlton.c
 
 reggen-%: $(MAIN)
-	@echo -n "[REG]          $*.defs "
-	@./$(MAIN) $(REGOPTSMOS) -o $(REGOUT)/$*.out $(REGIN)/$*.defs
+	@echo -n "[REG]          $*.defs "; \
+        params=`sed -e '/@PARAMS/!d' -e 's/.*@PARAMS=\([^@]*\)@.*/\1/' $(REGIN)/$*.defs` ; \
+	./$(MAIN) $(REGOPTSMOS) $$params -o $(REGOUT)/$*.out $(REGIN)/$*.defs
 
 reggenmlton-%: $(MAIN)
 	@echo -n "[REG (MLton)]  $*.defs "
@@ -59,8 +60,9 @@ regmlton: $(MAIN) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
 regression: $(MAIN) $(patsubst %.defs,regdiff-%,$(REGFILES)) $(patsubst %.defs,regdiffmlton-%,$(REGFILES))
 
 regcompgen-%: $(MAIN)
-	@echo "[GEN]          $*.defs"
-	@./$(MAIN) $(REGCOMPOPTSMOS) -o $(REGDIR)/output/$* $(REGIN)/$*.defs 
+	@echo "[GEN]          $*.defs"; \
+        params=`sed -e '/@PARAMS/!d' -e 's/.*@PARAMS=\([^@]*\)@.*/\1/' $(REGIN)/$*.defs` ; \
+	./$(MAIN) $(REGCOMPOPTSMOS) $$params -o $(REGDIR)/output/$* $(REGIN)/$*.defs 
 
 regcomp-%: regcompgen-%
 	@echo "[GCC]          $*.c"

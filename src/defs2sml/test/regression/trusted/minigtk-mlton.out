@@ -161,6 +161,7 @@ structure Gtk  = struct
 	val POPUP : type_t
 	val new : type_t option -> base t
 	val new' : unit -> base t
+	val get_size : 'a t -> int -> int -> unit
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -184,6 +185,12 @@ structure Gtk  = struct
 	val new : type_t option -> base t
 	    = fn typ => make (new_ (getOpt (typ, TOPLEVEL)))
 	val new' : unit -> base t = fn dummy => make (new_ TOPLEVEL)
+	val get_size_ : cptr * int * int -> unit
+	    = _import "gtk_window_get_size" : cptr * int * int -> unit;
+	val get_size : 'a t -> int -> int -> unit
+	    = fn self => fn width => fn height =>
+		 GObject.withPtr
+		   (self, fn self => get_size_ (self, width, height))
     end
     structure Button :>
       sig

@@ -8,6 +8,9 @@ struct
     type operator = string
     datatype ctype =
              TInt
+	   | TChar
+	   | TFloat
+	   | TDouble
 	   | TValue
 	   | TVoid
 	   | TStar of ctype
@@ -69,6 +72,9 @@ struct
 	let fun showTy ty =
 		case ty of 
 		    TInt => "int"
+		  | TChar => "char"
+		  | TFloat => "float"
+		  | TDouble => "double"
 		  | TValue => "value"
 		  | TVoid => "void"
 		  | TStar ty => showTy ty ^ "*"

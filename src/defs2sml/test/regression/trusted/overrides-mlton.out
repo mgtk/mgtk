@@ -1,0 +1,90 @@
+structure Gtk  = struct
+    
+    type cptr = GObject.cptr
+    structure Object :>
+      sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure Widget :>
+      sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure Window :>
+      sig
+	type base
+	type 'a window_t
+	type 'a t = 'a window_t Bin.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWindow : 'a t -> base t
+	val get_position : 'a t -> int -> int -> unit
+	val get_size : 'a t -> int -> int -> unit
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a window_t = unit
+	type 'a t = 'a window_t Bin.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Bin.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWindow obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_position_ : cptr * cptr * cptr -> unit
+	    = _import "gtk_window_get_position" : cptr * cptr * cptr -> unit;
+	val get_position : 'a t -> int -> int -> unit
+	    = fn self => fn root_x => fn root_y =>
+		 GObject.withPtr
+		   (self, fn self => get_position_ (self, root_x, root_y))
+	val get_size_ : cptr * cptr * cptr -> unit
+	    = _import "gtk_window_get_size" : cptr * cptr * cptr -> unit;
+	val get_size : 'a t -> int -> int -> unit
+	    = fn self => fn width => fn height =>
+		 GObject.withPtr
+		   (self, fn self => get_size_ (self, width, height))
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** Window *** */

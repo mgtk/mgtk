@@ -1,0 +1,20 @@
+(override-parameters gtk_widget_intersect
+  (of-object GtkWidget)
+  (parameters
+   '("GdkRectangle*" "intersection" (output))
+  )
+)
+(override-parameters gtk_window_get_position
+  (of-object GtkWindow)
+  (parameters
+   '("gint*" "root_x" (output))
+    ("gint*" "root_y" (output))
+  )
+)
+(override-parameters gtk_window_get_size
+  (of-object GtkWindow)
+  (parameters
+   '("gint*" "width" (output))
+    ("gint*" "height" (output))
+  )
+)

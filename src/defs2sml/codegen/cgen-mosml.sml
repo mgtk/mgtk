@@ -51,12 +51,12 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 		    val args = if List.length parsty > 5
 			       then [("mgtk_params", Type.Tname(Name.fromPaths([],[],["int"])))]
 			       else parsty
-		    fun ubnd n =
-			raise Skip("Unbound type name: "^Name.toString n)
+		    fun ubnd whre n =
+			raise Skip("Unbound type name ("^whre^"): "^Name.toString n)
 		    fun f (par,Type.Void) = NONE
 		      | f (par,ty) = 
 			(SOME(TypeInfo.toCValue typeinfo ty (Var par))
-			 handle TypeInfo.Unbound n => ubnd n)
+			 handle TypeInfo.Unbound n => ubnd "parameters" n)
 		    val parsty' = List.mapPartial f parsty
 		    val ret = Type.getRetType ty
 
@@ -70,8 +70,9 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 				     Exp(Call("SetRefVal",NONE,[Var(p^"_ref"),TypeInfo.fromCValue typeinfo ty (Var p)])))
 			      | f (p,t) = NONE
 			in  ListPair.unzip(List.mapPartial f parsty) end
+			handle TypeInfo.Unbound n => ubnd "outputs" n
 		    val call = TypeInfo.fromCValue typeinfo ret (Call(Name.asCFunc name, NONE, parsty'))
-			       handle TypeInfo.Unbound n => ubnd n
+			       handle TypeInfo.Unbound n => ubnd "call" n
 		    val body = 
 			Block(NONE,extract@outputs,
 			  Comment "ML" ::

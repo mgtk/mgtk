@@ -34,6 +34,7 @@ signature NAME = sig
     val asSignal: name -> string
     val asType: name -> string
 
+    val asCType: name -> string
     val asCEnum: name -> string
     val asCEnumConst: name -> string
     val asCBoxed: name -> string

@@ -55,9 +55,11 @@ structure ResolveTypes :> ResolveTypes = struct
 	case ty of
 	    AST.ApiTy str => Parse.toType str
 	  | AST.Defaulted(ty, v) => WithDefault(resTy ty, v)
-	  | AST.Output(pass,ty) => Output(case pass of AST.OUT => OUT
-						     | AST.INOUT => INOUT,
-					  resTy ty)
+	  | AST.Output(pass,ty) => 
+	    let val ty = resTy ty
+		val ty = case ty of Ptr ty => ty | _ => raise Fail("Not an output type")
+	    in  Output(case pass of AST.OUT => OUT | AST.INOUT => INOUT, ty)
+	    end
           | AST.ArrowTy(pars, ret) =>
 		Func(List.map (fn (n,t) => (n,resTy t)) pars,  resTy ret)
     fun resTy' ty = 

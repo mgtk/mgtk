@@ -164,6 +164,8 @@ structure TinySML :> TinySML = struct
 	fun pppat p =
 	    case p of
 		VarPat v => ppString (mlify v)
+	      | TupPat [] => ppString "()"
+	      | TupPat [p] => pppat p
 	      | TupPat ps => bracket "(#)" (ilist ", #" pppat ps)
     in
 

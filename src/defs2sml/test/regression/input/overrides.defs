@@ -1,0 +1,52 @@
+;; @PARAMS=--metadata-file test/regression/input/overrides.ovr@
+
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+)
+
+(define-object Window
+  (in-module "Gtk")
+  (parent "GtkBin")
+  (c-name "GtkWindow")
+  (gtype-id "GTK_TYPE_WINDOW")
+)
+
+(define-method intersect
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_intersect")
+  (return-type "gboolean")
+  (parameters
+    '("GdkRectangle*" "area")
+    '("GdkRectangle*" "intersection")
+  )
+)
+
+(define-method get_position
+  (of-object "GtkWindow")
+  (c-name "gtk_window_get_position")
+  (return-type "none")
+  (parameters
+    '("gint*" "root_x")
+    '("gint*" "root_y")
+  )
+)
+
+(define-method get_size
+  (of-object "GtkWindow")
+  (c-name "gtk_window_get_size")
+  (return-type "none")
+  (parameters
+    '("gint*" "width")
+    '("gint*" "height")
+  )
+)

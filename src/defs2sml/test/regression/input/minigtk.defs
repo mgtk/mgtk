@@ -177,8 +177,8 @@
   (of-object "GtkWindow")
   (return-type "none")
   (parameters
-    '("gint" "width" (output))
-     ("gint" "height" (output))
+    '("gint" "width")
+     ("gint" "height")
   )
 )
 

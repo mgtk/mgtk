@@ -201,6 +201,9 @@ struct
 	end
 
     exception Skip of string
+
+    fun ubnd whre n = raise Skip("Unbound type name("^whre^"): "^Name.toString n)
+
     fun trans tinfo (name,member) =
 	case member of
             (* METHODS 
@@ -212,14 +215,12 @@ struct
                    val new_with_label: string -> base t
                        = fn label => makeBut(new_with_label_ label)
             *)
-	    AST.Method ty => 
+	    AST.Method ty => (
 		let val cname = P.mkMethodName name
 		    val name = Name.asMethod name
 		    val parsty = Type.getParams ty
 		    val (pars,tys) = ListPair.unzip parsty
 		    val ret     = Type.getRetType ty
-		    fun ubnd n =
-			raise Skip("Unbound type name: "^Name.toString' n)
 
                     (* convenience *)
 		    val parFn = fn f => f tinfo o #2
@@ -229,9 +230,7 @@ struct
 
                     (* parameter list helpers *)
 		    fun var (par,ty) = (Var par, ty)
-		    fun prim (par,ty) = 
-			(TypeInfo.toPrimValue tinfo ty par, ty)
-			handle TypeInfo.Unbound n => ubnd n
+		    fun prim (par,ty) = (TypeInfo.toPrimValue tinfo ty par, ty)
 		    fun trans (par, ty) = 
 			(par, Type.mapiv (fn (ty,n)=>n) (transCValue tinfo) ty)
 		    fun default (_, t as Type.WithDefault(ty,v)) = 
@@ -243,15 +242,10 @@ struct
                     (* type-based helpers *)
 		    val seqfrom = TypeInfo.toSMLTypeSeq tinfo
 		    val fromtype = fn ty => seqfrom ty 
-				      handle TypeInfo.Unbound n => ubnd n
 		    val fromtypeclosed = 
 			fn ty => TypeInfo.toSMLType tinfo (fn _ => "base") ty
-			   handle TypeInfo.Unbound n => ubnd n
 		    val primfrom = fn ty => TypeInfo.toPrimType tinfo ty
-				      handle TypeInfo.Unbound n => ubnd n
-		    fun fromprim ty e =
-			TypeInfo.fromPrimValue tinfo ty e
-			handle TypeInfo.Unbound n => ubnd n
+		    fun fromprim ty e =	TypeInfo.fromPrimValue tinfo ty e
 
                     (* generate code that handles output parameters 
                        - returns a "wrapped" stub call and the list
@@ -267,17 +261,22 @@ struct
 				fun inout (v,t) =
 				    if TypeInfo.isOutput (fn Type.INOUT => true | Type.OUT => false) tinfo t
 				    then refe (Var v)
-				    else refe (Const "0")
-				val ret = (case ret of Type.Void => []
-						     | ty => [ty])
-					  @ (List.map #2 outputs)
-			    in  (Let(ValDec(TupPat(List.map (VarPat o #1) outputs), NONE, 
-					     Tup(List.map inout outputs)),
-				     SeqExp[ call
-					   , Tup(List.map (deref o Var o #1) outputs)
-					   ]
+				    else refe (TypeInfo.defaultValue tinfo t)
+				val ret_ty =
+				    (case ret of Type.Void => []
+					       | ty => [ty])
+				    @ (List.map #2 outputs)
+				val ret_val =
+				    case ret of Type.Void => []
+					      | ty => [Var "ret"]
+			    in  (Let(SeqDec
+                                       [ ValDec(TupPat(List.map (VarPat o #1) outputs), NONE, 
+					       Tup(List.map inout outputs))
+				       , ValDec(VarPat "ret", NONE, call)
+                                       ],
+				       Tup(ret_val @ List.map (fn (x,t) => fromprim t (deref(Var x))) outputs)
 				     ),
-				 non, ret)
+				 non, ret_ty)
 			    end
 			else 
 			    (call, parsty, [ret])
@@ -298,8 +297,7 @@ struct
 		    val primty = primfrom ty
 
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
-		    fun fromtype ty = 
-			fromtype' ty handle TypeInfo.Unbound n => ubnd n
+		    fun fromtype ty = fromtype' ty 
 
 		    val defpars = List.map (trans o default o var) parsty
 		    val defparams = 
@@ -329,8 +327,8 @@ struct
 				 ValSpec(VarPat(name^"'"), ty'_ml)
 			     else EmptySpec)
                     }
-		end
-
+		end handle TypeInfo.Unbound n => ubnd "method" n)
+                
             (* ENUMS 
  
                Prototypical declaration

@@ -1,0 +1,93 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-enum IconSize
+  (in-module "Gtk")
+  (c-name "GtkIconSize")
+  (gtype-id "GTK_TYPE_ICON_SIZE")
+  (values
+    '("invalid" "GTK_ICON_SIZE_INVALID")
+    '("menu" "GTK_ICON_SIZE_MENU")
+    '("small-toolbar" "GTK_ICON_SIZE_SMALL_TOOLBAR")
+    '("large-toolbar" "GTK_ICON_SIZE_LARGE_TOOLBAR")
+    '("button" "GTK_ICON_SIZE_BUTTON")
+    '("dnd" "GTK_ICON_SIZE_DND")
+    '("dialog" "GTK_ICON_SIZE_DIALOG")
+  )
+)
+
+(define-function icon_size_lookup
+  (c-name "gtk_icon_size_lookup")
+  (return-type "gboolean")
+  (parameters
+    '("GtkIconSize" "size")
+     ("gint*" "width" (output))
+     ("gint*" "height" (output))
+  )
+)
+
+
+(define-object TextBuffer
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkTextBuffer")
+  (gtype-id "GTK_TYPE_TEXT_BUFFER")
+  (fields
+    '("GtkTextTagTable*" "tag_table")
+  )
+)
+
+(define-boxed TextIter
+  (in-module "Gtk")
+  (c-name "GtkTextIter")
+  (gtype-id "GTK_TYPE_TEXT_ITER")
+  (copy-func "gtk_text_iter_copy")
+  (release-func "gtk_text_iter_free")
+)
+
+(define-method get_iter_at_line_offset
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_get_iter_at_line_offset")
+  (return-type "none")
+  (parameters
+    '("GtkTextIter*" "iter" (output))
+    '("gint" "line_number")
+    '("gint" "char_offset")
+  )
+)
+
+(define-interface TreeModel
+  (in-module "Gtk")
+  (c-name "GtkTreeModel")
+  (gtype-id "GTK_TYPE_TREE_MODEL")
+)
+
+(define-boxed TreeIter
+  (in-module "Gtk")
+  (c-name "GtkTreeIter")
+  (gtype-id "GTK_TYPE_TREE_ITER")
+  (copy-func "gtk_tree_iter_copy")
+  (release-func "gtk_tree_iter_free")
+)
+
+(define-object TreeSelection
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkTreeSelection")
+  (gtype-id "GTK_TYPE_TREE_SELECTION")
+)
+
+(define-method get_selected
+  (of-object "GtkTreeSelection")
+  (c-name "gtk_tree_selection_get_selected")
+  (return-type "gboolean")
+  (parameters
+    '("GtkTreeModel**" "model" (output))
+    '("GtkTreeIter*" "iter")
+  )
+)
+

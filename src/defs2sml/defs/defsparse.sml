@@ -255,12 +255,15 @@ structure DefsParse :> DEFSPARSE = struct
     val exclude = parens ("metadata-exclude" &-- parens (repeat1 word))
                          >> (MetaExclude o op::)
 
-    val argOverrides = parens (  "param" &-- defWord -- typeExp >> ParamOverride
-                              || "return-type" &-- typeExp >> ReturnOverride
-                              )
+    val overrideAttrib =
+        (   parens ("of-object"   &-- word)          >> OfObject
+        ||  parens ("parameters"  &-- typeNameList)  >> Params
+        ||  parens ("return-type" &-- typeExp)       >> ReturnType
+        )
+    val overrideAttribs = repeat1 overrideAttrib >> (op::)
     val override =  
-	parens ( "metadata-override" &-- defWord 
-		 -- (repeat1 argOverrides >> (op::)) ) >> MetaOverride
+	parens ( "override-parameters" &-- defWord -- overrideAttribs)
+	>> MetaOverride
 
 (*
     val metaTypeAttribs =

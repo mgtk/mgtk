@@ -63,6 +63,9 @@ structure Defs = struct
 	let val atts = #3 def
 	in  lookup "of-object" (fn (OfObject n) => SOME n | _ => NONE) atts
 	end
+    fun getMetaObject (atts: attrib list) = 
+	lookup "of-object" (fn (OfObject n) => SOME n | _ => NONE) atts
+
     fun getParent (def: definition) =
 	let val atts = #3 def
 	in  lookup "parent" (fn (Parent n) => SOME n | _ => NONE) atts
@@ -77,11 +80,16 @@ structure Defs = struct
 	let val atts = #3 def
 	in  lookup "return-type" (fn (ReturnType n) => SOME n | _ => NONE) atts
 	end
+    fun getMetaReturnType (atts: attrib list) = 
+	lookup "return-type" (fn (ReturnType n) => SOME n | _ => NONE) atts
     fun getParameters  (def: definition) = 
 	let val atts = #3 def
-	in  lookup "params" (fn (Params ps) => SOME (List.map(fn(t,n,f)=>(n,t,f))ps)
+	in  lookup "params" (fn (Params ps) => SOME(List.map(fn(t,n,f)=>(n,t,f))ps)
 			      | _ => NONE) atts
 	end
+    fun getMetaParams (atts: attrib list) = 
+	lookup "params" (fn (Params ps) => SOME(List.map(fn(t,n,f)=>(n,t,f))ps)
+			  | _ => NONE) atts
     fun getValues  (def: definition) = 
 	let val atts = #3 def
 	in  lookup "value"
@@ -104,10 +112,8 @@ structure Defs = struct
 	              (fn (Implements n) => SOME n | _ => NONE) atts
 	end
 
-    datatype override =
-	ParamOverride of string * string
-      | ReturnOverride of string
-
+    type override = attrib (* but only OfObject, ReturnType, and Params
+                              should occur *)
     datatype metadata =
 	MetaExclude of string list
       | MetaOverride of string * override list

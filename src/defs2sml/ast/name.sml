@@ -243,6 +243,7 @@ structure Name :> NAME = struct
 		  ify (#base name) [])
     end (* local *)
 
+    val asCType = asCName "" capitalize
     val asCEnum = asCName "_" toLower
     val asCBoxed = asCName "" (fn s=>s)
     val asCFunc = (asCName "_" toLower) o cify

@@ -65,6 +65,10 @@ fun main () =
 	      | SOME f => let val os = TextIO.openAppend f
 			  in (fn () => os, fn () => TextIO.closeOut os) end
 
+	val metadataFile = ref NONE
+	fun setMetaFile f = metadataFile := SOME f
+	fun getMetaFile () = !metadataFile
+
 	val verbosity = ref 0
 
 	val forMLton = ref false
@@ -85,6 +89,7 @@ fun main () =
 		   , ("--separate-struct",  ArgParse.Unit   (fn () => sep_struct := true))
 		   , ("--anonymous-sigs",  ArgParse.Unit   (fn () => named_sigs := false))
 		   , ("-as",  ArgParse.Unit   (fn () => named_sigs := false))
+		   , ("--metadata-file", ArgParse.String setMetaFile)
                    ] @ Debug.argparse ()
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
@@ -102,13 +107,21 @@ fun main () =
 		    before
 		    MsgUtil.close "done\n")
 	val _ = MsgUtil.print ("Defs file with " ^ Int.toString (List.length defs) ^ " definitions\n")
+	val metadata =
+	    case getMetaFile () of 
+		NONE => []
+	      | SOME f => ( MsgUtil.print "Parsing (metadata defs)..."
+		          ; DefsParse.parseMetadataFile f
+			    before
+			    MsgUtil.close "done\n"
+                          )
 
 	val toplevel = case !toplevel of
 			   NONE => Name.capitalize(Path.base(Path.file (getFile())))
 			 | SOME tl => tl
 
         (* 2. Build modules and exclude items*)
-	val api = FromDefs.fromDefs toplevel defs
+	val api = FromDefs.fromDefs toplevel defs metadata
 	val exclude = 
 	    let fun read file =
 		    let val is = TextIO.openIn file

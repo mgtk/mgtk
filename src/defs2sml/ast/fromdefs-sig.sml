@@ -3,7 +3,8 @@
 
 signature FromDefs = sig
 
-    val fromDefs: string (* toplevel module name *) -> Defs.definition list 
+    val fromDefs: string (* toplevel module name *) 
+		  -> Defs.definition list -> Defs.metadata list
                   -> (string,AST.api_type) AST.ast_module
 
 end (* signature FromDefs *)

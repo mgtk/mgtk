@@ -71,6 +71,7 @@ gtk_item_factory_construct
 gtk_item_factory_from_path
 gtk_item_factory_from_widget
 OUTPUT_PARAMETERS
+gtk_tree_view_get_path_at_pos
 gtk_menu_item_toggle_size_request
 gtk_tree_sortable_get_sort_column_id
 gtk_text_view_buffer_to_window_coords

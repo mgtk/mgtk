@@ -151,6 +151,7 @@ structure Gtk  = struct
 	val POPUP : type_t
 	val new : type_t option -> base t
 	val new' : unit -> base t
+	val get_size : 'a t -> int -> int -> unit
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -173,6 +174,11 @@ structure Gtk  = struct
 	val new : type_t option -> base t
 	    = fn typ => make (new_ (getOpt (typ, TOPLEVEL)))
 	val new' : unit -> base t = fn dummy => make (new_ TOPLEVEL)
+	val get_size_ : cptr -> int -> int -> unit
+	    = app3 (symb"mgtk_gtk_window_get_size")
+	val get_size : 'a t -> int -> int -> unit
+	    = fn self => fn width => fn height =>
+		 get_size_ (repr self) width height
     end
     structure Button :>
       sig
@@ -438,6 +444,12 @@ EXTERNML value mgtk_get_gtk_window_type(value dummy) { /* ML */
 /* ML type: int -> cptr */
 EXTERNML value mgtk_gtk_window_new(value type) { /* ML */
     return Val_GtkObj(gtk_window_new(Int_val(type)));
+}
+
+/* ML type: cptr -> int -> int -> unit */
+EXTERNML value mgtk_gtk_window_get_size(value self, value width, value height) { /* ML */
+    gtk_window_get_size(GtkObj_val(self), Int_val(width), Int_val(height));
+    return Val_unit;
 }
 
 

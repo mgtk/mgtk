@@ -1,0 +1,206 @@
+structure Gtk  = struct
+    
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+    type icon_size = int
+    val get_icon_size_ : unit -> int * int * int * int * int * int * int
+	= app1 (symb"mgtk_get_gtk_icon_size")
+    val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
+	 ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
+	 ICON_SIZE_DIALOG)
+	= get_icon_size_ ()
+    val icon_size_lookup_ : int -> int ref -> int ref -> bool
+	= app3 (symb"mgtk_gtk_icon_size_lookup")
+    val icon_size_lookup : icon_size -> bool * int * int
+	= fn size => let val (width, height) = (ref 0, ref 0)
+			 val ret = icon_size_lookup_ size width height
+		     in (ret, !width, !height) end
+    type textiter = GObject.cptr
+    type treeiter = GObject.cptr
+    structure Object :>
+      sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj = inherit () (fn () => repr obj)
+    end
+    structure TextBuffer :>
+      sig
+	type base
+	type 'a textbuffer_t
+	type 'a t = 'a textbuffer_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTextBuffer : 'a t -> base t
+	val getiter_at_line_offset : 'a t -> int -> int -> textiter
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a textbuffer_t = unit
+	type 'a t = 'a textbuffer_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTextBuffer obj = inherit () (fn () => repr obj)
+	val getiter_at_line_offset_ : cptr -> cptr ref -> int -> int -> unit
+	    = app4 (symb"mgtk_gtk_textbuffer_getiter_at_line_offset")
+	val getiter_at_line_offset : 'a t -> int -> int -> textiter
+	    = fn self => fn line_number => fn char_offset =>
+		 let val iter = ref GObject.null
+		     val ret = getiter_at_line_offset_
+				 (repr self) iter line_number char_offset
+		 in !iter end
+    end
+    structure TreeModel :>
+      sig
+	type base
+	type 'a treemodel_t
+	type 'a t = 'a treemodel_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeModel : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a treemodel_t = unit
+	type 'a t = 'a treemodel_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeModel obj = inherit () (fn () => repr obj)
+    end
+    structure TreeSelection :>
+      sig
+	type base
+	type 'a treeselection_t
+	type 'a t = 'a treeselection_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeSelection : 'a t -> base t
+	val get_selected : 'a t -> treeiter -> bool * base TreeModel.t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a treeselection_t = unit
+	type 'a t = 'a treeselection_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeSelection obj = inherit () (fn () => repr obj)
+	val get_selected_ : cptr -> cptr ref -> cptr -> bool
+	    = app3 (symb"mgtk_gtk_treeselection_get_selected")
+	val get_selected : 'a t -> treeiter -> bool * base TreeModel.t
+	    = fn self => fn iter =>
+		 let val model = ref GObject.null
+		     val ret = get_selected_ (repr self) model iter
+		 in (ret, TreeModel.inherit () (fn () => !model)) end
+    end
+end
+
+
+/* *** Gtk *** */
+/* ML type: unit */
+EXTERNML value mgtk_get_gtk_icon_size(value dummy) { /* ML */
+  value res = alloc_tuple(7);
+  Field(res, 0) = Val_int(GTK_ICON_SIZE_INVALID);
+  Field(res, 1) = Val_int(GTK_ICON_SIZE_MENU);
+  Field(res, 2) = Val_int(GTK_ICON_SIZE_SMALL_TOOLBAR);
+  Field(res, 3) = Val_int(GTK_ICON_SIZE_LARGE_TOOLBAR);
+  Field(res, 4) = Val_int(GTK_ICON_SIZE_BUTTON);
+  Field(res, 5) = Val_int(GTK_ICON_SIZE_DND);
+  Field(res, 6) = Val_int(GTK_ICON_SIZE_DIALOG);
+  return res;
+}
+
+/* ML type: int -> int ref -> int ref -> bool */
+EXTERNML value mgtk_gtk_icon_size_lookup(value size, value width_ref, value height_ref) { /* ML */
+  int width = Int_val(GetRefVal(width_ref));
+  int height = Int_val(GetRefVal(height_ref));
+  return Val_bool(gtk_icon_size_lookup(Int_val(size), &(width), &(height)));
+}
+
+#define GtkTextIter_val(x) (((void*) Field(x, 1)))
+
+#define GtkTextIter_val_nocast(x) (Field(x, 1))
+
+static void ml_finalize_GtkTextIter(value val) {
+  gtk_text_iter_free(GtkTextIter_val(val));
+}
+
+value Val_GtkTextIter(void* obj) {
+  value res;
+  res = alloc_final(2, ml_finalize_GtkTextIter, 0, 1);
+  GtkTextIter_val_nocast(res) = (value) gtk_text_iter_copy(obj);
+  return res;
+}
+
+#define GtkTreeIter_val(x) (((void*) Field(x, 1)))
+
+#define GtkTreeIter_val_nocast(x) (Field(x, 1))
+
+static void ml_finalize_GtkTreeIter(value val) {
+  gtk_tree_iter_free(GtkTreeIter_val(val));
+}
+
+value Val_GtkTreeIter(void* obj) {
+  value res;
+  res = alloc_final(2, ml_finalize_GtkTreeIter, 0, 1);
+  GtkTreeIter_val_nocast(res) = (value) gtk_tree_iter_copy(obj);
+  return res;
+}
+
+
+
+/* *** Object *** */
+
+
+/* *** TextBuffer *** */
+/* ML type: cptr -> cptr ref -> int -> int -> unit */
+EXTERNML value mgtk_gtk_textbuffer_getiter_at_line_offset(value self, value iter_ref, value line_number, value char_offset) { /* ML */
+    GtkTextIter* iter = GtkTextIter_val(GetRefVal(iter_ref));
+    gtk_text_buffer_get_iter_at_line_offset(GtkObj_val(self), (iter), Int_val(line_number), Int_val(char_offset));
+    SetRefVal(iter_ref, Val_GtkTextIter(iter));
+    return Val_unit;
+}
+
+
+
+/* *** TreeModel *** */
+
+
+/* *** TreeSelection *** */
+/* ML type: cptr -> cptr ref -> cptr -> bool */
+EXTERNML value mgtk_gtk_treeselection_get_selected(value self, value model_ref, value iter) { /* ML */
+    GtkTreeModel* model = GtkObj_val(GetRefVal(model_ref));
+    return Val_bool(gtk_tree_selection_get_selected(GtkObj_val(self), &(model), GtkTreeIter_val(iter)));
+}
+

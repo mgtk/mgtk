@@ -41,13 +41,18 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
      *  & a possible super type
      *)
 
-    type info = {stype: (unit -> string) -> SMLType.ty, ptype: SMLType.ty,
+    datatype kind = Base | Object | Boxed | Enum | Flag
+
+    type info = {kind : kind,
+		 stype: (unit -> string) -> SMLType.ty, ptype: SMLType.ty,
 		 toc: string (* which function to call *),
 		 fromc: string (* which function to call *),
+		 ctype: TinyC.ctype,
 		 super: name option,
 		 toprim: string option (* which function to call *),
 		 fromprim: TinySML.exp -> TinySML.exp,
-		 wrapped: bool
+		 wrapped: bool,
+		 default: TinySML.exp
 		}
     type typeinfo = (Name.name, info) Splaymap.dict
     exception NotFound = Splaymap.NotFound
@@ -62,48 +67,53 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun addObject (table,name) =
 	let 
 	    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
-	    val info = {toc="GtkObj_val",fromc="Val_GtkObj",
+	    val info = {kind = Object,
+			toc="GtkObj_val",fromc="Val_GtkObj",
 			ptype=SMLType.TyApp([],["cptr"]),
 			fromprim = make, toprim = Prim.unwrap, wrapped = true,
 			stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
-			super=NONE}
+			super=NONE, 
+			ctype = TinyC.TStar(TinyC.TTyName (Name.asCType name)),
+			default = TinySML.Var"GObject.null"
+		        }
 	in  add(table,name,info)  end
 
+    open TinySML
     type binfo
-      = ((unit -> string) -> SMLType.ty) * SMLType.ty * string * string * Name.name option
+      = ((unit -> string) -> SMLType.ty) * SMLType.ty * string * string * TinyC.ctype * Name.name option * TinySML.exp
     val basic: (string * binfo) list
     =   [("int",       (fn _ => SMLType.IntTy,SMLType.IntTy,
-		        "Int_val", "Val_int", NONE))
+		        "Int_val", "Val_int", TinyC.TInt, NONE, Const "0"))
         ,("uint",      (fn _ => SMLType.IntTy,SMLType.IntTy,
-		        "Int_val", "Val_int", NONE))
+		        "Int_val", "Val_int", TinyC.TInt, NONE, Const "0"))
         ,("guint",     (fn _ => SMLType.IntTy,SMLType.IntTy,    (* FIXME *)
-		        "Int_val", "Val_int", NONE))
+		        "Int_val", "Val_int", TinyC.TInt, NONE, Const "0"))
         ,("char",      (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        "Char_val", "Val_char", NONE))
+		        "Char_val", "Val_char", TinyC.TChar, NONE, Const "#\"\000\""))
         ,("gunichar",  (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        "Long_val", "Val_long", NONE)) (* FIXME *)
+		        "Long_val", "Val_long", TinyC.TChar, NONE, Const "#\"\000\"")) (* FIXME *)
         ,("float",     (fn _ => SMLType.RealTy,SMLType.RealTy,
-		        "Double_val", "copy_double", NONE))
+		        "Double_val", "copy_double", TinyC.TFloat, NONE, Const "0.0"))
         ,("double",    (fn _ => SMLType.RealTy,SMLType.RealTy,
-		        "Double_val", "copy_double", NONE))
+		        "Double_val", "copy_double", TinyC.TDouble, NONE, Const "0.0"))
         ,("gdouble",   (fn _ => SMLType.RealTy,SMLType.RealTy,
-		        "Double_val", "copy_double", NONE))
+		        "Double_val", "copy_double", TinyC.TDouble, NONE, Const "0.0"))
         ,("ptr",       (fn _ => SMLType.TyApp([],["cptr"]),SMLType.TyApp([],["cptr"]),         (* FIXME *)
-		        "(gpointer)", "(value)", NONE))
+		        "(gpointer)", "(value)", TinyC.TStar TinyC.TVoid, NONE, Var"GObject.null"))
         ,("bool",      (fn _ => SMLType.BoolTy,SMLType.BoolTy,
-		        "Bool_val", "Val_bool", NONE))
+		        "Bool_val", "Val_bool", TinyC.TInt, NONE, Const "true"))
         ,("GType",     (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
-		        "Int_val", "Val_int", NONE))
+		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
         ,("GtkType",   (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
-		        "Int_val", "Val_int", NONE))
+		        "Int_val", "Val_int", TinyC.TInt, NONE, Const"0"))
         ]
 
     fun init () = 
 	let fun a ((n,i:binfo),t)=
 		add(t,Name.fromPaths([],[],[n]),
-		    {stype= #1 i,ptype= #2 i,toc= #3 i, 
+		    {kind = Base, stype= #1 i,ptype= #2 i,toc= #3 i, 
 		     wrapped = false, fromprim = id, toprim = NONE,
-		     fromc= #4 i,super= #5 i})
+		     fromc= #4 i, ctype= #5 i, super= #6 i, default = #7 i})
 	    val table = List.foldl a (Splaymap.mkDict Name.compare) basic
 	in  addObject(table, Name.fromString "GObject")
 	end
@@ -126,18 +136,20 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		    AST.Enum(false (* not a flag *), _) => 
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
-			    {toc="Int_val", fromc="Val_int",
+			    {kind = Enum, toc="Int_val", fromc="Val_int",
+			     ctype = TinyC.TTyName(Name.asCType name),
 			     fromprim=id, toprim = NONE, wrapped = false,
-			     ptype=SMLType.IntTy, super=NONE,
+			     ptype=SMLType.IntTy, super=NONE, default=Const"0",
 			     stype=fn _ => SMLType.TyApp([],[Name.asEnum name])})
                     )
 		  | AST.Enum(true (* a flag *), _) => 
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
-			    {toc="Int_val", fromc="Val_int",
+			    {kind = Flag, toc="Int_val", fromc="Val_int",
+			     ctype = TinyC.TTyName(Name.asCType name),
 			     toprim= SOME"Flags.set",
 			     fromprim=fn e => TinySML.App(TinySML.Var"Flags.get",[e]),
-			     wrapped = false,
+			     wrapped = false, default = Const "[]",
 			     ptype=SMLType.IntTy, super=NONE,
 			     stype=fn _ => 
 				SMLType.TyApp([SMLType.TyApp([],[Name.asEnum name])],["list"])})
@@ -145,8 +157,9 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		  | AST.Boxed _ =>
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
-			    {toc=(Name.asCBoxed name^"_val"), 
-			     fromc=("Val_"^Name.asCBoxed name),
+			    {kind = Boxed, toc=(Name.asCBoxed name^"_val"), 
+			     ctype = TinyC.TStar(TinyC.TTyName(Name.asCType name)),
+			     fromc=("Val_"^Name.asCBoxed name), default = Var"GObject.null",
 			     fromprim=id, toprim=NONE, wrapped = false,
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
@@ -307,6 +320,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		    NONE => id
 		  | SOME f => fn e => App(Var"Option.map", [Var f, e])
                )
+	  | Type.Output(pass,ty) => id
 	  | ty =>
 	       (case toprimvalue tinfo ty of
 		    NONE => id
@@ -377,7 +391,23 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.WithDefault(ty,default) => isString tinfo ty
 	  | _ => false
 
-    fun toCType tinfo ty = TinyC.TInt
+    fun toCType tinfo ty = 
+	case ty of
+	    Type.Ptr ty => TinyC.TStar(toCType tinfo ty)
+	  | Type.Base n =>
+	      (let val info:info = lookup tinfo n
+	       in  #ctype info end
+		   handle NotFound => raise Unbound n
+              )
+	  | Type.Tname n =>
+	      (let val info:info = lookup tinfo n
+	       in  #ctype info end
+		   handle NotFound => raise Unbound n
+              )
+	  | Type.Output(_, ty) => TinyC.TStar(toCType tinfo ty)
+	  | Type.WithDefault(ty,default) => toCType tinfo ty
+	  | Type.Const ty => toCType tinfo ty
+	  | _ => raise Fail("toCType: not implemented")
 
     fun tocvalue tinfo ty =
 	case ty of
@@ -386,7 +416,15 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       else tocvalue tinfo ty
 	  | Type.Const ty => tocvalue tinfo ty
 	  | Type.WithDefault(ty,default) => tocvalue tinfo ty
-	  | Type.Output(pass,ty) => "&" (* YUCK *)
+	  | Type.Output(pass,ty) =>  (* FIXME *)
+               (case ty of
+		    Type.Tname n => (let val info:info = lookup tinfo n
+				     in  if #kind info = Boxed then  ""
+					 else "&" (* YUCK *)
+				     end handle NotFound => raise Unbound n
+                                    )
+		  | _ => "&"
+               )
 	  | Type.Base n => 
                (let val info:info = lookup tinfo n
 		in  #toc info end
@@ -412,16 +450,12 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Base n => 
                (let val info:info = lookup tinfo n
 		in  ccall(#fromc info) end
-		    handle NotFound => 
-			   (TextIO.output(TextIO.stdErr, "Unbound type name ("^Name.toString n^")\n");
-			    ccall "Val_int")
+		    handle NotFound => raise Unbound n 
                )
 	  | Type.Tname n => 
                (let val info:info = lookup tinfo n
 		in  ccall(#fromc info) end
-		    handle NotFound => 
-			   (TextIO.output(TextIO.stdErr, "Unbound type name ("^Name.toString n^")\n");
-			    ccall "Val_GtkObj")
+		    handle NotFound => raise Unbound n
                )
           | Type.Const ty => fromCValue tinfo ty
 	  | Type.Ptr ty => fromCValue tinfo ty
@@ -452,4 +486,23 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 				    ["Signal","signal"])
 	in  SMLType.ArrowTy([loop ty], ret) end
 
+    fun defaultValue tinfo ty = (* FIXME *)
+	case ty of
+	    Type.Base tn => 
+	    (let val info: info = lookup tinfo tn
+	     in  #default info
+	     end handle NotFound => raise Unbound tn
+            )
+	  | Type.Tname tn => 
+	    (let val info: info = lookup tinfo tn
+	     in  #default info
+	     end handle NotFound => raise Unbound tn
+            )
+	  | Type.Const ty => defaultValue tinfo ty
+	  | Type.Ptr ty => defaultValue tinfo ty
+	  | Type.WithDefault(ty,v) => defaultValue tinfo ty
+	  | Type.Output(pass,ty) => defaultValue tinfo ty
+	  | Type.Void => Const "()"
+	  | Type.Func _ => Util.abort 98342
+	  | Type.Arr _ => Util.abort 98343
 end (* structure TypeInfo *)

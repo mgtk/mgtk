@@ -1,0 +1,162 @@
+structure Gtk  = struct
+    
+    type cptr = GObject.cptr
+    type icon_size = int
+    val get_icon_size_ : int ref * int ref * int ref * int ref * int ref 
+		       * int ref * int ref
+			 -> unit
+	= _import "mgtk_get_gtk_icon_size" : int ref * int ref * int ref 
+					   * int ref * int ref * int ref 
+					   * int ref
+					     -> unit;
+    val (ICON_SIZE_INVALID, ICON_SIZE_MENU, ICON_SIZE_SMALL_TOOLBAR, 
+	 ICON_SIZE_LARGE_TOOLBAR, ICON_SIZE_BUTTON, ICON_SIZE_DND, 
+	 ICON_SIZE_DIALOG)
+	= let val (x0, x1, x2, x3, x4, x5, x6)
+		  = (ref 0, ref 0, ref 0, ref 0, ref 0, ref 0, ref 0)
+	  in get_icon_size_ (x0, x1, x2, x3, x4, x5, x6)
+	   ; (!x0, !x1, !x2, !x3, !x4, !x5, !x6)
+	  end
+    val icon_size_lookup_ : int * int ref * int ref -> bool
+	= _import "gtk_icon_size_lookup" : int * int ref * int ref -> bool;
+    val icon_size_lookup : icon_size -> bool * int * int
+	= fn size => let val (width, height) = (ref 0, ref 0)
+			 val ret = icon_size_lookup_ (size, width, height)
+		     in (ret, !width, !height) end
+    type textiter = GObject.cptr
+    type treeiter = GObject.cptr
+    structure Object :>
+      sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure TextBuffer :>
+      sig
+	type base
+	type 'a textbuffer_t
+	type 'a t = 'a textbuffer_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTextBuffer : 'a t -> base t
+	val getiter_at_line_offset : 'a t -> int -> int -> textiter
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a textbuffer_t = unit
+	type 'a t = 'a textbuffer_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTextBuffer obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val getiter_at_line_offset_ : cptr * cptr ref * int * int -> unit
+	    = _import "gtk_text_buffer_get_iter_at_line_offset"
+		      : cptr * cptr ref * int * int -> unit;
+	val getiter_at_line_offset : 'a t -> int -> int -> textiter
+	    = fn self => fn line_number => fn char_offset =>
+		 let val iter = ref GObject.null
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self => getiter_at_line_offset_
+					       (self, iter, line_number, 
+						char_offset))
+		 in !iter end
+    end
+    structure TreeModel :>
+      sig
+	type base
+	type 'a treemodel_t
+	type 'a t = 'a treemodel_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeModel : 'a t -> base t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a treemodel_t = unit
+	type 'a t = 'a treemodel_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeModel obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+    end
+    structure TreeSelection :>
+      sig
+	type base
+	type 'a treeselection_t
+	type 'a t = 'a treeselection_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toTreeSelection : 'a t -> base t
+	val get_selected : 'a t -> treeiter -> bool * base TreeModel.t
+      end = struct
+	type cptr = GObject.cptr
+	type base = unit
+	type 'a treeselection_t = unit
+	type 'a t = 'a treeselection_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toTreeSelection obj
+	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val get_selected_ : cptr * cptr ref * cptr -> bool
+	    = _import "gtk_tree_selection_get_selected"
+		      : cptr * cptr ref * cptr -> bool;
+	val get_selected : 'a t -> treeiter -> bool * base TreeModel.t
+	    = fn self => fn iter =>
+		 let val model = ref GObject.null
+		     val ret = GObject.withPtr
+				 (self, 
+				  fn self => GObject.withPtr
+					       (model, 
+						fn model =>
+						   get_selected_
+						     (self, model, iter)))
+		 in (ret, TreeModel.inherit () (fn () => !model)) end
+    end
+end
+
+
+/* *** Gtk *** */
+/* ML type: unit */
+EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4, int* x5, int* x6) {
+  *x6 = GTK_ICON_SIZE_DIALOG;
+  *x5 = GTK_ICON_SIZE_DND;
+  *x4 = GTK_ICON_SIZE_BUTTON;
+  *x3 = GTK_ICON_SIZE_LARGE_TOOLBAR;
+  *x2 = GTK_ICON_SIZE_SMALL_TOOLBAR;
+  *x1 = GTK_ICON_SIZE_MENU;
+  *x0 = GTK_ICON_SIZE_INVALID;
+}
+
+
+
+/* *** Object *** */
+
+
+/* *** TextBuffer *** */
+
+
+/* *** TreeModel *** */
+
+
+/* *** TreeSelection *** */

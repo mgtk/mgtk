@@ -27,7 +27,7 @@ structure FromDefs :> FromDefs = struct
 	    SOME r => (r := mem :: !r; map)
 	  | NONE => new map name (ref [])
 
-    fun trans top (def, map) =
+    fun trans top metadata (def, map) =
 	let val name = getName def handle AttribNotFound _ => #1 def
 	    fun probableModule nothing split name = 
 		(* look for modules "matching" name:
@@ -51,6 +51,7 @@ structure FromDefs :> FromDefs = struct
 			  ; nothing)
 		    else module
 		end
+	    fun getMeta md = Map.peek(metadata, md^"."^name)
 
 	in  case getTag def of
 		Object => 
@@ -83,7 +84,7 @@ structure FromDefs :> FromDefs = struct
 				then SOME md
 				else NONE
 		       val mem = Member{name=name,
-					info=A.Method(functype NONE rt def)}
+					info=A.Method(functype (getMeta md) NONE rt def)}
 		   in  insert map md mem end
 		       handle AttribNotFound msg => 
 			      ( TextIO.print("Problems ("^msg^") with " ^ name)
@@ -93,7 +94,7 @@ structure FromDefs :> FromDefs = struct
                    (
 		   let val md = getObject def
 		       val mem = Member{name=name,
-					info=A.Method(functype (SOME md) NONE def)}
+					info=A.Method(functype (getMeta md) (SOME md) NONE def)}
 		   in  insert map md mem end
 		       handle AttribNotFound msg => 
 			      ( TextIO.print("Problems ("^msg^") with " ^ name)
@@ -106,7 +107,7 @@ structure FromDefs :> FromDefs = struct
 	      | Signal =>
 		   let val md = getObject def
 		       val mem = Member{name=name,
-					info=A.Signal(functype NONE NONE def)}
+					info=A.Signal(functype (getMeta md) NONE NONE def)}
 		   in  insert map md mem end
 	      | Boxed => 
 		   let val md = getModule def
@@ -116,13 +117,22 @@ structure FromDefs :> FromDefs = struct
 		       val mem = Member{name=name,info=A.Boxed copyrel}
 		   in  insert map md mem end
 	end
-    and functype self rettype def =
+    and functype metadata self rettype def =
 	let fun addself ps = case self of NONE => ps
 					| SOME s => ("self",A.ApiTy s) :: ps
 	    fun nonempty [] = [("dummy",A.ApiTy "void")]
 	      | nonempty ps = ps
 	    val return = A.ApiTy(case rettype of NONE => getReturnType def
 					       | SOME rt => rt)
+	    fun applyMeta params meta =
+		let fun lookup default name =
+			let fun loop [] = default
+			      | loop ((n,t,f)::rest) = 
+				if n = name then (t,f) else loop rest
+			in  loop meta end 
+		    fun one (n,t,f) = let val (t,f) = lookup (t,f) n
+				      in  (n,t,f) end
+		in  map one params end
 	    fun applyFlags fs ty =
 		let fun loop [] (null,default,out) = 
 			(case default of SOME d => (SOME d,out)
@@ -140,13 +150,30 @@ structure FromDefs :> FromDefs = struct
 				       | NONE => ty
 		in  ty
 		end
-
-	    val params = map (fn(n,t,f)=>(n,applyFlags f (A.ApiTy t)))
-			     (getParameters def handle AttribNotFound _ => [])
+	    val params = (getParameters def handle AttribNotFound _ => [])
+	    val params = case metadata of
+			     NONE => params
+			   | SOME{params=p,...} => applyMeta params p
+	    val params = map (fn(n,t,f)=>(n,applyFlags f (A.ApiTy t))) params
 	in  A.ArrowTy(nonempty(addself params), return) end
 
-    fun fromDefs top defs : (string,module_info,member_info) AST.module =
-	let val map = List.foldl (trans top) (new empty top (ref[])) defs
+    fun interpretMetadata defs =
+	let fun one (MetaOverride(name,attribs), map) =
+		let val obj = getMetaObject attribs
+		    val params = getMetaParams attribs 
+			         handle AttribNotFound _ => []
+		    val rettype = SOME(getMetaReturnType attribs)
+			          handle AttribNotFound _ => NONE
+		in  Map.insert(map, obj^"."^name, 
+			       {params=params,rettype=rettype})
+		end
+	      | one (MetaExclude _, map) = map
+	in  List.foldl one (Map.mkDict String.compare) defs end
+		     
+    fun fromDefs top defs metadefs
+	: (string,module_info,member_info) AST.module =
+	let val md = interpretMetadata metadefs
+	    val map = List.foldl (trans top md) (new empty top (ref[])) defs
 	    fun convert () =
 		let val ast = Map.find (map, top)
 		    fun loop (Module{name,members,info}) = 
@@ -158,9 +185,9 @@ structure FromDefs :> FromDefs = struct
 
     (* For debugging: *)
     local open Pretty in
-    val fromDefs = fn top => fn defs => 
+    val fromDefs = fn top => fn defs => fn metadefs =>
         let val pp = AST.ppAst ppString AST.ppAstType
-	    val module' = fromDefs top defs
+	    val module' = fromDefs top defs metadefs
 	in  if Debug.included "FromDefs.debug_defs" then
 		( print("After building defs:\n")
 		; ppPlain (pp module') TextIO.stdOut)

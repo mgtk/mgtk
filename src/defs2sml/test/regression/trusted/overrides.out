@@ -1,0 +1,119 @@
+structure Gtk  = struct
+    
+    open Dynlib
+    type cptr = GObject.cptr
+    val repr = GObject.repr
+    val symb = GtkBasis.symb
+    structure Object :>
+      sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a object_t = unit
+	type 'a t = 'a object_t GObject.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in GObject.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toObject obj = inherit () (fn () => repr obj)
+    end
+    structure Widget :>
+      sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a widget_t = unit
+	type 'a t = 'a widget_t Object.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Object.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWidget obj = inherit () (fn () => repr obj)
+    end
+    structure Window :>
+      sig
+	type base
+	type 'a window_t
+	type 'a t = 'a window_t Bin.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWindow : 'a t -> base t
+	val get_position : 'a t -> int * int
+	val get_size : 'a t -> int * int
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type base = unit
+	type 'a window_t = unit
+	type 'a t = 'a window_t Bin.t
+	fun inherit w con = let val con = let val ptr = con ()
+					  in fn () => ptr end
+				val witness = ()
+			    in Bin.inherit witness con end
+	fun make ptr = inherit () (fn () => ptr)
+	fun toWindow obj = inherit () (fn () => repr obj)
+	val get_position_ : cptr -> int ref -> int ref -> unit
+	    = app3 (symb"mgtk_gtk_window_get_position")
+	val get_position : 'a t -> int * int
+	    = fn self => let val (root_x, root_y) = (ref 0, ref 0)
+			     val ret = get_position_ (repr self) root_x root_y
+			 in (!root_x, !root_y) end
+	val get_size_ : cptr -> int ref -> int ref -> unit
+	    = app3 (symb"mgtk_gtk_window_get_size")
+	val get_size : 'a t -> int * int
+	    = fn self => let val (width, height) = (ref 0, ref 0)
+			     val ret = get_size_ (repr self) width height
+			 in (!width, !height) end
+    end
+end
+
+
+/* *** Gtk *** */
+
+
+/* *** Object *** */
+
+
+/* *** Widget *** */
+
+
+/* *** Window *** */
+/* ML type: cptr -> int ref -> int ref -> unit */
+EXTERNML value mgtk_gtk_window_get_position(value self, value root_x_ref, value root_y_ref) { /* ML */
+    int root_x = Int_val(GetRefVal(root_x_ref));
+    int root_y = Int_val(GetRefVal(root_y_ref));
+    gtk_window_get_position(GtkObj_val(self), &(root_x), &(root_y));
+    SetRefVal(root_x_ref, Val_int(root_x));
+    SetRefVal(root_y_ref, Val_int(root_y));
+    return Val_unit;
+}
+
+/* ML type: cptr -> int ref -> int ref -> unit */
+EXTERNML value mgtk_gtk_window_get_size(value self, value width_ref, value height_ref) { /* ML */
+    int width = Int_val(GetRefVal(width_ref));
+    int height = Int_val(GetRefVal(height_ref));
+    gtk_window_get_size(GtkObj_val(self), &(width), &(height));
+    SetRefVal(width_ref, Val_int(width));
+    SetRefVal(height_ref, Val_int(height));
+    return Val_unit;
+}
+

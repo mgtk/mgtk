@@ -28,4 +28,6 @@ signature TypeInfo = sig
     val toCValue: typeinfo -> 'a ty -> TinyC.expr -> TinyC.expr
     val fromCValue: typeinfo -> 'a ty -> TinyC.expr -> TinyC.expr
 
+    val defaultValue: typeinfo -> 'a ty -> TinySML.exp
+
 end
