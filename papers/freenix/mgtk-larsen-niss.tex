@@ -230,10 +230,46 @@ because we can apply it to arguments of many shapes.
 \label{sec:encoding-classes}
 
 As described in Section~\ref{sec:intr-backgr} \sml in is a functional
-language without object-oriented features and \gtk is an object
-oriented library.  Thus, it is not trivial how to make an \sml
-interface to \gtk.
+language without object-oriented features and \gtk is designed as an
+object-oriented library.  Thus, it is not trivial how to make an \sml
+interface to \gtk.  The most difficult problem is how to present the
+subtype relations defined by a class hierarchy in \sml's type system.
+That is, in this section we are only interested in how to present a
+type-safe \sml interface to \gtk class hierarchy.  By type-safe we
+mean that, if an \sml application programmer uses our library and
+makes type-error when using the \gtk library, calling a undefined
+method on object, for instance, then the \sml compiler should give an
+error.
 
+Fortunately, we are able to take avangtage of two properties of \gtk
+and \sml.  First, \gtk implements an class system with only
+single-inheritance.  Second, \sml's type system is expressive enought
+to express the subtype-relations of single-inheritance class
+hierarchies.
+
+In type theoretical jargon, the trick is to use \emph{parametric
+  polymorphism} and \emph{existential types} to encode inheriatance
+subtyping.  
+
+\begin{figure}
+  \centering
+ \includegraphics[width=\linewidth]{example-class-diagram.eps}
+  \caption{Small example class hierarchy}
+  \label{fig:class-hierarchy}
+\end{figure}
+
+Figure~\ref{fig:class-hierarchy} shows a small class hierarchy with
+four classes.  Where \classname{SubClassA} and \classname{SubClassB}
+are subclasses of the class \classname{Super} and
+\classname{SubSubClassB} is a subclass of \classname{SubClassB}.  We
+shall go through the different parts of the encoding of a class.
+
+\begin{description}
+\item[Class type]
+\item[Subtyping/Inheritance]  
+\item[Method]
+\item[Constructor]  
+\end{description}
  
 \begin{ednote}{Ken}
   * Phantom types are inheritance paths.
@@ -446,6 +482,13 @@ of a signal on buttons.
 
 \item erlgtk
 \url{http://erlgtk.sourceforge.net}
+
+
+\item SWIG also used to generate language bindings
+
+\item ``Calling Heaven from Hell''
+
+\item nlffi
 
 \end{itemize}
 
