@@ -196,7 +196,7 @@ struct
 
     (* connect a callback with type unit -> bool *)
     fun bool_connect wid sign cb =
-        ignore(signalConnect wid (signal sign false (unit --> return_bool) cb))
+        ignore(signalConnect wid (signal sign true (unit --> return_bool) cb))
 
     (* old connect functions 
     fun unit_connect (OBJ wid) sign cb =
