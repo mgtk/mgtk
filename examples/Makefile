@@ -3,8 +3,10 @@ include ../src/Makefile.inc
 MOSMLINCLUDE=-I $(LIBDIR)
 
 OBJS= FunInput.uo valuta.uo helloworld2.uo helloworld.uo entrylabel.uo\
-      fileview.uo fileedit.uo fileedit2.uo counter.uo comboexample.uo\
-      treeexample.uo drawing.uo
+      fileedit.uo fileedit2.uo counter.uo comboexample.uo\
+      treeexample.uo drawing.uo twowindows.uo
+
+SUBDIRS= moside
 
 all: tests
 
@@ -15,6 +17,12 @@ clean:
 	$(REMOVE) *.u? 
 	$(REMOVE) Makefile.bak
 
+realclean: clean
+	@dirs='$(SUBDIRS)'; for dir in $$dirs; do \
+	   cd $$dir; \
+	   $(MAKE) realclean; \
+           cd ..; \
+        done
 depend: 
 	$(REMOVE) Makefile.bak
 	$(MOVE) Makefile Makefile.bak

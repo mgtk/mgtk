@@ -1,0 +1,47 @@
+----------------------------------------------------------------------
+TRYING THE EXAMPLE PROGRAMS
+
+This directory contains a few example programs to get you started with
+mGtk.  In order to try the example programs, issue the following
+commands
+
+(1) make
+
+(2) export MGTKHOME=../src  (when using bash)
+    setenv MGTKHOME ../src  (when using [t]csh)
+
+(3) mosml -I ../src
+
+(4) load "<file>";  (where <file> is the name of the file
+                     *without* the .uo extension)
+
+(5) <file>.main();
+
+
+Here is a list of the programs:
+
+File		 | Description
+----------------------------------------------------------------------
+helloworld.sml	 | A port of helloworld.c from the gtk+ tutorial
+helloworld2.sml	 | How to have more than one widget in a window
+entrylabel.sml	 | How to use entries
+valuta.sml	 | A port of a Peter Sestoft Java example 
+twowindows.sml	 | How to more than one window
+fileview.sml	 | A very simple file viewer, uses the text widget
+fileedit.sml	 | An extremely simple file editor, uses a ScrolledWindow
+fileedit2.sml	 | A very simple file editor, better layout than fileedit
+counter.sml	 | A first attempt to more some of the event loop to SML,
+                 | uses the FunInput stuff.
+calendar.sml     | Shows how to use the calendar widget
+drawing.sml      | Shows how to use the drawing area widget, including
+                 | how to manage graphics contexts, etc.
+comboexample.sml | Shows how to use combo boxes (from the gtk+ tutorial)
+treeexample.sml  | Shows how to use trees (from the gtk+ tutorial)
+moside/          | A larger example providing a small GUI for MosML
+
+
+
+Enjoy!
+
+----------------------------------------------------------------------
+                                          Henning Niss, April 11, 2000

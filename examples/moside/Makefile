@@ -2,6 +2,8 @@ include ../../src/Makefile.inc
 
 MOSMLINCLUDE=-I $(LIBDIR)
 
+SUBDIRS=
+
 # Options for compilation of mgtk.c
 OPTS=-O3 -fPIC
 CINCLUDE=-I$(MOSMLRUNTIME) `$(GTKCONFIG) --cflags`
@@ -21,6 +23,8 @@ clean:
 	$(REMOVE) *.u? 
 	$(REMOVE) *.o *.so
 	$(REMOVE) Makefile.bak
+
+realclean: clean
 
 depend: 
 	$(REMOVE) Makefile.bak
