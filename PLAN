@@ -7,7 +7,10 @@ Milestone 1 (red-hens alpha 0.02):
 * Error handling, can catch gtk+ errors and convert them to
   exceptions? (Henning)
 * Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
-
+* Constructed data types in .defs file (GList's, arrays, etc.)
+* More functions from Sugar: latest comparison:
+  + bitmaps / drawables
+  + cursors
 
 Milestone 2 (release version 1.0):
 ----------------------------------
@@ -16,12 +19,17 @@ Milestone 2 (release version 1.0):
   + Tutorial
   + mgtkgen
   + Type hacks
+* More functions from Sugar:
+  + AccelGroups
 
 
 Postpone for after version 1.0:
 -------------------------------
 * Split Gtk.s{ig,ml} into many files
 * Start to look at Gnome stuff
+* More functions from Sugar:
+  + Drag'n'Drop
+  + ItemFactories
 
 
 
