@@ -1,0 +1,2 @@
+defs2sml: util/util defs/defsparse
+    %PROGRAM
