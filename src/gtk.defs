@@ -1562,41 +1562,44 @@
    (int width)
    (int height)))
 
-(define-func gtk_draw_box_gap
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)
-   (GtkPositionType gap_side)
-   (int gap_x)
-   (int gap_width)))
+; Win32 compatibility
+;(define-func gtk_draw_box_gap
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)
+;   (GtkPositionType gap_side)
+;   (int gap_x)
+;   (int gap_width)))
 
-(define-func gtk_draw_check
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)))
+; Win32 compatibility
+;(define-func gtk_draw_check
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)))
 
-(define-func gtk_draw_cross
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)))
+; Win32 compatibility
+;(define-func gtk_draw_cross
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)))
 
 (define-func gtk_draw_diamond
   none
@@ -1609,49 +1612,53 @@
    (int width)
    (int height)))
 
-(define-func gtk_draw_extension
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)
-   (GtkPositionType gap_side)))
+; Win32 compatibility
+;(define-func gtk_draw_extension
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)
+;   (GtkPositionType gap_side)))
 
-(define-func gtk_draw_flat_box
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)))
+; Win32 compatibility
+;(define-func gtk_draw_flat_box
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)))
 
-(define-func gtk_draw_focus
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (int x)
-   (int y)
-   (int width)
-   (int height)))
+; Win32 compatibility
+;(define-func gtk_draw_focus
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)))
 
-(define-func gtk_draw_handle
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)
-   (GtkOrientation orientation)))
+; Win32 compatibility
+;(define-func gtk_draw_handle
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)
+;   (GtkOrientation orientation)))
 
 (define-func gtk_draw_hline
   none
@@ -1662,16 +1669,17 @@
    (int x2)
    (int y)))
 
-(define-func gtk_draw_option
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)))
+; Win32 compatibility
+;(define-func gtk_draw_option
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)))
 
 (define-func gtk_draw_oval
   none
@@ -1694,17 +1702,18 @@
 ;;;   (int npoints)
 ;;;   (bool fill)))
 
-(define-func gtk_draw_ramp
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (GtkArrowType arrow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)))
+; Win32 compatibility
+;(define-func gtk_draw_ramp
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (GtkArrowType arrow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)))
 
 (define-func gtk_draw_shadow
   none
@@ -1717,31 +1726,33 @@
    (int width)
    (int height)))
 
-(define-func gtk_draw_shadow_gap
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)
-   (GtkPositionType gap_side)
-   (int gap_x)
-   (int gap_width)))
+; Win32 compatibility
+;(define-func gtk_draw_shadow_gap
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)
+;   (GtkPositionType gap_side)
+;   (int gap_x)
+;   (int gap_width)))
 
-(define-func gtk_draw_slider
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)
-   (GtkOrientation orientation)))
+; Win32 compatibility
+;(define-func gtk_draw_slider
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)
+;   (GtkOrientation orientation)))
 
 (define-func gtk_draw_string
   none
@@ -1752,16 +1763,17 @@
    (int y)
    (static_string string)))
 
-(define-func gtk_draw_tab
-  none
-  ((GtkStyle style)
-   (GdkWindow window)
-   (GtkStateType state_type)
-   (GtkShadowType shadow_type)
-   (int x)
-   (int y)
-   (int width)
-   (int height)))
+; Win32 compatibility
+;(define-func gtk_draw_tab
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (int x)
+;   (int y)
+;   (int width)
+;   (int height)))
 
 (define-func gtk_draw_vline
   none
@@ -2425,9 +2437,10 @@
   none
   ((GtkContainer container)))
 
-(define-func gtk_container_dequeue_resize_handler
-  none
-  ((GtkContainer container)))
+; Win32 compatibility
+;(define-func gtk_container_dequeue_resize_handler
+;  none
+;  ((GtkContainer container)))
 
 ;gtk_container_child_set
 ;gtk_container_child_get
