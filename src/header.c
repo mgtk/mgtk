@@ -25,6 +25,8 @@
 /* A nice macro to have */
 #define GtkObj_val(x) ((void*) Field(x, 1))
 
+#define GtkObj_val_nocast(x) (Field(x, 1))
+
 
 static void ml_finalize_gtkobject (value val) {
   gtk_object_unref (GtkObj_val(val)); 
@@ -34,7 +36,7 @@ value Val_GtkObj (void* obj) {
   value res; 
   gtk_object_ref(obj); 
   res = alloc_final (2, ml_finalize_gtkobject, 0, 1);
-  GtkObj_val(res) = (value) obj;  
+  GtkObj_val_nocast(res) = (value) obj;  
   return res; 
 }
 
@@ -137,7 +139,7 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   if(mvp == (valueptr) NULL)
     failwith("Cannot find mgtk_callback_dispatch");
 
-  //printf("callback id = %i\n",(int) data);
+  /* printf("callback id = %i\n",(int) data); */
 
   res = callbackptr2(mvp, (value) data, res);
 
@@ -163,7 +165,7 @@ void mgtk_callback_destroy (gpointer data) {
 EXTERNML value mgtk_signal_connect (value object, value name, value clb, value after){
   int res;
 
-  //  printf("register id = %i\n",(int) clb);
+  /*  printf("register id = %i\n",(int) clb); */
 
   res = gtk_signal_connect_full (GtkObj_val(object), 
 				 String_val(name), 
@@ -196,6 +198,8 @@ EXTERNML value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
 
 #define Glist_val(x) ((GList *) Field(x, 1))
 
+#define Glist_val_nocast(x) (Field(x, 1))
+
 
 static void mgtk_finalize_glist (value val) {
   g_list_free(Glist_val(val));
@@ -206,13 +210,13 @@ static void mgtk_finalize_glist (value val) {
 EXTERNML value mgtk_glist_nil (value dummy) { /* ML */
   value res; 
   res = alloc_final (2, mgtk_finalize_glist, 0, 1);
-  Glist_val(res) = (value) NULL;  
+  Glist_val_nocast(res) = (value) NULL;  
   return res; 
 }
 
 /* ML type: glist -> string -> unit */
 EXTERNML value mgtk_glist_append_string(value ls, value s) { /* ML */
-  Glist_val(ls) = g_list_append (Glist_val(ls), String_val (s));
+  Glist_val_nocast(ls) = (value) g_list_append (Glist_val(ls), String_val (s));
   return Val_unit;
 }
 

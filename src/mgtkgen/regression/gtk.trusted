@@ -1358,6 +1358,8 @@ EXTERNML value mgtk_get_gdk_rgb_dither (value dummy) { /* ML */
 
 #define GtkAccelGroup_val(x) ((void*) Field(x, 1))
 
+#define GtkAccelGroup_val_nocast(x) (Field(x, 1))
+
 static void ml_finalize_gtk_accel_group (value val) {
   gtk_accel_group_unref (GtkAccelGroup_val(val)); 
 }
@@ -1366,11 +1368,13 @@ value Val_GtkAccelGroup (void* obj) {
   value res;
   gtk_accel_group_ref(obj);
   res = alloc_final (2, ml_finalize_gtk_accel_group, 0, 1);
-  GtkAccelGroup_val(res) = (value) obj ;
+  GtkAccelGroup_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GtkStyle_val(x) ((void*) Field(x, 1))
+
+#define GtkStyle_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gtk_style (value val) {
   gtk_style_unref (GtkStyle_val(val)); 
@@ -1380,11 +1384,13 @@ value Val_GtkStyle (void* obj) {
   value res;
   gtk_style_ref(obj);
   res = alloc_final (2, ml_finalize_gtk_style, 0, 1);
-  GtkStyle_val(res) = (value) obj ;
+  GtkStyle_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GtkSelectionData_val(x) ((void*) Field(x, 1))
+
+#define GtkSelectionData_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gtk_selection_data (value val) {
   gtk_selection_data_free (GtkSelectionData_val(val)); 
@@ -1394,11 +1400,13 @@ value Val_GtkSelectionData (void* obj) {
   value res;
   void* copy = gtk_selection_data_copy(obj);
   res = alloc_final (2, ml_finalize_gtk_selection_data, 0, 1);
-  GtkSelectionData_val(res) = (value) copy ;
+  GtkSelectionData_val_nocast(res) = (value) copy;
   return res;
 }
 
 #define GdkDragContext_val(x) ((void*) Field(x, 1))
+
+#define GdkDragContext_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_drag_context (value val) {
   gdk_drag_context_unref (GdkDragContext_val(val)); 
@@ -1408,11 +1416,13 @@ value Val_GdkDragContext (void* obj) {
   value res;
   gdk_drag_context_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_drag_context, 0, 1);
-  GdkDragContext_val(res) = (value) obj ;
+  GdkDragContext_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GdkColormap_val(x) ((void*) Field(x, 1))
+
+#define GdkColormap_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_colormap (value val) {
   gdk_colormap_unref (GdkColormap_val(val)); 
@@ -1422,11 +1432,13 @@ value Val_GdkColormap (void* obj) {
   value res;
   gdk_colormap_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_colormap, 0, 1);
-  GdkColormap_val(res) = (value) obj ;
+  GdkColormap_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GdkFont_val(x) ((void*) Field(x, 1))
+
+#define GdkFont_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_font (value val) {
   gdk_font_unref (GdkFont_val(val)); 
@@ -1436,11 +1448,13 @@ value Val_GdkFont (void* obj) {
   value res;
   gdk_font_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_font, 0, 1);
-  GdkFont_val(res) = (value) obj ;
+  GdkFont_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GdkWindow_val(x) ((void*) Field(x, 1))
+
+#define GdkWindow_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_window (value val) {
   gdk_window_unref (GdkWindow_val(val)); 
@@ -1450,11 +1464,13 @@ value Val_GdkWindow (void* obj) {
   value res;
   gdk_window_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_window, 0, 1);
-  GdkWindow_val(res) = (value) obj ;
+  GdkWindow_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GdkPixmap_val(x) ((void*) Field(x, 1))
+
+#define GdkPixmap_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_pixmap (value val) {
   gdk_pixmap_unref (GdkPixmap_val(val)); 
@@ -1464,11 +1480,13 @@ value Val_GdkPixmap (void* obj) {
   value res;
   gdk_pixmap_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_pixmap, 0, 1);
-  GdkPixmap_val(res) = (value) obj ;
+  GdkPixmap_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GdkBitmap_val(x) ((void*) Field(x, 1))
+
+#define GdkBitmap_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_bitmap (value val) {
   gdk_bitmap_unref (GdkBitmap_val(val)); 
@@ -1478,11 +1496,13 @@ value Val_GdkBitmap (void* obj) {
   value res;
   gdk_bitmap_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_bitmap, 0, 1);
-  GdkBitmap_val(res) = (value) obj ;
+  GdkBitmap_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GdkDrawable_val(x) ((void*) Field(x, 1))
+
+#define GdkDrawable_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_drawable (value val) {
   gdk_window_unref (GdkDrawable_val(val)); 
@@ -1492,11 +1512,13 @@ value Val_GdkDrawable (void* obj) {
   value res;
   gdk_window_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_drawable, 0, 1);
-  GdkDrawable_val(res) = (value) obj ;
+  GdkDrawable_val_nocast(res) = (value) obj;
   return res;
 }
 
 #define GdkEvent_val(x) ((void*) Field(x, 1))
+
+#define GdkEvent_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_event (value val) {
   gdk_event_free (GdkEvent_val(val)); 
@@ -1506,11 +1528,13 @@ value Val_GdkEvent (void* obj) {
   value res;
   void* copy = gdk_event_copy(obj);
   res = alloc_final (2, ml_finalize_gdk_event, 0, 1);
-  GdkEvent_val(res) = (value) copy ;
+  GdkEvent_val_nocast(res) = (value) copy;
   return res;
 }
 
 #define GdkColor_val(x) ((void*) Field(x, 1))
+
+#define GdkColor_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_color (value val) {
   gdk_color_free (GdkColor_val(val)); 
@@ -1520,11 +1544,13 @@ value Val_GdkColor (void* obj) {
   value res;
   void* copy = gdk_color_copy(obj);
   res = alloc_final (2, ml_finalize_gdk_color, 0, 1);
-  GdkColor_val(res) = (value) copy ;
+  GdkColor_val_nocast(res) = (value) copy;
   return res;
 }
 
 #define GdkGC_val(x) ((void*) Field(x, 1))
+
+#define GdkGC_val_nocast(x) (Field(x, 1))
 
 static void ml_finalize_gdk_gc (value val) {
   gdk_gc_unref (GdkGC_val(val)); 
@@ -1534,7 +1560,7 @@ value Val_GdkGC (void* obj) {
   value res;
   gdk_gc_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_gc, 0, 1);
-  GdkGC_val(res) = (value) obj ;
+  GdkGC_val_nocast(res) = (value) obj;
   return res;
 }
 
