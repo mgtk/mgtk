@@ -4,7 +4,6 @@ fun delete_event _ = ( GtkBasis.main_quit()
 		     ; true
                      )
 
-
 fun setUpGui() = 
     let val w = Window.new Window.WINDOW_TOPLEVEL
 
@@ -21,8 +20,8 @@ fun setUpGui() =
 
         val l = let val l = Label.new ("<span weight=\"bold\" size=\"larger\">" ^
 			   "Enter your name and preferred address</span>")
-                in  (* l.xalign = 0.0 
-                   ; *) Label.set_usemarkup l true
+                in   Misc.set_alignment l 0.0 0.5 
+                   ; Label.set_usemarkup l true
                    ; Box.pack_start outerv l false false 0
                    ; l
                 end
@@ -41,8 +40,7 @@ fun setUpGui() =
 
         fun makeEntryLabel text entry =
             let val l = Label.new text
-            in  (* l.xalign = 0.0 
-                 ; *) 
+            in  Misc.set_alignment l 0.0 0.5 
               ; Box.pack_start v l true false 0
               ; Label.set_mnemonic_widget l entry
             end
