@@ -333,6 +333,15 @@ EXTERNML value mgtk_gtk_button_new_with_label(value label) { /* ML */
 
 /* *** Window stuff *** */
 
+/* ML type: unit -> int * int  */
+EXTERNML value mgtk_get_window_type (value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res,0) = Val_int(GTK_WINDOW_TOPLEVEL);
+  Field(res,1) = Val_int(GTK_WINDOW_POPUP);
+  return res;
+}
+
+
 /* ML type: int -> cptr */
 EXTERNML value mgtk_gtk_window_new(value typ) { /* ML */
   return Val_GtkObj(gtk_window_new(Int_val(typ)));

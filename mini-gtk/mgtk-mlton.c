@@ -102,3 +102,9 @@ EXTERNML long mgtk_signal_connect ( Pointer object
   return res;
 }
 
+
+/* *** ENUMS *** */
+EXTERNML void mgtk_get_window_type (int* x1, int* x2) {
+  *x1 = GTK_WINDOW_TOPLEVEL;
+  *x2 = GTK_WINDOW_POPUP;
+}

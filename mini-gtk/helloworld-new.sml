@@ -7,7 +7,7 @@ fun destroy _ = GtkBasis.main_quit()
 
 fun main () =
     let val _      = GtkBasis.init(CommandLine.name()::CommandLine.arguments())
-	val window = Window.new ()
+	val window = Window.new Window.WINDOW_TOPLEVEL
 	val button = Button.new_with_label "Hello World"
     in  Signal.connect window (Widget.delete_event_sig delete_event) 
       ; Signal.connect window (Widget.destroy_sig destroy) 

@@ -399,7 +399,11 @@ sig
     type 'a t = 'a window_t Container.t
     type base
 
-    val new: unit -> base t
+    type window_type 
+    val WINDOW_TOPLEVEL : window_type
+    val WINDOW_POPUP : window_type
+
+    val new: window_type -> base t
 end
 
 
@@ -417,10 +421,17 @@ struct
     fun inherit w con = Container.inherit () con
     fun makeWin ptr = Container.inherit () (fn() => ptr)
 
+    type window_type = int
+    val get_window_type_: unit -> int * int
+        = app1(symb"mgtk_get_window_type")
+    val (WINDOW_TOPLEVEL,WINDOW_POPUP)
+        = get_window_type_ ()
+
+
     val new_: int -> cptr
         = app1(symb"mgtk_gtk_window_new")
-    val new: unit -> base t
-        = fn dummy => makeWin(new_ 0) (* FIXME: HACK ALERT!!!!!*)
+    val new: window_type -> base t
+        = fn wtype => makeWin(new_ wtype)
 
 end
 

@@ -15,7 +15,7 @@ fun add_button box ent _ =
 
 fun main () =
     let val _      = GtkBasis.init(CommandLine.name()::CommandLine.arguments())
-	val window = Window.new ()
+	val window = Window.new Window.WINDOW_TOPLEVEL
         val box    = VBox.new ()
         val entry  = Entry.new()
     in  Signal.connect window (Widget.delete_event_sig delete_event) 
