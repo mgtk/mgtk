@@ -183,13 +183,29 @@ old*)
     (* indentation in ML files *)
     val indent = "    "
 
+    fun allocExpression (AST.LONG(_, AST.TYPENAME tName)) =
+	let fun extractString (WSeq.$ s) = s
+              | extractString (WSeq.Empty) = ""
+              | extractString _ = Util.notImplemented "allocExpression.extractString"
+            val mlPrimType = extractString o #mlPrimType o TypeInfo.lookupTypeName
+	    val primType = mlPrimType tName
+	in  (* choose the safe way out: *)
+	    not (primType="int" orelse primType="word" orelse primType="bool")
+	end
+      | allocExpression (AST.LONG(_, AST.OUTPUT tExp)) = allocExpression tExp
+      | allocExpression _ = Util.notImplemented "allocExpression: not a type name"
+
     fun allocTuple name values =
 	let val values' = ListPair.zip (List.tabulate(List.length values, fn n=>n), values)
+	    val allocates = List.exists (allocExpression o #1) values
+	    val tupleName = if allocates then "r[0]" else "res"
 	    fun prValue (n, (t,v)) =
-		$$["  Field(",name,", ",Int.toString n,") = "] && fromCValue (t,v) && $";"
-	in  $$["  ", name, " = alloc_tuple(", Int.toString (List.length values), ");"] && Nl
+		$$["  Field(",tupleName,", ",Int.toString n,") = "] && fromCValue (t,v) && $";"
+	in  (if allocates then $"  Push_roots(r, 1);" && Nl else Empty)
+         && $$["  ", tupleName, " = alloc_tuple(", Int.toString (List.length values), ");"] && Nl
          && prsep Nl prValue values'
          && Nl
+         && (if allocates then $"  Pop_roots();" && Nl else Empty)
 	end
 
     (* ML comment *)

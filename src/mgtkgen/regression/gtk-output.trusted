@@ -37,9 +37,11 @@ EXTERNML value mgdk_color_parse(value name) { /* ML */
   value res;
   GdkColor rescolor;
   value rescall = gdk_color_parse(String_val(name), &rescolor);
-  res = alloc_tuple(2);
-  Field(res, 0) = Val_bool(rescall);
-  Field(res, 1) = Val_GdkColor(&rescolor);
+  Push_roots(r, 1);
+  r[0] = alloc_tuple(2);
+  Field(r[0], 0) = Val_bool(rescall);
+  Field(r[0], 1) = Val_GdkColor(&rescolor);
+  Pop_roots();
   return res;
 }
 

@@ -1600,9 +1600,11 @@ EXTERNML value mgdk_color_parse(value spec) { /* ML */
   value res;
   GdkColor rescolor;
   value rescall = gdk_color_parse(String_val(spec), &rescolor);
-  res = alloc_tuple(2);
-  Field(res, 0) = Val_bool(rescall);
-  Field(res, 1) = Val_GdkColor(&rescolor);
+  Push_roots(r, 1);
+  r[0] = alloc_tuple(2);
+  Field(r[0], 0) = Val_bool(rescall);
+  Field(r[0], 1) = Val_GdkColor(&rescolor);
+  Pop_roots();
   return res;
 }
 
@@ -5195,9 +5197,11 @@ EXTERNML value mgtk_clist_get_text(value clist, value row, value column) { /* ML
   value res;
   char* restext;
   value rescall = gtk_clist_get_text(GtkObj_val(clist), Int_val(row), Int_val(column), &restext);
-  res = alloc_tuple(2);
-  Field(res, 0) = Val_int(rescall);
-  Field(res, 1) = copy_string(restext);
+  Push_roots(r, 1);
+  r[0] = alloc_tuple(2);
+  Field(r[0], 0) = Val_int(rescall);
+  Field(r[0], 1) = copy_string(restext);
+  Pop_roots();
   return res;
 }
 
