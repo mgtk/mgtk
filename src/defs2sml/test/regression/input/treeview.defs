@@ -46,3 +46,15 @@
     '("GtkTreeModel*" "model" (null-ok) (default "NULL"))
   )
 )
+
+(define-object TreePath
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkTreePath")
+)
+
+(define-method get_indices
+  (of-object "GtkTreePath")
+  (c-name "gtk_tree_path_get_indices")
+  (return-type "gint*" (array foo))
+)

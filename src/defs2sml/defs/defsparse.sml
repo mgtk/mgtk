@@ -164,7 +164,8 @@ structure DefsParse :> DEFSPARSE = struct
                )
         >> (fn ((te,na),flags)=>(te,na,flags))
     val typeNameList = repeat0 typeName
-    
+    val return = typeExp --# repeat0 array (* does the others make any sense? *)
+
     (* Objects and boxed types *)
     val objAttrib =
         (   parens ("in-module" &-- word)           >> (SOME o Module)
@@ -219,7 +220,7 @@ structure DefsParse :> DEFSPARSE = struct
         (   parens ("c-name" &-- word)              >> CName
         ||  parens ("is-constructor-of" &-- word)   >> Constructor
         ||  parens ("of-object" &-- word)           >> OfObject
-        ||  parens ("return-type" &-- typeExp)      >> ReturnType
+        ||  parens ("return-type" &-- return)       >> ReturnType
         ||  parens ("parameters" &-- typeNameList)  >> Params
 	||  parens ("deprecated" &-- word)          |> Deprecated
 	||  parens ("varargs" &-- truth)            >> Varargs

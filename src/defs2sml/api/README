@@ -1,0 +1,7 @@
+We construct the binding automatically from the files in this directory.
+
+The origin of the files are as follows:
+
+- gtk.defs, gtk-types.defs are from PyGtk (2.4.0)
+- gtk-signals.defs is from Gtkmm (2.4.7)
+- gtk-api.raw, gtk.metadata are from Gtk# (?)
