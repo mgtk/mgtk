@@ -1,9 +1,17 @@
+fun makeDate (y, m, d) =
+    let open Date
+	val month = case m of 
+		       0w0 => Jan | 0w1 => Feb | 0w2 => Mar | 0w3 => Apr 
+		     | 0w4 => May | 0w5 => Jun | 0w6 => Jul | 0w7 => Aug 
+		     | 0w8 => Sep | 0w9 => Oct | 0w10 => Nov | _ => Dec
+    in  date{year=Word.toInt y, month=month, day=Word.toInt d,
+	     hour=0, minute=0, second=0,
+	     offset=NONE}
+    end
+
 fun print_sel cal _ = 
-    let val (setYear, setMonth, setDay) = Gtk.calendar_get_date cal
-    in  print (concat["you requested: ", 
-		      Int.toString (Word.toInt setYear),", ", 
-		      Int.toString (Word.toInt setMonth+1), ", ", 
-		      Int.toString (Word.toInt setDay), "\n"])
+    let val date = makeDate (Gtk.calendar_get_date cal)
+    in   print (Date.fmt "You requested: %B %d, %Y.  Which is a %A\n" date)
     end
 
 fun delete_event _ = ( print "delete event occurred\n"
@@ -19,7 +27,7 @@ fun main () =
       ; Gtk.connect_destroy window destroy
       ; Gtk.container_set_border_width window 10
       ; Gtk.container_add window cal
-      ; Gtk.connect_day_selected cal (print_sel cal)
+      ; Gtk.connect_day_selected_double_click cal (print_sel cal)
       ; Gtk.window_set_title window "Calendar Example"
       ; Gtk.widget_show cal
       ; Gtk.widget_show window
