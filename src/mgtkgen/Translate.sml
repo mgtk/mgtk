@@ -82,6 +82,12 @@ struct
         && $indent && $indent && $"= " && vExp && Nl 
     fun mkValDecl (vName, tExp, vExpOpt) = mkValDecl' ($vName, tExp, vExpOpt)
 
+    fun mkValDeclNoTyp' vName vExp =
+	$indent && $"val " && vName && $" = " && vExp && Nl
+    fun mkValDeclNoTyp vName = mkValDeclNoTyp' ($vName)
+
+
+
     (* Code to declare an mgtk C-function
        ------------------------------------------------------------
 
@@ -294,8 +300,42 @@ struct
                        && Nl && Nl
 	in  primval && funcval
 	end
-      | mkMLFunVal short _ =
+      | mkMLFunValSusp short _ =
 	raise Fail("mkMLFunVal: not a function type")
+
+    fun mkMLFunValSusp short (funname,typ as (TE.ARROW(pars',outPars,_,retTyp'))) =
+	let val no_args = if TI.fitsDynApp pars' then List.length pars' else 1
+	    val (c_name,ml_name) = 
+		    if short then (TI.CFunNameWithoutOpt funname,
+				   TI.MLFunNameWithoutOpt funname)
+		    else (TI.CFunName funname, TI.MLFunName funname)
+	    val suspName = ml_name && $"_susp"
+            val susp = 
+		   let val value = 
+                           $"Susp.delay(fn()=> symb\"mgtk_" && c_name && $"\")"
+		   in  mkValDeclNoTyp' suspName value
+		   end
+	    val primval = 
+		   let val value = $$["fn x => app", Int.toString no_args,
+                                      "(Susp.force "]
+				   && suspName && $") x"
+		   in  mkValDecl' (ml_name && $"_", TI.mkMLPrimType typ, 
+                                   SOME value)
+		   end
+	    val funcval =  mkMLFunDecl short (funname,typ)
+                        && $$[indent, indent, "= "]
+		        && prmap mkArg pars'
+                        && wrapResult retTyp' 
+                               (ml_name && $"_ " && 
+			         (if not(TI.fitsDynApp pars')
+				  then $"(" && prsep ($", ") unwrapArg pars' && $")"
+				  else prsep ($" ") unwrapArg pars')
+                               )
+                       && Nl && Nl
+	in  susp && primval && funcval
+	end
+      | mkMLFunValSusp short _ =
+	raise Fail("mkMLFunValSusp: not a function type")
 
     (* Code to extract fields of a widget 
        ------------------------------------------------------------
