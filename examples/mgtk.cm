@@ -1,6 +1,4 @@
 group is
 Callbacktable.sig
 Callbacktable.sml 
-mgtk-mlton.sml
-
-
+../src/defs2sml/release/mgtk/mgtk-mlton.sml

@@ -1,3 +1,8 @@
-menus
-menus.ui
-menus.uo
+*.ui
+*.uo
+buttons-galore	buttons-galore-mlton
+helloworld	helloworld-mlton
+listview	listview-mlton
+menus		menus-mlton
+signup		signup-mlton
+treeview	treeview-mlton

@@ -26,8 +26,8 @@ mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview treeview
 
 
 # MLton stuff
-mgtk-mlton.o: mgtk-mlton.c
-	gcc -c -O2 -I$(MLTONINCLUDE) `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
+mgtk-mlton.o: $(MGTKHOME)/mgtk-mlton.c
+	gcc -c -O2 -I$(MLTONINCLUDE) `pkg-config --cflags gtk+-2.0` $<
 #%-mlton: %-mlton.cm mgtk-mlton.o \
 #                      $(shell mlton -stop f %-mlton.cm)
 %-mlton: %-mlton.cm mgtk-mlton.o 

@@ -6,7 +6,6 @@ fun leftAlign lab =
     Misc.set_alignment lab 0.0 0.5 (* Left align X and center Y *)
 
 fun delete_event _ = ( GtkBasis.main_quit()
-                     ; print("back in mosml\n")
 		     ; true
                      )
 fun say message () = TextIO.print (message^"\n")
@@ -92,7 +91,6 @@ fun setUpGui() =
 fun main () = ( GtkBasis.init(CommandLine.name()::CommandLine.arguments())
               ; setUpGui()
               ; GtkBasis.main()
-              ; print "done in main\n"
               )
 
 val _ = main()
