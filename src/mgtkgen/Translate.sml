@@ -64,6 +64,12 @@ struct
 	    else if TypeInfo.isString typExp' 
 		 then $"StringOption_nullok(" && name && $")"
 		 else raise Fail("Translate.toCValue': can only handle primitive values and strings (got " ^ AST.toString long ^ ")")
+          | toc' long (AST.LIST typExp, name) = 
+	    if TypeInfo.isWidget typExp 
+		 then $"mgtk_smllist_to_glist_widget(" && name && $")"
+	    else if TypeInfo.isString typExp 
+		 then $"mgtk_smllist_to_glist_string(" && name && $")"
+	    else Util.notImplemented "toCValue: can only handle lists of widgets or strings"
 	  | toc' long (typExp, name) = toc long (typExp, name)
 
 	fun fromc long (AST.TYPENAME typExp, name) = 
@@ -116,6 +122,8 @@ struct
 	    (mkLongType nest mkTName tArg t) && $" option"
 	  | mkType nest mkTName tArg (AST.OUTPUT t) =
 	    mkLongType nest mkTName tArg t
+          | mkType nest mkTName tArg (AST.LIST t) = 
+	    (mkLongType nest mkTName tArg t) && $" list"
 	and mkLongType nest mkTName tArg long = 
 	    mkType nest mkTName tArg (get_texp long)
 
@@ -207,7 +215,8 @@ old*)
          && $$["  ", tupleName, " = alloc_tuple(", Int.toString (List.length values), ");"] && Nl
          && prsep Nl prValue values'
          && Nl
-         && (if allocates then $"  Pop_roots();" && Nl else Empty)
+         && (if allocates then $"  res = r[0];" && Nl && $"  Pop_roots();" && Nl 
+	     else Empty)
 	end
 
     (* ML comment *)
@@ -389,6 +398,9 @@ old*)
     fun unwrapArg (AST.LONG(_, AST.OPTION typExp), name) =
 	if TypeInfo.isWidget typExp
 	then $$["(unwrapObjOpt ", name, ")"]
+	else $name
+      | unwrapArg (AST.LONG(_, AST.LIST typExp), name) =
+	if TypeInfo.isWidget typExp then $$["(map unwrap ", name, ")"]
 	else $name
       | unwrapArg (_, name) = $name
     fun wrapResult typExp res =
