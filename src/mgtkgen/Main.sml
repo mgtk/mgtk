@@ -25,8 +25,8 @@ fun copyStream os is =TextIO.output (os, TextIO.inputAll is)
 fun parse file =
     case Parse.parse Parser.decls file of
 	(msg, SOME decls) => decls
-      | (msg, NONE) => raise Error("Syntax Error: " ^ msg)
-
+      | (SOME msg, _)     => raise Error("Error: " ^ msg)
+      | (NONE,NONE)       => Util.shouldntHappen "Parse.parse returned (N,N)"
 fun openOut file =
     case file of
 	SOME fName => ((TextIO.openOut fName) 

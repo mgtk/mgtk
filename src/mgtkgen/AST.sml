@@ -9,7 +9,6 @@
 structure AST :> AST =
 struct
 
-    type pos = Lexer.pos
     type long_texp = TypeExp.long_texp
 
     datatype target = SIG | SML | C
@@ -17,6 +16,7 @@ struct
     type constructor = string
     type parameter = long_texp * string
 
+    type pos = int * int
     datatype funtype =
 	FUNTYPE of long_texp  (* ``normal'' parameters *)
 	         * long_texp option (* short paramters *)

@@ -4,11 +4,11 @@
 signature AST =
 sig
 
-    type pos = Lexer.pos
     type long_texp = TypeExp.long_texp
 
     datatype target = SIG | SML | C
 
+    type pos = int * int
 
     type constructor = string
     type parameter = long_texp * string

@@ -10,74 +10,73 @@
 structure Parser =
 struct
 
-    open Combinators
+    structure TE = TypeExp
+    structure TI = TypeInfo
 
-    infix 6 $--
-    infix 6 --$
+    open Parsercomb
+
+    infix 6 $-- --$ #-- --#
     infix 5 --
-    infix 3 >>
+    infix 3 >> >>*
+    infix 2 >>=
     infix 0 ||
 
+    (* lexer like definitions *)
+    val comment = skipWS (";" $-- (getChars0 (fn c=>not(c= #"\n"))) --$ "\n")
+    fun skipComment pf = repeat0 comment #-- skipWS pf
+    fun skipCommentWS pf = skipWS (skipComment pf)
 
-    val openParen = Combinators.openParen (* for clarity *)
-    val closeParen = Combinators.closeParen (* for clarity *)
+    val $ = skipCommentWS o Parsercomb.$
 
-    fun parenthesized pf = openParen $-- pf --$ closeParen
+    val equals = $ "="
+    val fields = $ "fields"
+    val defObj = $ "define-object"
+    val defFnc = $ "define-func"
+    val defFlags = $ "define-flags"
+    val defEnum =  $ "define-enum"
+    val defBoxed = $ "define-boxed"
+    val defSignal = $ "define-signal"
+    val listQual = $ "list"
 
-    (* a version of parenthesized that includes position information *)
-    fun openParen' tokenStream =
-	case Lexer.get tokenStream of
-	    SOME (Lexer.LPAREN pos, tokenStream') => (pos, tokenStream')
-	  | SOME (_, tokenStream') => raise SyntaxError ("expected `('", tokenStream)
-	  | NONE => raise SyntaxError ("Unexpected end of file", tokenStream)
+    fun quoteSymb c = c = #"\""
+    val letterSymb = Char.isAlpha
+    val digitSymb  = Char.isDigit
+    fun wordSymb #"-" = true
+      | wordSymb #"_" = true
+      | wordSymb c = letterSymb c orelse digitSymb c
 
-    fun closeParen' tokenStream =
-	case Lexer.get tokenStream of
-	    SOME (Lexer.RPAREN pos, tokenStream') => (pos, tokenStream')
-	  | SOME (_, tokenStream') => raise SyntaxError ("expected `)'", tokenStream)
-	  | NONE => raise SyntaxError ("Unexpected end of file", tokenStream)
+    (* word actually allows slightly more than we want --- words
+       should not begin with a digit, underscore, or hypen. *)
+    val word   = skipCommentWS (getChars1 wordSymb)
+    val string = skipCommentWS ("\"" $-- (getChars0 (not o quoteSymb)) --$ "\"")
 
-    fun startPos (s,e) = s
-    fun endPos (s,e) = e
-    fun parenthesized' pf stream = 
-	let val (pos1, stream1) = openParen' stream
-	    val (tok,  stream2) = pf stream1
-	    val (pos2, stream3) = closeParen' stream2
-	in  (((startPos pos1, endPos pos2), tok), stream3)
-	end
+    val openParen  = skipCommentWS ($# #"(")
+    val closeParen = skipCommentWS ($# #")")
 
-    val equals = Combinators.equals (* for clarity *)
-
-    val fields = $$ "fields"
-    val defObj = $$ "define-object"
-    val defFnc = $$ "define-func"
-    val defFlags = $$ "define-flags"
-    val defEnum =  $$ "define-enum"
-    val defBoxed = $$ "define-boxed"
-    val defSignal = $$ "define-signal"
-    val listQual = $$ "list"
+    fun parenthesized pf = skipCommentWS (openParen #-- pf --# closeParen)
+    fun parenthesized' pf = skipCommentWS (withPos (openParen #-- pf --# closeParen))
 
     (* name resolution *)
     local
-	type type_info = TypeExp.texp
+	type type_info = TE.texp
 	exception Find
 	val (table: (string, type_info) Polyhash.hash_table) = 
 	    Polyhash.mkPolyTable (*(hash, compare)*) (99, Find)
 	(* insert some primitive types in the symbol table *)
-	val _ = app (fn n => Polyhash.insert table (n,TypeExp.PRIMTYPE n))
+	val _ = app (fn n => Polyhash.insert table (n,TE.PRIMTYPE n))
 	            ["none","int","uint","float","bool","string",
 		     "static_string","GtkType"
                     ]
 	val _ = app (Polyhash.insert table)
-	            [("GtkObject",TypeExp.WIDGET("GtkObject",NONE)),
-		     ("GtkWidget",TypeExp.WIDGET("GtkWidget",SOME "GtkObject"))
+	            [("GtkObject",TE.WIDGET("GtkObject",NONE)),
+		     ("GtkWidget",TE.WIDGET("GtkWidget",SOME "GtkObject"))
 		    ]
     in  fun insert tName func = Polyhash.insert table (tName, func)
-	fun insertTypeName tName = insert tName (TypeExp.PRIMTYPE tName)
-	fun insertFlag tName = insert tName (TypeExp.FLAG(tName,false))
-	fun insertEnum tName = insert tName (TypeExp.FLAG(tName,true))
-	fun insertWidget wid inh = insert wid (TypeExp.WIDGET(wid,SOME inh))
-	fun insertPointer box inh = insert box (TypeExp.POINTER(box,inh))
+	fun insertTypeName tName = insert tName (TE.PRIMTYPE tName)
+	fun insertFlag tName = insert tName (TE.FLAG(tName,false))
+	fun insertEnum tName = insert tName (TE.FLAG(tName,true))
+	fun insertWidget wid inh = insert wid (TE.WIDGET(wid,SOME inh))
+	fun insertPointer box inh = insert box (TE.POINTER(box,inh))
 	fun lookup tName =
 	    ((Polyhash.find table tName)
 	     handle Find => Util.notFound("unbound type name: " ^ tName))
@@ -85,7 +84,7 @@ struct
     end
 
     (* construct abstract syntax *)
-    type parlist = (TypeExp.long_texp * string) list
+    type parlist = (TE.long_texp * string) list
     fun splitList p l =
 	let fun f (elem, (acc1,acc2)) =
 	        if p elem then (elem::acc1,acc2)
@@ -95,30 +94,30 @@ struct
     fun separateParams (retType, params: parlist) =
 	let fun mkTuple ([], retType) = retType
               | mkTuple (pars, retType) =
-	        let val tOut = if TypeInfo.isVoidType retType then pars
+	        let val tOut = if TI.isVoidType retType then pars
 			       else retType :: pars
 		in  case tOut of
 		       nil => raise Fail ("mkTuple: has to return *something*")
 		     | [t] => t
-                     | ts => TypeExp.LONG([], TypeExp.TUPLE ts)
+                     | ts => TE.LONG([], TE.TUPLE ts)
 		end
-	    val (outPars, pars) = splitList (TypeInfo.isOutputType o #1) params
+	    val (outPars, pars) = splitList (TI.isOutputType o #1) params
 	in  (outPars, pars, mkTuple (map #1 outPars, retType))
 	end
     fun mkFunType (retType, []) = 
 	raise Fail ("mlFunType: no parameters")
       | mkFunType (retType, params) =
 	let val (outPars, pars, retType) = separateParams (retType, params)
-	in  TypeExp.LONG([], TypeExp.ARROW(pars, outPars, params, retType))
+	in  TE.LONG([], TE.ARROW(pars, outPars, params, retType))
 	end
 
     fun mkObjectDecl (pos, (((name, inherits), fields))) = 
 	( insertWidget name inherits
-        ; AST.OBJECT_DECL (pos, TypeExp.LONG([],TypeExp.WIDGET(name,SOME inherits)),fields)
+        ; AST.OBJECT_DECL (pos, TE.LONG([],TE.WIDGET(name,SOME inherits)),fields)
         )
     fun mkFunctionDecl (pos, ((name, typeExp), params)) =
-	let val dummyPair = (TypeExp.LONG([], TypeExp.PRIMTYPE "none"), "dummy")
-	    val params' = List.filter (not o TypeInfo.isNullType') params
+	let val dummyPair = (TE.LONG([], TE.PRIMTYPE "none"), "dummy")
+	    val params' = List.filter (not o TI.isNullType') params
 	    val params'' = if null params' then [dummyPair] else params'
 	    val retType = typeExp
 	    val shortType = if List.length params' = List.length params then NONE
@@ -127,82 +126,102 @@ struct
 	end
     fun mkFlagsDecl false (pos, (flagName, cs)) = 
 	( insertFlag flagName
-	; AST.FLAGS_DECL(pos, TypeExp.LONG([], TypeExp.FLAG(flagName, false)), cs)
+	; AST.FLAGS_DECL(pos, TE.LONG([], TE.FLAG(flagName, false)), cs)
         )
       | mkFlagsDecl true (pos, (flagName, cs)) =
 	( insertEnum flagName
-	; AST.FLAGS_DECL(pos, TypeExp.LONG([], TypeExp.FLAG(flagName, true)), cs)
+	; AST.FLAGS_DECL(pos, TE.LONG([], TE.FLAG(flagName, true)), cs)
         )
     fun mkBoxedDecl (pos, (((name, inherits), names), size)) =
 	( insertPointer name inherits
-	; AST.BOXED_DECL (pos, TypeExp.LONG([], TypeExp.POINTER(name,inherits)), names)
+	; AST.BOXED_DECL (pos, TE.LONG([], TE.POINTER(name,inherits)), names)
 	)
     fun mkSignalDecl (pos, ((name,signal),cbType)) = 
-	(AST.SIGNAL_DECL (pos, TypeExp.LONG([],mkTypeExp name), signal, cbType))
+	(AST.SIGNAL_DECL (pos, TE.LONG([],mkTypeExp name), signal, cbType))
 
-    fun mkCBType (retType, pars) = TypeExp.LONG ([], TypeExp.ARROW(pars, [], pars, retType))
+    fun mkBoxedInherits NONE = NONE
+      | mkBoxedInherits (SOME(NONE)) = SOME(TE.INH_ROOT)
+      | mkBoxedInherits (SOME(SOME inh)) = SOME(TE.INH_FROM inh)
 
-    fun ensureNonEmpty [] = [(TypeExp.LONG ([], TypeExp.PRIMTYPE "none"), "dummy")]
+    fun mkCBType (retType, pars) = 
+	TE.LONG ([], TE.ARROW(pars, [], pars, retType))
+
+    fun ensureNonEmpty [] = [(TE.LONG ([], TE.PRIMTYPE "none"), "dummy")]
       | ensureNonEmpty pars = pars
 
     fun singleton texp = ([], texp)
-    val mkLong = TypeExp.LONG o singleton
-
-    (* functions *)
-    val typeExp =  (word >> (mkLong o mkTypeExp))
-                || (parenthesized (word --$ listQual) >> (mkLong o TypeExp.LIST o mkLong o mkTypeExp))
-    val parenName = parenthesized word
-    val par = parenthesized (typeExp -- word)
-    val constr = parenthesized (word $-- word)
-    val constructors = constr -- (repeat constr) >> (op ::)
+    val mkLong = TE.LONG o singleton
 
     datatype type_flag = NULL_TYPE | OUTPUT_TYPE
-    fun flag toks = 
-	let val (fl, toks') = parenthesized word toks
-	in  case fl of
-	      "null-ok" => (NULL_TYPE, toks')
-	    | "output"  => (OUTPUT_TYPE, toks')
-            | _ => raise SyntaxError("unknown flag", toks)
-	end
-
-    fun toType ((x1,x2),SOME NULL_TYPE) = (TypeExp.LONG ([],TypeExp.OPTION x1),x2)
-      | toType ((x1,x2),SOME OUTPUT_TYPE) = (TypeExp.LONG ([],TypeExp.OUTPUT x1), x2)
+    fun toType ((x1,x2),SOME NULL_TYPE) = (TE.LONG ([],TE.OPTION x1),x2)
+      | toType ((x1,x2),SOME OUTPUT_TYPE) = (TE.LONG ([],TE.OUTPUT x1), x2)
       | toType ((x1,x2), NONE) = (x1, x2)
 
-    val default = parenthesized (equals $-- string)
-    val parWithOptDefault = 
-	parenthesized (typeExp -- word -- (optional flag) --$ (optional default))
-        >> toType
+    (* various *)
+    val typeExp =  (word >> (mkLong o mkTypeExp))
+                || (parenthesized (word --# listQual) >> (mkLong o TE.LIST o mkLong o mkTypeExp))
 
-    val parList = parenthesized (repeat par)
-    val parDefaultList = 
-	 parenthesized (repeat parWithOptDefault) >> ensureNonEmpty 
+    (* parameters *)
+    val default = parenthesized (equals #-- string)
+    val flag =  (parenthesized ($ "null-ok") >> (fn _ => NULL_TYPE))
+             || (parenthesized ($ "output")  >> (fn _ => OUTPUT_TYPE))
+    val par = parenthesized (typeExp -- word)
+    val parWithOptDefault = parenthesized 
+	(   typeExp
+	 -- word
+	 -- (optional flag)
+	--# (optional default)
+	)   >> toType
+    val parList = parenthesized (repeat0 par)
+    val parDefaultList = parenthesized (repeat0 parWithOptDefault) >> ensureNonEmpty 
 
     (* objects *)
     val inherits = parenthesized word
-    val fieldList = parenthesized (fields $-- repeat par)
+    val fieldList = parenthesized (fields #-- repeat1 par) >> op::
+    val objDecl = parenthesized' 
+	(   defObj
+	#-- word
+	 -- inherits
+	 -- optional fieldList
+	)
 
+    (* functions *)
+    val fncDecl = parenthesized' 
+	(   defFnc
+	#-- word
+	 -- typeExp
+	 -- parDefaultList
+	)
 
-    (* declarations *)
-    val objDecl = parenthesized' (defObj $-- word -- inherits -- optional fieldList)
-    val fncDecl = parenthesized' (defFnc $-- word -- typeExp -- parDefaultList)
-    val enumDecl = parenthesized' (defEnum $-- word -- constructors)
-    val flagsDecl = parenthesized' (defFlags $-- word -- constructors)
+    (* enums/flags *)
+    val constr = parenthesized (word #-- word)
+    val constructors = repeat1 constr >> (op ::)
+    val enumDecl = parenthesized' (defEnum #-- word -- constructors)
+    val flagsDecl = parenthesized' (defFlags #-- word -- constructors)
 
-    val size = Combinators.string 
-    fun mkInherits NONE = NONE
-      | mkInherits (SOME(NONE)) = SOME(TypeExp.INH_ROOT)
-      | mkInherits (SOME(SOME inh)) = SOME(TypeExp.INH_FROM inh)
-    val inherits = optional (parenthesized (optional word)) >> mkInherits
-    val boxedDecl = parenthesized' (defBoxed $-- word -- inherits -- repeat word -- optional size)
+    (* boxed types *)
+    val size = string 
+    val inherits = optional (parenthesized (optional word)) >> mkBoxedInherits
+    val boxedDecl = parenthesized' 
+	(   defBoxed 
+	#-- word
+	 -- inherits
+	 -- repeat0 word
+	 -- optional size
+	)
 
+    (* signals *)
     val cbType = parenthesized (typeExp -- parList) >> mkCBType
-
-    val signalName = (string >> (fn n => [n]) )
+    val signalName = (string >> (fn n => [n]))
                   || (parenthesized (string -- string) >> (fn (n,p) => [p,n]))
-    val signalDecl = parenthesized' (defSignal $-- word -- signalName --
-				     optional cbType)
+    val signalDecl = parenthesized' 
+	(   defSignal
+	#-- word
+	 -- signalName
+	 -- optional cbType
+	)
 
+    (* the various forms of declarations *)
     val decl' = (fncDecl >> mkFunctionDecl)
              || (objDecl >> mkObjectDecl) 
              || (enumDecl >> mkFlagsDecl true)
@@ -210,12 +229,16 @@ struct
              || (boxedDecl >> mkBoxedDecl)
              || (signalDecl >> mkSignalDecl)
 
+(*
     fun definePred (Lexer.WORD (pos, str)) = String.isPrefix "define" str
       | definePred _ = false
 
-    fun decl stream = (decl' || (skipN definePred 2 $-- decl)) stream
+    val decl = (decl' || (skipN definePred 2 #-- decl))
+*)
+    val decl = decl'
 
-    val decls = decl -- (repeat decl) >> op::
+    val decls =   (repeat1 decl >> op::)
+	      --# (getChars0 Char.isSpace) (* remove remaining whitespace *)
 
 end (* structure Parser *)
 
