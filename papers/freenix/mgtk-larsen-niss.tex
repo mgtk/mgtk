@@ -284,8 +284,8 @@ are subclasses of the class \classname{Super} and
 \classname{SubSubClassB} is a subclass of \classname{SubClassB}.  We
 shall go through the different parts of the encoding of a class.
 
-\medskip
-\noindent\textbf{Class types}\qquad A base class like \classname{Super} in
+\begin{description}
+\item[Class types] A base class like \classname{Super} in
   Figure~\ref{fig:class-hierarchy} is encoded as an abstract
   parameterized type:
 \begin{SMLcode}
@@ -295,8 +295,7 @@ type 'path super
 underscores if needed).  The type variable !'path! will be used to
 hold the inheritance path for subclasses.
 
-\medskip
-\noindent\textbf{Subtyping/Inheritance}\qquad For a subclass like \classname{SubClassA}
+\item[Subtyping/Inheritance] For a subclass like \classname{SubClassA}
   we need to declare two new \sml types: an abstract parameterized
   type, which we shall call a \emph{witness type}; and a type
   abbreviation specifying the inheritance:
@@ -315,8 +314,7 @@ we see that the type variable !'path! in the declaration of the type
 In the rest of the paper we shall use the convention that witness
 types ends with !_t!.
 
-\medskip
-\noindent\textbf{Methods}\qquad Because \sml is not an object-oriented language we shall
+\item[Methods] Because \sml is not an object-oriented language we shall
   model methods with ordinary functions, and use the usual convention
   that the first argument is the object on which the method is called
   (\gtk also uses this convention).
@@ -338,8 +336,7 @@ val foo : 'path sub_sub_class_b
 That is, !foo! takes any object which is a subclass of
 \classname{SubSubClassB} and an integer and returns an integer.
 
-\medskip
-\noindent\textbf{Constructors}\qquad We have to be a bit careful with constructors.  If
+\item[Constructors] We have to be a bit careful with constructors.  If
   we were to return a value with a polymorphic type-variable !'path!
   that holds an inheritance path that has not yet been ``plugged'',
   then we can accidently use a super-class constructor to construct
@@ -352,7 +349,9 @@ val new : unit -> base sub_class_a
 \end{SMLcode}
 The convention in \gtk is that constructors are named !new!.
 
-Then we wrap all parts of an encoding of a class into a structure of
+\end{description}
+
+We then wrap all parts of an encoding of a class into a structure of
 its own.  That is, for the class \classname{SubClassB} in
 Figure~\ref{fig:class-hierarchy} the \sml signatures is:
 \begin{SMLcode}
