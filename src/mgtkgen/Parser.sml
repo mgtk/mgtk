@@ -64,8 +64,8 @@ struct
 	AST.FUNCTION_DECL (pos, name, typeExp, parameters)
     fun mkEnumDecl (pos, (enum, cs)) = 
 	AST.ENUM_DECL(pos, enum, cs)
-    fun mkFlagsDecl (pos, (enum, cs)) = 
-	AST.FLAGS_DECL(pos, enum, cs)
+    fun mkFlagsDecl (pos, (flagName, cs)) = 
+	AST.FLAGS_DECL(pos, AST.LONG([], AST.FLAG flagName), cs)
     fun mkBoxedDecl (pos, ((name, names), size)) =
 	AST.BOXED_DECL (pos, name, names, size)
     fun mkSignalDecl (pos, ((name,signal),cbType)) = 
@@ -85,7 +85,7 @@ struct
                 || (parenthesized (word --$ listQual) >> (mkLong o AST.LIST o mkLong o mkTName))
     val parenName = parenthesized word
     val par = parenthesized (typeExp -- word)
-    val constr = parenthesized (word -- word)
+    val constr = parenthesized (word $-- word)
     val constructors = constr -- (repeat constr) >> (op ::)
 
     datatype type_flag = NULL_TYPE | OUTPUT_TYPE

@@ -19,6 +19,7 @@ struct
       | ARROW of long_texp list * long_texp
       | OPTION of long_texp
       | OUTPUT of long_texp
+      | FLAG of string
       | LIST of long_texp
     and long_texp = LONG of string list * texp
 
@@ -27,6 +28,7 @@ struct
       | typeClass' (ARROW _) = "arrow"
       | typeClass' (OPTION _) = "option"
       | typeClass' (OUTPUT _) = "output"
+      | typeClass' (FLAG _) = "flag"
       | typeClass' (LIST _) = "list"
     fun typeClass (LONG (path, texp)) = typeClass' texp
 
@@ -37,19 +39,20 @@ struct
 	(Util.stringSep "[" "]" " * " toString args) ^ " -> " ^ toString res
       | texpToString (OPTION long) = toString long ^ " option"
       | texpToString (OUTPUT long) = toString long ^ " output"
+      | texpToString (FLAG name) = name ^ " flag"
       | texpToString (LIST long) = toString long ^ " list"
     and toString (LONG ([], texp)) = texpToString texp
       | toString (LONG (path, texp)) = 
 	(Util.stringSep "" "." "." (fn s=>s) path) ^ texpToString texp
 
-    type constructor = string (* nick *) * string (* constructor *)
+    type constructor = string
     type parameter = long_texp * string
 
     datatype declaration =
 	OBJECT_DECL of pos * string * string * (parameter list option)
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
       | ENUM_DECL of pos * string * constructor list
-      | FLAGS_DECL of pos * string * constructor list
+      | FLAGS_DECL of pos * long_texp * constructor list
       | BOXED_DECL of pos * string * (string list) * string option
       | SIGNAL_DECL of pos * string * string list * long_texp option
 
@@ -70,10 +73,13 @@ struct
       | signalOf [p,n] = n
       | signalOf _ = Util.shouldntHappen "not a signal"
 
+    fun flagOf (LONG(_, FLAG fName)) = fName
+      | flagOf _ = Util.shouldntHappen "not a flag"
+
     fun nameOf (OBJECT_DECL (_, obj, _, _)) = obj
       | nameOf (FUNCTION_DECL (_, func, _, _)) = func
       | nameOf (ENUM_DECL (_, enum, _)) = enum
-      | nameOf (FLAGS_DECL (_, flag, _)) = flag
+      | nameOf (FLAGS_DECL (_, flag, _)) = flagOf flag
       | nameOf (BOXED_DECL (_,typ, _, _)) = typ
       | nameOf (SIGNAL_DECL (_, widget, signal, _)) = signalOf signal
 
@@ -108,6 +114,7 @@ struct
 	    equal_long_texp_list (args1, args2) andalso equal_long_texp (ret1, ret2)
 	  | equal_texp (OPTION texp1, OPTION texp2) = equal_long_texp (texp1, texp2)
 	  | equal_texp (OUTPUT texp1, OUTPUT texp2) = equal_long_texp (texp1, texp2)
+	  | equal_texp (FLAG flag1, FLAG flag2) = flag1=flag2
 	  | equal_texp (LIST texp1, LIST texp2) = equal_long_texp (texp1,texp2)
 	  | equal_texp _ = false
 	and equal_long_texp (LONG (path1, texp1), LONG (path2, texp2)) = 
@@ -121,7 +128,6 @@ struct
 	fun equal_pars (pars1, pars2) = equal_list equal_par (pars1, pars2)
 	fun equal_pars_opt (pars1, pars2) = 
 	    equal_opt (equal_list equal_par) (pars1, pars2)
-	fun equal_cons ((_,cons1), (_,cons2)) = cons1 = cons2
     in (* local *)
 
 	fun equal (OBJECT_DECL(_,obj1,inh1,fields1), OBJECT_DECL(_,obj2,inh2,fields2)) =
@@ -129,9 +135,9 @@ struct
 	  | equal (FUNCTION_DECL(_,func1,typExp1,pars1), FUNCTION_DECL(_,func2,typExp2,pars2)) =
 	    func1 = func2 andalso typExp1 = typExp2 andalso equal_pars (pars1, pars2)
 	  | equal (ENUM_DECL(_,enum1,cons1), ENUM_DECL(_,enum2,cons2)) =
-	    enum1 = enum1 andalso equal_list equal_cons (cons1,cons2)
+	    enum1 = enum1 andalso equal_list (op =) (cons1,cons2)
 	  | equal (FLAGS_DECL(_,flag1,cons1), FLAGS_DECL(_,flag2,cons2)) =
-	    flag1 = flag1 andalso equal_list equal_cons (cons1,cons2)
+	    flag1 = flag1 andalso equal_list (op =) (cons1,cons2)
 	  | equal (BOXED_DECL(_,typ1,funcs1,_), BOXED_DECL(_,typ2,funcs2,_)) =
 	    typ1 = typ2 andalso equal_list (op =) (funcs1, funcs2)
 	  | equal (SIGNAL_DECL(_,wid1,signal1,cbType1), SIGNAL_DECL(_,wid2,signal2,cbType2)) =

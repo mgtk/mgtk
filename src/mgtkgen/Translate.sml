@@ -32,8 +32,10 @@ struct
 	TypeInfo.insert (name, TypeInfo.objectInfo name)
       | insertDecl (AST.ENUM_DECL(pos, name,constr)) =
 	TypeInfo.insert (name, TypeInfo.enumInfo (name,constr))
+(*
       | insertDecl (AST.FLAGS_DECL(pos, name,constr)) =
 	TypeInfo.insert (name, TypeInfo.flagsInfo (name,constr))
+*)
       | insertDecl (AST.BOXED_DECL(pos, name, funcs, _)) =
 	TypeInfo.insert (name, TypeInfo.boxedInfo (name, funcs))
       | insertDecl _ = ()
@@ -56,6 +58,7 @@ struct
 	fun toc long (AST.TYPENAME "<ctype>", name) = name
 	  | toc long (AST.TYPENAME typExp, name) = 
 	    (#toCValue (TypeInfo.lookupTypeName typExp)) name
+	  | toc long (AST.FLAG fName, name) = $"Int_val(" && name && $")"
 	  | toc long (typExp, name) = 
 	    Util.notImplemented ("toCValue: not a type name: " ^ AST.toString long)
 
@@ -82,6 +85,7 @@ struct
 		 then fromCValue (long, $"&" && name)
 		 else fromCValue (long, name)
 	    else Util.notImplemented ("fromCValue: not a type name (" ^ AST.toString long' ^ ")")
+	  | fromc long (AST.FLAG fName, name) = $"Val_int(" && name && $")"
 	  | fromc long (typExp, name) = 
 	    Util.notImplemented ("fromCValue: neither type name or output type (" ^ AST.toString long ^ ")")
 	    
@@ -109,11 +113,13 @@ struct
     and mkCType long = mkc (get_texp long)
 
     local
+	datatype toType = ML_TYPE | ML_PRIM_TYPE
+
 	fun parens true wseq = $"(" && wseq && $")"
           | parens false wseq = wseq
 
 	fun mkType nest mkTName tArg (AST.TYPENAME tName) = 
-	    mkTName (tArg ()) tName
+	    (#2 mkTName) (tArg ()) tName
 	  | mkType nest mkTName tArg (AST.TUPLE tArgs) = 
 	    prsep ($" * ") (mkLongType true mkTName tArg) tArgs
 	  | mkType nest mkTName tArg (AST.ARROW(tArgs, tRet)) =
@@ -126,6 +132,9 @@ struct
 	    mkLongType nest mkTName tArg t
           | mkType nest mkTName tArg (AST.LIST t) = 
 	    (mkLongType nest mkTName tArg t) && $" list"
+          | mkType nest (ML_TYPE,mkTName) tArg (AST.FLAG fName) = 
+	    $$[TypeInfo.mlFlagsTypeName fName, " list"]
+          | mkType nest (ML_PRIM_TYPE,mkTName) tArg (AST.FLAG fName) = $"int"
 	and mkLongType nest mkTName tArg long = 
 	    mkType nest mkTName tArg (get_texp long)
 
@@ -138,11 +147,11 @@ struct
 
 	(* would we like versions with explicit type arguments? *)
 	fun mkMLFreshType typExp = 
-	    (reset (); mkLongType false mlType fresh typExp)
+	    (reset (); mkLongType false (ML_TYPE,mlType) fresh typExp)
 	fun mkMLType typExp = mkMLFreshType typExp
 
 	fun mkMLPrimFreshType typExp = 
-	    (reset (); mkLongType false mlPrimType fresh typExp)
+	    (reset (); mkLongType false (ML_PRIM_TYPE,mlPrimType) fresh typExp)
 	fun mkMLPrimType (AST.LONG(path, AST.ARROW(tArgs, tRet))) =
 	    if fitsDynApp tArgs (* check if it fits appX *)
 	    then mkMLPrimFreshType (AST.LONG(path, AST.ARROW(tArgs, tRet)))
@@ -404,9 +413,9 @@ old*)
       | unwrapArg (AST.LONG(_, AST.LIST typExp), name) =
 	if TypeInfo.isWidget typExp then $$["(map unwrap ", name, ")"]
 	else $name
-      | unwrapArg (typExp, name) =
-	if TypeInfo.isFlag typExp then $$["(setFlags ", name, ")"]
-	else $name
+      | unwrapArg (AST.LONG(_, AST.FLAG fName), name) = 
+	$$["(setFlags ", name, ")"]
+      | unwrapArg (typExp, name) = $name
     fun wrapResult typExp res =
 	if TypeInfo.isWidget typExp then $"OBJ(" && res && $")"
         else res
@@ -634,7 +643,7 @@ old*)
     fun mkEnumDecl (name, constr) =
 	let val type_name = TypeInfo.mlEnumTypeName name
 	    val constr' = ListPair.zip (List.tabulate(List.length constr, fn n=>n), constr)
-	    fun prCnstr (n, (_,c)) =
+	    fun prCnstr (n,c) =
 		$$["  Field(res,",Int.toString n,") = Val_int(",c,");"]
 	    val typ = mlPrimEnumType (name, constr)
 	in  (* why don't we use mkFunDecl above? *)
@@ -650,7 +659,7 @@ old*)
     fun mkMLEnumDecl (name, constr) =
 	let val type_name = TypeInfo.mlEnumTypeName name
 	    val ml_type = mkMLType (AST.LONG([], AST.TYPENAME name))
-	    fun prCnstr (n,const) = mkValDecl (mlEnumName const, ml_type, NONE)
+	    fun prCnstr const = mkValDecl (mlEnumName const, ml_type, NONE)
 	in  mkTypeDecl (type_name, NONE)
          && prsep Empty prCnstr constr
          && Nl
@@ -659,7 +668,7 @@ old*)
     fun mkMLEnumVal (name, constr) =
 	let val type_name = TypeInfo.mlEnumTypeName name
 	    val typ = mlPrimEnumType (name, constr)
-	    fun cName (name, const) = $(mlEnumName const)
+	    fun cName const = $(mlEnumName const)
 	in  $$[indent,"type ", type_name, " = int"] && Nl
          && $$[indent,"val get_", type_name, "_: "]
 	       && $"unit -> " && mkMLPrimType typ && Nl
@@ -669,15 +678,40 @@ old*)
          && Nl
 	end
 
-    val mkFlagsDecl = mkEnumDecl
-    fun mkMLFlagsDecl (name, constr) =
-	let val type_name = TypeInfo.mlFlagsTypeName name
-	    fun prCnstr (n,const) = mkValDecl (mlEnumName const, $type_name, NONE)
-	in  mkTypeDecl (type_name, NONE)
+    fun flagName (AST.LONG(_, AST.FLAG fName)) = fName
+    fun mkFlagsDecl (flag, constr) =
+	let val constr' = ListPair.zip (List.tabulate(List.length constr, fn n=>n), constr)
+	    fun prCnstr (n,c) =
+		$$["  Field(res,",Int.toString n,") = Val_int(",c,");"]
+	    val typ = mlPrimEnumType (flag, constr)
+		val fName = NameUtil.separateWords #"_" (flagName flag)
+	in  (* why don't we use mkFunDecl above? *)
+            $"/* ML type: unit -> " && mkMLPrimType flag && $" */" && Nl
+         && $$["EXTERNML value mgtk_get_", fName, " (value dummy) { /* ML */"] && Nl
+         && $$["  value res = alloc_tuple(", Int.toString (List.length constr), ");"] && Nl
+         && prsep Nl prCnstr constr' && Nl
+         && $$["  return res;"] && Nl
+         && $"}" && Nl
+         && Nl
+	end
+    fun mkMLFlagsDecl (flag, constr) =
+	let fun prCnstr const = mkValDecl (mlEnumName const, mkMLType flag, NONE)
+	in  mkTypeDecl' (mkMLPrimType flag, NONE)
          && prsep Empty prCnstr constr
          && Nl
 	end
-    val mkMLFlagsVal = mkMLEnumVal
+    fun mkMLFlagsVal (flag, constr) =
+	let val fName = NameUtil.separateWords #"_" (flagName flag)
+	    val typ = mlPrimEnumType (flag, constr)
+	    fun cName const = $(mlEnumName const)
+	in  $indent && $"type " && mkMLType flag && $" = int" && Nl
+         && $$[indent,"val get_", fName, "_: "]
+	       && $"unit -> " && mkMLPrimType typ && Nl
+	       && $$[indent, indent, "= app1(symb\"mgtk_get_",fName,"\")"] && Nl
+         && $$[indent,"val ("] && prsep ($",") cName constr && $")" && Nl
+         && $$[indent,indent,"= get_", fName, "_ ()"] && Nl
+         && Nl
+	end
 
     (* signals 
        ------------------------------------------------------------
