@@ -30,6 +30,8 @@ structure SMLType = struct
 	  | RealTy => "real"
 	  | TyVar a => a
 	  | TupTy tys => Util.stringSep "" "" " * " show tys
+	  | ArrowTy ([ty as ArrowTy(tys,ty1)],ty2) =>
+	      "(" ^ show ty ^ ") -> " ^ show ty2
 	  | ArrowTy (tys,ty2) =>Util.stringSep "" " -> " " -> " show tys ^ show ty2
 	  | TyApp([],tname) => show_tname tname
 	  | TyApp([ty],tname) => show ty ^ " " ^ show_tname tname

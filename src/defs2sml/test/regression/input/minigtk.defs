@@ -174,3 +174,27 @@
 ;    '("const-gchar*" "default_detail")
 ;  )
 ;)
+
+(define-signal clicked
+  (of-object "GtkButton")
+  (return-type "void")
+  (when "first")
+)
+
+(define-signal delete-event
+  (of-object "GtkWidget")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GdkEventAny*" "p0")
+  )
+)
+
+(define-signal destroy-event
+  (of-object "GtkWidget")
+  (return-type "gboolean")
+  (when "last")
+  (parameters
+    '("GdkEventAny*" "p0")
+  )
+)

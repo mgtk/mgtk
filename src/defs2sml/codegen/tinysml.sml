@@ -4,6 +4,7 @@ structure TinySML = struct
 
     datatype exp =
 	Unit 
+      | Const of string
       | Var of string
       | Long of Name.name
       | Str of string
@@ -35,7 +36,8 @@ structure TinySML = struct
       | EmptyDecl
       | Comment of string option (* an empty comment prints as newline *)
       | Open of string list
-
+      | Infix of string list
+      | Local of decl incl * decl incl
 
     structure H = Polyhash
     exception NotFound
@@ -63,6 +65,7 @@ structure TinySML = struct
 		case exp of
 		    Unit => "()"
 		  | Var x => mlify x
+		  | Const c => c
 		  | Long n => Name.toString n
 		  | Str s => "\"" ^ s ^ "\""
 		  | Fn(x,e) => parens 1 level ("fn " ^ mlify x ^ " => " ^ show_exp 1 e)
@@ -124,6 +127,16 @@ structure TinySML = struct
 		  | Comment NONE => ""
 		  | Comment(SOME c) => "(*" ^ c ^ "*)"
 		  | Open strs => indent ^ Util.stringSep "open " "" " " (fn s=>s) strs
+		  | Infix strs => indent ^ Util.stringSep "infix " "" " " (fn s=>s) strs
+		  | Local(dec1, dec2) =>
+		       let val dec1 = show' dec1
+		       in  if printing dec1 
+			   then indent ^ "local\n" 
+			      ^ dec1 ^ "\n" ^ indent ^ "in\n"
+                              ^ show' dec2
+                              ^ "\n" ^ indent ^ "end"
+			   else show' dec2
+		       end
 	    and show' (None) = ""
 	      | show' (Some decl) = show decl
 	      | show' (StrOnly decl) = if isStrMode mode then show decl else ""

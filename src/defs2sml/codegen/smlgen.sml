@@ -170,9 +170,60 @@ struct
 			    ccall ("mgtk_get_"^name) 1))
 		end
 
+(*
+   Generate in the structure:
+
+     local open Signal infix --> in
+     fun delete_event_sig f = 
+         signal "delete_event" true (unit --> return_bool) f
+     fun destroy_sig f = 
+         signal "destroy" false (void --> return_void) f
+     end
+
+   In the signature
+
+     val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+     val destroy_sig      : (unit -> unit) -> 'a t Signal.signal
+
+*)
 	  | AST.Signal ty =>
 	        let val name = Name.asSignal name
-		in  Some(ValDecl(VarPat name, None, Var name))
+		    fun show ty =
+			let open Type
+			    fun loop Void = "void"
+			      | loop (Func([(_,ty)],ret)) = 
+				   loop ty ^ " --> " ^ "return_" ^ loop ret
+			      | loop (Func _) = raise Fail("signal: not impl.")
+			      | loop (Base tn) = Name.asType tn
+			      | loop (Tname tn) = 
+				   (* FIXME: ? *) "unit"
+			      | loop (Ptr ty) = loop ty
+			      | loop _ = raise Fail("signal: not impl")
+			in  loop ty end
+		    fun toSmlType ty =
+			let open Type
+			    fun loop Void = UnitTy
+			      | loop (Ptr ty) = loop ty
+			      | loop (Func(args,ret)) = 
+				   ArrowTy(List.map (loop o #2) args, loop ret)
+			      | loop (Tname tn) = UnitTy
+			      | loop (Base tn) =
+				   (case Name.asType tn of
+					"bool" => BoolTy
+				      | "char" => CharTy
+				      | _ => raise Fail("signal: not impl")
+                                   )
+			      | loop _ = raise Fail("signal: not impl")
+			    val ret = TyApp([TyApp([TyVar "'a"], ["t"])], ["Signal","signal"])
+			in  ArrowTy([loop ty], ret) end
+		    val args = [Str name, Const "false", 
+				Const("("^show ty^")"), Var "f"]
+		    fun toUnderscore #"-" = #"_"
+		      | toUnderscore ch = ch
+		in  Some(Local(StrOnly(Open ["Signal"]) ++ StrOnly(Infix ["-->"]),
+			 Some(ValDecl(VarPat((String.map toUnderscore name)^"_sig"), 
+				      Some(toSmlType ty), 
+				      Fn("f", App(Var("signal"), args))))))
 		end
 
     fun header tinfo (name, info) =
