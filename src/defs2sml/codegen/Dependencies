@@ -3,7 +3,7 @@
 
 smltype: /ast/type /util/util /ast/name /util/pretty/pretty
 tinyc: /util/util
-tinysml: /util/hashtable /ast/name smltype /util/ /util/pretty/pretty
+tinysml: /ast/name smltype /util/ /util/pretty/pretty
 typeinfo-sig: /ast/ast /ast/name /ast/type smltype tinyc tinysml
 typeinfo: /util/ /ast/ast /ast/name /ast/type /util/pretty/pretty smltype tinyc tinysml
 smlgen: /ast/ast /ast/name /ast/type /util/ smltype tinysml typeinfo typeinfo-sig /util/pretty/pretty
