@@ -2787,27 +2787,27 @@
    (int columns)
    (bool homogenous)))
 
-;;;(define-func gtk_table_attach
-;;;  none
-;;;  ((GtkTable table)
-;;;   (GtkWidget child)
-;;;   (int left_attach)
-;;;   (int right_attach)
-;;;   (int top_attach)
-;;;   (int bottom_attach)
-;;;   (GtkAttachOptions xoptions (= "GTK_EXPAND|GTK_FILL"))
-;;;   (GtkAttachOptions yoptions (= "GTK_EXPAND|GTK_FILL"))
-;;;   (int xpadding (= "0"))
-;;;   (int ypadding (= "0"))))
+(define-func gtk_table_attach
+  none
+  ((GtkTable table)
+   (GtkWidget child)
+   (int left_attach)
+   (int right_attach)
+   (int top_attach)
+   (int bottom_attach)
+   (GtkAttachOptions xoptions (= "GTK_EXPAND|GTK_FILL"))
+   (GtkAttachOptions yoptions (= "GTK_EXPAND|GTK_FILL"))
+   (int xpadding (= "0"))
+   (int ypadding (= "0"))))
 
-;;;(define-func gtk_table_attach_defaults
-;;;  none
-;;;  ((GtkTable table)
-;;;   (GtkWidget child)
-;;;   (int left_attach)
-;;;   (int right_attach)
-;;;   (int top_attach)
-;;;   (int bottom_attach)))
+(define-func gtk_table_attach_defaults
+  none
+  ((GtkTable table)
+   (GtkWidget child)
+   (int left_attach)
+   (int right_attach)
+   (int top_attach)
+   (int bottom_attach)))
 
 (define-func gtk_table_set_row_spacing
   none
