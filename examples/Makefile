@@ -15,13 +15,13 @@ MGTKHOME=../src/defs2sml/release/mgtk
 
 all: mosml mlton
 
-mosml: helloworld-new buttons-galore signup menus
+mosml: helloworld-new buttons-galore signup menus listview treeview
 
-mlton: helloworld-mlton buttons-galore-mlton signup-mlton
+mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview treeview
 
 
 # mosml stuff
-%: %.sml
+%: %.sml $(MGTKHOME)/mgtk.ui
 	$(MOSMLBIN)/mosmlc -o $* -I $(MGTKHOME) mgtk.ui $*.sml
 
 
@@ -41,5 +41,7 @@ clean:
 	rm -f helloworld-new helloworld-mlton
 	rm -f buttons-galore buttons-galore-mlton
 	rm -f signup signup-mlton
+	rm -f listview listview-mlton
+	rm -f treeview treeview-mlton
 
 realclean: clean
