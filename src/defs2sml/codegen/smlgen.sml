@@ -7,8 +7,7 @@ signature PRIMITIVES = sig
     val ccall : string -> int -> SMLType.ty -> TinySML.exp
     val getEnumsTy : int -> SMLType.ty
     val getEnums : string -> Name.name list -> TinySML.exp
-    val unWrap: (Name.name, Name.name) Type.ty * TinySML.exp -> TinySML.exp
-    val toPrimString : TinySML.exp -> TinySML.exp
+
     val mkToFunc: unit -> TinySML.exp
     val callStub : TypeInfo.typeinfo -> string  -> (Name.name, Name.name) Type.ty
 		-> (TinySML.exp * (Name.name, TinySML.exp) Type.ty) list -> TinySML.exp
@@ -29,10 +28,6 @@ functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES
 	ArrowTy([UnitTy], TupTy(List.tabulate(num, fn _ => IntTy)))
     fun getEnums enum consts =
 	App(Var("get_" ^ enum ^ "_"), [Unit])
-
-    fun unWrap (Type.WithDefault(ty,v),e) = App(Var"Option.map",[Var "repr", e])
-      | unWrap (t,e) = App(Var "repr", [e])
-    val toPrimString = fn e => e
 
     fun mkToFunc () = 
 	App(Var"inherit", [Unit,Fn("()",App(Var"repr",[Var"obj"]))])
@@ -224,15 +219,10 @@ struct
 		    fun prim (par,ty) = 
 			(TypeInfo.toPrimValue tinfo ty par, ty)
 			handle TypeInfo.Unbound n => ubnd n
-		    fun wrap (par,ty) =
-			(if TypeInfo.isWrapped tinfo ty
-			 then (Prims.unWrap (ty,par),ty)
-			 else (par, ty))
-			handle TypeInfo.Unbound n => ubnd n
 		    fun trans (par, ty) = 
 			(par, Type.mapiv (fn (ty,n)=>n) (transCValue tinfo) ty)
 
-		    val pars' = List.map (trans o wrap o prim o var) parsty
+		    val pars' = List.map (trans o prim o var) parsty
 
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 
@@ -261,7 +251,7 @@ struct
 			(transCValue tinfo (ty,v), ty)
 		                      (* the second ty above is correct here to
 				         avoid extra calls to withPtr *)
-		      | default (p, ty) = wrap (Var p, ty)
+		      | default (p, ty) = prim (Var p, ty)
 		    val defpars = List.map (trans o default) parsty
 		    val defparams = 
 			List.map (fromtype o #2) 

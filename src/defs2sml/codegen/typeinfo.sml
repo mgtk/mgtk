@@ -5,6 +5,7 @@ signature PRIMTYPES = sig
     type ty = SMLType.ty
     val mkArrowTy : ty list * ty -> ty
     val stringTy : bool -> ty
+    val unwrap : string option
 end (* signature PRIMTYPES *)
 
 structure MosmlPrimTypes : PRIMTYPES = struct
@@ -16,6 +17,7 @@ structure MosmlPrimTypes : PRIMTYPES = struct
 	   else pars
         ,  ret)
     val stringTy = fn _ => SMLType.StringTy
+    val unwrap = SOME "repr"
 end (* structure MosmlPrimTypes *)
 
 structure MLtonPrimTypes : PRIMTYPES = struct
@@ -25,6 +27,7 @@ structure MLtonPrimTypes : PRIMTYPES = struct
     val stringTy = fn neg =>
 		      if neg then SMLType.TyApp([],["CString", "t"])
 		      else SMLType.TyApp([],["CString", "cstring"])
+    val unwrap = NONE
 end (* structure MosmlPrimTypes *)
 
 functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
@@ -61,7 +64,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
 	    val info = {toc="GtkObj_val",fromc="Val_GtkObj",
 			ptype=SMLType.TyApp([],["cptr"]),
-			fromprim = make, toprim = NONE, wrapped = true,
+			fromprim = make, toprim = Prim.unwrap, wrapped = true,
 			stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
 			super=NONE}
 	in  add(table,name,info)  end
