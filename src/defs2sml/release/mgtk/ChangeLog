@@ -1,0 +1,32 @@
+============ Version 0.93 (the "Add as many functions as possible"-release)
+
+2004-07-12  Henning Niss <hniss@itu.dk>
+	* Handled the "wrong make"-problem now allowing classes to return
+	objects of other class types.
+	* Special-cased some weird name problems.
+	* Included a bunch of functions that were previously excluded for
+	various reasons.
+	* Added support for defaults for parameters (functions with defaults
+	specified in the .defs file now takes 'a option's as parameters).
+	* Now "pretty printing" the generated SML code (though it still is
+	not as pretty as it could be, but it has the potential :-))
+	* Flags (as specified in the gtk.defs file is now supported - use of
+	list of the flag you wish to turn on)
+	
+============ Version 0.92
+
+2004-07-12  Henning Niss  <hniss@itu.dk>
+	* More signals.
+	* Preliminary support for interfaces.
+	* Bugfixes.
+
+============ Version 0.91 (not released)
+
+2004-07-05  Henning Niss  <hniss@itu.dk>
+	* Added MLton support.
+
+============ Version 0.90
+
+2004-06-30  Henning Niss   <hniss@itu.dk>
+	* Moved to Gtk+ 2.x and modular structure (changes to numerous to
+	mention, see our Freenix 2004 paper about mGTK).
