@@ -116,6 +116,10 @@ interactive \emph{read--eval--print--loops} (REPLs) to aggresively
 optimizing whole-program compilers targeting native code.
 
 
+\begin{ednote}{}
+  Introduce modules.  Just signatures and (nested) structures.
+\end{ednote}
+
 
 \subsection{\gtk}
 \label{sec:gtk}
@@ -176,6 +180,11 @@ val _ = main()
 \caption{Hello World in \mgtk.\label{fig:hello-world}}
 \end{centering}
 \end{figure*}
+
+\begin{ednote}{Ken}
+  Jeg syndes at vi skal putte koden i figur~\ref{fig:hello-world} ind
+  i en struktur.
+\end{ednote}
 
 In the figure we use the following \sml constructs
 (see a textbook on \sml for further examples;
@@ -330,8 +339,23 @@ That is, !foo! takes any object which is a subclass of
 \end{SMLcode}
 The convention in \gtk is that constructors are named !new!.
 \end{description}
+And then we wrap all parts of an encoding of a class into structure of
+its own.  That is, for the class \classname{SubClassB} in
+Figure~\ref{fig:class-hierarchy} the \sml signatures is:
+\begin{SMLcode}
+  signature SubClassB =
+  sig
+    type 'path sub_class_b_t
+    type 'path sub_class_b = 
+           'path sub_class_b_t Super.super
+    val toString : 'path sub_class_b 
+                                 -> string
+  end
+\end{SMLcode}
+
+
  
-Continuing our running example the two widgets
+Now, continuing our running example the two widgets
 \textit{window} and \textit{button} gets the following
 types
 \begin{displaymath}
