@@ -16,6 +16,7 @@ structure ResolveTypes :> ResolveTypes = struct
 	val num = getChars1 Char.isDigit >>* Int.fromString
 
 	val void = ($"void" || $"none") >> (fn _ => Void)
+
 	val bool = $"gboolean" >> (fn _ => Base "bool")
 	val ptr = $"gpointer" >> (fn _ => Base "ptr")
 	val char = $"gchar" >> (fn _ => Base "char")
@@ -23,11 +24,12 @@ structure ResolveTypes :> ResolveTypes = struct
 	val uint = $"guint" >> (fn _ => Base "uint")
 	val float = $"gfloat" >> (fn _ => Base "float")
 	val double = $"gdouble" >> (fn _ => Base "double")
+	val base = bool || int || uint || ptr || char || float || double
+
 	val dash_char = fn #"-" => true | _ => false
 	fun name_char ch = Char.isAlphaNum ch orelse dash_char ch
 	val tname = getChars1 name_char >> (fn n => Tname n)
 
-	val base = bool || int || uint || ptr || char || float || double || tname
 	val simple = void || base || tname
 
 	val array = simple -- "[" $-- num --$ "]" 
@@ -51,10 +53,10 @@ structure ResolveTypes :> ResolveTypes = struct
     type member_info = AST.api_type AST.api_info
 
     type ty = Name.name Type.ty
-    type module_info' = (ty * ty option) option
+    type module_info' = (ty * Name.name option) option
     type member_info' = ty AST.api_info
 
-    fun deModularize name tyname = (* FIXME *)
+    fun deModularize name (Tname _, tyname) = (* FIXME *)
 	let val (path,base) = ResolveNames.toName Name.separateWords (Name.getFullPath name) tyname
 (*
 	    val _ = 
@@ -67,25 +69,27 @@ structure ResolveTypes :> ResolveTypes = struct
 *)
         in  Name.fromPaths (Name.getFullPath name,path,base)
 	end
+      | deModularize name (_ , tyname) = Name.fromPaths([],[],[tyname])
 
     fun resTy (module, ty) = 
 	case ty of
 	    AST.ApiTy str => 
 	    let val typ = (Parse.toType str)
 			  handle exn => (TextIO.print("Error for " ^ Name.toString module); raise exn)
-	    in  map (deModularize module) typ
+	    in  mapi (deModularize module) typ
 	    end
           | AST.ArrowTy(pars, ret) =>
 		Func(List.map (fn (n,t) => (n,resTy(module, t))) pars, 
 		     resTy(module, ret))
     fun resTy' (module, ty) = 
-	let val module' = let val p = Name.getFullPath module  (* YIKES *)
-			 in  Name.fromPaths(p,p,Name.getBase module) end
-	in  case ty of 
-		NONE => NONE
-	      | SOME(ty,parent) => SOME(resTy(module,ty),
-					Option.map(fn ty => (resTy(module,ty)))parent)
-	end
+	case ty of 
+	    NONE => NONE
+	  | SOME(ty,parent) => 
+	       SOME(resTy(module,ty),
+		    Option.map(fn ty => case resTy(module,ty) of
+					    Tname n => n
+					  | _ => raise Fail("resTy': not a type name"))
+		               parent)
 
     fun resMember inm member =
 	case member of
@@ -93,6 +97,7 @@ structure ResolveTypes :> ResolveTypes = struct
           | AST.Field ty => AST.Field(resTy(inm, ty))
           | AST.Enum mems => AST.Enum(mems)
           | AST.Signal ty => AST.Signal(resTy(inm, ty))
+	  | AST.Boxed funcs => AST.Boxed funcs
 
     fun resolve inm module =
 	case module of
@@ -110,7 +115,7 @@ structure ResolveTypes :> ResolveTypes = struct
         let fun pptype ty = Type.show(Name.toString) ty
 	    fun ppmodi (SOME(ty, parent)) = 
 		": " ^ pptype ty ^
-		   (case parent of NONE => "" | SOME ty => " extends " ^ pptype ty)
+		   (case parent of NONE => "" | SOME ty => " extends " ^ Name.asType ty)
 	      | ppmodi NONE = ""
 	    fun ppmemi (AST.Method ty) = ": method " ^ pptype ty
 	      | ppmemi (AST.Field ty) = ": field " ^ pptype ty

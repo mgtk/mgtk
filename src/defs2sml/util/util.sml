@@ -25,4 +25,15 @@ struct
 				in  x end
 	end
 
+    fun listCmp cmp (xs, ys) =
+	let fun loop [] [] = EQUAL
+              | loop [] (y::ys) = LESS
+              | loop (x::xs) [] = GREATER
+	      | loop (x::xs) (y::ys) = 
+		let val ord = cmp (x,y)
+		in  if ord = EQUAL then loop xs ys else ord
+		end
+	in  loop xs ys
+	end
+
 end (* structure Util *)

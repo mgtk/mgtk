@@ -36,57 +36,5 @@ structure SMLType = struct
 	  | TyApp(tys,tname) => Util.stringSep "(" (") "^show_tname tname) "," show tys
     val toString = show
 
-    (* FIXME: How about a hash table *)
-    fun baseType "guint" = IntTy (* FIXME *)
-      | baseType "uint"  = IntTy
-      | baseType "int"   = IntTy
-      | baseType "char"  = CharTy
-      | baseType "bool"  = BoolTy
-      | baseType "float" = RealTy
-      | baseType "double" = RealTy
-      | baseType t = raise Fail("Type -> SML type: Unrecognized base type: "^t)
-
-    fun fromType fresh ty =
-	case ty of
-	    (* recognize standard "patterns" *)
-	    Type.Ptr(Type.Base "char") => StringTy
-
-            (* then the general stuff *)
-	  | Type.Void => UnitTy
-	  | Type.Base t => baseType t
-	  | Type.Tname n => TyApp([fresh()],(*Name.getPath n @*) Name.getBase n@["t"])
-(*
-	  | Type.Tname n => TyApp([TyVar "'a"],Name.getPath n @ ["t"])
-*)
-	  | Type.Const ty => fromType fresh ty
-	  | Type.Ptr ty => fromType fresh ty
-	  | Type.Func(pars,ret) => 
-	       ArrowTy(List.map (fromType fresh o #2) pars, fromType fresh ret)
-
-	  | Type.Arr(len,ty) => TyVar(toString(fromType fresh ty)^"["^(case len of NONE => "" | SOME l => Int.toString l)^"]")
-
-    fun fromTypeSeq () = 
-	let val no = ref 0
-	    val orda = Char.ord #"a"
-	    fun next () = if(!no<26) then (TyVar("'"^Char.toString(Char.chr(!no+orda)))
-				           before
-					   no := !no + 1)
-			  else raise Fail("Not implemented: fromTypeSeq.next()")
-	in  fromType next end
-
-    fun primtypeFromType ty =
-	case ty of 
-	    Type.Ptr(Type.Base "char") => StringTy
-	  | Type.Void => UnitTy
-	  | Type.Base t => baseType t
-	  | Type.Tname n => TyApp([],["cptr"])
-	  | Type.Const ty => primtypeFromType ty
-	  | Type.Ptr ty => TyApp([],["cptr"])
-	  | Type.Func(pars,ret) => 
-	       if List.length pars > 5 
-	       then ArrowTy([TupTy(List.map (primtypeFromType o #2) pars)], primtypeFromType ret)
-	       else ArrowTy(List.map (primtypeFromType o #2) pars, primtypeFromType ret)
-	  | Type.Arr(len,ty) => TyApp([],["..."]) (* FIXME *)
-
 end (* structure SMLType *)
 

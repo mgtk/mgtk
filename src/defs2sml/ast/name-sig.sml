@@ -10,6 +10,8 @@ signature NAME = sig
     val capitalize: string -> string
 
     val equal: name * name -> bool
+    val compare: name * name -> order
+
     val toString: name -> string
     val fromString: string -> name
     val fromPaths: string list * string list * string list -> name
@@ -20,12 +22,14 @@ signature NAME = sig
 
     val asModule: name -> string
     val asEnum: name -> string
+    val asBoxed: name -> string
     val asField: name -> string
     val asMethod: name -> string
     val asSignal: name -> string
     val asType: name -> string
 
     val asCEnum: name -> string
+    val asCBoxed: name -> string
     val asCFunc: name -> string
     val asCStub: name -> string
 

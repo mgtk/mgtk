@@ -5,7 +5,7 @@ signature Type = sig
 
     datatype 'a ty =
 	Void
-      | Base of string
+      | Base of 'a
       | Tname of 'a
       | Ptr of 'a ty
       | Const of 'a ty
@@ -14,6 +14,7 @@ signature Type = sig
 
     val show: ('n -> string) -> 'n ty -> string
     val map: ('n1 -> 'n2) -> 'n1 ty -> 'n2 ty
+    val mapi: (('n1 ty * 'n1) -> 'n2) -> 'n1 ty -> 'n2 ty
 
     val getParams: 'a ty -> (string * 'a ty) list
     val getRetType: 'a ty -> 'a ty

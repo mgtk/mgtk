@@ -7,7 +7,7 @@ signature ResolveTypes = sig
     type member_info = AST.api_type AST.api_info
 
     type ty = Name.name Type.ty
-    type module_info' = (ty * ty option) option
+    type module_info' = (ty * Name.name option) option
     type member_info' = ty AST.api_info
 
     val resolve: (Name.name,module_info,member_info) AST.module 

@@ -13,6 +13,9 @@ sig
               -> ('n,'i1, 'i2) module -> ('n,'i1', 'i2') module
     val mapi: (('n*'i1 -> 'i1') * ('n*'i2 -> 'i2'))
                -> ('n,'i1,'i2) module -> ('n,'i1','i2') module
+
+    val filteri: ('n*'i2 -> bool) -> ('n,'i1,'i2) module -> ('n,'i1,'i2) module
+
 (*
     val zip: (''n,'i1) module * (''n,'i2) module -> (''n, 'i1*'i2) module
     val exists: ('i -> bool) -> ('n,'i) module -> bool
@@ -24,6 +27,7 @@ sig
     datatype 't api_info =
 	Method of 't
       | Field of 't
+      | Boxed of {copy: string option, release: string option}
       | Enum of string list
       | Signal of 't
     and api_type =

@@ -5,29 +5,30 @@ structure Type :> Type = struct
 
     datatype 'n ty =
 	Void
-      | Base of string
+      | Base of 'n
       | Tname of 'n
       | Ptr of 'n ty
       | Const of 'n ty
       | Arr of int option * 'n ty
       | Func of (string * 'n ty) list * 'n ty
 
-    fun map (f: 'n1 -> 'n2) (ty: 'n1 ty) : 'n2 ty =
+    fun mapi (f: ('n1 ty * 'n1) -> 'n2) (ty: 'n1 ty) : 'n2 ty =
 	case ty of
 	    Void => Void
-	  | Base str => Base(str)
-	  | Ptr ty => Ptr(map f ty)
-	  | Const ty => Const(map f ty)
-	  | Arr(i,ty) => Arr(i,map f ty)
-	  | Func(pars,ret) => Func(List.map (fn (p,t) => (p,map f t)) pars,
-				   map f ret)
-	  | Tname n => Tname (f n)
+	  | Ptr ty => Ptr(mapi f ty)
+	  | Const ty => Const(mapi f ty)
+	  | Arr(i,ty) => Arr(i,mapi f ty)
+	  | Func(pars,ret) => Func(List.map (fn (p,t) => (p,mapi f t)) pars,
+				   mapi f ret)
+	  | Base n => Base (f(ty,n))
+	  | Tname n => Tname (f(ty, n))
+    fun map f ty = mapi (fn (_,n) => f n) ty
 
     fun show show_tname ty =
 	let fun shw ty =
 		case ty of
 		    Void => "VOID"
-		  | Base b => String.map Char.toUpper b
+		  | Base n => show_tname n
 		  | Tname n => show_tname n
 		  | Ptr ty => shw ty ^ " ref"
 		  | Const ty => shw ty ^ " const"

@@ -21,6 +21,13 @@ struct
 
     fun map (f,g) = mapi (fn (_,i1) => f i1, fn (_,i2) => g i2)
 
+    fun filteri f (Module{name,members,info}) =
+	Module{name=name, members=List.mapPartial (filteri_member f) members, 
+	       info=info}
+    and filteri_member f (Sub module) = SOME(Sub(filteri f module))
+      | filteri_member f (m as Member{name,info}) = 
+	if f(name,info) then SOME m else NONE
+	
     exception Zip
 (*
     fun exists p module = (* FIXME: what about the module info? *)
@@ -92,6 +99,7 @@ struct
     datatype 't api_info =
 	Method of 't
       | Field of 't
+      | Boxed of {copy:string option, release:string option}
       | Enum of string list
       | Signal of 't
     and api_type =

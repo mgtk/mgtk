@@ -36,8 +36,8 @@ test-compile: $(MAIN)
         done
 
 
-mgtk.c: $(MAIN) api/gtkmm/gtk.defs
-	./$(MAIN) -co mgtk.c -so mGtk.sml -cp lib/preamble.c api/gtkmm/gtk.defs 
+mgtk.c: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs
+	./$(MAIN) -co mgtk.c -so mGtk.sml -cp lib/preamble.c api/pygtk/gtk.defs 
 
 ctest: $(MAIN) mgtk.c
 	gcc $(CINCLUDE) -c -o /dev/null mgtk.c > c.out 2>&1 

@@ -10,9 +10,9 @@ structure GenSML :>
 	type sml_info
 	type 'a incl
 	type mode
-	val generate: (Name.name,(typeexp*typeexp option)option,typeexp AST.api_info) AST.module -> 
-		      (Name.name,mode,sml_info incl) AST.module
-	val print: TextIO.outstream -> (Name.name,mode,sml_info incl) AST.module 
+	val generate: TypeInfo.typeinfo -> (name,(typeexp*name option)option,typeexp AST.api_info) AST.module -> 
+		      (name,mode,sml_info incl) AST.module
+	val print: TextIO.outstream -> (name,mode,sml_info incl) AST.module 
                    -> unit
     end =
 struct
@@ -168,7 +168,7 @@ struct
     type typeexp = name Type.ty
 
     exception Skip of string
-    fun trans (name,member) =
+    fun trans tinfo (name,member) =
 	case member of
             (* METHODS 
  
@@ -191,10 +191,10 @@ struct
 					then App (Var"repr",[Var par])
 					else Var par
 		    val pars' = List.map wrap parsty
-		    val fromtype' = SMLType.fromTypeSeq()
+		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = fromtype' ty
 				      handle Fail m => raise Skip m
-		    fun primtypeFromType ty = SMLType.primtypeFromType ty
+		    fun primtypeFromType ty = TypeInfo.toPrimType tinfo ty
 					      handle Fail m => raise Skip m
 		in  StrOnly(
                        ValDecl(VarPat(name^"_"), Some(primtypeFromType ty), 
@@ -225,7 +225,10 @@ struct
 			    App(Var("get_" ^ name ^ "_"), [Unit])))
 		end
 
-
+	  | AST.Boxed funcs =>
+	        let val name = Name.asBoxed name
+		in  Some(TypeDecl(([],[name]), StrOnly(TyApp([],["cptr"]))))
+		end
           | AST.Field ty => 
 		let val name = Name.asField name
 		in  StrOnly(ValDecl(VarPat ("get_"^name), None, 
@@ -241,8 +244,10 @@ struct
 	let val (typ,parent) = 
 		case info of
 		    SOME (Type.Tname n,parent) => 
-		       (Name.asType n, case parent of NONE => raise Fail("moduleTypes: no parent")
-						    | SOME(Type.Tname p) => p)
+		       (Name.asType n, 
+			case parent of SOME(p) => p
+		                     | _ => raise Skip("No parent")
+                       )
 		  | _ => raise Skip("No type information")
 
 	    val base_t = "base"
@@ -272,12 +277,12 @@ struct
 
     local
 	open AST 
-	val trans = fn (name,member) => trans (name,member)
+	val trans = fn tinfo => fn (name,member) => trans tinfo (name,member)
 		   handle Skip msg => ( TextIO.output(TextIO.stdErr,
 		       "Error translating " ^ Name.toString name ^ ": " ^msg^"\n")
                      ; None)
-	fun generate_module (Module{name,members,info}) = 
-	    let val subs = List.concat(List.map generate_member members)
+	fun generate_module tinfo (Module{name,members,info}) = 
+	    let val subs = List.concat(List.map (generate_member tinfo) members)
 	    in  [ Module{name=name, info=SIGNATURE, 
 			 members=Member{name=Name.fromString "signatureheader",
 					info=header name info}
@@ -288,11 +293,13 @@ struct
 				 :: subs}
 		]
 	    end
-	and generate_member (Sub module) = List.map Sub (generate_module module)
-	  | generate_member (Member{name,info}) = 
-	    [Member{name=name,info=trans (name,info)}]
-    in  fun generate (Module{name,members,info}) = 
-	    Module{name=name,members=List.concat(List.map generate_member members),info=STRUCTURE}
+	and generate_member tinfo (Sub module) = 
+	    List.map Sub (generate_module tinfo module)
+	  | generate_member tinfo (Member{name,info}) = 
+	    [Member{name=name,info=trans tinfo (name,info)}]
+    in  fun generate tinfo (Module{name,members,info}) = 
+	    Module{name=name,info=STRUCTURE,
+		   members=List.concat(List.map (generate_member tinfo) members)}
     end (* local *)
 
 end (* structure GenSML *)

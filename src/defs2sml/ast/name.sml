@@ -63,11 +63,25 @@ structure Name :> NAME = struct
 	   | p => Util.stringSep "" "." "." (fn s=>s) p
         ) ^ Util.stringSep "" "" "" (fn s=>s) (#base name)
 
+    fun toString' (name:name) = 
+	Util.stringSep "(" ")" "." (fn s=>s) (#path name)
+        ^ Util.stringSep "[" "]" "." (fn s=>s) (#fullpath name)
+        ^ Util.stringSep "<" ">" "." (fn s=>s) (#base name)
+
+(*
+    fun compare (n1, n2) =
+	case Util.listCmp String.compare (#fullpath n1, #fullpath n2) of
+	    EQUAL => Util.listCmp String.compare(#base n1, #base n2)
+	  | order => order
+*)
+
+    (* FIXME *)
+    fun compare (n1, n2) = Util.listCmp String.compare (#base n1, #base n2)
+
     fun fromString base = (* FIXME *)
 	{path=[],fullpath=[],base=separateWords base}
 
     fun fromPaths (fullpath,path,base) = {fullpath=fullpath,path=path,base=base}
-
     val getPath = #path
     val getFullPath = #fullpath
     val getBase = #base
@@ -95,6 +109,7 @@ structure Name :> NAME = struct
 	in  combine "" (noSep path, noSep(map capitalize base))
 	end
     val asEnum = underscored
+    val asBoxed = underscored
     val asMethod = underscored
     val asField = underscored
     val asSignal = underscored
@@ -115,6 +130,7 @@ structure Name :> NAME = struct
 	end
 *)
     val asCEnum = asCName "_" toLower
+    val asCBoxed = asCName "" (fn s=>s)
     val asCFunc = asCName "_" toLower
     fun asCStub name = "mgtk_" ^ asCName "_" toLower name
 

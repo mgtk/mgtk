@@ -70,6 +70,7 @@ struct
 		case exp of
 		    Var x => x
 		  | Int i => i
+		  | Float f => f
 		  | VerbExp e => e
 		  | Call(f,cast,args) => 
 		       f ^ Util.stringSep "(" ")" ", " showExp args

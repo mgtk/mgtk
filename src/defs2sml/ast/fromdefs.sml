@@ -76,7 +76,15 @@ structure FromDefs :> FromDefs = struct
 		       val mem = Member{name=name,
 					info=A.Signal(functype NONE def)}
 		   in  insert map md mem end
-	      | Boxed => raise Fail("FromDefs.trans(Boxed): not implemented")
+	      | Boxed => 
+		   let val md = getModule def
+		       val copy = SOME(getCopyFunc def)
+			          handle AttribNotFound _ => NONE
+		       val rel =  SOME(getReleaseFunc def)
+			          handle AttribNotFound _ => NONE
+		       val mem = Member{name=name,
+					info=A.Boxed{copy=copy,release=rel}}
+		   in  insert map md mem end
 	end
     and functype self def =
 	let fun addself ps = case self of NONE => ps

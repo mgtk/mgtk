@@ -61,24 +61,53 @@ fun main () =
 		    MsgUtil.close "done\n")
 	val _ = MsgUtil.print ("Defs file with " ^ Int.toString (List.length defs) ^ " definitions\n")
 
-	val api = (ResolveTypes.resolve o ResolveNames.resolve)
-		      (FromDefs.fromDefs "Gtk" defs)
+
+	val api = FromDefs.fromDefs "Gtk" defs
+	val exclude = Splayset.addList(Splayset.empty String.compare,
+				       ["gtk_accel_group_connect",
+					"gtk_accel_group_connect_by_path",
+					"gtk_accel_group_disconnect",
+					"_gtk_accel_group_attach",
+					"_gtk_accel_group_detach",
+					"_gtk_accel_group_reconnect",
+					"_gtk_accel_map_init",
+					"_gtk_accel_map_add_group",
+					"_gtk_accel_map_remove_group",
+					"_gtk_accel_path_is_valid",
+					"gtk_accel_group_from_accel_closure",
+					"_gtk_button_box_child_requisition",
+					"_gtk_bindings_activate_event",
+					"__gtk_binding_reset_parsed",
+					"_gtk_scale_format_value",
+
+					"gtk_accel_group_find"
+				       ])
+	fun member set elem = Splayset.member(set,elem)
+	val api = AST.filteri (not o member exclude o #1) api
+
+	val api = ResolveTypes.resolve (ResolveNames.resolve api)
+
+	val typeinfo = TypeInfo.build api
 
 	val (modules,values) = AST.fold (fn (mn,(m,v)) => (m+1,v), fn (mn,(m,v)) => (m,v+1)) (0,0) api
 	val _ = MsgUtil.close ("  corresponding to " ^ Int.toString modules ^ "(sub)modules with " ^ Int.toString values ^ " values\n")
 
 
+	val _ = MsgUtil.print "Generating SML code ..."
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
-	val api' = GenSML.generate api
+	val api' = GenSML.generate typeinfo api
 	val _ = GenSML.print (getOutFile()) api'
         val _ = closeOutFile()
+	val _ = MsgUtil.close "done"
 
+	val _ = MsgUtil.print "Generating C code ..."
 	val (getOutFile,closeOutFile) = outFileSetup cOutFile
-	val api'' = GenC.generate api
+	val api'' = GenC.generate typeinfo api
 		    handle (exn as Fail m) => (TextIO.output(TextIO.stdOut, "Caught Fail(" ^ m ^ ")\n"); raise exn)
 	val _ = Option.app (copyFile (getOutFile())) (!cPreamble)
-	val _ = GenC.print (getOutFile()) api''
+	val _ = GenC.print typeinfo (getOutFile()) api''
         val _ = closeOutFile()
+	val _ = MsgUtil.close "done"
 
     in  ()
     end

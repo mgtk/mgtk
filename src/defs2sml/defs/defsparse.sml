@@ -22,7 +22,11 @@ struct
 
     fun id x = x
     fun tagFn tag (name,attribs) = (name, tag, attribs)
-
+(*
+    (* Debugging: *)
+    val tagFn = fn tag => fn (name,attribs) => 
+		   (TextIO.print(name^"\n"); tagFn tag (name,attribs))
+*)
 
     local structure IO = FileUtils(type instream = TextIO.instream
                                    val openIn = TextIO.openIn)
@@ -70,7 +74,7 @@ struct
     fun qc #"\"" = true
       | qc _ = false
     val pureWord   = getChars1 wc
-    val quotedWord = "\"" $-- getChars1 (not o qc) --$ "\""
+    val quotedWord = "\"" $-- getChars0 (not o qc) --$ "\""
     val word       = pureWord || quotedWord
 
     (* PRE-LEXING *)
@@ -150,9 +154,6 @@ struct
 
     fun parens pf = LPAR_T %-- pf --% RPAR_T
     val word = getElem isWord >> wordOf
-(*
-    val defWord = word >> (fn n => (TextIO.print(n^"\n"); n))
-*)
     val defWord = word
 
     (* Type expressions and lists of types and names *)

@@ -86,6 +86,16 @@ structure Defs = struct
 		   (fn (Values vs) => SOME (List.map(fn(a,v)=>v)vs)
 		     | _ => NONE) atts
 	end
+    fun getCopyFunc (def: definition) = 
+	let val atts = #3 def
+	in  lookup "copy-func" 
+		   (fn (CopyFunc n) => SOME n | _ => NONE) atts
+	end
+    fun getReleaseFunc (def: definition) = 
+	let val atts = #3 def
+	in  lookup "release-func" 
+		   (fn (ReleaseFunc n) => SOME n | _ => NONE) atts
+	end
 
 
 end (* structure Defs *)

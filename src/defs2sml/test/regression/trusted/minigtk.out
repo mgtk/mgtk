@@ -134,6 +134,32 @@ structure Gtk :> Gtk = struct
         fun inherit w con = Container.inherit () con
         fun makeBin ptr = Container.inherit () (fn () => repr ptr)
     end
+    signature Window = sig
+
+        type base
+        type 'a window_t
+        type 'a t = 'a window_t Bin.t
+
+        val inherit : 'a -> GObject.constructor -> 'a t
+
+        val new : WindowType -> 'a Widget.t
+    end
+    structure Window :> Window = struct
+
+        type cptr = GObject.cptr
+        val repr = GObject.repr
+        val symb = GtkBasis.symb
+        type base = unit
+        type 'a window_t = unit
+        type 'a t = 'a window_t Bin.t
+
+        fun inherit w con = Bin.inherit () con
+        fun makeWindow ptr = Bin.inherit () (fn () => repr ptr)
+        val new_ : int -> cptr
+            = app1 (symb"mgtk_gtk_window_new")
+        val new : WindowType -> 'a Widget.t
+            = fn type => new_ (repr type)
+    end
     signature Button = sig
 
         type base
@@ -142,7 +168,7 @@ structure Gtk :> Gtk = struct
 
         val inherit : 'a -> GObject.constructor -> 'a t
 
-        val get_type : unit -> 'a GType.t
+        val get_type : unit -> int
         val new : unit -> 'a Widget.t
         val new_with_label : string -> 'a Widget.t
         val set_label : 'a Button.t -> string -> unit
@@ -159,9 +185,9 @@ structure Gtk :> Gtk = struct
 
         fun inherit w con = Bin.inherit () con
         fun makeButton ptr = Bin.inherit () (fn () => repr ptr)
-        val get_type_ : unit -> cptr
+        val get_type_ : unit -> int
             = app1 (symb"mgtk_gtk_button_get_type")
-        val get_type : unit -> 'a GType.t
+        val get_type : unit -> int
             = fn dummy => get_type_ dummy
         val new_ : unit -> cptr
             = app1 (symb"mgtk_gtk_button_new")
@@ -180,6 +206,10 @@ structure Gtk :> Gtk = struct
         val get_label : 'a Button.t -> string
             = fn self => get_label_ (repr self)
     end
+    type windowtype = int
+    val get_windowtype_ : unit -> int * int
+        = app1 (symb"mgtk_get_gtk_windowtype")
+    val (GTK_WINDOW_TOPLEVEL,GTK_WINDOW_POPUP) = get_windowtype_ ()
 end
 
 
@@ -257,8 +287,16 @@ EXTERNML value mgtk_gtk_container_remove(value self, value widget) { /* ML */
 /* *** Bin *** */
 
 
+/* *** Window *** */
+/* ML type: int -> cptr */
+EXTERNML value mgtk_gtk_window_new(value type) { /* ML */
+    return Val_GtkObj(gtk_window_new(Int_val(type)));
+}
+
+
+
 /* *** Button *** */
-/* ML type: unit -> cptr */
+/* ML type: unit -> int */
 EXTERNML value mgtk_gtk_button_get_type(value dummy) { /* ML */
     return Val_int(gtk_button_get_type());
 }
@@ -282,5 +320,13 @@ EXTERNML value mgtk_gtk_button_set_label(value self, value label) { /* ML */
 /* ML type: cptr -> string */
 EXTERNML value mgtk_gtk_button_get_label(value self) { /* ML */
     return copy_string(gtk_button_get_label(GtkObj_val(self)));
+}
+
+/* ML type: unit */
+EXTERNML value mgtk_gtk_windowtype(value dummy) { /* ML */
+  value res = alloc_tuple(2);
+  Field(res, 0) = Val_int(GTK_WINDOW_TOPLEVEL);
+  Field(res, 1) = Val_int(GTK_WINDOW_POPUP);
+  return res;
 }
 
