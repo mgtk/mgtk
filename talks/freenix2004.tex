@@ -1,0 +1,501 @@
+\documentclass[pdf,slideColor,myITUVer2]{prosper}
+
+\usepackage{xspace}
+\usepackage{fancyvrb}
+\usepackage{graphicx}
+\usepackage[scaled=.92]{helvet}
+
+\DefineShortVerb{\¡}
+
+\newcommand*{\Abbrev}[1]{#1\xspace}
+
+\newcommand*{\sml}{\Abbrev{SML}}
+\newcommand*{\smlbasis}{\Abbrev{Standard~ML Basis Library}}
+\newcommand*{\mosml}{\Abbrev{Moscow ML}}
+\newcommand*{\mlton}{\Abbrev{MLton}}
+\newcommand*{\smlnj}{\Abbrev{SML/NJ}}
+
+\newcommand*{\mgtk}{\Abbrev{mGTK}}
+\newcommand*{\minimgtk}{\Abbrev{Mini-mGTK}}
+
+\newcommand*{\gtk}{\Abbrev{Gtk+}}
+\newcommand*{\gtksharp}{\Abbrev{Gtk\#}}
+\newcommand*{\glib}{\Abbrev{glib}}
+\newcommand*{\gnome}{\Abbrev{GNOME}}
+
+\newcommand*{\classname}[1]{\textsf{#1}}
+
+\begin{document}
+
+\title{\mgtk}
+\subtitle{An \sml binding of \gtk}
+\author{\textbf{Henning~Niss}\\(Ken~Friis~Larsen)}
+\email{hniss@itu.dk}
+\institution{IT University of Copenhagen}
+\date{July 2, 2004}
+
+\maketitle
+
+
+\begin{slide}{\mgtk}
+
+\mgtk is a Standard ML \textit{language binding} for
+the graphical toolkit \gtk.
+
+\begin{itemize}
+\item Standard ML (\sml) is a mostly functional language
+  with some imperative features.
+
+\item \gtk is a library for creating graphical user interfaces.
+\end{itemize}
+
+\medskip
+
+Motivation:
+\begin{itemize}
+\item \sml access to a good, general-purpose graphical toolkit;
+
+\item binding not restricted to one \sml system;
+
+\item test interfaceability of \gtk;
+
+\item providing compile-time type checking.
+\end{itemize}
+
+\end{slide}
+
+
+\begin{slide}{Type checking}
+
+\begin{itemize}
+\item
+Example incorrect C program fragment:
+\begin{Verbatim}
+  GtkWidget* label;
+  label = gtk_label_new("Text");
+  gtk_window_set_title(GTK_WINDOW(label), "New text");
+\end{Verbatim}
+\smallskip
+Unfortunately \emph{no} type error (because of the cast).
+
+\item
+The corresponding \sml program \emph{does} give a type error:
+\begin{Verbatim}
+  - val lab = Label.new();
+  > ...
+  - Window.set_title lab "New text";
+  ! Toplevel input:
+  ! Window.set_title lab "New text";
+  !                  ^^^
+  ! Type clash: expression of type
+  !   base label_t widget
+  ! cannot have type
+  !   'a window_t container_t widget
+\end{Verbatim}
+\end{itemize}
+
+\end{slide}
+
+
+\begin{slide}{\sml introduction}
+
+\sml is a \emph{functional language} with a formal definition.
+
+\medskip
+
+Core language:
+\begin{itemize}
+\item functions as the main abstraction;
+\item computation by constructing new values;
+\item static type system and type inference;
+\item polymorphism and parametrized types.
+\end{itemize}
+
+\medskip
+
+Module language:
+\begin{itemize}
+\item \emph{signatures} (interface description) specifie the contents of
+   modules;
+
+\item \emph{structures} (implementation module) give the implementation
+   of modules.
+\end{itemize}
+
+\end{slide}
+
+\begin{slide}{\mgtk example}
+
+\begin{Verbatim}
+fun hello _ = print "Hello World\n"
+
+fun main cmdline =
+  let val _ = GtkBasis.init cmdline
+      val window = Window.new ()
+      val button = Button.new_with_label "Hello World"
+  in  Signal.connect window
+         (Widget.delete_event_sig (fn _ => false))
+    ; Signal.connect window 
+         (Widget.destroy_sig GtkBasis.main_quit)
+    ; Signal.connect button (Button.clicked_sig hello)
+    ; Container.add window button
+    ; Widget.show_all window
+    ; GtkBasis.main() 
+  end
+
+val _ = main(CommandLine.name()::CommandLine.arguments())
+\end{Verbatim}
+
+\end{slide}
+
+\begin{slide}{Polymorphism and parametrized types}
+
+\sml allows \emph{polymorphic} types:
+\begin{itemize}
+\item specify a datastructure ¡list¡ with elements of any type
+\begin{Verbatim}
+  type 'a list
+\end{Verbatim}
+\item ¡'a¡ is a \emph{type variable} that can be instantiated
+  with concrete types:
+\begin{Verbatim}
+  type intlist = int list
+  type intlistlist = (int list) list
+\end{Verbatim}
+\item define \emph{polymorhic} functions that need not inspect the elements
+\begin{Verbatim}
+  val length : 'a list -> int
+\end{Verbatim}
+\item (like generics in C++ and Java).
+\end{itemize}
+
+\end{slide}
+
+
+\begin{slide}{Phantom types}
+
+Idea: use type constraints to enforce invariants.
+\begin{itemize}
+\item a \emph{phantom type} is a parametrized type where the type
+  parameter only occurs on the left-hand side.
+
+\item a \emph{witness type} ia type that is used to instantiate the
+  type parameters of phantom types.
+
+\item phantom types are widely used (socket libraries for SML,
+  embedded languages, valid XHTML, \ldots).
+  
+\item this talk: use phantom types to encode single-inheritance object
+  hierarchies.
+\end{itemize}
+\end{slide}
+
+\begin{SaveVerbatim}{AbsFD}
+signature FileDsr = sig
+
+
+     type             fd
+     type             access
+     val READ   :      access
+     val WRITE  :       access
+     val openFd : string ->      access ->      fd
+     val read   :      fd -> char
+     val write  :       fd -> char -> unit
+     val close  :             fd -> unit
+end
+\end{SaveVerbatim}
+
+\begin{SaveVerbatim}[commandchars=\\\{\}]{PhantomFD}
+signature FileDsr = sig
+     \textbf{type read}
+     \textbf{type write}
+     type \textbf{'capability} fd
+     type \textbf{'capability} access
+     val READ   : \textbf{read} access
+     val WRITE  : \textbf{write} access
+     val openFd : string -> \textbf{'cap} access -> \textbf{'cap} fd
+     val read   : \textbf{read} fd -> char
+     val write  : \textbf{write} fd -> char -> unit
+     val close  : \textbf{'capability} fd -> unit
+end
+\end{SaveVerbatim}
+
+\overlays{2}{%
+\begin{slide}{Phantom types example: file descriptors}
+\onlySlide*{1}{\UseVerbatim{AbsFD}}%
+\onlySlide*{2}{\UseVerbatim{PhantomFD}}
+\end{slide}}
+
+
+\begin{slide}{Encoding a single-inheritance class hierarchy (1)}
+
+Structure of the encoding:
+\begin{itemize}
+\item Class represented by an \sml signature/structure.
+
+\item Class type represented by an \sml type.
+
+\item Methods represented by functions.
+
+\item Objects instances represented by values of the class type.
+\end{itemize}
+
+\medskip
+
+Example:
+\begin{Verbatim}
+  signature Widget = sig
+      ...
+      type 'path widget
+      val show: 'p widget -> unit
+  end
+
+  structure Widget :> Widget = struct
+      ...
+  end
+\end{Verbatim}
+
+\end{slide}
+
+\begin{slide}{Encoding class hierarchies (2)}
+
+\begin{tabular}{@{}ll@{}}
+\begin{minipage}[t]{.57\textwidth}
+\vskip-1cm
+Encoding \emph{subtype inheritance}:
+
+\medskip
+
+Has to encode two facts:
+\begin{enumerate}
+\item that the class type exists:
+  \begin{itemize}
+  \item use an abstract witness type\\
+     \texttt{type 'p label\_t}
+  \end{itemize}
+\end{enumerate}
+\end{minipage}
+&
+\begin{minipage}[c]{.4\textwidth}
+\includegraphics[width=\linewidth]{widget-class-diagram.mps}
+\end{minipage}
+\end{tabular}
+
+\begin{enumerate}
+\item[2.] that a subclass inherits from a superclass
+  \begin{itemize}
+  \item use a type abbrev.\ and an explicit
+     rep.\ of the inheritance path\\
+     \texttt{type 'p label = 'p label\_t widget}
+  \end{itemize}
+\end{enumerate}
+
+Examples:
+\begin{Verbatim}
+  - val wid = Widget.new()
+  > val wid = <t> : base widget
+
+  - val lab = Label.new()
+  > val lab = <t>: base label_t widget
+\end{Verbatim}
+
+\end{slide}
+
+\begin{slide}{Encoding class hierarchies (3)}
+
+Encoding \emph{methods}:
+\begin{itemize}
+  \item represent methods as functions;
+  \item include an explicit ¡self¡/¡this¡ parameter
+\begin{Verbatim}
+  val add: 'p1 container -> 'p2 widget -> unit
+
+  val set_title: 'p window -> string -> unit
+\end{Verbatim}
+
+\item \sml polymorphism (in ¡'p1¡, ¡'p2¡, and ¡'p¡) allows us to invoke
+  such methods on instances of subclasses
+\begin{Verbatim}
+  - val win = Window.new ()
+  > wal win = <t> : base window
+  - val _   = Window.set_title win "Title"
+
+  - val lab = Label.new ()
+  > val lab = <t> : base label
+  - val _   = Container.add win lab
+\end{Verbatim}
+using ¡base window_t¡ for ¡'p1¡,
+and ¡base widget¡ for ¡'p2¡.
+\end{itemize}
+
+\end{slide}
+
+\begin{slide}{Encoding class hierarchies (4)}
+
+Encoding \emph{constructors}:
+\begin{itemize}
+\item have to be careful with subclasses:
+\begin{itemize}
+\item for example the \classname{Container} constructor
+\begin{Verbatim}
+  val new_doesnt_work : unit -> 'p container
+\end{Verbatim}
+\item this allows us to use the value ¡new_doesnt_work ()¡ as a window (by using
+  ¡'p window_t¡ for ¡'p¡).
+\end{itemize}
+
+\item have to ``stop'' the inheritance path for constructors:
+\begin{itemize}
+\item introduce an abstract, dummy type ¡base¡
+\begin{Verbatim}
+  type base
+  val new : unit -> base container
+\end{Verbatim}
+\item then the value ¡new ()¡ cannot be used as a window
+(it is already fully instantiated).
+\end{itemize}
+\end{itemize}
+
+\end{slide}
+
+\begin{slide}{Encoding class hierarchies (5)}
+
+Wrapping it up:
+\begin{itemize}
+\item collect all functionality for one class in one \sml module:
+\\\emph{interface:}
+\begin{verbatim}
+  signature Window = sig
+    type base
+    type 'p window_t
+    type 'p window = 'p window_t Container.container
+
+    val new : unit -> base window
+    val set_title : 'p window -> string -> unit
+    ...
+  end
+ \end{verbatim}
+
+\emph{implementation:}
+\begin{verbatim}
+  structure Window :> Window = struct
+    (* calls to C functions *)     
+  end
+\end{verbatim}
+\end{itemize}
+
+\end{slide}
+
+\begin{slide}{Compile-time type checking (1)}
+  
+  Property: \textit{All typings allowed by the class hierarchy are
+    also allowed by the encoding.}
+
+\medskip
+
+Example: Let
+\begin{Verbatim}
+  val lab : base label
+  val win : base window
+\end{Verbatim}
+and consider ¡Container.add¡ with type
+\begin{Verbatim}
+  val add : 'p1 container -> 'p2 widget -> unit
+\end{Verbatim}
+Recall: \begin{tabular}[t]{@{}ll@{}}
+1.&¡base window¡ abbreviates ¡base window_t container¡\\
+2.&¡base label¡ abbreviates ¡base label_t widget¡
+\end{tabular}
+so using ¡base window_t¡ for ¡'p1¡ and
+¡base label_t¡ for ¡'p2¡ allows us to type
+\begin{Verbatim}
+  Container.add win lab
+\end{Verbatim}
+as desired.
+
+\medskip
+
+This is known as \emph{completeness} of the encoding.
+\end{slide}
+
+\begin{slide}{Compile-time type checking (2)}
+  
+  Property: \textit{All typings rejected by the class hierarchy are also
+  rejected by the encoding.}
+
+\medskip
+
+Example: Consider ¡Window.set_title¡ with type
+\begin{Verbatim}
+  set_title : 'p window -> string -> unit
+\end{Verbatim}
+
+\medskip
+
+Should we accidentally try to apply that to a label
+\begin{Verbatim}
+  - Window.set_title lab "New text";
+\end{Verbatim}
+we get a type error:
+\begin{Verbatim}
+  ! Toplevel input:
+  ! Window.set_title lab "New text";
+  !                  ^^^
+  ! Type clash: expression of type
+  !   base label_t widget
+  ! cannot have type
+  !   'a window_t container_t widget
+\end{Verbatim}
+
+\medskip
+
+This is known as \emph{soundness} of the encoding.
+\end{slide}
+
+\begin{slide}{Contributions}
+
+Using programming language technology for better bindings.
+\begin{itemize}
+\item Phantom types:
+   \begin{itemize}
+   \item encoding single-inheritance class hierarchies;
+   \item compile-time type safety;
+   \item programming with objects in a functional language.
+   \end{itemize}
+
+\item Bringing graphical toolkits to \sml.
+
+\item Bringing SML to \gtk.
+\end{itemize}
+
+\end{slide}
+
+\begin{slide}{Future work}
+  
+Goal: make most of the \gnome platform available from a wide
+selection of \sml systems.
+
+\begin{itemize}
+\item More \sml compilers: 
+   \begin{itemize}
+   \item SML.NET (with \gtksharp);
+   \item The ML Kit.
+   \end{itemize}
+
+\item More of the \gnome platform:
+   \begin{itemize}
+   \item more libraries;
+   \item enable \gnome components written in \sml;
+   \item type-safe inheritance in \sml of \gnome components.
+   \end{itemize}
+
+\item More autogenerated bindings:
+   \begin{itemize}
+   \item Generalize the code generator.
+   \end{itemize}
+
+\end{itemize}
+
+\end{slide}
+
+\end{document}
