@@ -59,6 +59,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     exception Unbound of Name.name
     val add = Splaymap.insert
     fun lookup table name = Splaymap.find(table,name)
+			    handle NotFound => raise Unbound name
 
     fun id x = x
     fun make e = TinySML.App(TinySML.Var("make"), [e])
@@ -217,18 +218,13 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.WithDefault(ty, default) => 
                SMLType.TyApp([toSMLType tinfo fresh ty], ["option"])
 	  | Type.Base n => 
-	       (let val info: info = lookup tinfo n
-		in  #stype info fresh
-		end
-		    handle NotFound => raise Unbound n
-               )
+	       let val info: info = lookup tinfo n
+	       in  #stype info fresh end
 	  | Type.Tname n => 
-	       (let val info: info = lookup tinfo n
-		in  prependPath (Name.getPath n, Name.getBase n) 
-				(#stype info fresh)
-		end
-		    handle NotFound => raise Unbound n
-               )
+	       let val info: info = lookup tinfo n
+	       in  prependPath (Name.getPath n, Name.getBase n) 
+			       (#stype info fresh)
+	       end
 	  | Type.Const ty => toSMLType tinfo fresh ty
 	  | Type.Ptr ty => toSMLType tinfo fresh ty
 	  | Type.Func(pars,ret) => 
@@ -260,17 +256,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Void => SMLType.UnitTy
 	  | Type.WithDefault(ty,default) => toPrimType negative tinfo ty
 	  | Type.Base n => 
-	       (let val info: info = lookup tinfo n
-		in  #ptype info
-		end
-		    handle NotFound => raise Unbound n
-               )
+	       let val info: info = lookup tinfo n
+	       in  #ptype info end
 	  | Type.Tname n => 
-	       (let val info: info = lookup tinfo n
-		in  #ptype info
-		end
-		    handle NotFound => raise Unbound n
-               )
+	       let val info: info = lookup tinfo n
+	       in  #ptype info end
 	  | Type.Const ty => toPrimType negative tinfo ty
 	  | Type.Output(pass, ty) => SMLType.RefTy(toPrimType negative tinfo ty)
 	  | Type.Ptr ty => SMLType.TyApp([],["cptr"])
@@ -296,17 +286,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun toprimvalue tinfo ty =
 	case ty of
 	    Type.Base n =>
-	       (let val info: info = lookup tinfo n
-		in  #toprim info
-		end
-		    handle NotFound => raise Unbound n
-	       )
+	       let val info: info = lookup tinfo n
+	       in  #toprim info end
 	  | Type.Tname n =>
-	       (let val info: info = lookup tinfo n
-		in  #toprim info
-		end
-		    handle NotFound => raise Unbound n
-	       )
+	       let val info: info = lookup tinfo n
+	       in  #toprim info end
 	  | Type.WithDefault(ty,default) => toprimvalue tinfo ty
 	  | Type.Ptr ty => toprimvalue tinfo ty (* FIXME: ? *)
 	  | Type.Const ty => toprimvalue tinfo ty
@@ -330,17 +314,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun fromPrimValue tinfo ty =
 	case ty of
 	    Type.Base n =>
-	       (let val info: info = lookup tinfo n
-		in  #fromprim info
-		end
-		    handle NotFound => raise Unbound n
-	       )
+	       let val info: info = lookup tinfo n
+	       in  #fromprim info end
 	  | Type.Tname n =>
-	       (let val info: info = lookup tinfo n
-		in  (prependPath n) o #fromprim info
-		end
-		    handle NotFound => raise Unbound n
-	       )
+	       let val info: info = lookup tinfo n
+	       in  (prependPath n) o #fromprim info end
 	  | Type.WithDefault(ty,default) => fromPrimValue tinfo ty
 	  | Type.Ptr ty => fromPrimValue tinfo ty (* FIXME: ? *)
 	  | Type.Const ty => fromPrimValue tinfo ty
@@ -350,17 +328,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun isWrapped tinfo ty =
 	case ty of
 	    Type.Base n =>
-	       (let val info: info = lookup tinfo n
-		in  #wrapped info
-		end
-		    handle NotFound => raise Unbound n
-	       )
+	       let val info: info = lookup tinfo n
+	       in  #wrapped info end
 	  | Type.Tname n =>
-	       (let val info: info = lookup tinfo n
-		in  #wrapped info
-		end
-		    handle NotFound => raise Unbound n
-	       )
+	       let val info: info = lookup tinfo n
+	       in  #wrapped info end
 	  | Type.WithDefault(ty,default) => isWrapped tinfo ty
 	  | Type.Ptr ty => isWrapped tinfo ty
 	  | Type.Output(pass,ty) => isWrapped tinfo ty
@@ -395,15 +367,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	case ty of
 	    Type.Ptr ty => TinyC.TStar(toCType tinfo ty)
 	  | Type.Base n =>
-	      (let val info:info = lookup tinfo n
-	       in  #ctype info end
-		   handle NotFound => raise Unbound n
-              )
+	      let val info:info = lookup tinfo n
+	      in  #ctype info end
 	  | Type.Tname n =>
-	      (let val info:info = lookup tinfo n
-	       in  #ctype info end
-		   handle NotFound => raise Unbound n
-              )
+	      let val info:info = lookup tinfo n
+	      in  #ctype info end
 	  | Type.Output(_, ty) => TinyC.TStar(toCType tinfo ty)
 	  | Type.WithDefault(ty,default) => toCType tinfo ty
 	  | Type.Const ty => toCType tinfo ty
@@ -418,23 +386,18 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.WithDefault(ty,default) => tocvalue tinfo ty
 	  | Type.Output(pass,ty) =>  (* FIXME *)
                (case ty of
-		    Type.Tname n => (let val info:info = lookup tinfo n
-				     in  if #kind info = Boxed then  ""
+		    Type.Tname n => let val info:info = lookup tinfo n
+				    in  if #kind info = Boxed then  ""
 					 else "&" (* YUCK *)
-				     end handle NotFound => raise Unbound n
-                                    )
+				    end
 		  | _ => "&"
                )
 	  | Type.Base n => 
-               (let val info:info = lookup tinfo n
-		in  #toc info end
-		    handle NotFound => raise Unbound n
-               )
+               let val info:info = lookup tinfo n
+	       in  #toc info end
 	  | Type.Tname n => 
-               (let val info:info = lookup tinfo n
-		in  #toc info end
-		    handle NotFound => raise Unbound n
-               )
+               let val info:info = lookup tinfo n
+	       in  #toc info end
 	  | Type.Ptr ty => tocvalue tinfo ty (* FIXME: ? *)
 	  | Type.Void => raise Fail "toCValue: shouldn't happen (Void)"
 	  | Type.Arr _ => raise Fail "toCValue: not implemented (Arr)"
@@ -448,15 +411,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.WithDefault(ty,default) => fromCValue tinfo ty
 	  | Type.Output(pass,ty) => fromCValue tinfo ty
 	  | Type.Base n => 
-               (let val info:info = lookup tinfo n
-		in  ccall(#fromc info) end
-		    handle NotFound => raise Unbound n 
-               )
+               let val info:info = lookup tinfo n
+	       in  ccall(#fromc info) end
 	  | Type.Tname n => 
-               (let val info:info = lookup tinfo n
-		in  ccall(#fromc info) end
-		    handle NotFound => raise Unbound n
-               )
+               let val info:info = lookup tinfo n
+	       in  ccall(#fromc info) end
           | Type.Const ty => fromCValue tinfo ty
 	  | Type.Ptr ty => fromCValue tinfo ty
 	  | Type.Void => (fn e => e)
@@ -475,11 +434,8 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		  | Type.Output(pass,ty) => loop ty
 		  | Type.Tname tn => SMLType.UnitTy (* FIXME: true? *)
 		  | Type.Base tn =>
-		    (let val info: info = lookup tinfo tn
-		     in  #ptype info
-		     end
-			 handle NotFound => raise Unbound tn
-                    )
+		    let val info: info = lookup tinfo tn
+		    in  #ptype info end
 		  | Type.Arr(i,ty) => 
 		    raise Fail("toSignalType(arr): not implemented")
 	    val ret = SMLType.TyApp([SMLType.TyApp([SMLType.TyVar "'a"], ["t"])], 
@@ -489,15 +445,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun defaultValue tinfo ty = (* FIXME *)
 	case ty of
 	    Type.Base tn => 
-	    (let val info: info = lookup tinfo tn
-	     in  #default info
-	     end handle NotFound => raise Unbound tn
-            )
+	    let val info: info = lookup tinfo tn
+	    in  #default info end
 	  | Type.Tname tn => 
-	    (let val info: info = lookup tinfo tn
-	     in  #default info
-	     end handle NotFound => raise Unbound tn
-            )
+	    let val info: info = lookup tinfo tn
+	    in  #default info end
 	  | Type.Const ty => defaultValue tinfo ty
 	  | Type.Ptr ty => defaultValue tinfo ty
 	  | Type.WithDefault(ty,v) => defaultValue tinfo ty
