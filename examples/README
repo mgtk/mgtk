@@ -51,6 +51,7 @@ treeexample2.sml | Like treeexample, but show how closures can be used to
 menuexample.sml  | Shows how to use menus
 statusbar.sml    | Shows how to use statusbars
 stopwatch.sml    | Shows how to use timeouts
+timetracker.sml  | Shows how to use timeouts and CList
 moside/          | A larger example providing a small GUI for Moscow ML
                  | (This will probably not work under Windows!)
 
