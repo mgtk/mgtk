@@ -3,7 +3,11 @@ TRYING THE EXAMPLE PROGRAMS
 
 This directory contains a few example programs to get you started with
 mGTK.  In order to try the example programs, issue the following
-commands
+commands:
+
+
+(0) Edit Makefile to suit your installation
+
 
 Using Moscow ML:
 ----------------
