@@ -1,0 +1,66 @@
+----------------------------------------------------------------------
++ Space leak with static_strings. This is simple to fix---do it!
+
++ Is the output satisfactory. I know some lines are very long---
+  perhaps we could find some heuristic to improve this. This is
+  a minor issue since people aren't expected to look at the generated
+  code, only the signatures (and they need to be nice, consequently).
+
++ Manually inspect the generated code. Check for non-inhabitable
+  types, inconsistent namings, etc.
+
++ Functions with a potential for returning errors (gdk_font_load
+  returns NULL for instance) needs treatment. In some situations
+  it may be appropriate to use an option; in others it may be more
+  appropriate to raise an exception.
+
++ Namings of long/short variants of the same function (i.e., functions
+  for which all optional arguments have been set to NONE). The current
+  solution, the normal name for the long version, and the normal name
+  with a appended ' for the short version is rooted in the idea that
+  then the correspondence between the documentation of C-GTK and mgtk
+  remains intact. Ken proposed to use the normal name for the short
+  version, because that's the function one uses mostly anyway, and
+  appending _all or _full or something for the long version.
+  
++ Can we use
+
+  /* Does this work? 
+  value Nullok_option(void *nl) {
+    value res;
+
+    if (nl == NULL) {
+      res = NONE;
+    } else {
+      res = alloc(1, SOMEtag);
+      modify(&Field(res, 0), (value) nl);
+    };
+    return res;
+  }
+  */
+
+  for widget pointers?
+
++ Consider removing all XXX_ functions to save ``globals''.
+
++ We really should differentiate between enums and flags.  Currently
+  it is not possible to set more than one flag (since flags are
+  treated as enums). A possible idea is to let all flags be
+  represented as lists of the underlying enum. Ken made some code
+  to handle this---use that.
+
++ The specification of signals is *very* ad hoc. In particular only
+  unit -> unit and unit -> bool signals are recognized, and the unit
+  -> bool requires the signal to be an AFTER-signal.
+
++ a mechanism for handling ~1 a la the solution to null-ok.
+
++ Make Translate more transparent and modular.
+
++ Perhaps the lexer and parser could be made more efficient, but this
+  is not a major priority since we need to run them seldomly.
+
++ Error reporting is non-existent.
+
+----------------------------------------------------------------------
+                                          Henning Niss, April 13, 2000
