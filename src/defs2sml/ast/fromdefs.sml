@@ -13,7 +13,7 @@ structure FromDefs :> FromDefs = struct
     type member_info = (string,AST.api_type) AST.api_info
 
     datatype module = 
-	Module of {done: bool ref, name: string, members: member list ref, info: module_info}
+	Module of {name: string, members: member list ref, info: module_info}
     and member =
         Sub of module
       | Member of {name: string, info: member_info}
@@ -26,35 +26,16 @@ structure FromDefs :> FromDefs = struct
       = Map.mkDict (String.compare o pairmap Name.toLower) (* FIXME *)
     fun insert map name mem = 
 	case Map.peek (map, name) of
-	    SOME(Module{done,name,members,info}) => 
+	    SOME(Module{name,members,info}) => 
 	      (members := mem :: !members; map)
 	  | NONE => ( print("Unbound module "^name^" for "^show mem^"\n")
 		    ; map) (* FIXME *)
     fun new map name parent info = 
-	let val md = Module{done=ref false,name=name,info=info,members=ref[]}
+	let val md = Module{name=name,info=info,members=ref[]}
 	    val map = case parent of NONE => map
 				   | SOME p => insert map p (Sub md)
 	in  Map.insert(map, name, md) end
 
-    val dependencies = ref (Map.mkDict(String.compare))
-    fun fromList l = Set.addList(Set.empty String.compare, l)
-    fun getDependencies name =
-	case Map.peek(!dependencies,name) of
-	    NONE => []
-	  | SOME d => Set.listItems d
-    fun addDependencies name dep = 
-	dependencies := Map.insert(!dependencies, name, fromList(getDependencies name @ dep))
-
-    fun freeTyNames ty =
-	let fun loop (A.ApiTy tyname, acc) = tyname::acc
-	      | loop (A.ArrowTy(args,ret), acc) =
-		  loop(ret, List.foldl loop' acc args)
-	      | loop (A.Defaulted(ty,_), acc) = loop(ty, acc)
-	      | loop (A.Output(_,ty), acc) = loop(ty, acc)
-	      | loop (A.Array ty, acc) = loop(ty, acc)
-	    and loop' ((_, ty),acc) = loop(ty,acc)
-	in  rev(loop(ty,[])) 
-	end
     fun trans top metadata (def, map) =
 	let val name = getName def handle AttribNotFound _ => #1 def
 	    fun probableModule nothing split name = 
@@ -87,10 +68,6 @@ structure FromDefs :> FromDefs = struct
 		       val parent = SOME(getParent def)
 			            handle AttribNotFound _ => NONE
 		       val implements = getImplements def
-		       val _ = addDependencies name
-			         ((case parent of SOME p => [p]
-						| NONE => [])
-                                  @ implements)
 		       val info = (name,parent,implements)
 		       val mem = Member{name=name,info=A.Object info}
 		   in  insert (new map name (SOME md) (* parent *) NONE)
@@ -230,31 +207,12 @@ structure FromDefs :> FromDefs = struct
 	: (string,module_info,member_info) AST.module =
 	let val md = interpretMetadata metadefs
 	    val map = List.foldl (trans top md) (new empty top NONE NONE) defs
-	    fun cmap f = List.concat o List.map f
-	    fun convert (Module{done,name,members=mbs,info}) =
-		if !done then []
-		else let val _ = done := true
-			 val deps = getDependencies name
-			 val showdeps = Util.stringSep "[" "]" "," (fn s=>s)
-			 val _ = MsgUtil.debug(name ^ " dependencies " ^ showdeps deps ^ "\n")
-		     in  (cmap (process name) deps) @
-		         [A.Module{name=name,info=info,
-				   members=cmap loop (rev(!mbs))}
-			 ]
-		     end
-	    and loop (Sub module) = List.map A.Sub (convert module)
-	      | loop (Member{name,info}) = 
-		[A.Member{name=name,info=info}]
-	    and process name dep = 
-		if dep="GObject" then [] (* YUCK: HACK *)
-		else convert(Map.find(map,dep))
-		     handle Map.NotFound => 
-			( print("Unbound dependency "^dep^" for "^name^"\n")
-			; [] )
-	in  case process "toplevel" top of
-		[m] => m
-	      | _ => Util.abort 12345
-	end
+	    fun convert (Module{name,members=mbs,info}) =
+		A.Module{name=name,info=info,
+			 members=List.map convert' (rev(!mbs))}
+	    and convert' (Sub module) = A.Sub (convert module)
+	      | convert' (Member{name,info}) = A.Member{name=name,info=info}
+	in  convert(Map.find(map, top)) end
 
     (* For debugging: *)
     local open Pretty in
