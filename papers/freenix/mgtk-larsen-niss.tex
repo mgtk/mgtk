@@ -68,21 +68,21 @@
 \section{Introduction}
 \label{sec:intr-backgr}
 
-This section gives a brief introduction to \sml and \gtk, and presents
-an overview of the rest of the paper.
-
+%This section gives a brief introduction to \sml and \gtk, and presents
+%an overview of the rest of the paper.
+%
 Making a good Standard~ML (\sml) binding to \gtk is an advantage for
 both the \sml community and for the \gtk community.  For the \sml
 community the two main advantages are: First, \sml programmers get
 access to a good general-purpose graphical user interface (GUI)
 library with a large range of modern widgets, and the \sml community
-is sorely missing such a library.  Second, on a long term basis, when
-we have wrapped the whole GNOME platform, it is possible for \sml
+is sorely missing such a library.  Second, on a more long term basis, when
+we have wrapped the whole GNOME platform, it will be possible for \sml
 programmers to make real applications without having to invent add-hoc
-solutions to many standard problems, like as database access, for
+solutions to many standard problems, like database access, for
 instance.  To the \gtk community the two main advantages of an \sml
 binding are: First, that such a binding can help open up the small,
-but important, marked of teaching languages.  Second, as \sml is a
+but important, market of teaching languages.  Second, as \sml is a
 radically different language than C, an \sml binding will test the
 ``interfaceability'' of \gtk which is an important design goal for the
 \gtk developers.
@@ -91,8 +91,8 @@ radically different language than C, an \sml binding will test the
 \subsection{Standard ML}
 
 
-\sml is a functional language with imperative features
-widely used for teaching and in research.  It is roughly on the same
+\sml is a functional language with imperative features which is
+widely used for teaching and research.  It is roughly on the same
 level of abstraction as Python or Scheme. In contrast to Python and
 Scheme, which are \emph{dynamically typed}, \sml is \emph{statically
   typed} (like Java and C++) which means that type errors are detected
@@ -112,8 +112,8 @@ definition means that it is possible to write substantial applications
 in \sml that are not dependent on a specific compiler.  There are also
 several mature \sml implementations with widely different
 implementation strategies ranging from byte-code interpreters with
-interactive \emph{read--eval--print--loops} (REPLs) to aggressively
-optimizing whole-program compilers targeting native code.
+interactive \emph{read--eval--print--loops} (REPLs) to aggressive
+whole-program optimizing compilers targeting native code.
 
 
 
@@ -134,8 +134,9 @@ other programming languages than C.  Such bindings allows \gtk to be
 used in programs written in those languages. See
 \cite{Gtk-bindings-webpage:2004} for a current list of bindings.
 
-\gtk itself only contains GUI widgets, the main libraries it is on top
-of are \cite{gtk-reference-manual}: 
+The \gtk library itself only contains widgets, but it is built on a
+number of useful libraries, to which it is often associated. The main
+ones are~\cite{gtk-reference-manual}:
 \begin{description}
 \item[Glib] A general-purpose utility library, not specific to
   graphical user interfaces. GLib provides many useful data types,
@@ -154,7 +155,7 @@ of are \cite{gtk-reference-manual}:
 \item[GDK] The abstraction layer that allows GTK+ to support multiple
   windowing systems.
 \end{description}
-However, in this article we are consentrating on the GUI widgets.
+However, in this paper we are concentrating on the widgets only.
 
 
 %% FIXME
@@ -180,7 +181,7 @@ Section~\ref{sec:example} shows a ``Hello World'' example using \mgtk.
 Section~\ref{sec:encoding-classes} explains how a single-inheritance
 class-hierarchy, in particular \gtk's, can be encoded in \sml's type
 system, while retaining type safety.  Section~\ref{sec:process}
-describes the woking process we have used to make the \mgtk library.
+describes the work process we have used to make the \mgtk library.
 Section~\ref{sec:mgtk-binding} describes practical matters of \mgtk,
 such as which \sml compilers are supported.  Finally,
 Section~\ref{sec:related-work} lists related work and
@@ -259,28 +260,28 @@ end
   \label{fig:stack-lib}
 \end{figure*}
 
-Figure~\ref{fig:stack-lib} show a small stack library implemented in
+Figure~\ref{fig:stack-lib} shows a small stack library implemented in
 SML.  This example shows most of the important features of SML.  The
 library consists of two parts: an interface description, which is
 called a \emph{signature} in SML (Figure~\ref{fig:stack-sig}), and an
-module implementation, which is called a \emph{structure} in SML
+implementation module, which is called a \emph{structure} in SML
 (Figure~\ref{fig:stack-struct}).  Informally speaking, a
-signature is the type of a structure. It specifies the
+signature is the ``type'' of a structure. It specifies the
 declarations of the structure that is to be visible from the outside.
 
 
 The signature is named !STACK!, its extent is delimited by
 \texttt{sig} \ldots\ \texttt{end}, and it contains five
-specifications: one type specification, one exception sprcification,
+specifications: one type specification, one exception specification,
 and three value specifications.
 
 The type specification !type 'a stack! states that a module that
-satisfy (implements) the signature !STACK! must declare a type named
+satisfies (implements) the signature !STACK! must declare a type named
 !stack! and that this type is parameterized.  The !'a! is a \emph{type
   variable} and this is what makes the type parameterized.  Type
-variables can be instansiated to other types.  Thus, the type of a
+variables can be instantiated to other types.  Thus, the type of a
 stack of intergers is !int stack!, the type of a stack of integer
-stacks is !int stack stack!, and so on. Type variables are the core of
+stacks is !int stack stack!, and so on. Type variables are at the core of
 \emph{parametric polymorphism} (also known as generics in, for
 example, C++ and Java; see \cite{garcia03:generics} for a comparison
 of programming languages with support for parametric polymorphism).
@@ -303,7 +304,7 @@ specification states that a function named !pop! must be implemented,
 and that !pop!  takes a stack as argument and returs an element and a
 new stack.
 
-Figure~\ref{fig:stack-struct} show the code of the implementation, that is a
+Figure~\ref{fig:stack-struct} shows the code of the implementation, that is a
 structure declaration.  The declarations states
 that the structure is named !Stack!, that !Stack! satisfies the
 signature !STACK!, and that !Stack! does not reveal any implementation
@@ -321,7 +322,7 @@ called unit constructors or just constructors).
 The exception declaration !exception EmptyStack! just declares an
 exception.
 
-The next declaration just states that !empty! is bound to !Empty!.  The
+The next declaration states that !empty! is bound to !Empty!.  The
 function !push! just applies the constructor !Stack! to its argumets.
 The function !pop! is more interesting, it takes a stack as argument
 (here we have reused the name !stack! as types and values uses
@@ -341,7 +342,7 @@ composing, and sharing old values, in contrast to imperative and
 object-oriented programming where values are copied and modified
 (although, a new trend in object-oriented programming is to simulate a
 functional style, see for example \cite[Item 13 and
-14]{bloch01:effective-java}.
+14]{bloch01:effective-java}).
 
 
 
@@ -403,8 +404,8 @@ not explained earlier: the expression !fn _ => false!  denotes an
 \emph{anonymous function} that returns !false! regardless of what
 argument is given (you can use the \emph{wildcard pattern} !_!
 (underscore) if you do not care about the arguments to a function).
-Anonymous functions are often really handy for small semi-trivial
-callback, such as this one.  The construct \texttt{let}~\texttt{val}
+Anonymous functions are often really handy for small trivial
+callbacks, such as this one.  The construct \texttt{let}~\texttt{val}
 \textit{x} \texttt{=} \textit{exp} declares the identifier \textit{x}
 to be bound to the value obtained by evaluating the expression
 \textit{exp}.  If the only reason for evaluating \textit{exp} is any
@@ -412,10 +413,10 @@ potential side effect, one can again use the wildcard pattern.
 Expressions evaluated for their side effects only can also be
 sequentialized using \texttt{;}.  The value \texttt{()}, the nullary
 tuple of type \texttt{unit}, can be used as the return value of purely
-side-effecting functions.  Finally, in \sml double-colon, \texttt{::},
+side-effecting functions.  Finally, in \sml, the double-colon \texttt{::}
 denotes the cons operation on lists.  That is, to add an element $x$
 to the begining of a list $\mathit{xs}$ we write $x \texttt{::}
-\mathit{xs}$. (in contrast to C++ where double-colon is the module operator).
+\mathit{xs}$ (in contrast to C++ where double-colon is the module operator).
 
 %% FIXME
 %% \begin{ednote}{Bart}
@@ -480,21 +481,21 @@ to the begining of a list $\mathit{xs}$ we write $x \texttt{::}
 \section{Encoding of Classes}
 \label{sec:encoding-classes}
 
-As described in Section~\ref{sec:intr-backgr}, \sml in is a functional
+As described in Section~\ref{sec:intr-backgr}, \sml is a functional
 language without object-oriented features and \gtk is designed as an
 object-oriented library.  Thus, it is not easy to see how to make an \sml
 interface to \gtk.  The most difficult problem is how to present the
 subtype relations defined by a class hierarchy in \sml's type system.
 That is, in this section we are only interested in how to present a
-type-safe \sml interface to \gtk class hierarchy.  By \emph{type-safe} we
+type-safe \sml interface to the \gtk class hierarchy.  By \emph{type-safe} we
 mean that, if an \sml application programmer uses our library and
 makes a type-error when using the \gtk library, calling a undefined
-method on object, for instance, then the \sml compiler should give an
+method on object, for instance, then the \sml compiler should give a
 type error (at compile-time).
 
 Throughout we shall think of class-hierarchies mainly as definitions
 of subtype relationship.  This ``confusion'' of classes and types is
-intentional, as this is right level of abstraction for the paper.
+intentional, as this is the right level of abstraction for the paper.
 
 Fortunately, we are able to take advantage of two properties of \gtk
 and \sml.  First, \gtk implements a class system with only
@@ -541,6 +542,8 @@ We now go through the different parts of the encoding of a class.
 Throughout this description we only present the \sml specifications.
 That is, the parts that go into the signatures.
 
+\begin{ednote}{HN} Structure \end{ednote}
+
 \begin{description}
 \item[Class types] A base class like \classname{Widget} in
   Figure~\ref{fig:class-hierarchy} is encoded as an abstract
@@ -558,7 +561,7 @@ subclasses.
   need to encode two things: that the class (type) exists and the
   subtype relation to the parent class.  To do this, we declare two
   new \sml types: an abstract parameterized type; and a type
-  abbreviation specifying for specifying the inheritance:
+  abbreviation for specifying the inheritance:
 \begin{SMLcode}
 type 'path label_t
 type 'path label = 
@@ -566,11 +569,11 @@ type 'path label =
 \end{SMLcode}
 We call the abstract type (here !label_t!) the \emph{witness type}
 because it witness that the class exists.  Similar, the type !label!
-is the type abbrivation that specifies that \classname{Label} inherits
+is the type abbreviation that specifies that \classname{Label} inherits
 from \classname{Widget}.  In the declaration of !label!  we see that
 the type variable !'path! in the declaration of the type !widget!  has
 been instantiated with the type expression !'path label_t!, which
-contains an new type variable (also named !'path!).
+contains a new type variable (also named !'path!).
 
 In the rest of the paper we shall use the convention that witness
 types ends with !_t!.
@@ -631,12 +634,11 @@ The convention in \gtk is that constructors are named !new!.
   inspections and changes to fields must be done though getter and
   setter methods.
 
-
 \end{description}
 
-We then wrap all parts of an encoding of a class into a structure of
-its own.  That is, for the class \classname{Window} in
-Figure~\ref{fig:class-hierarchy} the \sml signatures is:
+We then wrap all parts of an encoding of a class into a signature,
+structure pair of its own.  That is, for the class \classname{Window}
+in Figure~\ref{fig:class-hierarchy} the \sml signatures is:
 \begin{SMLcode}
 signature Window =
 sig
@@ -650,28 +652,28 @@ sig
 end
 \end{SMLcode}
 We see that this signature relies on two structures: The structure
-!Super! for the class \classname{Widget} and !GtkBasis! for the dummy
+!Container! for the class \classname{Container} and !GtkBasis! for the dummy
 type !base!.  In addition to the signature !Window! we also need a
 structure called !Window! that implements the actual calling of the
 relevant \gtk C functions.
 
-Now, does this encoding really allows all the things that the class
+Now, does this encoding really allow all the things that the class
 hierarchy allows?  Yes, for example, the function
 \texttt{Container.add} has type:
 \begin{SMLcode}
 val add : 'path1 container -> 'path2 widget 
                                     -> unit
 \end{SMLcode}
-From this type we can see that, if !lab! is a value of type 
+From this type we can see that, if !label! is a value of type 
 %
 !base label! 
 % 
-and !win! is a value of type !base window! then
+and !window! is a value of type !base window! then
 the application
 %
 !Container.add window label!
 %
-is well-typed because: (1)~the type of !lab! is just a abrivation for 
+is well-typed because: (1)~the type of !window! is just a abbreviation for 
 %
 !base window_t container!,
 %
@@ -679,7 +681,7 @@ thus, the type variable !'path1! can be instantiated to
 %
 !base window_t!,
 % 
-and (2)~the type of !win! is just an abbreviation of 
+and (2)~the type of !label! is just an abbreviation of 
 %
 !base label_t widget!,
 %
@@ -692,20 +694,20 @@ Consider now the function !set_title! that only works on \classname{Window}s:
 val set_title : 'path window -> string 
                                -> unit
 \end{SMLcode}
-If we, by mistake, attemt to use this function to set the text of the
-label \texttt{lab} (with type !base label!) as in expression
+If we, by mistake, attempt to use this function to set the text of the
+label !label! (with type !base label!) as in expression
 %
-!Window.set_title lab "New text"!, 
+!Window.set_title label "New text"!, 
 %
 we get a (compile-time) type error saying (essentially) that a
 \classname{Label} widget is not a subclass of a \classname{Window}
 widget because the inheritance paths do not match.  Here is the
 concrete error message given by the Moscow ML compiler:
 \begin{verbatim}
-- Window.set_title lab "New text";
+- Window.set_title label "New text";
 ! Toplevel input:
-! Window.set_title lab "New text";
-!                  ^^^
+! Window.set_title label "New text";
+!                  ^^^^^
 ! Type clash: expression of type
 !   base label_t widget
 ! cannot have type
@@ -759,6 +761,8 @@ of \gtk are produced. Most of the work in constructing the binding for
 the new release is over when the design of the small subset has been
 completed.
 
+\begin{ednote}{HN} Rework \end{ednote}
+
 Let us return to our running example, and look at some example
 specifications of widgets, functions, and signals. Figure~\ref{fig:gtk-defs}
 shows three entries in the \texttt{gtk.defs} file.
@@ -790,8 +794,8 @@ The first entry shows a widget specification indicated by
 !define-object!. From the entry we see that the !GtkButton! widget
 (the name appearing right after !define-object! is a shorthand)
 inherits from !GtkBin!, and it belongs in the !Gtk! module.  We also
-see the type assigned to instances of this widget in the \gtk type
-system (which is completely unrelated to the \sml encoding given
+see the type assigned to instances of this widget in the \emph{\gtk type
+system} (which is completely unrelated to the \sml encoding given
 above).
 
 The next entry shows a function specification (that actually is a
@@ -843,14 +847,14 @@ there is only one compiler/system to target.
 
 The encoding of the \gtk class hierarchy in the \sml type system in
 Section~\ref{sec:encoding-classes} is \emph{the} core aspect of the
-binding. As the encoding remains within the language as defined in the
+binding. As the encoding stays within the language as defined in the
 Definition~\cite{Milner:1997:Definition}, this aspect of the binding
 remains the same for all \sml compilers comforming to the Definition.
 In other words, the interface exposed to the application programmer is
 the same across all compilers.
 %
-One finds \sml and \gtk implementation on a large variety of
-platforms. Thus, the porting work in moving from one of these
+One finds \sml and \gtk implementations on a large variety of
+platforms. Thus, the porting work in moving application programs from one of these
 platforms to another is non-existent.
 
 The \mgtk binding already targets two of the main \sml systems,
@@ -859,7 +863,7 @@ The authors are currently looking into the prospects of constructing
 the binding for other \sml compilers (in particular, the \emph{ML Kit
   with Regions} \cite{MLKit-webpage:2003} and \emph{SML.NET}
 \cite{SML.NET-webpage:2003} with \gtksharp). As mentioned above,
-Section~\ref{sec:process}, this is mainly on issue about interfacing
+Section~\ref{sec:process}, this is mainly an issue about interfacing
 to C.
 
 This potential for compiler independence sets the present binding
