@@ -1,3 +1,15 @@
+2000-06-19  Henning Niss  <hniss@diku.dk>
+
+	* Translate.sml and TypeExp.sml: Now using convenience bindings
+	for long names:
+	    structure A  = AST
+	    structure U  = Util
+	    structure TE = TypeExp
+	    structure TI = TypeInfo
+	    structure NU = NameUtil
+        I have been wanting to do this for quite a while, but mosml
+	wouldn't let me :-)
+	
 2000-06-18  Henning Niss  <hniss@diku.dk>
 
 	* Translate.sml (et al): Moved the construction of function types
