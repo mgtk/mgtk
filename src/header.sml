@@ -144,6 +144,10 @@ struct
 	                   = app4(symb"mgtk_signal_connect")
         val timeout_add_ : int -> int -> int
                          = app2(symb"mgtk_gtk_timeout_add")
+        val idle_add_ : int -> int -> int
+                      = app2(symb"mgtk_gtk_idle_add")
+        val get_g_priority_ : unit -> int * int * int * int * int
+                            = app1(symb"mgtk_get_g_priority")
     in
     datatype state = S of GtkArgs * int * int
     type ('a, 'b) trans   = 'a * state -> 'b * state
@@ -220,6 +224,22 @@ struct
         end
 
     val timeout_remove : int -> unit = app1(symb"mgtk_gtk_timeout_remove") 
+
+    type priority = int
+    type idle_id = int
+
+    val (G_PRIORITY_HIGH, G_PRIORITY_DEFAULT, G_PRIORITY_HIGH_IDLE,
+         G_PRIORITY_DEFAULT_IDLE, G_PRIORITY_LOW) = get_g_priority_ ()
+
+    fun idle_add_priority priority f =
+        let fun wrap (_, arg, max) = setBool arg max (f())
+            val id = register wrap
+        in  idle_add_ priority id
+        end
+
+    fun idle_add f = idle_add_priority G_PRIORITY_DEFAULT_IDLE f
+
+    val idle_remove : int -> unit = app1(symb"mgtk_gtk_idle_remove") 
 
     end	
 

@@ -235,6 +235,29 @@ EXTERNML value mgtk_gtk_timeout_remove(value id) {
   return Val_unit;
 }
 
+EXTERNML value mgtk_gtk_idle_add(value priority, value clb) {
+  guint result;
+  result = gtk_idle_add_full (Int_val(priority), NULL,
+                              mgtk_callback_dispatch, (void*) clb,
+                              mgtk_callback_destroy);
+  return Val_long(result);  
+}
+
+EXTERNML value mgtk_gtk_idle_remove(value id) {
+  gtk_idle_remove (Int_val(id));
+  return Val_unit;
+}
+
+
+EXTERNML value mgtk_get_g_priority (value dummy) { /* ML */
+  value res = alloc_tuple(5);
+  Field(res,0) = Val_int(G_PRIORITY_HIGH);
+  Field(res,1) = Val_int(G_PRIORITY_DEFAULT); 
+  Field(res,2) = Val_int(G_PRIORITY_HIGH_IDLE);
+  Field(res,3) = Val_int(G_PRIORITY_DEFAULT_IDLE); 
+  Field(res,4) = Val_int(G_PRIORITY_LOW);
+  return res;
+}
 
 
 /* *** Convertion from ML to C *** */

@@ -39,6 +39,19 @@ sig
     val timeout_add : int -> (unit -> bool) -> timeout_id
     val timeout_remove : timeout_id -> unit
 
+    type idle_id
+    type priority = int
+    val idle_add : (unit -> bool) -> idle_id
+    val idle_add_priority : priority -> (unit -> bool) -> idle_id
+
+    val G_PRIORITY_HIGH : priority
+    val G_PRIORITY_DEFAULT : priority 
+    val G_PRIORITY_HIGH_IDLE : priority
+    val G_PRIORITY_DEFAULT_IDLE : priority 
+    val G_PRIORITY_LOW : priority
+
+
+
     type base
     type 'a widget_t
     type 'a GtkWidget = 'a widget_t GtkObject
