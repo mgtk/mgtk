@@ -18,6 +18,12 @@ Milestone 2 (release version 1.0):
   + Type hacks
 
 
+Postpone for after version 1.0:
+-------------------------------
+* Split Gtk.s{ig,ml} into many files
+* Start to look at Gnome stuff
+
+
 
 Milestone in some distant future:
 ---------------------------------
