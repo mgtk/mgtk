@@ -24,7 +24,7 @@ REGTRS=$(REGDIR)/trusted
 
 REGFILES=$(notdir $(wildcard $(REGIN)/*.defs))
 
-REGOPTS=--separate-struct -q $(OPTIONS)
+REGOPTS=--separate-struct -tl Gtk -q $(OPTIONS)
 REGOPTSMOS=$(REGOPTS)
 REGOPTSMLTON=--mlton $(REGOPTS)
 

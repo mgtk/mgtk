@@ -37,6 +37,9 @@ fun main () =
 	val smlPreamble = ref NONE
 	fun setSMLPreamble f = smlPreamble := SOME f
 
+	val toplevel = ref NONE
+	fun setToplevel tl = toplevel := SOME tl
+
         (* input and output files *)
 	val file = ref NONE
 	fun setFile f = file := SOME f
@@ -74,6 +77,7 @@ fun main () =
 		   , ("-bo", ArgParse.String setOutFileBase)
 		   , ("-cp", ArgParse.String setCPreamble)
 		   , ("-sp", ArgParse.String setSMLPreamble)
+		   , ("-tl", ArgParse.String setToplevel)
 		   , ("-q",  ArgParse.Unit   MsgUtil.quiet)
 		   , ("-v",  ArgParse.Unit   (inc verbosity))
 		   , ("--mlton",  ArgParse.Unit   (fn () => forMLton := true))
@@ -94,7 +98,9 @@ fun main () =
 		    MsgUtil.close "done\n")
 	val _ = MsgUtil.print ("Defs file with " ^ Int.toString (List.length defs) ^ " definitions\n")
 
-	val toplevel = Name.capitalize(Path.base(Path.file (getFile())))
+	val toplevel = case !toplevel of
+			   NONE => Name.capitalize(Path.base(Path.file (getFile())))
+			 | SOME tl => tl
 
         (* 2. Build modules and exclude items*)
 	val api = FromDefs.fromDefs toplevel defs

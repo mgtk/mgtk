@@ -15,8 +15,6 @@
 structure ArgParse :> ArgParse =
 struct
 
-open BasicIO
-
 exception Bad of string
 
 datatype spec =
