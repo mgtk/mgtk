@@ -138,7 +138,7 @@ The \gtk library itself only contains widgets, but it is built on a
 number of useful libraries, to which it is often associated. The main
 ones are~\cite{gtk-reference-manual}:
 \begin{description}
-\item[Glib] A general-purpose utility library, not specific to
+\item[GLib] A general-purpose utility library, not specific to
   graphical user interfaces. GLib provides many useful data types,
   macros, type conversions, string utilities, file utilities, and so
   on.
@@ -175,7 +175,7 @@ However, in this paper we are concentrating on the widgets only.
 \subsection{Overview of this paper}
 \label{sec:overview-this-paper}
 
-The rest of this paper is organised as follows.
+The rest of this paper is organized as follows.
 Section~\ref{sec:brief-intr-sml} gives a brief introduction to \sml.
 Section~\ref{sec:example} shows a ``Hello World'' example using \mgtk.
 Section~\ref{sec:encoding-classes} explains how a single-inheritance
@@ -192,7 +192,7 @@ Section~\ref{sec:conclusion} concludes.
 \section{Brief Introduction to \sml{}}
 \label{sec:brief-intr-sml}
 
-This section gives a breif overview of some of the main features of
+This section gives a brief overview of some of the main features of
 \sml{}.  It is not enough to use the language to make real programs,
 but it should be sufficient to get an understanding of the examples in
 the rest of the paper.  We refer the interested reader to one of the
@@ -280,7 +280,7 @@ satisfies (implements) the signature !STACK! must declare a type named
 !stack! and that this type is parameterized.  The !'a! is a \emph{type
   variable} and this is what makes the type parameterized.  Type
 variables can be instantiated to other types.  Thus, the type of a
-stack of intergers is !int stack!, the type of a stack of integer
+stack of integers is !int stack!, the type of a stack of integer
 stacks is !int stack stack!, and so on. Type variables are at the core of
 \emph{parametric polymorphism} (also known as generics in, for
 example, C++ and Java; see \cite{garcia03:generics} for a comparison
@@ -293,7 +293,7 @@ The exception specification just states that an exception named
 
 The first value specification says that a constant named !empty! must
 be declared and that this constant must have type !'a stack!.  That
-is, !empty! is a \emph{polymophic} value, it can be used in contexts
+is, !empty! is a \emph{polymorphic} value, it can be used in contexts
 where an \texttt{int stack} is needed or in contexts where a
 !int stack stack! is needed.  The next value specification states that a
 function named !push! must be implemented, and that this function
@@ -301,7 +301,7 @@ takes two arguments: an element and a stack, and returns a stack.
 Again, we see how type variables are used to specify that !push! must
 work with stacks where the elements can have any type.  The last value
 specification states that a function named !pop! must be implemented,
-and that !pop!  takes a stack as argument and returs an element and a
+and that !pop!  takes a stack as argument and returns an element and a
 new stack.
 
 Figure~\ref{fig:stack-struct} shows the code of the implementation, that is a
@@ -323,11 +323,11 @@ The exception declaration !exception EmptyStack! just declares an
 exception.
 
 The next declaration states that !empty! is bound to !Empty!.  The
-function !push! just applies the constructor !Stack! to its argumets.
+function !push! just applies the constructor !Stack! to its arguments.
 The function !pop! is more interesting, it takes a stack as argument
 (here we have reused the name !stack! as types and values uses
 different namespaces, thus the same name can be used for both a type
-and a value) and then uses a !case! expression to analyse its argument.
+and a value) and then uses a !case! expression to analyze its argument.
 If the argument is the empty stack (the constant !Empty!) then the
 exception !EmptyStack! is raised (thrown); otherwise, if the argument
 has been constructed with !Stack! applied to the arguments !top! and
@@ -415,7 +415,7 @@ sequentialized using \texttt{;}.  The value \texttt{()}, the nullary
 tuple of type \texttt{unit}, can be used as the return value of purely
 side-effecting functions.  Finally, in \sml, the double-colon \texttt{::}
 denotes the cons operation on lists.  That is, to add an element $x$
-to the begining of a list $\mathit{xs}$ we write $x \texttt{::}
+to the beginning of a list $\mathit{xs}$ we write $x \texttt{::}
 \mathit{xs}$ (in contrast to C++ where double-colon is the module operator).
 
 %% FIXME
@@ -508,7 +508,7 @@ class type has a corresponding \sml type; the encoding is
 \emph{complete}, meaning that all that is allowed by the class
 hierarchy is also allowed by the encoding; and the encoding is
 \emph{sound}, meaning that all that is disallowed by the class
-hierarch is also disallowed by the encoding.  The last property is
+hierarchy is also disallowed by the encoding.  The last property is
 also called type-safety.  In type-theoretical jargon, the trick is to
 use parametric polymorphism and \emph{existential types} to encode
 inheritance subtyping.  In particular we use \emph{phantom types} to
@@ -582,7 +582,7 @@ This is the juicy bits of the encoding, because this is really what
 makes it possible to encode single-inheritance class hierarchies in
 \sml.  Unfortunately, this is also the hardest part of the encoding to
 understand.  Our experience is that you have to work a bit with some
-code to realy comprehend the trick.
+code to really comprehend the trick.
 
 
 %% \begin{ednote}{Bart}
@@ -611,7 +611,7 @@ Similar the type for the method !set_title! from class
 val set_title : 'path window -> string 
                                -> unit
 \end{SMLcode}
-That is, !foo! takes two arguments: an object of type 
+That is, !set_title! takes two arguments: an object of type 
 \classname{Window} and a string, and returns !unit!.
 
 
@@ -849,7 +849,7 @@ The encoding of the \gtk class hierarchy in the \sml type system in
 Section~\ref{sec:encoding-classes} is \emph{the} core aspect of the
 binding. As the encoding stays within the language as defined in the
 Definition~\cite{Milner:1997:Definition}, this aspect of the binding
-remains the same for all \sml compilers comforming to the Definition.
+remains the same for all \sml compilers conforming to the Definition.
 In other words, the interface exposed to the application programmer is
 the same across all compilers.
 %
@@ -877,7 +877,7 @@ system?  You need to cite [10] much earlier in the paper,
 and make it clear that you are not the only ones to use
 phantom types for this task.  In particular, I don't see how
 the claim that "the encoding of a single inheritance
-heirarchy as above is [new]." can be true, given that [10]
+hierarchy as above is [new]." can be true, given that [10]
 appears to have a very similar system.  Do you predate this
 work?
 
