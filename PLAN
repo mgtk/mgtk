@@ -1,4 +1,20 @@
-Milestone 1 (alpha 0.02):
+-*- indented-text -*-
+
+Milestone 1 (red-hens alpha 0.02):
+----------------------------------
+* gtk_init fix (Ken)
+* Signals
+* Error handling, can catch gtk+ errors and convert them to
+  exceptions? (Henning)
+
+
+Milestone 2 (release version 1.0):
+----------------------------------
+* Release at most one week later than mosml 2.0
+* Documentation
+  + Tutorial
+  + mgtkgen
+  + Type hacks
 
 
 
@@ -8,4 +24,4 @@ Milestone in some distant future:
 
 
 
--*- indented-text -*-
+
