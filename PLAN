@@ -3,6 +3,7 @@
 Milestone 1 (red-hens alpha 0.02):
 ----------------------------------
 v gtk_init fix (Ken) [May 1, 2000]
+  + Make a better gtk_init fix (Ken)
 * Signals
   v What to do about duplicate signals (especially "activate" on menu
     items is missing). [Fixed (Henning, May 31, 2000). Such signals,
