@@ -57,17 +57,24 @@ cp $SRC/mgtk.c mgtk-alpha
 
 echo Copying examples ...
 cp $EXAMPLES/README mgtk-alpha/examples
-cp $EXAMPLES/Makefile mgtk-alpha/examples
 cp $EXAMPLES/Makefile.w32 mgtk-alpha/examples
 cp $EXAMPLES/*.sig mgtk-alpha/examples
 cp $EXAMPLES/*.sml mgtk-alpha/examples
+#   We have to treat the Makefile specially since it
+#   refers to the ../src/Makefile.inc
+#   Wont do: cp $EXAMPLES/Makefile mgtk-alpha/examples
+sed 's/^include.*Makefile\.inc$/include ..\/Makefile.inc/' $EXAMPLES/Makefile > mgtk-alpha/examples/Makefile
 
 echo Copying mosIDE ...
 cp $MOSIDE/README mgtk-alpha/examples/moside
-cp $MOSIDE/Makefile mgtk-alpha/examples/moside
 cp $MOSIDE/*.sig mgtk-alpha/examples/moside
 cp $MOSIDE/*.sml mgtk-alpha/examples/moside
 cp $MOSIDE/*.c mgtk-alpha/examples/moside
+#   We have to treat the Makefile specially since it
+#   refers to the ../src/Makefile.inc
+#   Wont do: cp $MOSIDE/Makefile mgtk-alpha/examples/moside
+sed 's/^include.*Makefile\.inc$/include ..\/..\/Makefile.inc/' $MOSIDE/Makefile > mgtk-alpha/examples/moside/Makefile
+
 
 echo Constructing .tar.gz file ...
 tar cf $TARFILE mgtk-alpha/
