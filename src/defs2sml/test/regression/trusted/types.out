@@ -22,14 +22,14 @@ structure Gtk  = struct
     val accel_groups_activate : 'a GObject.t -> int -> int -> bool
 	= fn object => fn accel_key => fn accel_mods =>
 	     accel_groups_activate_ (repr object) accel_key accel_mods
-    signature Settings = sig
+    structure Settings :>
+      sig
 	type base
 	type 'a settings_t
 	type 'a t = 'a settings_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toSettings : 'a t -> base t
-    end
-    structure Settings :> Settings = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -44,14 +44,14 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toSettings obj = inherit () (fn () => repr obj)
     end
-    signature Style = sig
+    structure Style :>
+      sig
 	type base
 	type 'a style_t
 	type 'a t = 'a style_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toStyle : 'a t -> base t
-    end
-    structure Style :> Style = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -66,7 +66,8 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toStyle obj = inherit () (fn () => repr obj)
     end
-    signature RcStyle = sig
+    structure RcStyle :>
+      sig
 	type base
 	type 'a rcstyle_t
 	type 'a t = 'a rcstyle_t GObject.t
@@ -74,8 +75,7 @@ structure Gtk  = struct
 	val toRcStyle : 'a t -> base t
 	val rc_get_style_by_paths
 	  : 'a Settings.t -> string -> string -> int -> base Style.t
-    end
-    structure RcStyle :> RcStyle = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -99,14 +99,14 @@ structure Gtk  = struct
 		   (fn () => rc_get_style_by_paths_
 			       (repr settings) widget_path class_path typ)
     end
-    signature Object = sig
+    structure Object :>
+      sig
 	type base
 	type 'a object_t
 	type 'a t = 'a object_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toObject : 'a t -> base t
-    end
-    structure Object :> Object = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -121,15 +121,15 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
-    signature Widget = sig
+    structure Widget :>
+      sig
 	type base
 	type 'a widget_t
 	type 'a t = 'a widget_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWidget : 'a t -> base t
 	val modify_style : 'a t -> 'b RcStyle.t -> unit
-    end
-    structure Widget :> Widget = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -148,7 +148,8 @@ structure Gtk  = struct
 	val modify_style : 'a t -> 'b RcStyle.t -> unit
 	    = fn self => fn style => modify_style_ (repr self) (repr style)
     end
-    signature Calendar = sig
+    structure Calendar :>
+      sig
 	type base
 	type 'a calendar_t
 	type 'a t = 'a calendar_t Widget.t
@@ -162,8 +163,7 @@ structure Gtk  = struct
 	val WEEK_START_MONDAY : display_options
 	val display_options : 'a t -> display_options list -> unit
 	val get_display_options : 'a t -> display_options list
-    end
-    structure Calendar :> Calendar = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr

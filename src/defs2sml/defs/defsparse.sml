@@ -1,13 +1,7 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
 
-structure DefsParse :>
-    sig
-	val addPath : string -> unit (* add a path to the list of directories
-                                        searched when expanding includes *)
-	val parseFile : string -> Defs.definition list
-    end = 
-struct
+structure DefsParse :> DEFSPARSE = struct
 
     val pathList: string list ref = ref []
     fun addPath p = pathList := p :: !(pathList)
@@ -241,9 +235,10 @@ struct
                            -- repeat0 (parens (word -- word)))
 
     val definitions = repeat1 (  function >> SOME || method >> SOME 
-                              || object >> SOME || boxed >> SOME
-                              || enum >> SOME || signal >> SOME
-                              || property |> NONE)
+                              || object   >> SOME || boxed >> SOME
+                              || enum     >> SOME || signal >> SOME
+                              || property |> NONE
+                              )
                           --% EOF_T
                       >> (List.mapPartial id o (op::))
 
@@ -254,6 +249,37 @@ struct
 	in  case definitions lexed of
 		SOME(res, _) => res
 	      | NONE => raise Fail("parsing failed")
+	end
+
+
+    val exclude = parens ("metadata-exclude" &-- parens (repeat1 word))
+                         >> (MetaExclude o op::)
+
+    val argOverrides = parens (  "param" &-- defWord -- typeExp >> ParamOverride
+                              || "return-type" &-- typeExp >> ReturnOverride
+                              )
+    val override =  
+	parens ( "metadata-override" &-- defWord 
+		 -- (repeat1 argOverrides >> (op::)) ) >> MetaOverride
+
+(*
+    val metaTypeAttribs =
+        (  
+    val declaredtype = 
+	parens ("metadata-type" &-- defWord -- metaTypeAttribs) >> MetaType
+*)
+
+    val metadata = repeat1 (  exclude || override
+                       ) --% EOF_T
+                   >> (op ::)
+
+    fun parseMetadataFile file =
+	let val stream = toStream file
+	    val included = includer stream
+	    val lexed = lexer included
+	in  case metadata lexed of
+		SOME(res, _) => res
+	      | NONE => raise Fail("metadata parsing failed")
 	end
 
 end (* structure DefsParse *)

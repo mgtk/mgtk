@@ -1,14 +1,11 @@
-signature GtkBasis =
-sig
+structure GtkBasis :> 
+  sig
     val init : string list -> string list
     val main : unit -> unit
     val main_quit : unit -> unit
 
     val symb : string -> Dynlib.symHandle
-end
-
-structure GtkBasis :> GtkBasis =
-struct
+  end = struct
     open Dynlib
     local 
         val path = case Process.getEnv "MGTKHOME" of
@@ -36,9 +33,8 @@ struct
     val main_quit : unit -> unit = app1(symb "mgtk_main_quit")
 end
 
-
-signature GObject =
-sig
+structure GObject :>
+  sig
     type cptr
     type base
     type 'a t
@@ -49,12 +45,7 @@ sig
     val repr     : 'a t -> cptr
     val inherit  : 'a -> constructor -> 'a t
     val toObject : 'a t -> base t
-
-end
-
-
-structure GObject :> GObject =
-struct
+  end = struct
     prim_type cptr
     type base = unit
 
@@ -70,8 +61,8 @@ struct
 
 end
 
-signature Signal =
-sig
+structure Signal :>
+  sig
     type state
     type 'a t = 'a GObject.t
 
@@ -105,11 +96,7 @@ sig
     val signal  : string -> bool -> ('b -> 'c) return -> ('b -> 'c) ->
                                                   'a t signal
     val connect : 'a t -> 'a t signal -> signal_id
-end
-
-
-structure Signal :> Signal =
-struct
+  end = struct
     type 'a t = 'a GObject.t
     local
         structure GO = GObject
@@ -239,15 +226,14 @@ struct
     end 
 end
 
-signature Flags = sig
+structure Flags :>
+  sig
     val setGeneral : int -> int list -> int list -> int 
     val set : int list -> int
     val get : int -> int list
     val isSet : int list -> int -> int list
     val areTheseSet : int list -> int -> bool
-end
-
-structure Flags = struct
+  end = struct
     (* convert a list of flags to a word *)
     infix orb andb
     val notb = Word.notb 

@@ -1,5 +1,7 @@
 (* An example adopted from "Mono: A Developers Notebook" *)
 
+open Gtk
+
 fun delete_event _ = ( GtkBasis.main_quit()
 		     ; true
                      )

@@ -1,14 +1,14 @@
 structure Gtk  = struct
     
     type cptr = GObject.cptr
-    signature Object = sig
+    structure Object :>
+      sig
 	type base
 	type 'a object_t
 	type 'a t = 'a object_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toObject : 'a t -> base t
-    end
-    structure Object :> Object = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a object_t = unit
@@ -21,7 +21,8 @@ structure Gtk  = struct
 	fun toObject obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature CellRenderer = sig
+    structure CellRenderer :>
+      sig
 	type base
 	type 'a cellrenderer_t
 	type 'a t = 'a cellrenderer_t Object.t
@@ -29,8 +30,7 @@ structure Gtk  = struct
 	val toCellRenderer : 'a t -> base t
 	val get_type : unit -> int
 	val set_fixed_size : 'a t -> int -> int -> unit
-    end
-    structure CellRenderer :> CellRenderer = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a cellrenderer_t = unit

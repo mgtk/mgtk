@@ -104,4 +104,12 @@ structure Defs = struct
 	              (fn (Implements n) => SOME n | _ => NONE) atts
 	end
 
+    datatype override =
+	ParamOverride of string * string
+      | ReturnOverride of string
+
+    datatype metadata =
+	MetaExclude of string list
+      | MetaOverride of string * override list
+
 end (* structure Defs *)

@@ -1,3 +1,6 @@
+local open Gtk
+in
+
 fun hello _ = print "Hello World\n"
 
 fun main () =
@@ -12,5 +15,6 @@ fun main () =
       ; GtkBasis.main() 
     end
 
+end
 
 val _ = main()

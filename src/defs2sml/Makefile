@@ -88,7 +88,7 @@ mgtk-mlton.c mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs
 	./$(MAIN) $(DEFSOPTSMLTON) $(DEFSOPTS)
 
 mosml: $(MAIN) mgtk.c mgtk.sml
-	mosmlc -toplevel -liberal -c mgtk.sml
+	mosmlc -toplevel -c mgtk.sml
 	gcc $(CINCLUDE) -c mgtk.c
 
 MLTONHOME=/usr/lib/mlton

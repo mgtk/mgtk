@@ -21,9 +21,6 @@ mlton: helloworld-mlton buttons-galore-mlton signup-mlton
 mgtk.uo mgtk.ui: mgtk.sml
 	$(MOSMLBIN)/mosmlc -c -toplevel mgtk.sml
 
-%: %.sml mgtk.ui mgtk.uo
-	$(MOSMLBIN)/mosmlc -o $* mgtk.ui $*.sml
-
 mgtk.so: mgtk.o
 	gcc -shared -o mgtk.so mgtk.o `pkg-config --libs gtk+-2.0`
 
@@ -31,14 +28,19 @@ mgtk.o: mgtk.c
 	gcc -c -O3 -fPIC -Wall -Dunix -I$(MOSMLRUNTIME) \
 	                              `pkg-config --cflags gtk+-2.0` mgtk.c 
 
+%: %.sml mgtk.ui mgtk.uo
+	$(MOSMLBIN)/mosmlc -o $* mgtk.ui $*.sml
+
+
 # MLton stuff
 mgtk-mlton.o: mgtk-mlton.c
 	gcc -c -O2 -I$(MLTONINCLUDE) `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
 #%-mlton: %-mlton.cm mgtk-mlton.o \
 #                      $(shell mlton -stop f %-mlton.cm)
-#	$(MLTONBIN)/mlton -output %-mlton \
-#			  -link-opt "`pkg-config --libs-only-l gtk+-2.0`" \
-#	                  $*-mlton.cm mgtk-mlton.o
+%-mlton: %-mlton.cm mgtk-mlton.o 
+	$(MLTONBIN)/mlton -output $*-mlton \
+			  -link-opt "`pkg-config --libs-only-l gtk+-2.0`" \
+	                  $*-mlton.cm mgtk-mlton.o
 
 # cleaning
 clean:

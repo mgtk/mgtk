@@ -4,13 +4,14 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    structure Object :> sig
-			    type base
-			    type 'a object_t
-			    type 'a t = 'a object_t GObject.t
-			    val inherit : 'a -> GObject.constructor -> 'a t
-			    val toObject : 'a t -> base t
-			end = struct
+    structure Object :>
+      sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -27,19 +28,19 @@ structure Gtk  = struct
     end
     structure Widget :>
       sig
-	  type base
-	  type 'a widget_t
-	  type 'a t = 'a widget_t Object.t
-	  val inherit : 'a -> GObject.constructor -> 'a t
-	  val toWidget : 'a t -> base t
-	  val destroy : 'a t -> unit
-	  val show : 'a t -> unit
-	  val show_now : 'a t -> unit
-	  val hide : 'a t -> unit
-	  val show_all : 'a t -> unit
-	  val hide_all : 'a t -> unit
-	  val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
-	  val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+	val destroy : 'a t -> unit
+	val show : 'a t -> unit
+	val show_now : 'a t -> unit
+	val hide : 'a t -> unit
+	val show_all : 'a t -> unit
+	val hide_all : 'a t -> unit
+	val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+	val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -74,17 +75,18 @@ structure Gtk  = struct
 	       = fn f => signal "destroy-event" false (unit --> return_bool) f
 	end
     end
-    structure Container :> sig
-			       type base
-			       type 'a container_t
-			       type 'a t = 'a container_t Widget.t
-			       val inherit : 'a -> GObject.constructor -> 'a t
-			       val toContainer : 'a t -> base t
-			       val set_border_width : 'a t -> int -> unit
-			       val get_border_width : 'a t -> int
-			       val add : 'a t -> 'b Widget.t -> unit
-			       val remove : 'a t -> 'b Widget.t -> unit
-			   end = struct
+    structure Container :>
+      sig
+	type base
+	type 'a container_t
+	type 'a t = 'a container_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toContainer : 'a t -> base t
+	val set_border_width : 'a t -> int -> unit
+	val get_border_width : 'a t -> int
+	val add : 'a t -> 'b Widget.t -> unit
+	val remove : 'a t -> 'b Widget.t -> unit
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -115,13 +117,14 @@ structure Gtk  = struct
 	val remove : 'a t -> 'b Widget.t -> unit
 	    = fn self => fn widget => remove_ (repr self) (repr widget)
     end
-    structure Bin :> sig
-			 type base
-			 type 'a bin_t
-			 type 'a t = 'a bin_t Container.t
-			 val inherit : 'a -> GObject.constructor -> 'a t
-			 val toBin : 'a t -> base t
-		     end = struct
+    structure Bin :>
+      sig
+	type base
+	type 'a bin_t
+	type 'a t = 'a bin_t Container.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toBin : 'a t -> base t
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -136,19 +139,19 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toBin obj = inherit () (fn () => repr obj)
     end
-    structure Window :> sig
-			    type base
-			    type 'a window_t
-			    type 'a t = 'a window_t Bin.t
-			    val inherit : 'a -> GObject.constructor -> 'a t
-			    val toWindow : 'a t -> base t
-			    type type_t
-			    val TOPLEVEL : type_t
-			    val POPUP : type_t
-			    val new : type_t option -> base t
-			    val new' : unit -> base t
-			    val get_size : 'a t -> int * int
-			end = struct
+    structure Window :>
+      sig
+	type base
+	type 'a window_t
+	type 'a t = 'a window_t Bin.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWindow : 'a t -> base t
+	type type_t
+	val TOPLEVEL : type_t
+	val POPUP : type_t
+	val new : type_t option -> base t
+	val new' : unit -> base t
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -170,27 +173,20 @@ structure Gtk  = struct
 	val new : type_t option -> base t
 	    = fn typ => make (new_ (getOpt (typ, TOPLEVEL)))
 	val new' : unit -> base t = fn dummy => make (new_ TOPLEVEL)
-	val get_size_ : cptr -> int ref -> int ref -> unit
-	    = app3 (symb"mgtk_gtk_window_get_size")
-	val get_size : 'a t -> int * int
-	    = fn self => let val (width, height) = (ref 0, ref 0)
-			 in get_size_ (repr self) width height
-			  ; (!width, !height)
-			 end
     end
     structure Button :>
       sig
-	  type base
-	  type 'a button_t
-	  type 'a t = 'a button_t Bin.t
-	  val inherit : 'a -> GObject.constructor -> 'a t
-	  val toButton : 'a t -> base t
-	  val get_type : unit -> int
-	  val new : unit -> base t
-	  val new_with_label : string -> base t
-	  val set_label : 'a t -> string -> unit
-	  val get_label : 'a t -> string
-	  val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+	type base
+	type 'a button_t
+	type 'a t = 'a button_t Bin.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toButton : 'a t -> base t
+	val get_type : unit -> int
+	val new : unit -> base t
+	val new_with_label : string -> base t
+	val set_label : 'a t -> string -> unit
+	val get_label : 'a t -> string
+	val clicked_sig : (unit -> unit) -> 'a t Signal.signal
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -226,14 +222,15 @@ structure Gtk  = struct
 	       = fn f => signal "clicked" false (void --> return_void) f
 	end
     end
-    structure Editable :> sig
-			      type base
-			      type 'a editable_t
-			      type 'a t = 'a editable_t GObject.t
-			      val inherit : 'a -> GObject.constructor -> 'a t
-			      val toEditable : 'a t -> base t
-			      val get_chars : 'a t -> int -> int -> string
-			  end = struct
+    structure Editable :>
+      sig
+	type base
+	type 'a editable_t
+	type 'a t = 'a editable_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toEditable : 'a t -> base t
+	val get_chars : 'a t -> int -> int -> string
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -255,11 +252,11 @@ structure Gtk  = struct
     end
     structure CellEditable :>
       sig
-	  type base
-	  type 'a celleditable_t
-	  type 'a t = 'a celleditable_t GObject.t
-	  val inherit : 'a -> GObject.constructor -> 'a t
-	  val toCellEditable : 'a t -> base t
+	type base
+	type 'a celleditable_t
+	type 'a t = 'a celleditable_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toCellEditable : 'a t -> base t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -277,12 +274,12 @@ structure Gtk  = struct
     end
     structure Entry :>
       sig
-	  type base
-	  type 'a entry_t
-	  type 'a t = 'a entry_t Editable.t CellEditable.t Widget.t
-	  val inherit : 'a -> GObject.constructor -> 'a t
-	  val toEntry : 'a t -> base t
-	  val get_text : 'a t -> string
+	type base
+	type 'a entry_t
+	type 'a t = 'a entry_t Editable.t CellEditable.t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toEntry : 'a t -> base t
+	val get_text : 'a t -> string
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -302,13 +299,14 @@ structure Gtk  = struct
 	val get_text_ : cptr -> string = app1 (symb"mgtk_gtk_entry_get_text")
 	val get_text : 'a t -> string = fn self => get_text_ (repr self)
     end
-    structure Misc :> sig
-			  type base
-			  type 'a misc_t
-			  type 'a t = 'a misc_t Widget.t
-			  val inherit : 'a -> GObject.constructor -> 'a t
-			  val toMisc : 'a t -> base t
-		      end = struct
+    structure Misc :>
+      sig
+	type base
+	type 'a misc_t
+	type 'a t = 'a misc_t Widget.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toMisc : 'a t -> base t
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -323,15 +321,16 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toMisc obj = inherit () (fn () => repr obj)
     end
-    structure Label :> sig
-			   type base
-			   type 'a label_t
-			   type 'a t = 'a label_t Misc.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toLabel : 'a t -> base t
-			   val new : string option -> base t
-			   val new' : unit -> base t
-		       end = struct
+    structure Label :>
+      sig
+	type base
+	type 'a label_t
+	type 'a t = 'a label_t Misc.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toLabel : 'a t -> base t
+	val new : string option -> base t
+	val new' : unit -> base t
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -439,16 +438,6 @@ EXTERNML value mgtk_get_gtk_window_type(value dummy) { /* ML */
 /* ML type: int -> cptr */
 EXTERNML value mgtk_gtk_window_new(value type) { /* ML */
     return Val_GtkObj(gtk_window_new(Int_val(type)));
-}
-
-/* ML type: cptr -> int ref -> int ref -> unit */
-EXTERNML value mgtk_gtk_window_get_size(value self, value width_ref, value height_ref) { /* ML */
-    int width = Int_val(GetRefVal(width_ref));
-    int height = Int_val(GetRefVal(height_ref));
-    gtk_window_get_size(GtkObj_val(self), &(width), &(height));
-    SetRefVal(width_ref, Val_int(width));
-    SetRefVal(height_ref, Val_int(height));
-    return Val_unit;
 }
 
 

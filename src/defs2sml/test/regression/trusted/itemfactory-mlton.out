@@ -1,14 +1,14 @@
 structure Gtk  = struct
     
     type cptr = GObject.cptr
-    signature Object = sig
+    structure Object :>
+      sig
 	type base
 	type 'a object_t
 	type 'a t = 'a object_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toObject : 'a t -> base t
-    end
-    structure Object :> Object = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a object_t = unit
@@ -21,14 +21,14 @@ structure Gtk  = struct
 	fun toObject obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature Widget = sig
+    structure Widget :>
+      sig
 	type base
 	type 'a widget_t
 	type 'a t = 'a widget_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWidget : 'a t -> base t
-    end
-    structure Widget :> Widget = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a widget_t = unit
@@ -41,7 +41,8 @@ structure Gtk  = struct
 	fun toWidget obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature ItemFactory = sig
+    structure ItemFactory :>
+      sig
 	type base
 	type 'a itemfactory_t
 	type 'a t = 'a itemfactory_t Object.t
@@ -49,8 +50,7 @@ structure Gtk  = struct
 	val toItemFactory : 'a t -> base t
 	val get_item : 'a t -> string -> base Widget.t
 	val get_widget : 'a t -> string -> base Widget.t
-    end
-    structure ItemFactory :> ItemFactory = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a itemfactory_t = unit

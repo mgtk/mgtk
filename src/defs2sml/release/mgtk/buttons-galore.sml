@@ -1,3 +1,5 @@
+open Gtk
+
 fun say s _ = print (s^"\n")
 
 fun delete_event _ = ( say "delete event occurred" ()

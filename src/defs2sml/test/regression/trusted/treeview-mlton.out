@@ -1,14 +1,14 @@
 structure Gtk  = struct
     
     type cptr = GObject.cptr
-    signature Object = sig
+    structure Object :>
+      sig
 	type base
 	type 'a object_t
 	type 'a t = 'a object_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toObject : 'a t -> base t
-    end
-    structure Object :> Object = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a object_t = unit
@@ -21,14 +21,14 @@ structure Gtk  = struct
 	fun toObject obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature Widget = sig
+    structure Widget :>
+      sig
 	type base
 	type 'a widget_t
 	type 'a t = 'a widget_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWidget : 'a t -> base t
-    end
-    structure Widget :> Widget = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a widget_t = unit
@@ -41,14 +41,14 @@ structure Gtk  = struct
 	fun toWidget obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature Container = sig
+    structure Container :>
+      sig
 	type base
 	type 'a container_t
 	type 'a t = 'a container_t Widget.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toContainer : 'a t -> base t
-    end
-    structure Container :> Container = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a container_t = unit
@@ -61,14 +61,14 @@ structure Gtk  = struct
 	fun toContainer obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature TreeModel = sig
+    structure TreeModel :>
+      sig
 	type base
 	type 'a treemodel_t
 	type 'a t = 'a treemodel_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTreeModel : 'a t -> base t
-    end
-    structure TreeModel :> TreeModel = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a treemodel_t = unit
@@ -81,7 +81,8 @@ structure Gtk  = struct
 	fun toTreeModel obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature TreeView = sig
+    structure TreeView :>
+      sig
 	type base
 	type 'a treeview_t
 	type 'a t = 'a treeview_t Container.t
@@ -90,8 +91,7 @@ structure Gtk  = struct
 	val get_model : 'a t -> base TreeModel.t
 	val set_model : 'a t -> 'b TreeModel.t option -> unit
 	val set_model' : 'a t -> unit
-    end
-    structure TreeView :> TreeView = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a treeview_t = unit

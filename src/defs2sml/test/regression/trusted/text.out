@@ -5,7 +5,8 @@ structure Gtk  = struct
     val repr = GObject.repr
     val symb = GtkBasis.symb
     type textiter = GObject.cptr
-    signature TextBuffer = sig
+    structure TextBuffer :>
+      sig
 	type base
 	type 'a textbuffer_t
 	type 'a t = 'a textbuffer_t GObject.t
@@ -13,8 +14,7 @@ structure Gtk  = struct
 	val toTextBuffer : 'a t -> base t
 	val insert : 'a t -> textiter -> string -> int option -> unit
 	val insert' : 'a t -> textiter -> string -> unit
-    end
-    structure TextBuffer :> TextBuffer = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr

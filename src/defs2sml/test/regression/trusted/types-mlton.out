@@ -31,14 +31,14 @@ structure Gtk  = struct
 	     GObject.withPtr (object, 
 			      fn object => accel_groups_activate_
 					     (object, accel_key, accel_mods))
-    signature Settings = sig
+    structure Settings :>
+      sig
 	type base
 	type 'a settings_t
 	type 'a t = 'a settings_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toSettings : 'a t -> base t
-    end
-    structure Settings :> Settings = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a settings_t = unit
@@ -51,14 +51,14 @@ structure Gtk  = struct
 	fun toSettings obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature Style = sig
+    structure Style :>
+      sig
 	type base
 	type 'a style_t
 	type 'a t = 'a style_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toStyle : 'a t -> base t
-    end
-    structure Style :> Style = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a style_t = unit
@@ -71,7 +71,8 @@ structure Gtk  = struct
 	fun toStyle obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature RcStyle = sig
+    structure RcStyle :>
+      sig
 	type base
 	type 'a rcstyle_t
 	type 'a t = 'a rcstyle_t GObject.t
@@ -79,8 +80,7 @@ structure Gtk  = struct
 	val toRcStyle : 'a t -> base t
 	val rc_get_style_by_paths
 	  : 'a Settings.t -> string -> string -> int -> base Style.t
-    end
-    structure RcStyle :> RcStyle = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a rcstyle_t = unit
@@ -109,14 +109,14 @@ structure Gtk  = struct
 			       (settings, CString.fromString widget_path, 
 				CString.fromString class_path, typ)))
     end
-    signature Object = sig
+    structure Object :>
+      sig
 	type base
 	type 'a object_t
 	type 'a t = 'a object_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toObject : 'a t -> base t
-    end
-    structure Object :> Object = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a object_t = unit
@@ -129,15 +129,15 @@ structure Gtk  = struct
 	fun toObject obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature Widget = sig
+    structure Widget :>
+      sig
 	type base
 	type 'a widget_t
 	type 'a t = 'a widget_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWidget : 'a t -> base t
 	val modify_style : 'a t -> 'b RcStyle.t -> unit
-    end
-    structure Widget :> Widget = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a widget_t = unit
@@ -159,7 +159,8 @@ structure Gtk  = struct
 		       GObject.withPtr
 			 (style, fn style => modify_style_ (self, style)))
     end
-    signature Calendar = sig
+    structure Calendar :>
+      sig
 	type base
 	type 'a calendar_t
 	type 'a t = 'a calendar_t Widget.t
@@ -173,8 +174,7 @@ structure Gtk  = struct
 	val WEEK_START_MONDAY : display_options
 	val display_options : 'a t -> display_options list -> unit
 	val get_display_options : 'a t -> display_options list
-    end
-    structure Calendar :> Calendar = struct
+      end = struct
 	type cptr = GObject.cptr
 	type base = unit
 	type 'a calendar_t = unit

@@ -4,14 +4,14 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    signature Object = sig
+    structure Object :>
+      sig
 	type base
 	type 'a object_t
 	type 'a t = 'a object_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toObject : 'a t -> base t
-    end
-    structure Object :> Object = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -26,7 +26,8 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
-    signature CellRenderer = sig
+    structure CellRenderer :>
+      sig
 	type base
 	type 'a cellrenderer_t
 	type 'a t = 'a cellrenderer_t Object.t
@@ -34,8 +35,7 @@ structure Gtk  = struct
 	val toCellRenderer : 'a t -> base t
 	val get_type : unit -> int
 	val set_fixed_size : 'a t -> int -> int -> unit
-    end
-    structure CellRenderer :> CellRenderer = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr

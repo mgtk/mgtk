@@ -4,14 +4,14 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    signature Object = sig
+    structure Object :>
+      sig
 	type base
 	type 'a object_t
 	type 'a t = 'a object_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toObject : 'a t -> base t
-    end
-    structure Object :> Object = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -26,14 +26,14 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
-    signature Widget = sig
+    structure Widget :>
+      sig
 	type base
 	type 'a widget_t
 	type 'a t = 'a widget_t Object.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWidget : 'a t -> base t
-    end
-    structure Widget :> Widget = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -48,14 +48,14 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWidget obj = inherit () (fn () => repr obj)
     end
-    signature Container = sig
+    structure Container :>
+      sig
 	type base
 	type 'a container_t
 	type 'a t = 'a container_t Widget.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toContainer : 'a t -> base t
-    end
-    structure Container :> Container = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -70,14 +70,14 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toContainer obj = inherit () (fn () => repr obj)
     end
-    signature Bin = sig
+    structure Bin :>
+      sig
 	type base
 	type 'a bin_t
 	type 'a t = 'a bin_t Container.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toBin : 'a t -> base t
-    end
-    structure Bin :> Bin = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -92,14 +92,14 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toBin obj = inherit () (fn () => repr obj)
     end
-    signature Window = sig
+    structure Window :>
+      sig
 	type base
 	type 'a window_t
 	type 'a t = 'a window_t Bin.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toWindow : 'a t -> base t
-    end
-    structure Window :> Window = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
@@ -114,7 +114,8 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toWindow obj = inherit () (fn () => repr obj)
     end
-    signature Dialog = sig
+    structure Dialog :>
+      sig
 	type base
 	type 'a dialog_t
 	type 'a t = 'a dialog_t Window.t
@@ -128,8 +129,7 @@ structure Gtk  = struct
 			    -> flags list option -> string option
 			       -> base t
 	val new_with_buttons' : unit -> base t
-    end
-    structure Dialog :> Dialog = struct
+      end = struct
 	open Dynlib
 	type cptr = GObject.cptr
 	val repr = GObject.repr
