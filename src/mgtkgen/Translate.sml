@@ -472,7 +472,7 @@ struct
 
        (3) for SML
 
-           prim_type gdk_font
+           type gdk_font = gpointer
 
     *)
 
@@ -506,7 +506,7 @@ struct
     fun mkMLBoxedDecl name = mkTypeDecl (TypeInfo.mlBoxedTypeName name, NONE) && Nl
 
     fun mkMLBoxedVal name =
-	mkPrimTypeDecl (TypeInfo.mlBoxedTypeName name) && Nl
+	mkTypeDecl (TypeInfo.mlBoxedTypeName name, SOME ($"gpointer")) && Nl
 
 
     (* code to declare enums

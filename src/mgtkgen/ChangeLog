@@ -1,3 +1,10 @@
+2000-04-07  Henning Niss  <hniss@diku.dk>
+
+	* Parse.sml: Minor update to return the position of a syntax
+	error.
+
+	* Lexer.sig, Lexer.sml: ditto.
+
 2000-04-03  Henning Niss  <hniss@diku.dk>
 
 	* Util.sml: Added documentation.

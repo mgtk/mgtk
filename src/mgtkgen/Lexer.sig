@@ -17,6 +17,8 @@ sig
     val scan: (char * int) Stream.stream -> tokenStream
     val get: tokenStream -> (token * tokenStream) option
 
+    val posOf: token -> pos
+
 end
 
 (*
@@ -30,6 +32,8 @@ end
 
    [get stream] returns the first token on the stream and the rest of
    the stream if a token is available, otherwise NONE.
+
+   [posOf token] returns the position of the token.
 
 *)
 

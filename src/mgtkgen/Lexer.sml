@@ -32,6 +32,12 @@ struct
       | toString (WORD(_, s)) = s
       | toString (STRING(_, s)) = "\"" ^ s ^ "\""
 
+    fun posOf (LPAREN p) = p
+      | posOf (RPAREN p) = p
+      | posOf (EQUALS p) = p
+      | posOf (WORD (p,_)) = p
+      | posOf (STRING (p,_)) = p
+
     fun whitespaceChar #" " = true
       | whitespaceChar #"\r" = true
       | whitespaceChar #"\n" = true

@@ -48,6 +48,19 @@ struct
 	end handle Combinators.SyntaxError (msg, fresult) => 
 	                 (showRest msg fresult, NONE)
 
+    local 
+	fun pos strm = Lexer.posOf (#1(Stream.getItem strm))
+    in 
+	fun parse' pf fname =
+	    let val tokenStream = Lexer.scan(inputFile fname)
+		val (res, tokenStream') = pf tokenStream
+	    in  if Stream.null tokenStream'
+		then (NONE, SOME res)
+		else (SOME (pos tokenStream'), NONE)
+	    end handle Combinators.SyntaxError (msg, fresult) => 
+		         (SOME (pos fresult), NONE)
+    end
+
 end (* structure Parse *)
 
 (*
@@ -69,5 +82,10 @@ end (* structure Parse *)
    the pf parser. If any tokens remain on the input stream
    it is considered an error. This is probably NOT what one
    would expect; but it helps me debug the code
+
+   [parse' pf fname] as above, but returns an option, option
+   pair with the first component indicating error (with a
+   position), and the second component the parsed declarations
+   (on success).
   
 *)
