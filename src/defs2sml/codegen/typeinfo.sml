@@ -10,7 +10,7 @@ signature PRIMTYPES = sig
     val mkArrayPrimTy : sml_ty -> sml_ty
     val stringTy : bool (*negative*) -> bool (*output*) -> sml_ty
     val outputPrimString : unit -> exp
-    val toPrimString : exp -> exp
+    val toPrimString : string option
     val unwrap : string option
     val toArrayPrim : exp -> exp
 end (* signature PRIMTYPES *)
@@ -40,7 +40,7 @@ structure MosmlPrimTypes : PRIMTYPES = struct
     val outputPrimString = fn _ => TinySML.Const"\"\""
     val unwrap = SOME "repr"
     val toArrayPrim = (fn e => e)
-    val toPrimString = (fn e => e)
+    val toPrimString = NONE
 end (* structure MosmlPrimTypes *)
 
 structure MLtonPrimTypes : PRIMTYPES = struct
@@ -68,7 +68,7 @@ structure MLtonPrimTypes : PRIMTYPES = struct
     val outputPrimString = fn _ => TinySML.Var"CString.null"
     val unwrap = NONE
     val toArrayPrim = fn e => TinySML.App(TinySML.Var"Array.fromList", [e])
-    val toPrimString = fn e => TinySML.App(TinySML.Var"CString.fromString", [e])
+    val toPrimString = SOME "CString.fromString"
 
 end (* structure MosmlPrimTypes *)
 
@@ -409,7 +409,11 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	  | Type.Output(pass,ty) => id
 	  | Type.Array ty => (fn e => Prim.toArrayPrim
 	       (case toprimvalue tinfo ty of
-		    NONE => e
+		    NONE => if isString tinfo ty
+			    then case Prim.toPrimString of
+				     NONE => e
+				   | SOME f => App(Var"List.map", [Var f, e])
+			    else e
 		  | SOME f => App(Var"List.map", [Var f, e])
                ))
 	  | ty =>
@@ -513,7 +517,10 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     fun defaultValue tinfo ty = (* FIXME *)
 	case ty of
 	    Type.Ptr(ty') => 
-	    if isString tinfo ty then Prim.toPrimString(Const"\"\"")
+	    if isString tinfo ty then 
+		case Prim.toPrimString of
+		    NONE => Const"\"\""
+		  | SOME f => App(Var f, [Const"\"\""])
 	    else defaultValue tinfo ty'
 	  | Type.Output(Type.OUT,ty') =>
 	    if isString tinfo ty' then Prim.outputPrimString()
