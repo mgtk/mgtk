@@ -45,14 +45,14 @@ end
 EXTERNML value mgtk_gtk_list_store_newv(value n_columns, value valu_arr) { /* ML */
     GType* valu;
     list_to_array(GType, valu, Int_val, valu_arr);
-    return Val_GtkObj(gtk_list_store_newv(Int_val(n_columns), (valu)));
+    return Val_GtkObj(gtk_list_store_newv(Int_val(n_columns), valu));
 }
 
 /* ML type: cptr -> int -> GType.t list -> unit */
 EXTERNML value mgtk_gtk_list_store_set_column_types(value self, value n_columns, value types_arr) { /* ML */
     GType* types;
     list_to_array(GType, types, Int_val, types_arr);
-    gtk_list_store_set_column_types(GtkObj_val(self), Int_val(n_columns), (types));
+    gtk_list_store_set_column_types(GtkObj_val(self), Int_val(n_columns), types);
     return Val_unit;
 }
 

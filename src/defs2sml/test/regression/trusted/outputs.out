@@ -175,7 +175,7 @@ value Val_GtkTreeIter(void* obj) {
 /* ML type: cptr -> cptr ref -> int -> int -> unit */
 EXTERNML value mgtk_gtk_textbuffer_getiter_at_line_offset(value self, value iter_ref, value line_number, value char_offset) { /* ML */
     GtkTextIter* iter = GtkTextIter_val(GetRefVal(iter_ref));
-    gtk_text_buffer_get_iter_at_line_offset(GtkObj_val(self), (iter), Int_val(line_number), Int_val(char_offset));
+    gtk_text_buffer_get_iter_at_line_offset(GtkObj_val(self), iter, Int_val(line_number), Int_val(char_offset));
     SetRefVal(iter_ref, Val_GtkTextIter(iter));
     return Val_unit;
 }
