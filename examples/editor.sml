@@ -23,10 +23,11 @@ fun makeMenubar agrp =
               ; item
             end
 
-
         val openItem = makeStockItem file_menu "gtk-open"
 
         val closeItem = makeStockItem file_menu "gtk-close"
+
+        val _ = MenuShell.append file_menu (SeparatorMenuItem.new())
 
         val saveAsItem = makeStockItem file_menu "gtk-save-as"
 		
@@ -45,9 +46,12 @@ fun makeMenubar agrp =
                          ; item
                        end
 
-        fun activateConnect item action = Signal.connect item (MenuItem.activate_sig action)
+        fun activateConnect item action = 
+            Signal.connect item (MenuItem.activate_sig action)
 
-    in  (mb, activateConnect openItem, activateConnect closeItem, activateConnect saveAsItem)
+    in  (mb, activateConnect openItem
+           , activateConnect closeItem
+           , activateConnect saveAsItem)
     end
 
 datatype chooser_kind = OPEN | SAVE 
@@ -90,9 +94,10 @@ fun setUpGui() =
         val menu_context = Statusbar.get_context_id statusbar "Menu bar"
         fun say msg = ignore(Statusbar.push statusbar menu_context msg)
 
-        val (menubar, connectOpen, connectClose, connectSaveAs) = makeMenubar agrp
+        val (menubar, connectOpen, connectClose, connectSaveAs) = 
+            makeMenubar agrp
 
-        val textView = TextView.new()
+        val notebook = Notebook.new()
 
         fun openAction () =
             let val filename = getFile OPEN
@@ -103,10 +108,23 @@ fun setUpGui() =
                          val {dir, file} = OS.Path.splitDirFile path
                          val _ = OS.FileSys.chDir dir
                          val dev = TextIO.openIn file
-                         val content = TextIO.inputAll dev before TextIO.closeIn dev
+                         val content = TextIO.inputAll dev 
+                                       before TextIO.closeIn dev
+                         
+                         val textView = TextView.new()
                          val buffer = TextView.get_buffer textView
-                     in  TextBuffer.set_text buffer content ~1
-                       ; say (file ^ " has " ^ Int.toString (TextBuffer.get_line_count buffer) ^ " lines")
+                         val scrolled = ScrolledWindow.new'()
+                         val lab = Label.new (SOME file)                  
+                     in  ScrolledWindow.set_policy scrolled POLICY_AUTOMATIC 
+                                                            POLICY_AUTOMATIC
+                       ; Container.add scrolled textView  
+                       ; TextBuffer.set_text buffer content ~1
+                       ; Widget.show_all scrolled
+                       ; Widget.show lab
+                       ; Notebook.prepend_page notebook scrolled lab
+                       ; say (file ^ " has " ^ 
+                              Int.toString (TextBuffer.get_line_count buffer) ^
+                              " lines")
                      end
             end
 
@@ -119,7 +137,7 @@ fun setUpGui() =
                          val {dir, file} = OS.Path.splitDirFile path
                          val _ = OS.FileSys.chDir dir
                          val dev = TextIO.openOut file
-                         val buffer = TextView.get_buffer textView
+                         val buffer = TextBuffer.new NONE
                          val (startIter, endIter) = TextBuffer.get_bounds buffer
                          val content = TextBuffer.get_text buffer startIter endIter (SOME false)
                      in  TextIO.output(dev, content)
@@ -128,16 +146,9 @@ fun setUpGui() =
                      end
             end
 
-
-        val scrolled = let val sw = ScrolledWindow.new'()
-                       in  ScrolledWindow.set_policy sw POLICY_AUTOMATIC POLICY_AUTOMATIC
-                         ; Container.add sw textView
-                         ; sw
-                       end
-
         val vbox = VBox.new' ()
     in  Box.pack_start vbox menubar (SOME false) (SOME false) (SOME 0)
-      ; Box.pack_start' vbox scrolled
+      ; Box.pack_start' vbox notebook 
       ; Box.pack_start vbox statusbar (SOME false) (SOME false) (SOME 0)
       ; Container.add w vbox
       ; Widget.show_all w
