@@ -76,7 +76,7 @@ fun main () =
 		    in  TextIO.inputAll is
 			before TextIO.closeIn is
 		    end
-		val contents = read "excludes.txt"
+		val contents = read "lib/excludes.txt"
 		val excludes = Splayset.addList
 		       (Splayset.empty String.compare,
 			String.tokens Char.isSpace contents)

@@ -41,7 +41,11 @@ structure Name :> NAME = struct
             val words = split word ([],[])
 	    fun coalesce words =
 		let fun loop [] = []
+		      (* Special-case some Gtk name patterns *)
 		      | loop (x::"Type"::xs) = (x^"Type") :: loop xs
+		      | loop (x::"Buffer"::xs) = (x^"Buffer") :: loop xs
+		      | loop (x::"Renderer"::xs) = (x^"Renderer") :: loop xs
+		      | loop (x::"Iter"::xs) = (x^"Iter") :: loop xs
 		      | loop (x::xs) = x :: loop xs
 		in  loop words end
         in  coalesce words

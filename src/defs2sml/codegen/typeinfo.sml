@@ -96,11 +96,13 @@ structure TypeInfo :> TypeInfo = struct
 			     ptype=SMLType.IntTy, super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.toString name])})
 		  | AST.Boxed _ =>
+		    (TextIO.print("Binding " ^ Name.toString' name ^ "\n");
 		        add(table,name,
 			    {toc=ccall(Name.asCBoxed name^"_val"), 
 			     fromc=ccall("Val_"^Name.asCBoxed name),
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
+                    )
 		  | _ => table
 	in  bmod (module,init())
 	end

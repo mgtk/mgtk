@@ -63,7 +63,6 @@ struct
 			Member{name=Name.fromPaths(fullpath,[],base),info=info}
 	in  modMod module
 	end
-
 (*
     (* For debugging: *)
     val resolve = fn module => 

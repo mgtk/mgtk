@@ -37,7 +37,7 @@ test-compile: $(MAIN)
         done
 
 
-mgtk.c: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs
+mgtk.c: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs excludes.txt
 	./$(MAIN) -co mgtk.c -so mGtk.sml -cp lib/preamble.c api/pygtk/gtk.defs 
 
 ctest: $(MAIN) mgtk.c excludes.txt

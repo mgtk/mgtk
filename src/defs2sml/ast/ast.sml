@@ -88,7 +88,7 @@ struct
 
     local 
 	fun ppMod ppModI (n,i) = "module " ^ Name.toString n ^ ppModI i
-	fun ppMem ppMemI (n,i) = "member " ^ Name.toString n ^ ppMemI i
+	fun ppMem ppMemI (n,i) = "member " ^ Name.toString' n ^ ppMemI i
     in
 	val ppName = fn (ppModI, ppMemI) => pp (ppMod ppModI, ppMem ppMemI)
     end
