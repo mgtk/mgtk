@@ -6,19 +6,18 @@ include ../Makefile.inc
 OBJS=Parsercomb.uo WSeq.uo Util.uo NameUtil.uo ArgParse.uo \
      TypeExp.uo TypeInfo.uo Parse.uo ParseUtils.uo Parser.uo \
      AST.uo Translate.uo Messages.uo Main.uo
-PROG=mgtkgen
 
 SUBDIRS=regression tools
 
-all: $(PROG)
+all: $(GENPROG)
 
-$(PROG): $(OBJS)
-	$(MOSMLC) -o $(PROG) Main.uo
+$(GENPROG): $(OBJS)
+	$(MOSMLC) -o $(GENPROG) Main.uo
 
-test: $(PROG)
+test: $(GENPROG)
 	cd regression && $(MAKE) fresh
 
-quicktest: $(PROG)
+quicktest: $(GENPROG)
 	cd regression && $(MAKE) clean && $(MAKE) quick
 
 clean:
@@ -41,23 +40,23 @@ depend:
 
 ### EVERYTHING THAT GOES BEYOND THIS COMMENT WILL BE ERASED WITHOUT WARNING
 ### DO NOT DELETE THIS LINE
-ParseUtils.ui: AST.ui TypeExp.ui 
-ParseUtils.uo: ParseUtils.ui AST.ui TypeExp.ui Util.uo 
-TypeInfo.ui: TypeExp.ui NameUtil.ui WSeq.ui 
-Parsercomb.uo: Parsercomb.ui 
-TypeExp.uo: TypeExp.ui Util.uo 
-TypeExp.ui: NameUtil.ui 
-WSeq.uo: WSeq.ui 
-TypeInfo.uo: TypeInfo.ui WSeq.ui Util.uo 
-Translate.uo: Translate.ui WSeq.ui 
 Translate.ui: AST.ui 
+TypeInfo.ui: TypeExp.ui NameUtil.ui WSeq.ui 
+TypeInfo.uo: TypeInfo.ui WSeq.ui Util.uo 
+TypeExp.uo: TypeExp.ui Util.uo 
+WSeq.uo: WSeq.ui 
+ArgParse.uo: ArgParse.ui 
+ParseUtils.uo: ParseUtils.ui AST.ui TypeExp.ui NameUtil.ui Util.uo 
+ParseUtils.ui: AST.ui TypeExp.ui NameUtil.ui 
+Parsercomb.uo: Parsercomb.ui 
 Parser.uo: Parsercomb.ui 
-Parse.uo: Parsercomb.ui 
 NameUtil.uo: NameUtil.ui Util.uo 
+TypeExp.ui: NameUtil.ui 
 Messages.uo: Messages.ui AST.ui WSeq.ui 
+Parse.uo: Parsercomb.ui 
 Messages.ui: AST.ui 
 Main.uo: Parser.uo AST.ui Translate.ui Messages.ui ArgParse.ui Util.uo \
     Parse.uo 
 AST.uo: AST.ui TypeExp.ui NameUtil.ui Util.uo 
+Translate.uo: Translate.ui WSeq.ui 
 AST.ui: TypeExp.ui NameUtil.ui 
-ArgParse.uo: ArgParse.ui 

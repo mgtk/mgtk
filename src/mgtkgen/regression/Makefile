@@ -1,9 +1,12 @@
 # mgtkgen --- generate wrapper code from .defs file.
 # (c) Ken Friis Larsen and Henning Niss 1999, 2000.
 
+include ../../Makefile.inc
+
+TRANSLATE=../`basename $(GENPROG)`
+
 .PRECIOUS: %.res
 
-TRANSLATE=../mgtkgen
 REMOVE=rm -f
 
 all: quick gtk

@@ -108,7 +108,7 @@ fun inputFile  fName     =
     ( chat ("  input file is: " ^ fName ^ "\n")
     ; inFile := fName)
 fun showVersion () =
-    ( say ("mgtk generator (Apr 3). ")
+    ( say ("defs2sml --- stub file generator (Jul 11). ")
     ; say ("(c) Henning Niss and Ken Friis-Larsen\n")
     ; raise Error("")
     )

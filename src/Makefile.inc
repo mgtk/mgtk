@@ -4,13 +4,13 @@
 
 
 # Toplevel directory of unpacked distribution
-TOPDIR=${HOME}/tmp/mgtk
+TOPDIR=$(HOME)/mgtk
 
 # Where to install stuff
-MGTKHOME=${HOME}/tmp/mgtk
+MGTKHOME=$(HOME)/mgtk
 
 # Where MosML resides
-MOSMLHOME=${HOME}/utils/mosml2.0
+MOSMLHOME=$(HOME)/mosml2.0
 
 # Where the source files for the MosML runtime reside
 MOSMLRUNTIMESRC=$(MOSMLHOME)/include
@@ -38,15 +38,15 @@ SHELL=/bin/sh
 BINDIR=$(TOPDIR)/bin
 LIBDIR=$(TOPDIR)/src
 
-GENPROG=../bin/mgtkgen
+GENPROG=$(TOPDIR)/src/mgtkgen/defs2sml
 
-MOSMLTOOLS=${MOSMLHOME}/tools
-MOSMLRUNTIME=${MOSMLRUNTIMESRC}
+MOSMLTOOLS=$(MOSMLHOME)/tools
+MOSMLRUNTIME=$(MOSMLRUNTIMESRC)
 
-MOSMLC=${MOSMLHOME}/bin/mosmlc
-CAMLRUNM=${MOSMLHOME}/bin/camlrunm
+MOSMLC=$(MOSMLHOME)/bin/mosmlc
+CAMLRUNM=$(MOSMLHOME)/bin/camlrunm
 
-GTKCONFIG=${GTKHOME}/bin/gtk-config
+GTKCONFIG=$(GTKHOME)/bin/gtk-config
 
 .SUFFIXES :
 .SUFFIXES : .sml .sig .ui .uo .c .o
