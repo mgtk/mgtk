@@ -39,6 +39,8 @@ drawing.sml      | Shows how to use the drawing area widget, including
                  | how to manage graphics contexts, etc.
 comboexample.sml | Shows how to use combo boxes (from the gtk+ tutorial)
 treeexample.sml  | Shows how to use trees (from the gtk+ tutorial)
+treeexample2.sml | Like treeexample, but show how closures can be used to 
+                 | determine which item is signaled.
 moside/          | A larger example providing a small GUI for MosML
 
 
