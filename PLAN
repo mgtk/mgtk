@@ -2,10 +2,8 @@
 
 Milestone 1 (red-hens alpha 0.02):
 ----------------------------------
-* gtk_init fix (Ken)
+v gtk_init fix (Ken) [May 1, 2000]
 * Signals
-* Error handling, can catch gtk+ errors and convert them to
-  exceptions? (Henning)
 * Extract the gdk parts of Gtk.s{ig,ml} into Gdk.s{ig,ml}
 * Constructed data types in .defs file (GList's, arrays, etc.)
 * More functions from Sugar: latest comparison:
@@ -15,6 +13,8 @@ Milestone 1 (red-hens alpha 0.02):
 Milestone 2 (release version 1.0):
 ----------------------------------
 * Release at most one week later than mosml 2.0
+* Error handling, can catch gtk+ errors and convert them to
+  exceptions? (Henning)
 * Documentation
   + Tutorial
   + mgtkgen

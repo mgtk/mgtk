@@ -3,5 +3,8 @@ Changes since mgtk-alpha-0.01
 
 * Added a bunch of widgets and functions from the Sugar gtk.defs file.
 
-* Fixed some bugs.
+* Fixed some bugs. For example,
+  + command line arguments are now passed on to gtk_init.
+  + short version of functions with no arguments are now also in the
+    signature.
 ----------------------------------------------------------------------
