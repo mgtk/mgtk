@@ -1,15 +1,9 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
-structure GenC :> sig
-        type topdecl
-	type typeexp = Name.name Type.ty
-        type 'a module  = (Name.name, 'a, (Name.name,typeexp) AST.api_info) AST.module
-        type 'a module' = (Name.name, 'a, (topdecl*typeexp option) list) AST.module
-        val generate: TypeInfo.typeinfo -> 'a module -> 'a module'
-        val print: TypeInfo.typeinfo -> TextIO.outstream -> 'a module' -> unit
-    end =
-struct
+functor GenC(structure TypeInfo : TypeInfo) 
+	:> GEN_C where type typeinfo = TypeInfo.typeinfo
+= struct
 
     open TinyC
 
@@ -17,6 +11,7 @@ struct
     type 'a module  = (Name.name, 'a, (Name.name,typeexp) AST.api_info) AST.module
     type 'a module' = (Name.name, 'a, (topdecl*typeexp option) list) AST.module
 
+    type typeinfo = TypeInfo.typeinfo
 
     fun print tinfo os module =
 	let 

@@ -17,6 +17,7 @@ structure SMLType = struct
       | TupTy of ty list
       | ArrowTy of ty list * ty
       | TyApp of ty list * tyname
+      | RefTy of ty
 
     fun show_tname tname = Util.stringSep "" "" "." (fn s=>s) tname
 
@@ -36,6 +37,7 @@ structure SMLType = struct
 	  | TyApp([],tname) => show_tname tname
 	  | TyApp([ty],tname) => show ty ^ " " ^ show_tname tname
 	  | TyApp(tys,tname) => Util.stringSep "(" (") "^show_tname tname) "," show tys
+	  | RefTy ty => show ty ^ " ref"
     val toString = show
 
 end (* structure SMLType *)

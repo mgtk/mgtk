@@ -1,7 +1,36 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
-structure TypeInfo :> TypeInfo = struct
+signature PRIMTYPES = sig
+    type ty = SMLType.ty
+    val mkArrowTy : ty list * ty -> ty
+    val stringTy : ty
+    val toPrimString : TinySML.exp -> TinySML.exp
+end (* signature PRIMTYPES *)
+
+structure MosmlPrimTypes : PRIMTYPES = struct
+    type ty = SMLType.ty
+    fun mkArrowTy(pars,ret) =
+	SMLType.ArrowTy(
+	   if List.length pars > TinySML.max_curried
+	   then [SMLType.TupTy pars]
+	   else pars
+        ,  ret)
+    val stringTy = SMLType.StringTy
+    val toPrimString = fn e => e
+end (* structure MosmlPrimTypes *)
+
+structure MLtonPrimTypes : PRIMTYPES = struct
+    type ty = SMLType.ty
+    fun mkArrowTy(pars,ret) =
+	SMLType.ArrowTy([SMLType.TupTy pars], ret)
+    val stringTy = SMLType.TyApp([],["CString", "cstring"])
+    local open TinySML in  
+        fun toPrimString e = App(Var("Cstring.cstring"), [e])
+    end
+end (* structure MosmlPrimTypes *)
+
+functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
     
     type name = Name.name
     type ty = name Type.ty
@@ -184,7 +213,7 @@ structure TypeInfo :> TypeInfo = struct
     fun toPrimType tinfo ty =
 	case ty of 
 	    Type.Ptr(Type.Base n) => 
-	       if Name.asType n = "char" then SMLType.StringTy
+	       if Name.asType n = "char" then Prim.stringTy
 	       else SMLType.TyApp([],["cptr"])
 	  | Type.Void => SMLType.UnitTy
 	  | Type.Base n => 
@@ -202,11 +231,8 @@ structure TypeInfo :> TypeInfo = struct
 	  | Type.Const ty => toPrimType tinfo ty
 	  | Type.Ptr ty => SMLType.TyApp([],["cptr"])
 	  | Type.Func(pars,ret) => 
-	       SMLType.ArrowTy(
-	           if List.length pars > 5 
-		   then [SMLType.TupTy(List.map (toPrimType tinfo o #2) pars)]
-		   else List.map (toPrimType tinfo o #2) pars,
-		   toPrimType tinfo ret)
+	       Prim.mkArrowTy(List.map (toPrimType tinfo o #2) pars,
+			      toPrimType tinfo ret)
 	  | Type.Arr(len,ty) => SMLType.TyApp([],["..."]) (* FIXME *)
 
 
@@ -230,7 +256,10 @@ structure TypeInfo :> TypeInfo = struct
 	  | _ => id
     fun toPrimValue tinfo ty =
 	case ty of
-	    Type.Base n =>
+	    Type.Ptr(ty as Type.Base n) =>
+	       if Name.asType n = "char" then Prim.toPrimString
+	       else toPrimValue tinfo ty
+	  | Type.Base n =>
 	       (let val info: info = lookup tinfo n
 		in  #toprim info
 		end

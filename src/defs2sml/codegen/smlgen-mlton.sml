@@ -1,22 +1,10 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
-structure GenSML :>
-    sig
-	type name = Name.name
-	type typeexp = name Type.ty
+functor GenSMLMLton(structure TypeInfo : TypeInfo) 
+	: GEN_SML where type typeinfo = TypeInfo.typeinfo =
 
-	type sml_info
-	type 'a incl
-	type module_info
-
-	val generate: TypeInfo.typeinfo -> (name,(name*name option)option,(name,typeexp) AST.api_info) AST.module -> 
-		      (name,module_info,sml_info incl) AST.module
-	val print: string option -> TextIO.outstream -> (name,module_info,sml_info incl) AST.module 
-                   -> unit
-    end =
 struct
-
     (* convenience *)
     open TinySML
 
@@ -29,13 +17,9 @@ struct
     fun tys ==> ty2 = ArrowTy(tys, ty2)
 
     (* "primitives" *)
-    fun ccall name args =
-	let val app = if args > max_curried then "app1" 
-		      else "app" ^ Int.toString args
-	in  App(Var app, [App(Var "symb", [Str name])])
-	end
+    fun ccall name ty = Import(name, ty)
 
-    (* print *)
+    type typeinfo = TypeInfo.typeinfo
     type 'a incl = 'a TinySML.incl
     type sml_info = TinySML.decl
 
@@ -75,10 +59,8 @@ struct
 		; dump(spaces indent ^ "end\n")
 		)
 	    fun print_toplevel (AST.Module{name,members,info}) =
-		( dump(spaces 0 ^ showModInfo info ^ " = " ^ showModBegin info ^ "\n")
-                ; dump_preamble 4 preamble
-                ; List.app (print_member info 4) members
-                ; dump("end\n")
+		( dump_preamble 0 preamble
+                ; List.app (print_member info 0) members
                 )
 	in  print_toplevel module
 	end
@@ -100,7 +82,7 @@ struct
                        = fn label => makeBut(new_with_label_ label)
             *)
 	    AST.Method ty => 
-		let val cname = Name.asCStub name
+		let val cname = Name.asCFunc name
 		    val name = Name.asMethod name
 		    val parsty = Type.getParams ty
 		    val (pars,tys) = ListPair.unzip parsty
@@ -113,9 +95,7 @@ struct
 		    fun wrap (par,ty) = 
 			TypeInfo.toPrimValue tinfo ty (Var par)
 			handle TypeInfo.Unbound n => ubnd n
-		    val pars' = if List.length pars > max_curried
-				then [Tup(List.map wrap parsty)]
-				else List.map wrap parsty
+		    val pars' = List.map wrap parsty
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 
 			fromtype' ty handle TypeInfo.Unbound n => ubnd n
@@ -130,9 +110,10 @@ struct
 		    fun fromprim ty e =
 			TypeInfo.fromPrimValue tinfo ty e
 			handle TypeInfo.Unbound n => ubnd n
+		    val primty = primtypeFromType ty
 		in  StrOnly(
-                       ValDecl(VarPat(name^"_"), Some(primtypeFromType ty), 
-			       ccall cname (List.length pars)))
+                       ValDecl(VarPat(name^"_"), SigOnly(primty),
+			       ccall cname primty))
                  ++ Some(
                        ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),
 			       List.foldr Fn (fromprim ret (App(Var(name^"_"), pars')))
@@ -152,12 +133,16 @@ struct
 	  | AST.Enum consts => 
 	        let val cname = Name.asCEnum name
 		    val name = Name.asEnum name
-		    val tup = List.tabulate(List.length consts, fn _ => IntTy)
-		in  Some(TypeDecl(([],[name]), StrOnly IntTy))
-                 ++ StrOnly(ValDecl(VarPat("get_" ^ name ^ "_"), Some(UnitTy --> TupTy tup),
-			    ccall ("mgtk_get_"^cname) 1))
-		 ++ StrOnly(ValDecl(TupPat(List.map (VarPat o Name.asEnumConst) consts), None,
+		    val tup = TupTy(List.tabulate(List.length consts, fn _ => RefTy IntTy))
+		    val decs = List.map (fn c => SigOnly(ValDecl(VarPat(Name.asEnumConst c),Some(TyApp([],[name])),Const "1"))) consts
+		in  Some(SeqDecl(
+	            Some(TypeDecl(([],[name]), StrOnly IntTy))
+                 :: decs
+                @ [ StrOnly(ValDecl(VarPat("get_" ^ name ^ "_"), Some(tup --> UnitTy),
+			    ccall ("mgtk_get_"^cname) (tup --> UnitTy)))
+		  , StrOnly(ValDecl(TupPat(List.map (VarPat o Name.asEnumConst) consts), None,
 			    App(Var("get_" ^ name ^ "_"), [Unit])))
+                  ]))
 		end
 
 	  | AST.Boxed funcs =>
@@ -167,7 +152,7 @@ struct
           | AST.Field ty => 
 		let val name = Name.asField name
 		in  StrOnly(ValDecl(VarPat ("get_"^name), None, 
-			    ccall ("mgtk_get_"^name) 1))
+			    ccall ("mgtk_get_"^name) IntTy))
 		end
 
 (*
@@ -247,11 +232,12 @@ struct
          ++ Some(TypeDecl((["'a"],[witness_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[type_t]), 
 		    Some(TyApp([TyApp([TyVar "'a"],[witness_t])],[parent_t]))))
-         ++ StrOnly(Open["Dynlib"])
+(*mlton         ++ StrOnly(Open["Dynlib"])*)
          ++ StrOnly(TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"]))))
-         ++ StrOnly(ValDecl(VarPat"repr", None, Var("GObject.repr")))
+(*mlton  ++ StrOnly(ValDecl(VarPat"repr", None, Var("GObject.repr")))
          ++ StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))
          ++ Some(Comment NONE)
+*)
          ++ Some(FunDecl("inherit",[VarPat "w",VarPat "con"],
 		    (* 'a -> GObject.constructor -> 'a t *)
 		    SigOnly([TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"])),
@@ -286,11 +272,14 @@ struct
 	    [Member{name=name,info=trans tinfo (name,info)}]
     in  fun generate tinfo (Module{name,members,info}) = 
 	    Module{name=name,info=STRUCTURE(Name.asModule name, NONE),
-		   members=Member{name=Name.fromString "structureheader",
+		   members=
+(*mlton
+		           Member{name=Name.fromString "structureheader",
 				  info = StrOnly(Open["Dynlib"])}  
                            :: Member{name=Name.fromString "structureheader",
 				  info = StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))}
-                           :: Member{name=Name.fromString "structureheader",
+*)
+                              Member{name=Name.fromString "structureheader",
 				  info = StrOnly(TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"]))))}
                            :: Member{name=Name.fromString "structureheader",
 				  info = Some(TypeDecl(([],["base"]),StrOnly UnitTy))}

@@ -1,6 +1,12 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
+structure MosmlTypeInfo = TypeInfo(structure Prim = MosmlPrimTypes)
+structure MLtonTypeInfo = TypeInfo(structure Prim = MLtonPrimTypes)
+structure GenSMLMosml = GenSMLMosml(structure TypeInfo = MosmlTypeInfo)
+structure GenSMLMLton = GenSMLMLton(structure TypeInfo = MLtonTypeInfo)
+structure GenC = GenC(structure TypeInfo = MosmlTypeInfo)
+
 fun main () =
     let 
 
@@ -55,6 +61,8 @@ fun main () =
 
 	val verbosity = ref 0
 
+	val forMLton = ref false
+
 	val args = [ ("-I",  ArgParse.String DefsParse.addPath)
 		   , ("-so", ArgParse.String setSMLOutFile)
 		   , ("-o",  ArgParse.String setOutFileBase)
@@ -64,6 +72,7 @@ fun main () =
 		   , ("-sp", ArgParse.String setSMLPreamble)
 		   , ("-q",  ArgParse.Unit   MsgUtil.quiet)
 		   , ("-v",  ArgParse.Unit   (inc verbosity))
+		   , ("--mlton",  ArgParse.Unit   (fn () => forMLton := true))
                    ] @ Debug.argparse ()
 	val _ = ArgParse.parse args setFile
 	val _ = DefsParse.addPath (#dir (Path.splitDirFile (getFile())))
@@ -141,17 +150,34 @@ fun main () =
         (* 4. Resolve types and names *)
 	val api = ResolveNames.resolve (ResolveTypes.resolve api)
 	val _ = debug api
-	val typeinfo = TypeInfo.build api
 
 	val (modules,values) = AST.fold (fn (mn,(m,v)) => (m+1,v), fn (mn,(m,v)) => (m,v+1)) (0,0) api
 	val _ = MsgUtil.close ("  corresponding to " ^ Int.toString modules ^ "(sub)modules with " ^ Int.toString values ^ " values\n")
 
+	val _ =
+	    if !forMLton then
+		let
 	(* 5. Generate code ... *)
         (*    ... SML *)
 	val _ = MsgUtil.print "Generating SML code ..."
+	val typeinfo = MLtonTypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
-	val api' = GenSML.generate typeinfo api
-	val _ = GenSML.print (!smlPreamble) (getOutFile()) api'
+	val api' = GenSMLMLton.generate typeinfo api
+	val _ = GenSMLMLton.print (!smlPreamble) (getOutFile()) api'
+        val _ = closeOutFile()
+	val _ = MsgUtil.close "done"
+	val _ = MsgUtil.print "No C code generated for MLton"
+	val _ = MsgUtil.close ""
+		in () end
+        
+	    else let
+	(* 5. Generate code ... *)
+        (*    ... SML *)
+	val _ = MsgUtil.print "Generating SML code ..."
+	val typeinfo = MosmlTypeInfo.build api
+	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
+	val api' = GenSMLMosml.generate typeinfo api
+	val _ = GenSMLMosml.print (!smlPreamble) (getOutFile()) api'
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 
@@ -164,6 +190,7 @@ fun main () =
 	val _ = GenC.print typeinfo (getOutFile()) api''
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
+		in () end
 
     in  ()
     end

@@ -44,6 +44,8 @@ structure Gtk = struct
         val hide : 'a t -> unit
         val show_all : 'a t -> unit
         val hide_all : 'a t -> unit
+        val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+        val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
     end
     structure Widget :> Widget = struct
         type base = unit
@@ -80,6 +82,20 @@ structure Gtk = struct
             = app1 (symb"mgtk_gtk_widget_hide_all")
         val hide_all : 'a t -> unit
             = fn self => hide_all_ (repr self)
+        local
+        open Signal
+        infix -->
+        in
+        val delete_event_sig : (unit -> bool) -> 'a t Signal.signal
+            = fn f => signal "delete-event" false (unit --> return_bool) f
+        end
+        local
+        open Signal
+        infix -->
+        in
+        val destroy_event_sig : (unit -> bool) -> 'a t Signal.signal
+            = fn f => signal "destroy-event" false (unit --> return_bool) f
+        end
     end
     signature Container = sig
         type base
@@ -201,6 +217,7 @@ structure Gtk = struct
         val new_with_label : string -> base t
         val set_label : 'a t -> string -> unit
         val get_label : 'a t -> string
+        val clicked_sig : (unit -> unit) -> 'a t Signal.signal
     end
     structure Button :> Button = struct
         type base = unit
@@ -233,6 +250,13 @@ structure Gtk = struct
             = app1 (symb"mgtk_gtk_button_get_label")
         val get_label : 'a t -> string
             = fn self => get_label_ (repr self)
+        local
+        open Signal
+        infix -->
+        in
+        val clicked_sig : (unit -> unit) -> 'a t Signal.signal
+            = fn f => signal "clicked" false (void --> return_void) f
+        end
     end
 end
 

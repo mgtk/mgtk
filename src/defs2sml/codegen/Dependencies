@@ -4,6 +4,9 @@
 smltype: /ast/type /util/util /ast/name
 tinyc: /util/util
 tinysml: /ast/name smltype /util/
+typeinfo-sig: /ast/ast /ast/name /ast/type smltype tinyc tinysml
 typeinfo: /util/ /ast/ast /ast/name /ast/type smltype tinyc tinysml
-smlgen: /ast/ast /ast/name /ast/type /util/ smltype tinysml typeinfo
-cgen: /ast/ast /ast/name /ast/type tinyc smltype typeinfo
+smlgen-sig: /ast/ast /ast/type /ast/name 
+smlgen-mosml: /ast/ast /ast/name /ast/type /util/ smltype tinysml typeinfo typeinfo-sig smlgen-sig
+smlgen-mlton: /ast/ast /ast/name /ast/type /util/ smltype tinysml typeinfo typeinfo-sig smlgen-sig
+cgen: /ast/ast /ast/name /ast/type tinyc smltype typeinfo typeinfo-sig

@@ -2,6 +2,10 @@ structure TinySML = struct
 
     val max_curried = 5
 
+    type typeexp = SMLType.ty
+    type tyvar = SMLType.tyvar
+    type tyname = SMLType.tyname
+
     datatype exp =
 	Unit 
       | Const of string
@@ -11,16 +15,13 @@ structure TinySML = struct
       | Fn of string * exp
       | App of exp * exp list
       | Tup of exp list
+      | Import of string * typeexp
     infix ==>
     fun x ==> e = Fn(x,e)
 
     datatype pat =
         VarPat of string
       | TupPat of pat list
-
-    type typeexp = SMLType.ty
-    type tyvar = SMLType.tyvar
-    type tyname = SMLType.tyname
 
     datatype 'a incl =
         None
@@ -76,6 +77,8 @@ structure TinySML = struct
 		  | Tup [] => "()"
 		  | Tup [e] => show_exp level e
 		  | Tup es => Util.stringSep "(" ")" "," (show_exp 1) es
+		  | Import(cglobal,ty) =>
+		      "_import \"" ^ cglobal ^ "\" : " ^ SMLType.toString ty ^ ";"
 	    val show_exp = fn exp => show_exp 1 exp
 	    fun show_pat pat =
 		case pat of

@@ -59,6 +59,9 @@ compile: $(MAIN) mgtk.c mgtk.sml
 	mosmlc -toplevel -liberal -c mgtk.sml
 	gcc $(CINCLUDE) -c -o /dev/null mgtk.c > c.out 2>&1 
 
+mlton: $(MAIN)
+	@./$(MAIN) --mlton -sp lib/preamble-mlton.sml -q $(OPTIONS) -o minimgtk.sml test/regression/input/minigtk.defs
+
 realclean:
 	rm -f c.out mgtk.c mgtk.sml
 	rm -f typetable.txt
