@@ -647,12 +647,12 @@ struct
         && Nl
       | mkMLSigdecl (AST.FUNCTION_DECL(pos, name, retTyp, params)) = 
 	let val params' = List.filter (not o TypeInfo.isNullType') params
-	    val params' = if null params' then [(AST.TYPENAME "none","dummy")]
-			  else params'
+	    val params'' = if null params' then [(AST.TYPENAME "none","dummy")]
+			   else params'
 	in  mkMLFunDecl NONE (name, mlFunType(retTyp, params))
          && (if List.length params' = List.length params
 	     then Empty
-             else mkMLFunDecl NONE (name^"'", mlFunType(retTyp, params')))
+             else mkMLFunDecl NONE (name^"'", mlFunType(retTyp, params'')))
 	end
       | mkMLSigdecl (AST.FLAGS_DECL(pos, name,constr)) =
 	   mkMLEnumDecl (name, constr)

@@ -16,6 +16,17 @@
 /*                                                                           */
 
 
+/* ML type: word -> word -> word -> string */
+value mgtk_check_version(value required_major, value required_minor, value required_micro) { /* ML */
+  return copy_string(gtk_check_version(Int_val(required_major), Int_val(required_minor), Int_val(required_micro)));
+}
+
+/* ML type: int -> unit */
+value mgtk_exit(value error_code) { /* ML */
+  gtk_exit(Int_val(error_code));
+  return Val_unit;
+}
+
 /* ML type: unit -> int * int * int * int */
 value mgtk_get_accel_flags (value dummy) { /* ML */
   value res = alloc_tuple(4);
@@ -1446,12 +1457,12 @@ value Val_GdkWindow (void* obj) {
 #define GdkPixmap_val(x) ((void*) Field(x, 1))
 
 static void ml_finalize_gdk_pixmap (value val) {
-  gdk_window_unref (GdkPixmap_val(val)); 
+  gdk_pixmap_unref (GdkPixmap_val(val)); 
 }
 
 value Val_GdkPixmap (void* obj) {
   value res;
-  gdk_window_ref(obj);
+  gdk_pixmap_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_pixmap, 0, 1);
   GdkPixmap_val(res) = (value) obj ;
   return res;
@@ -1460,12 +1471,12 @@ value Val_GdkPixmap (void* obj) {
 #define GdkBitmap_val(x) ((void*) Field(x, 1))
 
 static void ml_finalize_gdk_bitmap (value val) {
-  gdk_window_unref (GdkBitmap_val(val)); 
+  gdk_bitmap_unref (GdkBitmap_val(val)); 
 }
 
 value Val_GdkBitmap (void* obj) {
   value res;
-  gdk_window_ref(obj);
+  gdk_bitmap_ref(obj);
   res = alloc_final (2, ml_finalize_gdk_bitmap, 0, 1);
   GdkBitmap_val(res) = (value) obj ;
   return res;
@@ -1525,6 +1536,12 @@ value Val_GdkGC (void* obj) {
   res = alloc_final (2, ml_finalize_gdk_gc, 0, 1);
   GdkGC_val(res) = (value) obj ;
   return res;
+}
+
+/* ML type: unit -> unit */
+value mgdk_beep(value dummy) { /* ML */
+  gdk_beep();
+  return Val_unit;
 }
 
 /* ML type: string -> gdk_font */
@@ -2751,6 +2768,30 @@ value mgtk_container_child_type(value container) { /* ML */
   return Val_int(gtk_container_child_type(GtkObj_val(container)));
 }
 
+/* ML type: gtkobj -> unit */
+value mgtk_container_clear_resize_widgets(value container) { /* ML */
+  gtk_container_clear_resize_widgets(GtkObj_val(container));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+value mgtk_container_dequeue_resize_handler(value container) { /* ML */
+  gtk_container_dequeue_resize_handler(GtkObj_val(container));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+value mgtk_container_queue_resize(value container) { /* ML */
+  gtk_container_queue_resize(GtkObj_val(container));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> bool -> unit */
+value mgtk_container_set_reallocate_redraws(value container, value needs_redraws) { /* ML */
+  gtk_container_set_reallocate_redraws(GtkObj_val(container), Bool_val(needs_redraws));
+  return Val_unit;
+}
+
 /* *** Fixed stuff *** */
 
 
@@ -2925,6 +2966,34 @@ value mgtk_box_reorder_child(value box, value child, value pos) { /* ML */
   return Val_unit;
 }
 
+/* ML type: gtkobj * gtkobj * bool * bool * int * int -> unit */
+value mgtk_box_set_child_packing(value mgtk_params) { /* ML */
+  value box = Field(mgtk_params, 0);
+  value child = Field(mgtk_params, 1);
+  value expand = Field(mgtk_params, 2);
+  value fill = Field(mgtk_params, 3);
+  value padding = Field(mgtk_params, 4);
+  value pack_type = Field(mgtk_params, 5);
+  gtk_box_set_child_packing(GtkObj_val(box), GtkObj_val(child), Bool_val(expand), Bool_val(fill), Int_val(padding), Int_val(pack_type));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> gtkobj -> bool * bool * word * int */
+value mgtk_box_query_child_packing(value box, value child) { /* ML */
+  value res;
+  int resexpand;
+  int resfill;
+  unsigned int respadding;
+  GtkPackType respack_type;
+  gtk_box_query_child_packing(GtkObj_val(box), GtkObj_val(child), &resexpand, &resfill, &respadding, &respack_type);
+  res = alloc_tuple(4);
+  Field(res, 0) = Val_bool(resexpand);
+  Field(res, 1) = Val_bool(resfill);
+  Field(res, 2) = Val_int(respadding);
+  Field(res, 3) = Val_int(respack_type);
+  return res;
+}
+
 /* *** HBox stuff *** */
 
 
@@ -2943,6 +3012,54 @@ value mgtk_vbox_new(value homogeneous, value spacing) { /* ML */
 
 /* *** ButtonBox stuff *** */
 
+
+/* ML type: gtkobj -> int * int */
+value mgtk_button_box_get_child_size(value widget) { /* ML */
+  value res;
+  int resmin_width;
+  int resmin_height;
+  gtk_button_box_get_child_size(GtkObj_val(widget), &resmin_width, &resmin_height);
+  res = alloc_tuple(2);
+  Field(res, 0) = Val_int(resmin_width);
+  Field(res, 1) = Val_int(resmin_height);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+value mgtk_button_box_get_child_size_default(value dummy) { /* ML */
+  value res;
+  int resmin_width;
+  int resmin_height;
+  gtk_button_box_get_child_size_default(&resmin_width, &resmin_height);
+  res = alloc_tuple(2);
+  Field(res, 0) = Val_int(resmin_width);
+  Field(res, 1) = Val_int(resmin_height);
+  return res;
+}
+
+/* ML type: gtkobj -> int * int */
+value mgtk_button_box_get_child_ipadding(value widget) { /* ML */
+  value res;
+  int resipad_x;
+  int resipad_y;
+  gtk_button_box_get_child_ipadding(GtkObj_val(widget), &resipad_x, &resipad_y);
+  res = alloc_tuple(2);
+  Field(res, 0) = Val_int(resipad_x);
+  Field(res, 1) = Val_int(resipad_y);
+  return res;
+}
+
+/* ML type: unit -> int * int */
+value mgtk_button_box_get_child_ipadding_default(value dummy) { /* ML */
+  value res;
+  int resipad_x;
+  int resipad_y;
+  gtk_button_box_get_child_ipadding_default(&resipad_x, &resipad_y);
+  res = alloc_tuple(2);
+  Field(res, 0) = Val_int(resipad_x);
+  Field(res, 1) = Val_int(resipad_y);
+  return res;
+}
 
 /* ML type: int -> int -> unit */
 value mgtk_button_box_set_child_size_default(value min_width, value min_height) { /* ML */
@@ -3118,6 +3235,38 @@ value mgtk_packer_new(value dummy) { /* ML */
 /* ML type: gtkobj -> gtkobj -> int -> int -> int -> unit */
 value mgtk_packer_add_defaults(value packer, value child, value side, value anchor, value options) { /* ML */
   gtk_packer_add_defaults(GtkObj_val(packer), GtkObj_val(child), Int_val(side), Int_val(anchor), Int_val(options));
+  return Val_unit;
+}
+
+/* ML type: gtkobj * gtkobj * int * int * int * word * word * word * word * word -> unit */
+value mgtk_packer_add(value mgtk_params) { /* ML */
+  value packer = Field(mgtk_params, 0);
+  value child = Field(mgtk_params, 1);
+  value side = Field(mgtk_params, 2);
+  value anchor = Field(mgtk_params, 3);
+  value options = Field(mgtk_params, 4);
+  value border_width = Field(mgtk_params, 5);
+  value pad_x = Field(mgtk_params, 6);
+  value pad_y = Field(mgtk_params, 7);
+  value ipad_x = Field(mgtk_params, 8);
+  value ipad_y = Field(mgtk_params, 9);
+  gtk_packer_add(GtkObj_val(packer), GtkObj_val(child), Int_val(side), Int_val(anchor), Int_val(options), Int_val(border_width), Int_val(pad_x), Int_val(pad_y), Int_val(ipad_x), Int_val(ipad_y));
+  return Val_unit;
+}
+
+/* ML type: gtkobj * gtkobj * int * int * int * word * word * word * word * word -> unit */
+value mgtk_packer_set_child_packing(value mgtk_params) { /* ML */
+  value packer = Field(mgtk_params, 0);
+  value child = Field(mgtk_params, 1);
+  value size = Field(mgtk_params, 2);
+  value anchor = Field(mgtk_params, 3);
+  value options = Field(mgtk_params, 4);
+  value border_width = Field(mgtk_params, 5);
+  value pad_x = Field(mgtk_params, 6);
+  value pad_y = Field(mgtk_params, 7);
+  value ipad_x = Field(mgtk_params, 8);
+  value ipad_y = Field(mgtk_params, 9);
+  gtk_packer_set_child_packing(GtkObj_val(packer), GtkObj_val(child), Int_val(size), Int_val(anchor), Int_val(options), Int_val(border_width), Int_val(pad_x), Int_val(pad_y), Int_val(ipad_x), Int_val(ipad_y));
   return Val_unit;
 }
 
@@ -3537,6 +3686,20 @@ value mgtk_notebook_set_menu_label(value notebook, value child, value menu_label
 value mgtk_notebook_set_menu_label_text(value notebook, value child, value menu_text) { /* ML */
   gtk_notebook_set_menu_label_text(GtkObj_val(notebook), GtkObj_val(child), String_val(menu_text));
   return Val_unit;
+}
+
+/* ML type: gtkobj -> gtkobj -> bool * bool * int */
+value mgtk_notebook_query_tab_label_packing(value notebook, value child) { /* ML */
+  value res;
+  int resexpand;
+  int resfill;
+  GtkPackType respack_type;
+  gtk_notebook_query_tab_label_packing(GtkObj_val(notebook), GtkObj_val(child), &resexpand, &resfill, &respack_type);
+  res = alloc_tuple(3);
+  Field(res, 0) = Val_bool(resexpand);
+  Field(res, 1) = Val_bool(resfill);
+  Field(res, 2) = Val_int(respack_type);
+  return res;
 }
 
 /* ML type: gtkobj -> gtkobj -> bool -> bool -> int -> unit */
@@ -4721,6 +4884,12 @@ value mgtk_tree_insert(value tree, value child, value position) { /* ML */
   return Val_unit;
 }
 
+/* ML type: gtkobj -> gtkobj -> unit */
+value mgtk_tree_remove_item(value tree, value child) { /* ML */
+  gtk_tree_remove_item(GtkObj_val(tree), GtkObj_val(child));
+  return Val_unit;
+}
+
 /* ML type: gtkobj -> int -> int -> unit */
 value mgtk_tree_clear_items(value tree, value start_item, value end_item) { /* ML */
   gtk_tree_clear_items(GtkObj_val(tree), Int_val(start_item), Int_val(end_item));
@@ -4995,6 +5164,17 @@ value mgtk_clist_set_text(value clist, value row, value column, value text) { /*
   return Val_unit;
 }
 
+/* ML type: gtkobj -> int -> int -> int * string */
+value mgtk_clist_get_text(value clist, value row, value column) { /* ML */
+  value res;
+  char* restext;
+  value rescall = gtk_clist_get_text(GtkObj_val(clist), Int_val(row), Int_val(column), &restext);
+  res = alloc_tuple(2);
+  Field(res, 0) = Val_int(rescall);
+  Field(res, 1) = copy_string(restext);
+  return res;
+}
+
 /* ML type: gtkobj -> int -> int -> gdk_pixmap -> gdk_bitmap -> unit */
 value mgtk_clist_set_pixmap(value clist, value row, value col, value pixmap, value mask) { /* ML */
   gtk_clist_set_pixmap(GtkObj_val(clist), Int_val(row), Int_val(col), GdkPixmap_val(pixmap), GdkBitmap_val(mask));
@@ -5106,6 +5286,19 @@ value mgtk_clist_undo_selection(value clist) { /* ML */
 value mgtk_clist_clear(value clist) { /* ML */
   gtk_clist_clear(GtkObj_val(clist));
   return Val_unit;
+}
+
+/* ML type: gtkobj -> int -> int -> int * int * int */
+value mgtk_clist_get_selection_info(value clist, value x, value y) { /* ML */
+  value res;
+  int resrow;
+  int rescolumn;
+  value rescall = gtk_clist_get_selection_info(GtkObj_val(clist), Int_val(x), Int_val(y), &resrow, &rescolumn);
+  res = alloc_tuple(3);
+  Field(res, 0) = Val_int(rescall);
+  Field(res, 1) = Val_int(resrow);
+  Field(res, 2) = Val_int(rescolumn);
+  return res;
 }
 
 /* ML type: gtkobj -> unit */
@@ -5727,6 +5920,30 @@ value mgtk_range_slider_update(value range) { /* ML */
   return Val_unit;
 }
 
+/* ML type: gtkobj -> int -> int -> unit */
+value mgtk_range_default_hmotion(value range, value xdelta, value ydelta) { /* ML */
+  gtk_range_default_hmotion(GtkObj_val(range), Int_val(xdelta), Int_val(ydelta));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+value mgtk_range_default_hslider_update(value range) { /* ML */
+  gtk_range_default_hslider_update(GtkObj_val(range));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> int -> int -> unit */
+value mgtk_range_default_vmotion(value range, value xdelta, value ydelta) { /* ML */
+  gtk_range_default_vmotion(GtkObj_val(range), Int_val(xdelta), Int_val(ydelta));
+  return Val_unit;
+}
+
+/* ML type: gtkobj -> unit */
+value mgtk_range_default_vslider_update(value range) { /* ML */
+  gtk_range_default_vslider_update(GtkObj_val(range));
+  return Val_unit;
+}
+
 /* *** Scale stuff *** */
 
 
@@ -6095,6 +6312,12 @@ value mgtk_spin_button_update(value spin_button) { /* ML */
   return Val_unit;
 }
 
+/* ML type: gtkobj -> gtkobj -> real -> word -> unit */
+value mgtk_spin_button_configure(value spin_button, value adjustment, value climb_rate, value digits) { /* ML */
+  gtk_spin_button_configure(GtkObj_val(spin_button), GtkObj_val(adjustment), Double_val(climb_rate), Int_val(digits));
+  return Val_unit;
+}
+
 /* *** Combo stuff *** */
 
 /* ML type: gtkobj -> gtkobj */
@@ -6280,6 +6503,8 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 (*                                                                           *)
 
 
+    val check_version: word -> word -> word -> string
+    val exit: int -> unit
     type accel_flags
     val ACCEL_VISIBLE: accel_flags
     val ACCEL_SIGNAL_VISIBLE: accel_flags
@@ -7199,6 +7424,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
     type gdk_gc
 
+    val gdk_beep: unit -> unit
     val gdk_font_load: string -> gdk_font
     val gdk_fontset_load: string -> gdk_font
     val gdk_color_alloc: gdk_colormap -> gdk_color -> bool
@@ -7396,6 +7622,10 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val container_unregister_toplevel: 'a GtkContainer -> unit
     val container_resize_children: 'a GtkContainer -> unit
     val container_child_type: 'a GtkContainer -> word
+    val container_clear_resize_widgets: 'a GtkContainer -> unit
+    val container_dequeue_resize_handler: 'a GtkContainer -> unit
+    val container_queue_resize: 'a GtkContainer -> unit
+    val container_set_reallocate_redraws: 'a GtkContainer -> bool -> unit
 
     (* *** Fixed *** *)
 
@@ -7465,6 +7695,8 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val box_set_homogeneous: 'a GtkBox -> bool -> unit
     val box_set_spacing: 'a GtkBox -> int -> unit
     val box_reorder_child: 'a GtkBox -> 'b GtkWidget -> word -> unit
+    val box_set_child_packing: 'a GtkBox -> 'b GtkWidget -> bool -> bool -> int -> pack_type -> unit
+    val box_query_child_packing: 'a GtkBox -> 'b GtkWidget -> bool * bool * word * pack_type
 
     (* *** HBox *** *)
 
@@ -7488,6 +7720,10 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     type 'a GtkButtonBox = 'a buttonbox_t GtkBox
 
 
+    val button_box_get_child_size: 'a GtkButtonBox -> int * int
+    val button_box_get_child_size_default: unit -> int * int
+    val button_box_get_child_ipadding: 'a GtkButtonBox -> int * int
+    val button_box_get_child_ipadding_default: unit -> int * int
     val button_box_set_child_size_default: int -> int -> unit
     val button_box_set_child_ipadding_default: int -> int -> unit
     val button_box_get_spacing: 'a GtkButtonBox -> int
@@ -7552,6 +7788,8 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
     val packer_new: unit -> base GtkPacker
     val packer_add_defaults: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> unit
+    val packer_add: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
+    val packer_set_child_packing: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
     val packer_reorder_child: 'a GtkPacker -> 'b GtkWidget -> int -> unit
     val packer_set_spacing: 'a GtkPacker -> word -> unit
     val packer_set_default_border_width: 'a GtkPacker -> word -> unit
@@ -7595,6 +7833,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
 
     val frame_new: string option -> base GtkFrame
+    val frame_new': unit -> base GtkFrame
     val frame_set_label: 'a GtkFrame -> string -> unit
     val frame_set_label_align: 'a GtkFrame -> real -> real -> unit
     val frame_set_shadow_type: 'a GtkFrame -> shadow_type -> unit
@@ -7676,6 +7915,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val notebook_get_menu_label: 'a GtkNotebook -> 'b GtkWidget -> base GtkWidget
     val notebook_set_menu_label: 'a GtkNotebook -> 'b GtkWidget -> 'c GtkWidget -> unit
     val notebook_set_menu_label_text: 'a GtkNotebook -> 'b GtkWidget -> string -> unit
+    val notebook_query_tab_label_packing: 'a GtkNotebook -> 'b GtkWidget -> bool * bool * pack_type
     val notebook_set_tab_label_packing: 'a GtkNotebook -> 'b GtkWidget -> bool -> bool -> pack_type -> unit
 
     (* *** Alignment *** *)
@@ -8103,6 +8343,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val tree_append: 'a GtkTree -> 'b GtkWidget -> unit
     val tree_prepend: 'a GtkTree -> 'b GtkWidget -> unit
     val tree_insert: 'a GtkTree -> 'b GtkWidget -> int -> unit
+    val tree_remove_item: 'a GtkTree -> 'b GtkWidget -> unit
     val tree_clear_items: 'a GtkTree -> int -> int -> unit
     val tree_select_item: 'a GtkTree -> int -> unit
     val tree_unselect_item: 'a GtkTree -> int -> unit
@@ -8157,6 +8398,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val clist_row_is_visible: 'a GtkCList -> int -> bool
     val clist_get_cell_type: 'a GtkCList -> int -> int -> cell_type
     val clist_set_text: 'a GtkCList -> int -> int -> string -> unit
+    val clist_get_text: 'a GtkCList -> int -> int -> int * string
     val clist_set_pixmap: 'a GtkCList -> int -> int -> gdk_pixmap -> gdk_bitmap -> unit
     val clist_set_pixtext: 'a GtkCList -> int -> int -> string -> word -> gdk_pixmap -> gdk_bitmap option -> unit
     val clist_set_pixtext': 'a GtkCList -> int -> int -> string -> word -> gdk_pixmap -> unit
@@ -8174,6 +8416,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val clist_unselect_row: 'a GtkCList -> int -> int -> unit
     val clist_undo_selection: 'a GtkCList -> unit
     val clist_clear: 'a GtkCList -> unit
+    val clist_get_selection_info: 'a GtkCList -> int -> int -> int * int * int
     val clist_select_all: 'a GtkCList -> unit
     val clist_unselect_all: 'a GtkCList -> unit
     val clist_swap_rows: 'a GtkCList -> int -> int -> unit
@@ -8359,6 +8602,10 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val range_draw_step_forw: 'a GtkRange -> unit
     val range_draw_step_back: 'a GtkRange -> unit
     val range_slider_update: 'a GtkRange -> unit
+    val range_default_hmotion: 'a GtkRange -> int -> int -> unit
+    val range_default_hslider_update: 'a GtkRange -> unit
+    val range_default_vmotion: 'a GtkRange -> int -> int -> unit
+    val range_default_vslider_update: 'a GtkRange -> unit
 
     (* *** Scale *** *)
 
@@ -8379,6 +8626,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
 
     val hscale_new: 'a GtkAdjustment option -> base GtkHScale
+    val hscale_new': unit -> base GtkHScale
 
     (* *** VScale *** *)
 
@@ -8387,6 +8635,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
 
     val vscale_new: 'a GtkAdjustment option -> base GtkVScale
+    val vscale_new': unit -> base GtkVScale
 
     (* *** Scrollbar *** *)
 
@@ -8402,6 +8651,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
 
     val hscrollbar_new: 'a GtkAdjustment option -> base GtkHScrollbar
+    val hscrollbar_new': unit -> base GtkHScrollbar
 
     (* *** VScrollbar *** *)
 
@@ -8410,6 +8660,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
 
 
     val vscrollbar_new: 'a GtkAdjustment option -> base GtkVScrollbar
+    val vscrollbar_new': unit -> base GtkVScrollbar
 
     (* *** Ruler *** *)
 
@@ -8498,6 +8749,7 @@ value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val spin_button_set_shadow_type: 'a GtkSpinButton -> shadow_type -> unit
     val spin_button_set_snap_to_ticks: 'a GtkSpinButton -> bool -> unit
     val spin_button_update: 'a GtkSpinButton -> unit
+    val spin_button_configure: 'a GtkSpinButton -> 'b GtkAdjustment -> real -> word -> unit
 
     (* *** Combo *** *)
 
@@ -8683,6 +8935,16 @@ end
 (* Start of AUTOMATICALLY generated code.                                    *)
 (*                                                                           *)
 
+
+    val check_version_: word -> word -> word -> string
+        = app3(symb"mgtk_check_version")
+    val check_version: word -> word -> word -> string
+        = fn required_major => fn required_minor => fn required_micro => check_version_ required_major required_minor required_micro
+
+    val exit_: int -> unit
+        = app1(symb"mgtk_exit")
+    val exit: int -> unit
+        = fn error_code => exit_ error_code
 
     type accel_flags = int
     val get_accel_flags_: unit -> int * int * int * int
@@ -9363,6 +9625,11 @@ end
     type gdk_color = gpointer
 
     type gdk_gc = gpointer
+
+    val gdk_beep_: unit -> unit
+        = app1(symb"mgdk_beep")
+    val gdk_beep: unit -> unit
+        = fn dummy => gdk_beep_ dummy
 
     val gdk_font_load_: string -> gdk_font
         = app1(symb"mgdk_font_load")
@@ -10233,6 +10500,26 @@ end
     val container_child_type: 'a GtkContainer -> word
         = fn OBJ container => container_child_type_ container
 
+    val container_clear_resize_widgets_: gtkobj -> unit
+        = app1(symb"mgtk_container_clear_resize_widgets")
+    val container_clear_resize_widgets: 'a GtkContainer -> unit
+        = fn OBJ container => container_clear_resize_widgets_ container
+
+    val container_dequeue_resize_handler_: gtkobj -> unit
+        = app1(symb"mgtk_container_dequeue_resize_handler")
+    val container_dequeue_resize_handler: 'a GtkContainer -> unit
+        = fn OBJ container => container_dequeue_resize_handler_ container
+
+    val container_queue_resize_: gtkobj -> unit
+        = app1(symb"mgtk_container_queue_resize")
+    val container_queue_resize: 'a GtkContainer -> unit
+        = fn OBJ container => container_queue_resize_ container
+
+    val container_set_reallocate_redraws_: gtkobj -> bool -> unit
+        = app2(symb"mgtk_container_set_reallocate_redraws")
+    val container_set_reallocate_redraws: 'a GtkContainer -> bool -> unit
+        = fn OBJ container => fn needs_redraws => container_set_reallocate_redraws_ container needs_redraws
+
     (* *** Fixed *** *)
 
     type 'a fixed_t = base
@@ -10404,6 +10691,16 @@ end
     val box_reorder_child: 'a GtkBox -> 'b GtkWidget -> word -> unit
         = fn OBJ box => fn OBJ child => fn pos => box_reorder_child_ box child pos
 
+    val box_set_child_packing_: gtkobj * gtkobj * bool * bool * int * int -> unit
+        = app1(symb"mgtk_box_set_child_packing")
+    val box_set_child_packing: 'a GtkBox -> 'b GtkWidget -> bool -> bool -> int -> pack_type -> unit
+        = fn OBJ box => fn OBJ child => fn expand => fn fill => fn padding => fn pack_type => box_set_child_packing_ (box, child, expand, fill, padding, pack_type)
+
+    val box_query_child_packing_: gtkobj -> gtkobj -> bool * bool * word * int
+        = app2(symb"mgtk_box_query_child_packing")
+    val box_query_child_packing: 'a GtkBox -> 'b GtkWidget -> bool * bool * word * pack_type
+        = fn OBJ box => fn OBJ child => box_query_child_packing_ box child
+
     (* *** HBox *** *)
 
     type 'a hbox_t = base
@@ -10431,6 +10728,26 @@ end
     type 'a buttonbox_t = base
     type 'a GtkButtonBox = 'a buttonbox_t GtkBox
 
+
+    val button_box_get_child_size_: gtkobj -> int * int
+        = app1(symb"mgtk_button_box_get_child_size")
+    val button_box_get_child_size: 'a GtkButtonBox -> int * int
+        = fn OBJ widget => button_box_get_child_size_ widget
+
+    val button_box_get_child_size_default_: unit -> int * int
+        = app1(symb"mgtk_button_box_get_child_size_default")
+    val button_box_get_child_size_default: unit -> int * int
+        = fn dummy => button_box_get_child_size_default_ dummy
+
+    val button_box_get_child_ipadding_: gtkobj -> int * int
+        = app1(symb"mgtk_button_box_get_child_ipadding")
+    val button_box_get_child_ipadding: 'a GtkButtonBox -> int * int
+        = fn OBJ widget => button_box_get_child_ipadding_ widget
+
+    val button_box_get_child_ipadding_default_: unit -> int * int
+        = app1(symb"mgtk_button_box_get_child_ipadding_default")
+    val button_box_get_child_ipadding_default: unit -> int * int
+        = fn dummy => button_box_get_child_ipadding_default_ dummy
 
     val button_box_set_child_size_default_: int -> int -> unit
         = app2(symb"mgtk_button_box_set_child_size_default")
@@ -10606,6 +10923,16 @@ end
         = app5(symb"mgtk_packer_add_defaults")
     val packer_add_defaults: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> unit
         = fn OBJ packer => fn OBJ child => fn side => fn anchor => fn options => packer_add_defaults_ packer child side anchor options
+
+    val packer_add_: gtkobj * gtkobj * int * int * int * word * word * word * word * word -> unit
+        = app1(symb"mgtk_packer_add")
+    val packer_add: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
+        = fn OBJ packer => fn OBJ child => fn side => fn anchor => fn options => fn border_width => fn pad_x => fn pad_y => fn ipad_x => fn ipad_y => packer_add_ (packer, child, side, anchor, options, border_width, pad_x, pad_y, ipad_x, ipad_y)
+
+    val packer_set_child_packing_: gtkobj * gtkobj * int * int * int * word * word * word * word * word -> unit
+        = app1(symb"mgtk_packer_set_child_packing")
+    val packer_set_child_packing: 'a GtkPacker -> 'b GtkWidget -> side_type -> anchor_type -> packer_options -> word -> word -> word -> word -> word -> unit
+        = fn OBJ packer => fn OBJ child => fn size => fn anchor => fn options => fn border_width => fn pad_x => fn pad_y => fn ipad_x => fn ipad_y => packer_set_child_packing_ (packer, child, size, anchor, options, border_width, pad_x, pad_y, ipad_x, ipad_y)
 
     val packer_reorder_child_: gtkobj -> gtkobj -> int -> unit
         = app3(symb"mgtk_packer_reorder_child")
@@ -10999,6 +11326,11 @@ end
         = app3(symb"mgtk_notebook_set_menu_label_text")
     val notebook_set_menu_label_text: 'a GtkNotebook -> 'b GtkWidget -> string -> unit
         = fn OBJ notebook => fn OBJ child => fn menu_text => notebook_set_menu_label_text_ notebook child menu_text
+
+    val notebook_query_tab_label_packing_: gtkobj -> gtkobj -> bool * bool * int
+        = app2(symb"mgtk_notebook_query_tab_label_packing")
+    val notebook_query_tab_label_packing: 'a GtkNotebook -> 'b GtkWidget -> bool * bool * pack_type
+        = fn OBJ notebook => fn OBJ child => notebook_query_tab_label_packing_ notebook child
 
     val notebook_set_tab_label_packing_: gtkobj -> gtkobj -> bool -> bool -> int -> unit
         = app5(symb"mgtk_notebook_set_tab_label_packing")
@@ -12149,6 +12481,11 @@ end
     val tree_insert: 'a GtkTree -> 'b GtkWidget -> int -> unit
         = fn OBJ tree => fn OBJ child => fn position => tree_insert_ tree child position
 
+    val tree_remove_item_: gtkobj -> gtkobj -> unit
+        = app2(symb"mgtk_tree_remove_item")
+    val tree_remove_item: 'a GtkTree -> 'b GtkWidget -> unit
+        = fn OBJ tree => fn OBJ child => tree_remove_item_ tree child
+
     val tree_clear_items_: gtkobj -> int -> int -> unit
         = app3(symb"mgtk_tree_clear_items")
     val tree_clear_items: 'a GtkTree -> int -> int -> unit
@@ -12390,6 +12727,11 @@ end
     val clist_set_text: 'a GtkCList -> int -> int -> string -> unit
         = fn OBJ clist => fn row => fn column => fn text => clist_set_text_ clist row column text
 
+    val clist_get_text_: gtkobj -> int -> int -> int * string
+        = app3(symb"mgtk_clist_get_text")
+    val clist_get_text: 'a GtkCList -> int -> int -> int * string
+        = fn OBJ clist => fn row => fn column => clist_get_text_ clist row column
+
     val clist_set_pixmap_: gtkobj -> int -> int -> gdk_pixmap -> gdk_bitmap -> unit
         = app5(symb"mgtk_clist_set_pixmap")
     val clist_set_pixmap: 'a GtkCList -> int -> int -> gdk_pixmap -> gdk_bitmap -> unit
@@ -12474,6 +12816,11 @@ end
         = app1(symb"mgtk_clist_clear")
     val clist_clear: 'a GtkCList -> unit
         = fn OBJ clist => clist_clear_ clist
+
+    val clist_get_selection_info_: gtkobj -> int -> int -> int * int * int
+        = app3(symb"mgtk_clist_get_selection_info")
+    val clist_get_selection_info: 'a GtkCList -> int -> int -> int * int * int
+        = fn OBJ clist => fn x => fn y => clist_get_selection_info_ clist x y
 
     val clist_select_all_: gtkobj -> unit
         = app1(symb"mgtk_clist_select_all")
@@ -13052,6 +13399,26 @@ end
     val range_slider_update: 'a GtkRange -> unit
         = fn OBJ range => range_slider_update_ range
 
+    val range_default_hmotion_: gtkobj -> int -> int -> unit
+        = app3(symb"mgtk_range_default_hmotion")
+    val range_default_hmotion: 'a GtkRange -> int -> int -> unit
+        = fn OBJ range => fn xdelta => fn ydelta => range_default_hmotion_ range xdelta ydelta
+
+    val range_default_hslider_update_: gtkobj -> unit
+        = app1(symb"mgtk_range_default_hslider_update")
+    val range_default_hslider_update: 'a GtkRange -> unit
+        = fn OBJ range => range_default_hslider_update_ range
+
+    val range_default_vmotion_: gtkobj -> int -> int -> unit
+        = app3(symb"mgtk_range_default_vmotion")
+    val range_default_vmotion: 'a GtkRange -> int -> int -> unit
+        = fn OBJ range => fn xdelta => fn ydelta => range_default_vmotion_ range xdelta ydelta
+
+    val range_default_vslider_update_: gtkobj -> unit
+        = app1(symb"mgtk_range_default_vslider_update")
+    val range_default_vslider_update: 'a GtkRange -> unit
+        = fn OBJ range => range_default_vslider_update_ range
+
     (* *** Scale *** *)
 
     type 'a scale_t = base
@@ -13418,6 +13785,11 @@ end
         = app1(symb"mgtk_spin_button_update")
     val spin_button_update: 'a GtkSpinButton -> unit
         = fn OBJ spin_button => spin_button_update_ spin_button
+
+    val spin_button_configure_: gtkobj -> gtkobj -> real -> word -> unit
+        = app4(symb"mgtk_spin_button_configure")
+    val spin_button_configure: 'a GtkSpinButton -> 'b GtkAdjustment -> real -> word -> unit
+        = fn OBJ spin_button => fn OBJ adjustment => fn climb_rate => fn digits => spin_button_configure_ spin_button adjustment climb_rate digits
 
     (* *** Combo *** *)
 
