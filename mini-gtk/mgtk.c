@@ -88,42 +88,6 @@ EXTERNML value mgtk_main_quit(value dummy) { /* ML */
   return Val_unit;
 }
 
-/* *** Nulls and options *** */
-
-/* [GtkOption_nullok(opt)] returns NULL if opt is
-   NONE, otherwise the pointer contained in opt.
-   THIS ONLY WORKS IF OPT CONTAINS A WIDGET POINTER!
-*/
-void *GtkObjOption_nullok(value opt) {
-  void *res;
-  int contag = Tag_val(opt);
-  if(contag == SOMEtag) {
-      value val;
-      val = Field(opt, 0);
-      res = GtkObj_val(val);
-  } else { /* must be NONE */
-      res = NULL;
-  };
-  return res;
-}
-
-/* [StringOption_nullok(opt)] returns NULL if opt is
-   NONE, otherwise the pointer contained in opt.
-   THIS ONLY WORKS IF OPT CONTAINS A STRING!
-*/
-char *StringOption_nullok(value opt) {
-  void *res;
-  int contag = Tag_val(opt);
-  if(contag == SOMEtag) {
-      value val;
-      val = Field(opt, 0);
-      res = String_val(val);
-  } else { /* must be NONE */
-      res = NULL;
-  };
-  return res;
-}
-
 /* *** GtkArg stuff *** */
 
 #define GtkArg_val(arg) ( Field(arg, 0) )
@@ -221,53 +185,6 @@ EXTERNML value mgtk_signal_connect (value object, value name, value clb, value a
 				 Bool_val(after));
   return Val_long(res);
 }
-
-/* *** Convertion from ML to C *** */
-#define Mgtk_isCons(x) (Tag_val(x) != 0)
-#define Mgtk_head(x) (Field(x, 0))
-#define Mgtk_tail(x) (Field(x, 1))
-
-
-/* CONDITION: conv must not allocate in the mosml heap */
-#define Mgtk_SMLARRAY_TO_CARRAY(sarr, carr, conv)               \
-{int MGTK_SMLARRAY_I, MGTK_SMLARRAY_SZ;                         \
- sarr = Field(sarr, 0); /* get underlying vector */             \
- MGTK_SMLARRAY_SZ = Wosize_val(sarr);                           \
- carr = malloc(MGTK_SMLARRAY_SZ);                               \
- /* FIXME: check result from malloc */                          \
- for(MGTK_SMLARRAY_I = 0; MGTK_SMLARRAY_I < MGTK_SMLARRAY_SZ;   \
-     MGTK_SMLARRAY_I++)                                         \
-   carr[MGTK_SMLARRAY_I] = conv(Field(sarr, MGTK_SMLARRAY_I));  \
-}
-
-
-/* *** Glib stuff *** */
-
-/* *** glist stuff *** */
-
-#define Mgtk_SMLLIST_TO_GLIST(sls,gls,conv)                             \
-{value MGTK_SMLLIST_TEMP = sls;                                         \
- gls = NULL;                                                            \
- while (Mgtk_isCons(MGTK_SMLLIST_TEMP)){                                \
-   value MGTK_SMLLIST_ELEM__TEMP = Mgtk_head(MGTK_SMLLIST_TEMP);        \
-   gls = g_list_append (gls,conv(MGTK_SMLLIST_ELEM__TEMP));             \
-   MGTK_SMLLIST_TEMP = Mgtk_tail(MGTK_SMLLIST_TEMP);                    \
- }                                                                      \
-}
-									
-/* Shows how Mgtk_SMLLIST_TO_GLIST can be used */
-GList* mgtk_smllist_to_glist_string(value smllist) {
-  GList* glist;
-  Mgtk_SMLLIST_TO_GLIST(smllist,glist,String_val);
-  return glist;
-}
-
-GList* mgtk_smllist_to_glist_object(value smllist) {
-  GList* glist;
-  Mgtk_SMLLIST_TO_GLIST(smllist,glist,GtkObj_val);
-  return glist;
-}
-
 
 /* *** Widget stuff *** */
 
