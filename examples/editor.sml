@@ -58,12 +58,13 @@ fun getFile () =
 (*
 	val _ = Signal.connect dialog (Dialog.response_sig (fn _ => Widget.destroy dialog))
 *)
-        val response = Dialog.run dialog  
-    in  if response = RESPONSE_ACCEPT then 
-            let val chooser = FileChooserDialog.asFileChooser dialog
-            in  SOME(FileChooser.get_filename chooser)
-            end
-        else NONE
+        val result = if Dialog.run dialog =  RESPONSE_ACCEPT then 
+                         let val chooser = FileChooserDialog.asFileChooser dialog
+                         in  SOME(FileChooser.get_filename chooser)
+                         end
+                     else NONE
+    in  Widget.destroy dialog
+      ; result
     end
 
 fun setUpGui() = 
