@@ -1,3 +1,10 @@
+2000-07-19  Henning Niss  <hniss@diku.dk>
+
+	* State.sml: made a more general and hopefully more intelligent
+	options-handling structure.
+ 	
+	* Target.sml, Messages.sml, Main.sml: using this structure.
+	
 2000-07-12  Henning Niss  <hniss@diku.dk>
 
 	* Many files: Added/updated documentation in signature files, and

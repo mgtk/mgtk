@@ -665,11 +665,12 @@ struct
     (* Main translate function - dispatches on target
        ------------------------------------------------------------
     *)
-    fun translate os target decls =
-	let val t = case target of
-	               State.C => mkCdecl
-                     | State.SIG => mkMLSigdecl
-                     | State.SML => mkMLStrdecl
+    fun translate os decls =
+	let val t = case State.getStringOption "target" of
+	               SOME "C" => mkCdecl
+                     | SOME "SIG" => mkMLSigdecl
+                     | SOME "SML" => mkMLStrdecl
+                     | _ => Util.shouldntHappen ("No target or wrong target name")
 	    fun trans d = (t d) 
 		          handle exn => 
 			      ( U.explain (U.extend exn (A.nameOf d))

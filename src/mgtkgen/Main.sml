@@ -6,106 +6,100 @@
  * Author: Henning Niss
  *)
 
+val setStringOption = State.setStringOption State.COMMAND_LINE
+val setBoolOption =   State.setBoolOption   State.COMMAND_LINE
+val addStringOption = State.addStringOption
+val addBoolOption   = State.addBoolOption
+val getStringOption = State.getStringOption
+val getBoolOption   = State.getBoolOption
+
 
 exception Error of string
 
 fun say msg = (TextIO.output(TextIO.stdErr,msg);TextIO.flushOut TextIO.stdErr)
 
-(* auxillaries for command line parsing *)
-val inFile: string ref = ref ""
-val outFile: string option ref = ref NONE
-val headFile: string option ref = ref NONE
-val footFile: string option ref = ref NONE
-val insertEnd: bool ref = ref false
-val verbose : bool ref = ref false
+(* declare some options *)
+val _ = ( addStringOption "inFile" NONE
+	; addStringOption "outFile" NONE
+        ; addStringOption "headFile" NONE
+        ; addStringOption "footFile" NONE
+        ; addBoolOption "insertEnd" false
+        ; addStringOption "target" (SOME "C")
+        )
 
 fun copyStream os is =TextIO.output (os, TextIO.inputAll is)
 
-fun parse file =
-    case Parse.parse Parser.decls file of
+fun parse () =
+    case Parse.parse Parser.decls (valOf (getStringOption "inFile")) of
 	(msg, SOME decls) => decls
-      | (SOME msg, _)     => raise Error("Error: " ^ msg)
-      | (NONE,NONE)       => Util.shouldntHappen "Parse.parse returned (N,N)"
-fun openOut file =
-    case file of
+      | (SOME msg, _) => raise Error("Error: " ^ msg)
+      | (NONE,NONE) => Util.shouldntHappen "Parse.parse returned (N,N)"
+
+fun openOut () =
+    case getStringOption "outFile" of
 	SOME fName => ((TextIO.openOut fName) 
 	               handle General.Io _ => raise Error("Couldn't open "^fName))
       | NONE => TextIO.stdOut
 
-fun closeOut (file, stream) =
-    case file of
+fun closeOut stream =
+    case getStringOption "outFile" of
 	SOME fName => TextIO.closeOut stream
       | NONE => ()
 
 fun insert (outstream, file) =
-    case file of
-	SOME fName => (let val is = TextIO.openIn fName
-		       in  (copyStream outstream is)
-			   before
-			   (TextIO.closeIn is)
-		       end
-		       handle General.Io _ => raise Error("Couldn't open "^fName))
-      | NONE => ()
+    let val is = TextIO.openIn file
+    in  (copyStream outstream is)
+	before
+	(TextIO.closeIn is)
+    end
+    handle General.Io _ => raise Error("Couldn't open "^file)
 
-fun insertFoot (outstream, file) =
-    case file of
-	SOME _ => if !insertEnd then raise Error("Both --end_footer and --footer specified")
-		  else insert (outstream, file)
-      | NONE => if !insertEnd then TextIO.output(outstream, "end\n")
-		else ()
+fun insertHead outstream =
+    case getStringOption "headFile" of
+	SOME file => insert (outstream, file)
+    |   NONE => ()
+
+fun insertFoot outstream =
+    let val insertEnd = getBoolOption "insertEnd"
+    in  case getStringOption "footFile" of
+	   SOME file => if insertEnd 
+			then raise Error("Both --end_footer and --footer specified")
+			else insert (outstream, file)
+	 | NONE => if insertEnd then TextIO.output(outstream, "end\n")
+		   else ()
+    end
 
 fun translate (outstream, decls) =
-    Translate.translate outstream (!State.target) decls
+    Translate.translate outstream decls
 
 fun message (outstream, func) =
-    func (!State.target) outstream
-
-fun chat msg =
-    if !verbose then say (msg)
-    else ()
-
-fun phase (msg, func) = (chat msg; func ())
+    func outstream
 
 (* auxillary functions used in ArgParse.parse below *)
-fun generateStructure () = 
-    ( chat "  generating ML structure\n"
-    ; State.target := State.SML
-    ; insertEnd := true
-    ; headFile := SOME("header.sml"))
-fun generateSignature () = 
-    ( chat "  generating ML signature\n"
-    ; State.target := State.SIG
-    ; insertEnd := true
-    ; headFile := SOME("header.sig"))
-fun generateC ()         = 
-    ( chat "  generating C code\n"
-    ; State.target := State.C
-    ; headFile := SOME("header.c"))
-fun setVerbose ()        = verbose := true
-fun outputFile fName     = 
-    ( chat ("  output file is: " ^ fName ^ "\n")
-    ; outFile := SOME fName)
-fun headerFile fName     = 
-    ( chat ("  header file is: " ^ fName ^ "\n")
-    ; headFile := SOME fName)
-fun noHeaderFile () =
-    ( chat ("  no header file\n")
-    ; headFile := NONE)
+fun headerFile fName = setStringOption "headFile" (SOME fName)
+fun noHeaderFile () = setStringOption "headFile" NONE
 fun footerFile fName     = 
-    ( chat ("  footer file is: " ^ fName ^ "\n")
-    ; footFile := SOME fName
-    ; insertEnd := false)
+    ( setStringOption "footFile" (SOME fName)
+    ; setBoolOption "insertEnd" false)
 fun endFooter () =
-    ( chat ("  footer is `end´\n")
-    ; insertEnd := true
-    ; footFile := NONE)
+    ( setBoolOption "insertEnd" true
+    ; setStringOption "footFile" NONE)
 fun noFooter () =
-    ( chat ("  no footer\n")
-    ; insertEnd := false
-    ; footFile := NONE)
-fun inputFile  fName     = 
-    ( chat ("  input file is: " ^ fName ^ "\n")
-    ; inFile := fName)
+    ( setBoolOption "insertEnd" false
+    ; setStringOption "footFile" NONE)
+
+fun generateStructure () = 
+    ( setStringOption "target" (SOME "SML")
+    ; endFooter ()
+    ; headerFile "header.sml")
+fun generateSignature () = 
+    ( setStringOption "target" (SOME "SIG")
+    ; endFooter ()
+    ; headerFile "header.sig")
+fun generateC ()         = 
+    ( setStringOption "target" (SOME "C")
+    ; headerFile "header.c")
+
 fun showVersion () =
     ( say ("defs2sml --- stub file generator (Jul 11). ")
     ; say ("(c) Henning Niss and Ken Friis-Larsen\n")
@@ -114,15 +108,16 @@ fun showVersion () =
 
 fun showFunctionality () =
     ( say ("functionality: ")
-    ; case !headFile of SOME fName => say(fName ^ "+") | NONE => ()
-    ; case !State.target of
-         State.SML => say ("toSML(")
-       | State.SIG => say ("toSIG(")
-       | State.C   => say ("toC(")
-    ; say (!inFile ^ ")")
-    ; case !footFile of SOME fName => say("+" ^ fName) | NONE => ()
+    ; case getStringOption "headFile" of SOME fName => say(fName ^ "+") 
+                                       | NONE => ()
+    ; case getStringOption "target" of SOME str => "to"^str^"(" 
+                                     | NONE => raise Error "No target specified."
+    ; say (valOf(getStringOption "inFile") ^ ")")
+    ; case getStringOption "footFile" of SOME fName => say("+" ^ fName) 
+                                       | NONE => ()
     ; say (" -> ")
-    ; case !outFile of SOME fName => say(fName) | NONE => say ("stdout")
+    ; case getStringOption "outFile" of SOME fName => say(fName) 
+                                      | NONE => say ("stdout")
     ; say ("\n")
     )
 fun main () =
@@ -140,27 +135,27 @@ fun main () =
 			("--end-footer",  ArgParse.Unit endFooter),
 			("-end",          ArgParse.Unit endFooter),
 			("--no-footer",   ArgParse.Unit noFooter),
-			("-o",            ArgParse.String outputFile),
+			("-o",            ArgParse.String (setStringOption "outFile" o SOME)),
 			("-V",            ArgParse.Unit showVersion),
-			("--version",     ArgParse.Unit showVersion),
-			("-v",            ArgParse.Unit setVerbose),
-			("--verbose",     ArgParse.Unit setVerbose)
-		       ] inputFile)
+			("--version",     ArgParse.Unit showVersion)
+		       ] (setStringOption "inFile" o SOME))
                        handle ArgParse.Bad msg => raise Error msg
 
-        val _ = if !inFile = "" then raise Error("No input file specified!")
-		else ()
-	val _ = showFunctionality ()
-	val decls = phase ("Parsing " ^ !inFile ^ "\n", fn () => parse (!inFile))
-	val outstream = openOut (!outFile)
+	val _ = case (getStringOption "inFile") of
+	           NONE => raise Error("No input file specified!")
+		|  _ => ()
 
-        val _ = phase ("Copyright message\n", fn () => message (outstream,Messages.copyright))
-        val _ = phase ("Autogenerated message\n", fn () => message (outstream,Messages.autogenerated))
-	val _ = phase ("Inserting header\n", fn () => insert (outstream, !headFile))
-        val _ = phase ("Autogeneration start message\n", fn () => message (outstream,Messages.autostart))
-        val _ = phase ("Translating\n", fn () => translate (outstream, decls))
-        val _ = phase ("Inserting footer\n", fn () => insertFoot (outstream,!footFile))
-	val _ = closeOut (!outFile, outstream)
+	val _ = showFunctionality ()
+	val decls = parse ()
+	val outstream = openOut ()
+
+        val _ = message (outstream,Messages.copyright)
+        val _ = message (outstream,Messages.autogenerated)
+	val _ = insertHead outstream
+        val _ = message (outstream,Messages.autostart)
+        val _ = translate (outstream, decls)
+        val _ = insertFoot outstream
+	val _ = closeOut outstream
     in  ()
     end
     handle Error msg => say (msg ^ "\n")

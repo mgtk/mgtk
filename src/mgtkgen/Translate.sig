@@ -4,14 +4,14 @@
 signature Translate =
 sig
 
-    val translate: TextIO.outstream -> State.target -> AST.declaration list -> unit
+    val translate: TextIO.outstream -> AST.declaration list -> unit
 end
 
 (*
 
-   [translate outstream target decls] generates code from the list of
+   [translate outstream decls] generates code from the list of
    declarations decls and outputs the result on the output stream
    outstream. The type of the generated code depends on the target
-   argument (C, SIG, SML).
+   option (either C, SIG, SML; see Main.sml).
 
 *)
