@@ -226,11 +226,11 @@ EXTERNML value mgtk_signal_connect (value object, value name, value clb, value a
 
 
 /* CONDITION: conv must not allocate in the mosml heap */
-#define Mgtk_SMLARRAY_TO_CARRAY(sarr, carr, conv)               \
+#define Mgtk_SMLARRAY_TO_CARRAY(sarr, carr, csize, conv)        \
 {int MGTK_SMLARRAY_I, MGTK_SMLARRAY_SZ;                         \
  sarr = Field(sarr, 0); /* get underlying vector */             \
  MGTK_SMLARRAY_SZ = Wosize_val(sarr);                           \
- carr = malloc(MGTK_SMLARRAY_SZ);                               \
+ carr = malloc(MGTK_SMLARRAY_SZ*csize);                         \
  /* FIXME: check result from malloc */                          \
  for(MGTK_SMLARRAY_I = 0; MGTK_SMLARRAY_I < MGTK_SMLARRAY_SZ;   \
      MGTK_SMLARRAY_I++)                                         \
