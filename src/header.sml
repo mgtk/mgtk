@@ -2,6 +2,7 @@ structure Gtk :> Gtk =
 struct
 
     prim_type gtkobj
+    prim_type gpointer (* the type of all boxed types *)
 
     open Dynlib
     local 
@@ -81,11 +82,13 @@ struct
 
     end	
 
+    (* connect a callback with return type unit *)
     fun unit_connect (OBJ wid) sign cb =
 	let val id = reg_unit cb
 	in  ignore(signal_connect wid sign id false)
 	end
 
+    (* connect a callback with return type bool *)
     fun bool_connect (OBJ wid) sign cb =
 	let val id = reg_bool cb
 	in  ignore(signal_connect wid sign id true)
@@ -94,4 +97,3 @@ struct
     type base = unit
     type 'a widget_t = base
     type 'a GtkWidget = 'a widget_t GtkObject
-

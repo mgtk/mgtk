@@ -1074,73 +1074,319 @@
   int
   ())
 
-(define-func gdk_draw_point
-  none
-  ((GdkDrawable drawable)
-   (GdkGC gc)
-   (int x) (int y)))
-(define-func gdk_draw_line
-  none
-  ((GdkDrawable drawable)
-   (GdkGC gc)
-   (int x1) (int y1)
-   (int x2) (int y2)))
-(define-func gdk_draw_rectangle
-  none
-  ((GdkDrawable drawable)
-   (GdkGC gc)
-   (int filled)
-   (int x)     (int y)
-   (int width) (int height)))
-(define-func gdk_draw_arc
-  none
-  ((GdkDrawable drawable)
-   (GdkGC gc)
-   (int filled)
-   (int x)      (int y)
-   (int width)  (int height)
-   (int angle1) (int angle2)))
-; gdk_draw_polygon
-(define-func gdk_draw_string
-  none
-  ((GdkDrawable drawable)
-   (GdkFont font)
-   (GdkGC gc)
-   (int x) (int y)
-   (string str)))
-(define-func gdk_draw_text;  Henning, inserted, 06/03/2000
-  none
-  ((GdkDrawable drawable)
-   (GdkFont font)
-   (GdkGC gc)
-   (int x) (int y)
-   (string text)
-   (int text_length)))
-(define-func gdk_draw_pixmap
-  none
-  ((GdkDrawable drawable)
-   (GdkGC gc)
-   (GdkDrawable src)
-   (int xsrc)  (int ysrc)
-   (int xdest) (int ydest)
-   (int width) (int height)))
-;gdk_draw_points
-;gdk_draw_segments
-;gdk_draw_lines
+;; Replaced a lot of Gdk drawing functions
+;; with the Gtk equivalents (from Sugar).
+;; Henning
 
-; Henning
-;(define-func gdk_cursor_new
-;  GdkCursor
-;  ((GdkCursorType cursor_type)))
+(define-func gdk_window_clear_area 
+   none
+   ((GdkWindow window); Henning, this should be a drawable
+    (int x1) (int y1)
+    (int x2) (int y2)))
 
-; Henning
-;(define-func gdk_cursor_new_from_pixmap
-;  GdkCursor
-;  ((GdkPixmap source)
-;   (GdkBitmap mask)
-;   (GdkColor fg)
-;   (GdkColor bg)
+;(define-func gdk_draw_point
+;  none
+;  ((GdkDrawable drawable)
+;   (GdkGC gc)
 ;   (int x) (int y)))
+;(define-func gdk_draw_line
+;  none
+;  ((GdkDrawable drawable)
+;   (GdkGC gc)
+;   (int x1) (int y1)
+;   (int x2) (int y2)))
+;(define-func gdk_draw_rectangle
+;  none
+;  ((GdkDrawable drawable)
+;   (GdkGC gc)
+;   (int filled)
+;   (int x)     (int y)
+;   (int width) (int height)))
+;(define-func gdk_draw_arc
+;  none
+;  ((GdkDrawable drawable)
+;   (GdkGC gc)
+;   (int filled)
+;   (int x)      (int y)
+;   (int width)  (int height)
+;   (int angle1) (int angle2)))
+;; gdk_draw_polygon
+;(define-func gdk_draw_string
+;  none
+;  ((GdkDrawable drawable)
+;   (GdkFont font)
+;   (GdkGC gc)
+;   (int x) (int y)
+;   (string str)))
+;(define-func gdk_draw_text;  Henning, inserted, 06/03/2000
+;  none
+;  ((GdkDrawable drawable)
+;   (GdkFont font)
+;   (GdkGC gc)
+;   (int x) (int y)
+;   (string text)
+;   (int text_length)))
+;(define-func gdk_draw_pixmap
+;  none
+;  ((GdkDrawable drawable)
+;   (GdkGC gc)
+;   (GdkDrawable src)
+;   (int xsrc)  (int ysrc)
+;   (int xdest) (int ydest)
+;   (int width) (int height)))
+;;gdk_draw_points
+;;gdk_draw_segments
+;;gdk_draw_lines
+
+;; Henning
+;;(define-func gdk_cursor_new
+;;  GdkCursor
+;;  ((GdkCursorType cursor_type)))
+
+;; Henning
+;;(define-func gdk_cursor_new_from_pixmap
+;;  GdkCursor
+;;  ((GdkPixmap source)
+;;   (GdkBitmap mask)
+;;   (GdkColor fg)
+;;   (GdkColor bg)
+;;   (int x) (int y)))
+
+;; Gtk equivalents, Henning
+(define-func gtk_draw_arrow
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (GtkArrowType arrow_type)
+   (bool fill)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_box
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_box_gap
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)
+   (GtkPositionType gap_side)
+   (int gap_x)
+   (int gap_width)))
+
+(define-func gtk_draw_check
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_cross
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_diamond
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_extension
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)
+   (GtkPositionType gap_side)))
+
+(define-func gtk_draw_flat_box
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_focus
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_handle
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)
+   (GtkOrientation orientation)))
+
+(define-func gtk_draw_hline
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (int x1)
+   (int x2)
+   (int y)))
+
+(define-func gtk_draw_option
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_oval
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+; Henning
+;(define-func gtk_draw_polygon
+;  none
+;  ((GtkStyle style)
+;   (GdkWindow window)
+;   (GtkStateType state_type)
+;   (GtkShadowType shadow_type)
+;   (GdkPoint points)
+;   (int npoints)
+;   (bool fill)))
+
+(define-func gtk_draw_ramp
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (GtkArrowType arrow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_shadow
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_shadow_gap
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)
+   (GtkPositionType gap_side)
+   (int gap_x)
+   (int gap_width)))
+
+(define-func gtk_draw_slider
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)
+   (GtkOrientation orientation)))
+
+(define-func gtk_draw_string
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (int x)
+   (int y)
+   (static_string string)))
+
+(define-func gtk_draw_tab
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (GtkShadowType shadow_type)
+   (int x)
+   (int y)
+   (int width)
+   (int height)))
+
+(define-func gtk_draw_vline
+  none
+  ((GtkStyle style)
+   (GdkWindow window)
+   (GtkStateType state_type)
+   (int y1)
+   (int y2)
+   (int x)))
 
 ;; misc gdk functions that are useful to GTK programmers ...
 (define-func gdk_screen_width
@@ -1165,9 +1411,21 @@
 ;(define-object GtkObject (nil))
 
 ; GtkWidgets has to be defined in the ``header''
-; in order to give the right type to toWidget;
-; hence it is commented-out here, Henning
+; in order to give the right type to toWidget
+; (in the signature); hence it is commented-out
+; here, Henning
 ;(define-object GtkWidget (GtkObject))
+
+
+;; Added a few functions accessing internal widget data, Henning
+(define-func gtk_get_window
+  GdkWindow
+  ((GtkWidget widget)))
+
+(define-func gtk_get_state 
+  GtkStateType 
+  ((GtkWidget widget)))
+
 
 ; from gtktypeutils.h
 ; Removed, Henning

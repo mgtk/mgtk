@@ -160,7 +160,7 @@ value mgtk_set_pos_bool (GtkArg *args, value pos, value val) { /* ML */
   int p = Int_val(pos);
 
   if (GTK_FUNDAMENTAL_TYPE(args[p].type) != GTK_TYPE_BOOL)
-    failwith (" mgtk_set_pos_bool: argument type mismatch");
+    failwith ("mgtk_set_pos_bool: argument type mismatch");
   
   *GTK_RETLOC_BOOL(args[p]) = Bool_val(val);
   return Val_unit;
@@ -191,4 +191,16 @@ value mgtk_glist_nil (value dummy) { /* ML */
 value mgtk_glist_append_string(value ls, value s) { /* ML */
   Glist_val(ls) = g_list_append (Glist_val(ls), String_val (s));
   return Val_unit;
+}
+
+
+
+/* *** Access functions to internal widget data *** */
+
+GdkWindow *gtk_get_window (GtkWidget *widget) {
+  return widget->window;
+}
+
+GtkStateType gtk_get_state (GtkWidget *widget) {
+  return widget->state;
 }
