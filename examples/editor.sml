@@ -61,7 +61,7 @@ fun getFile kind =
                     , (stock       , RESPONSE_ACCEPT)
                     ]
 
-        val result = if Dialog.run dialog =  RESPONSE_ACCEPT then 
+        val result = if Dialog.run dialog =  RESPONSE_ACCEPT orelse true then 
                          let val chooser = FileChooserDialog.asFileChooser dialog
                          in  SOME(FileChooser.get_filename chooser)
                          end
