@@ -279,6 +279,10 @@ by the Moscow ML compiler
   Fra mini muck-up til fuld toolkit
 \end{ednote}
 
+\begin{ednote}{Henning}
+  What is a binding?
+\end{ednote}
+
 In constructing the \mgtk binding we leverage the foresightedness of
 the \gtk developers. Early on it was recognized that it would be
 important to have a machine-readable ``specification'' of the toolkit.
@@ -290,8 +294,24 @@ the C header files; however, that incurs an initial hurdle in the
 form of a suitable parser that is not present with the easily parsable
 defs-format.
 
+\begin{ednote}{Henning} This is crap, but it is there. \end{ednote}
+
 The bulk of the \mgtk binding is constructed automatically from the
-\texttt{gtk.defs} file. An important part of the process is to
+\texttt{gtk.defs} file. Based on this automatic construction the
+complete binding process is naturally divided in two phases: (1)
+binding ``design'', and (2) binding construction. It is important to
+note here that the design phase can be carried out for a very small
+subset of the complete toolkit after which the construction phase
+``mimicks'' that for the complete toolkit We refer to the design as a
+\emph{muck-up} and the result as \minimgtk. This phase separation
+makes it easier to get the design right simply because there are fewer
+issues to deal with, and it makes the work involved in moving the
+binding to other \sml compilers manageable (essentially just ask the
+compiler writers to provide the equivalent of \minimgtk for their
+compiler; and mimic that during the construction phase). Of course it
+also when new releases of \gtk are produced. Most of the work in
+constructing the binding for the new release is over when the muck-up
+has been completed.
 
 
 \subsection{Stubs and code generation}
