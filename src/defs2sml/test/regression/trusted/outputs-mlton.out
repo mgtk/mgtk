@@ -192,7 +192,7 @@ structure Gtk  = struct
 		      : cptr * cptr * int * int -> unit;
 	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn line_number => fn char_offset =>
-		 let val iter = alloc_GtkTextIter ()
+		 let val iter = TextIter.alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self => getiter_at_line_offset_
@@ -342,7 +342,7 @@ structure Gtk  = struct
 	    = _import "gtk_tree_store_append" : cptr * cptr * cptr -> unit;
 	val append : 'a t -> TreeIter.t option -> TreeIter.t
 	    = fn self => fn parent =>
-		 let val iter = alloc_GtkTreeIter ()
+		 let val iter = TreeIter.alloc_GtkTreeIter ()
 		     val ret = GObject.withPtr
 				 (self, 
 				  fn self =>
@@ -350,7 +350,7 @@ structure Gtk  = struct
 					      getOpt (parent, GObject.null)))
 		 in iter end
 	val append' : 'a t -> TreeIter.t
-	    = fn self => let val iter = alloc_GtkTreeIter ()
+	    = fn self => let val iter = TreeIter.alloc_GtkTreeIter ()
 			     val ret = GObject.withPtr
 					 (self, 
 					  fn self => append_ (self, iter, 

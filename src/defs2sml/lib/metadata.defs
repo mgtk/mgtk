@@ -81,3 +81,12 @@
     '("gint" "n_elements")
   )
 )
+
+(override-parameters gtk_file_chooser_dialog_new
+  (of-object "GtkFileChooserDialog")
+  (parameters
+    '("const-gchar*" "title"   (null-ok))
+    '("GtkWindow*"   "parent"  (null-ok))
+    '("const-gchar*" "first_button_text" (null-ok))
+  )
+)
