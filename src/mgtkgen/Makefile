@@ -4,7 +4,7 @@
 include ../Makefile.inc
 
 OBJS=Combinators.uo Stream.uo WSeq.uo Util.uo NameUtil.uo \
-     TypeInfo.uo Parse.uo Parser.uo Lexer.uo AST.uo Translate.uo \
+     TypeExp.uo TypeInfo.uo Parse.uo Parser.uo Lexer.uo AST.uo Translate.uo \
      ArgParse.uo Messages.uo Main.uo
 PROG=mgtkgen
 
@@ -38,22 +38,24 @@ depend:
 
 ### EVERYTHING THAT GOES BEYOND THIS COMMENT WILL BE ERASED WITHOUT WARNING
 ### DO NOT DELETE THIS LINE
-Translate.ui: AST.ui 
-TypeInfo.uo: AST.ui NameUtil.ui WSeq.ui Util.uo 
+Combinators.uo: Combinators.ui Lexer.ui Stream.ui 
+TypeExp.uo: TypeExp.ui Util.uo 
 WSeq.uo: WSeq.ui 
-ArgParse.uo: ArgParse.ui 
-Combinators.uo: Combinators.ui Lexer.ui 
-Combinators.ui: Lexer.ui 
+TypeInfo.uo: TypeExp.ui NameUtil.ui WSeq.ui Util.uo 
+Translate.uo: Translate.ui AST.ui TypeInfo.uo TypeExp.ui NameUtil.ui \
+    WSeq.ui Util.uo 
+Translate.ui: AST.ui 
 Stream.uo: Stream.ui 
-Parser.uo: AST.ui Lexer.ui Combinators.ui 
+Parser.uo: AST.ui TypeExp.ui Lexer.ui Combinators.ui Util.uo 
 Parse.uo: Lexer.ui Combinators.ui Stream.ui 
-Main.uo: Parser.uo AST.ui Translate.ui Messages.ui ArgParse.ui Util.uo \
-    Parse.uo 
 NameUtil.uo: NameUtil.ui 
 Messages.uo: Messages.ui AST.ui WSeq.ui 
 Messages.ui: AST.ui 
+Main.uo: Parser.uo AST.ui Translate.ui Messages.ui ArgParse.ui Util.uo \
+    Parse.uo 
 Lexer.uo: Lexer.ui Stream.ui 
 Lexer.ui: Stream.ui 
-Translate.uo: Translate.ui AST.ui TypeInfo.uo NameUtil.ui WSeq.ui Util.uo 
-AST.uo: AST.ui Lexer.ui 
-AST.ui: Lexer.ui 
+Combinators.ui: Lexer.ui 
+ArgParse.uo: ArgParse.ui 
+AST.uo: AST.ui TypeExp.ui Lexer.ui Util.uo 
+AST.ui: TypeExp.ui Lexer.ui 

@@ -5,31 +5,20 @@ signature AST =
 sig
 
     type pos = Lexer.pos
+    type long_texp = TypeExp.long_texp
 
     datatype target = SIG | SML | C
 
-    datatype texp = 
-	TYPENAME of string
-      | TUPLE of long_texp list
-      | ARROW of long_texp list * long_texp
-      | OPTION of long_texp
-      | OUTPUT of long_texp
-      | FLAG of string * bool (* is this an enum? *)
-      | LIST of long_texp
-    and long_texp = LONG of string list (* path to the type *)
-                          * texp (* the type itself *)
-
-    val toString: long_texp -> string
 
     type constructor = string
     type parameter = long_texp * string
 
     datatype declaration =
-	OBJECT_DECL of pos * string * string * (parameter list option)
+	OBJECT_DECL of pos * long_texp * (parameter list option)
       | FUNCTION_DECL of pos * string * long_texp * (parameter list)
       | FLAGS_DECL of pos * long_texp * constructor list
-      | BOXED_DECL of pos * string * (string list) * string option
-      | SIGNAL_DECL of pos * string * string list * long_texp option
+      | BOXED_DECL of pos * long_texp * (string list) * string option
+      | SIGNAL_DECL of pos * long_texp * string list * long_texp option
 
     val isWidget: declaration -> bool
     val isFunction: declaration -> bool
@@ -42,8 +31,6 @@ sig
     val signalOf: string list -> string
     val typeOf: declaration -> string
     val posOf: declaration -> pos
-
-    val typeClass: long_texp -> string
 
     val equal: declaration * declaration -> bool
     val nameOrder: declaration * declaration -> order

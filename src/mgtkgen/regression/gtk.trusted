@@ -7611,7 +7611,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val drag_dest_unset: 'a GtkWidget -> unit
     val drag_source_unset: 'a GtkWidget -> unit
     val drag_source_set_icon: 'a GtkWidget -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> unit
-    val drag_set_icon_widget: gdk_drag_context -> 'b GtkWidget -> int -> int -> unit
+    val drag_set_icon_widget: gdk_drag_context -> 'a GtkWidget -> int -> int -> unit
     val drag_set_icon_pixmap: gdk_drag_context -> gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
     val drag_set_icon_default: gdk_drag_context -> unit
     val drag_set_default_icon: gdk_colormap -> gdk_pixmap -> gdk_bitmap -> int -> int -> unit
@@ -8414,7 +8414,7 @@ EXTERNML value mgtk_text_forward_delete(value text, value nchars) { /* ML */
     val clist_column_titles_passive: 'a GtkCList -> unit
     val clist_set_column_title: 'a GtkCList -> int -> string -> unit
     val clist_get_column_title: 'a GtkCList -> int -> string
-    val clist_set_column_widget: 'a GtkCList -> int -> 'c GtkWidget -> unit
+    val clist_set_column_widget: 'a GtkCList -> int -> 'b GtkWidget -> unit
     val clist_get_column_widget: 'a GtkCList -> int -> base GtkWidget
     val clist_set_column_justification: 'a GtkCList -> int -> justification -> unit
     val clist_set_column_visibility: 'a GtkCList -> int -> bool -> unit
@@ -10377,7 +10377,7 @@ end
 
     val drag_set_icon_widget_: gdk_drag_context -> gtkobj -> int -> int -> unit
         = app4(symb"mgtk_drag_set_icon_widget")
-    val drag_set_icon_widget: gdk_drag_context -> 'b GtkWidget -> int -> int -> unit
+    val drag_set_icon_widget: gdk_drag_context -> 'a GtkWidget -> int -> int -> unit
         = fn context => fn OBJ widget => fn hot_x => fn hot_y => drag_set_icon_widget_ context widget hot_x hot_y
 
     val drag_set_icon_pixmap_: gdk_drag_context * gdk_colormap * gdk_pixmap * gdk_bitmap * int * int -> unit
@@ -12681,7 +12681,7 @@ end
 
     val clist_set_column_widget_: gtkobj -> int -> gtkobj -> unit
         = app3(symb"mgtk_clist_set_column_widget")
-    val clist_set_column_widget: 'a GtkCList -> int -> 'c GtkWidget -> unit
+    val clist_set_column_widget: 'a GtkCList -> int -> 'b GtkWidget -> unit
         = fn OBJ clist => fn column => fn OBJ widget => clist_set_column_widget_ clist column widget
 
     val clist_get_column_widget_: gtkobj -> int -> gtkobj
