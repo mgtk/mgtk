@@ -1,0 +1,125 @@
+\RequirePackage[latin1]{inputenc}
+\RequirePackage[T1]{fontenc}
+
+% Fonts
+\RequirePackage{charter}
+\RequirePackage{mathptm}
+% (Use a condensed courier --- from the pslatex.sty package
+%  Need an ugly hack, the \input below, to persuade LaTeX
+%  to do this.)
+\renewcommand{\ttdefault}{pcr}
+\input t1pcr.fd
+\DeclareFontShape{T1}{pcr}{m}{n}{%
+   <-> pcrr8tn%
+}{}%
+
+
+\RequirePackage{ifthen}
+\RequirePackage{array}
+\RequirePackage{multicol}
+
+\def\progname{defs2sml}
+\def\libname{mGtk}
+\def\gtkname{Gtk+}
+
+\def\programname#1{#1}
+
+\def\command{\texttt}
+\def\filename{\textsf}
+\def\filenamestart{\sffamily}
+\def\filenameend{}
+
+% Hackery to let syntax use underscores
+{
+  \gdef\underscore{\texttt{\char'137}}% Character '137 in TT is underscore
+  \catcode`\_=\active
+  \gdef\typesetsyntax{\begingroup%
+                        \catcode`\_=\active\relax
+                        \typesetsyntax@}
+  \gdef\typesetsyntax@#1{\let_\underscore\texttt{#1}\endgroup}
+}
+\let\syntax\typesetsyntax
+\let\function\syntax
+\let\literal\syntax
+
+% Hackery to let options use double dashes
+{
+  \gdef\dash{\texttt{\char'055}}% Character '055 in TT is dash
+  \catcode`\-=\active
+  \gdef\optionstart{\begingroup%
+                       \catcode`\-=\active\relax%
+                       \optionstart@}
+%  !*!,! is a string that is probably never used ;-)
+  \gdef\optionstart@{\@ifnextchar[{\optionstart@@}{\optionstart@@[!*!,!]}}
+  \gdef\optionstart@@[#1]#2{%
+    \let-\dash%
+    \texttt{#2}%
+    \ifthenelse{\equal{#1}{!*!,!}}{}{\,\optionarg{#1}}%
+    \endgroup}
+}
+\let\optionname\optionstart
+\def\optionarg{\textit}
+\def\option{\optionstart}
+
+\newenvironment{filedescription}
+  {\tabular{@{}>{\small\filenamestart}p{.28\textwidth}@{\quad}|@{\quad}>{\small}p{.58\textwidth}@{}}}
+  {\endtabular}
+
+{
+  \gdef\nonterminal#1>{$\langle\textit{#1}\rangle$}
+  \gdef\colon{\char'072}
+  \catcode`\<=\active
+  \catcode`\"=\active
+  \catcode`\:=\active
+  \catcode`\*=\active
+  \catcode`\+=\active
+  \catcode`\|=\active
+  \catcode`\^^M=\active %
+  \gdef\ebnfstart{\begingroup%
+                     \catcode`\<=\active\relax%
+                     \catcode`\"=\active\relax%
+                     \catcode`\:=\active\relax%
+                     \catcode`\*=\active\relax%
+                     \catcode`\+=\active\relax%
+                     \catcode`\|=\active\relax%
+                     \catcode`\^^M=\active\relax%
+                     \ebnfstart@}%
+  \gdef\ebnfstart@{%
+    \let<\nonterminal%
+    \def"{\texttt\bgroup\char'042\termin@l}%
+    \def:{\col@n}%
+    \def|{$\,\vert\,$}%
+    \def*{${}^\star$}%
+    \def+{${}^{\textrm{\char'053}}$}%
+    \def^^M{\\}%
+  }%
+  \gdef\col@n{\futurelet\next\c@l@n}%
+  \gdef\c@l@n#1{\ifx:\next\let\next\equ@l%
+                \else\def\next{\clnsmt#1}%
+                \fi\next}%
+  \gdef\equ@l{\futurelet\next\eq@@l}%
+  \gdef\eq@@l#1{\ifx=\next\let\next\clnclneql%
+                \else\def\next{\clnclnsmt#1}%
+                \fi\next}%
+  \gdef\clnsmt#1{\colon #1}%
+  \gdef\clnclneql{$\rightarrow$}%
+  \gdef\clnclnsmt#1{\colon\colon #1}%
+  %
+  \gdef\termin@l{\futurelet\next\term@n@l}%
+  \gdef\term@n@l#1{\ifx"\next\def\next{\char'042\egroup}%
+                   \else\def\next{\trmins#1}%
+                   \fi\next}%
+  \gdef\trmins#1{#1\termin@l}%
+}%
+\newenvironment{ebnf}{\ebnfstart\tabular{lcl}}{\endtabular\endgroup}
+
+
+% Table of contents
+\setlength{\columnseprule}{.5pt}
+\AtBeginDocument{\addtocontents{toc}{\protect\begin{multicols}{2}}}
+\AtEndDocument{\addtocontents{toc}{\protect\end{multicols}}}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "defs2sml"
+%%% End: 
