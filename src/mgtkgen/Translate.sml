@@ -563,7 +563,7 @@ struct
 	    val fName' = flagRealName flag
 	    val tupleType = mlFlagTupleType constr
 	    fun cName const = $(mlEnumName const)
-	in  mkEqTypeDecl (fName, SOME ($"int"))
+	in  mkTypeDecl (fName, SOME ($"int"))
          && $$[indent,"val get_", fName, "_: "]
 	       && $"unit -> " && TypeInfo.mkMLPrimType tupleType && Nl
 	       && $$[indent, indent, "= app1(symb\"mgtk_get_",fName,"\")"] && Nl
