@@ -65,9 +65,7 @@ fun getFile kind =
                 OPEN => ("Open File", FileChooser.ACTION_OPEN, "gtk-open")
               | SAVE => ("Save As", FileChooser.ACTION_SAVE, "gtk-save-as")
 
-	val _ = print "Making dialog ...\n"
         val dialog = FileChooserDialog.new NONE NONE action
-	val _ = print "Dialog up\n"
         val _ = map (uncurry (Dialog.add_button dialog))
                     [ ("gtk-cancel", RESPONSE_CANCEL)
                     , (stock       , RESPONSE_ACCEPT)
