@@ -186,19 +186,9 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   if(mvp == (valueptr) NULL)
     failwith("Cannot find mgtk_callback_dispatch");
 
-  /* printf("callback id = %i\n",(int) data); */
-
+  /* printf("callback id = %i\n",(int) data); 
+   */
   res = callbackptr2(mvp, (value) data, res);
-
-  /*
-  switch (GTK_FUNDAMENTAL_TYPE(args[nargs].type)) {
-  case GTK_TYPE_NONE:
-    return;
-  case GTK_TYPE_BOOL:
-    *GTK_RETLOC_BOOL(*args) = Bool_val(res);
-    return;
-  }
-  */
 }
 
 void mgtk_callback_destroy (gpointer data) {

@@ -149,8 +149,11 @@ struct
     type 'a return        = ('a, unit) trans
 
     fun getter get (f, S(arg, max, next)) = 
-        if next < max then (f (get arg next), S(arg, max, next+1))
+        if next <= max  (* FIXME: it should be < but that gives problems with
+                                  return_unit.  Currently unsafe *)
+        then (f (get arg next), S(arg, max, next+1))
         else raise Subscript
+
     fun setter set (x, dummy as S(arg, max, next)) =
         if next = max then (set arg max x; ((),dummy))
         else raise Subscript
@@ -161,15 +164,19 @@ struct
     fun bool x        = getter getBool x
     fun return_bool x = setter setBool x
 
-    fun unit x       = getter (fn _ => fn _ => ()) x
-    fun return_unit x = setter (fn _ => fn _ => fn _ => ()) x
+    
+    fun unit x        = getter (fn _ => fn _ => ()) x
+    fun return_unit x = x
+    (*fun return_unit x = setter (fn _ => fn _ => fn _ => ()) x
+    *)           
+
                
     infix --> 
 
     fun (x --> y) arg = y (x arg)                        
 
     fun signalConnect (OBJ wid) sign after conv f =
-        let val wrap = fn (_, arg, max) => ignore(conv (f, S(arg, max, 0)))
+        let fun wrap (_, arg, max) = ignore(conv (f, S(arg, max, 0)))
             val id = register wrap
         in  signal_connect wid sign id after
         end
