@@ -57,13 +57,13 @@ mgtk-mlton.o: mgtk-mlton.c
 buttons-galore-mlton: buttons-galore-mlton.cm mgtk-mlton.o \
                       $(shell mlton -stop f buttons-galore-mlton.cm)
 	mlton -output buttons-galore-mlton -verbose 2 buttons-galore-mlton.cm \
-	      mgtk-mlton.o `pkg-config --libs gtk+-2.0`
+	      mgtk-mlton.o `pkg-config --libs-only-l gtk+-2.0`
 
 
 helloworld-mlton: helloworld-mlton.cm mgtk-mlton.o \
                   $(shell mlton -stop f helloworld-mlton.cm)
 	mlton -output helloworld-mlton -verbose 2 helloworld-mlton.cm \
-	      mgtk-mlton.o `pkg-config --libs gtk+-2.0`
+	      mgtk-mlton.o `pkg-config --libs-only-l gtk+-2.0`
 
 
 
