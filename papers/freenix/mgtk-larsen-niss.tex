@@ -56,7 +56,7 @@
   language with a non--object-oriented type system.  In this paper we
   describe how it is possible to encode a single-inheritance
   class-hierarchy using \sml's type system and we describe how we
-  machine-generate most of the library to utilise the limited
+  machine-generate most of the library to utilize the limited
   man-power of the project.
 \end{abstract}
 
@@ -65,23 +65,66 @@
 \section{Introduction}
 \label{sec:intr-backgr}
 
-
-
-\subsection{Standard ML and GTK+}
+This section gives a brief introduction to \sml and \gtk, and present
+an overview of the rest of the paper.
 
 \begin{ednote}{Ken}
-  * Hvad og hvorfor: SML  
-  
-  * Gtk+ er interessant (og C var et godt
-    impl. valg)  
-  
+  * Hvad med at motivere og forklare hvorfor vi vil have et grafisk lib
+  til SML.
+
   * SML er ikke OO (tester Gtk+-folkenes "hypotese")
 \end{ednote}
 
+\subsection{Standard ML}
+
+\begin{ednote}{Ken}
+  Take one.  It is crap but is it here
+\end{ednote}
+
 Standard ML (\sml) is a functional language with imperative features
-widely used for teaching and in reasearch. 
+widely used for teaching and in research.  It is roughtly on the same
+level of abstraction as Python or Scheme, but in contrast to Python
+and Scheme, which are \emph{dynamically typed}, is \sml
+\emph{statically typed} like Java and C++ which means that type errors
+are detected at \emph{compile time} in contrast to \emph{run time}.
+Despite \sml being statically typed, it is not necessary for the
+programmaer to provide type annotations because \sml features
+\emph{type inference} which means that the compiler reconstruct type
+annotations as needed.  \sml also features algebraric datatypes,
+pattern-matching, tuples and records, first-class and anonymous
+functions, exception handling, immutable data types and updatable
+references, abstract data types, and parametric modules, but it is
+outside the scope of this paper to introduce all these features,
+instead we refer the interested reading to one of the fine textbooks
+\cite{Hansen-Rischel:1999,Paulson:1996}.
+
+\begin{ednote}{Ken}
+  Skulle vi have et lille fac og fib eksempel?
+\end{ednote}
+
+\sml is one of the few languages with a formal definition
+\cite{Milner:1997:Definition}.  The definition defines \sml in 93
+pages of mathematical notation and English prose.  The book is not
+meant as tutorial for the language, its existence is rather to provide
+an implementation-independent formulation of \sml.  This formal
+definition means that it is possible to write substantial applications
+in \sml which are not dependent on a specific compiler, also there
+areseveral mature \sml implementations with widely different
+implementation strategies ranging from byte-code interpreters with
+interactive \emph{read--eval--print--loops} (REPLs) to aggresively
+optimizing whole-program compilers targeting native code.
 
 
+
+\subsection{\gtk}
+\label{sec:gtk}
+
+
+\begin{ednote}{Ken}
+  * Gtk+ er interessant (og C var et godt
+    impl. valg)  
+\end{ednote}
+  
 
 \subsection{Overview of this paper}
 \label{sec:overview-this-paper}
@@ -102,13 +145,13 @@ widely used for teaching and in reasearch.
   afterwards.
 \end{ednote}
 
-Figure~\ref{fig:hello-world} shows a deliberately simple Hello World example
-using \mgtk. It illustrates (1) how to get the toolkit initialized
-using \texttt{GtkBasis.int} (from a module containing basic \gtk
-functionality not related to specific widgets), (2) how to construct
-new widgets (using module \texttt{Window} for the Window widget,
-and \texttt{Button} for the Button widget), and (3) how to conecct
-signals to widgets (using module \texttt{Signal}).
+Figure~\ref{fig:hello-world} shows a deliberately simple Hello World
+example using \mgtk. It illustrates (1) how to get the toolkit
+initialized using \texttt{GtkBasis.init} (from a module containing
+basic \gtk functionality not related to specific widgets), (2) how to
+construct new widgets (using module \texttt{Window} for the Window
+widget, and \texttt{Button} for the Button widget), and (3) how to
+connect signals to widgets (using module \texttt{Signal}).
 \begin{figure*}[htbp]
 \begin{centering}
 \begin{verbatim}
@@ -177,7 +220,7 @@ $\alpha$), the function can compute the length of the list. Such type
 variables are \emph{instantiated} to (more) specific types when we
 apply the polymorphic function. For example, when we apply the
 polymorphic identity function to \texttt{()} we instantiate $\alpha$
-to {\tUnit} giving this occurence of the function the type
+to {\tUnit} giving this occurrence of the function the type
 \tArrow\tUnit\tUnit; when we apply it to \texttt{17} we instantiate
 $\alpha$ to {\tInt} and the occurrence of the function gets type
 \tArrow\tInt\tInt. The function is said to be (parametric) polymorphic
@@ -305,7 +348,7 @@ complete binding process is naturally divided in two phases: (1)
 binding ``design'', and (2) binding construction. It is important to
 note here that the design phase can be carried out for a very small
 subset of the complete toolkit after which the construction phase
-``mimicks'' that for the complete toolkit We refer to the design as a
+``mimics'' that for the complete toolkit We refer to the design as a
 \emph{muck-up} and the result as \minimgtk. This phase separation
 makes it easier to get the design right simply because there are fewer
 issues to deal with, and it makes the work involved in moving the
@@ -418,7 +461,7 @@ of a signal on buttons.
 In this paper we have demonstrated that is theoretical and practically
 possible to make an interface from SML to GTK.
 
-\bibliographystyle{abbrv}
+\bibliographystyle{alpha}
 \bibliography{mgtk}
 
 \end{document}
@@ -427,3 +470,6 @@ possible to make an interface from SML to GTK.
 %%% mode: latex
 %%% TeX-master: t
 %%% End: 
+
+% LocalWords:  mGTK FREENIX Friis Niss GtkBasis fn wildcard tl gtk defs SML
+% LocalWords:  GtkWidget MLton mgtk
