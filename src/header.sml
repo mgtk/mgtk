@@ -91,6 +91,7 @@ struct
 	    in  loop 0w1 []
 	    end
 
+	fun areTheseSet flags flag = ((W(setFlags flags)) andb (W flag)) <> 0w0
     end
 
     local
