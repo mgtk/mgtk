@@ -1,11 +1,12 @@
 structure Gtk  = struct
     
     type cptr = GObject.cptr
-    signature Object = sig type base
-			   type 'a object_t
-			   type 'a t = 'a object_t GObject.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toObject : 'a t -> base t
+    signature Object = sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
 	type cptr = GObject.cptr

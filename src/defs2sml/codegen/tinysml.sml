@@ -347,14 +347,14 @@ structure TinySML :> TinySML = struct
 				   NONE => empty
 				 | SOME sigid => ":> " ^+ ppString sigid
 		       in  close(1,"end")
-			     (break(1,4)( ("structure " ^+ ppString strid ++ sigcons) +^ " = struct"
-					, pptoplist (true,false) decs )
+			     (always 4 ( ("structure " ^+ ppString strid ++ sigcons) +^ " = struct"
+				       , pptoplist (true,false) decs )
                              )
 		       end
 		  | SigDec(sigid, specs) =>
 		       close(1,"end")
-                             (break(1,4)( "signature " ^+ ppString sigid +^ " = sig"
-                                        , pptoplist (false,true) specs )
+                             (always 4 ( ("signature " ^+ ppString sigid +^ " = sig")
+                                       , pptoplist (false,true) specs )
                              )
 		  | CoreDec decl => ppDec mode decl
 	    and pptoplist mode tops =

@@ -17,11 +17,12 @@ structure Gtk  = struct
     val icon_size_register : string -> int -> int -> icon_size
 	= fn name => fn width => fn height =>
 	     icon_size_register_ name width height
-    signature Settings = sig type base
-			     type 'a settings_t
-			     type 'a t = 'a settings_t GObject.t
-			     val inherit : 'a -> GObject.constructor -> 'a t
-			     val toSettings : 'a t -> base t
+    signature Settings = sig
+	type base
+	type 'a settings_t
+	type 'a t = 'a settings_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toSettings : 'a t -> base t
     end
     structure Settings :> Settings = struct
 	open Dynlib
@@ -38,11 +39,12 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toSettings obj = inherit () (fn () => repr obj)
     end
-    signature Style = sig type base
-			  type 'a style_t
-			  type 'a t = 'a style_t GObject.t
-			  val inherit : 'a -> GObject.constructor -> 'a t
-			  val toStyle : 'a t -> base t
+    signature Style = sig
+	type base
+	type 'a style_t
+	type 'a t = 'a style_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toStyle : 'a t -> base t
     end
     structure Style :> Style = struct
 	open Dynlib
@@ -92,11 +94,12 @@ structure Gtk  = struct
 		   (fn () => rc_get_style_by_paths_
 			       (repr settings) widget_path class_path typ)
     end
-    signature Object = sig type base
-			   type 'a object_t
-			   type 'a t = 'a object_t GObject.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toObject : 'a t -> base t
+    signature Object = sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
 	open Dynlib
@@ -113,12 +116,13 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
-    signature Widget = sig type base
-			   type 'a widget_t
-			   type 'a t = 'a widget_t Object.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toWidget : 'a t -> base t
-			   val modify_style : 'a t -> 'b RcStyle.t -> unit
+    signature Widget = sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
+	val modify_style : 'a t -> 'b RcStyle.t -> unit
     end
     structure Widget :> Widget = struct
 	open Dynlib

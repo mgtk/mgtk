@@ -1,11 +1,12 @@
 structure Gtk  = struct
     
     type cptr = GObject.cptr
-    signature Object = sig type base
-			   type 'a object_t
-			   type 'a t = 'a object_t GObject.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toObject : 'a t -> base t
+    signature Object = sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
 	type cptr = GObject.cptr
@@ -20,11 +21,12 @@ structure Gtk  = struct
 	fun toObject obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
-    signature Widget = sig type base
-			   type 'a widget_t
-			   type 'a t = 'a widget_t Object.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toWidget : 'a t -> base t
+    signature Widget = sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
     end
     structure Widget :> Widget = struct
 	type cptr = GObject.cptr

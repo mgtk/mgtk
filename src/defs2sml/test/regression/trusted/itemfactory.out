@@ -4,11 +4,12 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    signature Object = sig type base
-			   type 'a object_t
-			   type 'a t = 'a object_t GObject.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toObject : 'a t -> base t
+    signature Object = sig
+	type base
+	type 'a object_t
+	type 'a t = 'a object_t GObject.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toObject : 'a t -> base t
     end
     structure Object :> Object = struct
 	open Dynlib
@@ -25,11 +26,12 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toObject obj = inherit () (fn () => repr obj)
     end
-    signature Widget = sig type base
-			   type 'a widget_t
-			   type 'a t = 'a widget_t Object.t
-			   val inherit : 'a -> GObject.constructor -> 'a t
-			   val toWidget : 'a t -> base t
+    signature Widget = sig
+	type base
+	type 'a widget_t
+	type 'a t = 'a widget_t Object.t
+	val inherit : 'a -> GObject.constructor -> 'a t
+	val toWidget : 'a t -> base t
     end
     structure Widget :> Widget = struct
 	open Dynlib

@@ -33,6 +33,10 @@ sig
 
   type 'x pp = 'x -> style pptree
 
+  val always : int -> 'a pptree' * 'a pptree' -> 'a pptree'
+  (* always k (s,t) is laid out like break(0,k) (s,t) except that
+     it always choose the linebreak *)
+
   val ppNone: 'a pp   (* never prints anything *)
   val ppStar: 'a pp   (* just prints "*" *)
   val ppUnit: unit pp (* just prints "N/A" *)

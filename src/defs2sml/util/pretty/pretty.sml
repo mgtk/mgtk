@@ -138,6 +138,8 @@ struct
 
   fun ppBinary(t1,ope,t2) = break(1,0)(t1,ope ^+ " " ^+ t2)
 
+  fun always k (t1,t2) = break(0,k)(forcemulti t1, t2)
+
   fun ppFold tree dev
       = let fun ftoken (_,s) = s
 	    val lines = format (NORMAL,#1) { vindentpenalty = 30
