@@ -13,5 +13,5 @@ Changes since mgtk-alpha-0.01
   + command line arguments are now passed on to gtk_init.
   + short version of functions with no arguments are now also in the
     signature.
-  + added a GtkType enumeration.
+  + bugs related to Garbage Collection and (minor) space leaks.
 ----------------------------------------------------------------------
