@@ -10,7 +10,6 @@ fun main () =
     let val _      = Gtk.init(CommandLine.name()::CommandLine.arguments())
 	val window = Gtk.window_new Gtk.WINDOW_TOPLEVEL
 	val button = Gtk.button_new_with_label "Hello World"
-
     in  Gtk.connect_delete_event window delete_event 
       ; Gtk.connect_destroy window destroy
       ; Gtk.container_set_border_width window 10

@@ -1,10 +1,10 @@
 (* nim.sml                             HR 21/7-00 *)
-
+(*
 load "Gtk";
 load "ListPair";
 load "Date";
 load "Time";
-
+*)
 val rows = 5
 val columns = 8
 
@@ -79,21 +79,23 @@ fun win(x::xs,xr) = let val y = Word.toInt(Word.xorb(Word.fromInt x,xr))
                     in if y < x then y::xs else x::win(xs,xr) end
 
 fun callBack (row,col) butTab mesW _ = 
-    (Gtk.label_set_text mesW (Int.toString(row)^" "^Int.toString(col)^"\n")
-     ; state := List.take(!state,row) @ col :: List.drop(!state,row+1)
-     ; if isNull(!state) then
-         message mesW YouAreTheWinner
-       else 
+    ( Gtk.label_set_text mesW (Int.toString(row)^" "^Int.toString(col)^"\n")
+    ; state := List.take(!state,row) @ col :: List.drop(!state,row+1)
+    ; if isNull(!state) then
+          message mesW YouAreTheWinner
+      else 
           (case xor (!state) of
-              0w0  => let val i = maxIndex(!state) in
-                      state := List.take(!state,i) @ (List.nth(!state,i)-1)
-                               :: List.drop(!state,i+1)
-                      ; message mesW YouMayWin end
-             |xr   => (state := win(!state,xr)
+               0w0  => 
+               let val i = maxIndex(!state) in
+                   state := List.take(!state,i) @ (List.nth(!state,i)-1)
+                            :: List.drop(!state,i+1)
+                 ; message mesW YouMayWin end
+             |xr   => ( state := win(!state,xr)
                       ; message mesW (if isNull(!state) then YouLost
-                                      else YouAreLoosing) )
+                                      else YouAreLoosing) 
+                      )
           )
-     ; display butTab state)
+    ; display butTab state)
 
 fun main () =
     let val window  = Gtk.window_new Gtk.WINDOW_TOPLEVEL
