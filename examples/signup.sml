@@ -13,19 +13,19 @@ fun delete_event _ = ( GtkBasis.main_quit()
    and the right containing entries.
 *)
 fun labelsAndEntries ls = 
-    let val hbox = HBox.new' ()
-        val left = VBox.new' ()
-        val right = VBox.new' ()
+    let val hbox = HBox.new false 0
+        val left = VBox.new false 0
+        val right = VBox.new false 0
         fun makeEntryLabel (text, entry) =
-            let val lab = Label.new_with_mnemonic (SOME text)
+            let val lab = Label.new_with_mnemonic text
             in  leftAlign lab
               ; Label.set_mnemonic_widget lab entry
-              ; Box.pack_start left lab (SOME true) (SOME false) (SOME 0)
+              ; Box.pack_start left lab true false 0
               ; Box.pack_start' right entry
             end
     in  Box.set_spacing hbox 6
       ; Box.set_spacing left 6
-      ; Box.pack_start hbox left (SOME false) (SOME false) (SOME 0)
+      ; Box.pack_start hbox left false false 0
       ; Box.set_spacing right 6
       ; Box.pack_start' hbox right
       ; app makeEntryLabel ls
@@ -33,7 +33,7 @@ fun labelsAndEntries ls =
     end
 
 fun setUpGui() = 
-    let val w = Window.new' ()
+    let val w = Window.new Window.TOPLEVEL
 
         val firstname_entry = Entry.new ()
 	val lastname_entry = Entry.new ()
@@ -47,25 +47,23 @@ fun setUpGui() =
             in  Entry.set_text email_entry (String.map emailize e)
             end
         val nameChanged_cb = Editable.changed_sig nameChanged
-
-        val outerv = VBox.new' ()
+        val outerv = VBox.new false 0
         val _ = ( Container.set_border_width outerv 12
                 ; Box.set_spacing outerv 12
                 ; Container.add w outerv
                 ) 
                  
         val topLabel = 
-            Label.new (SOME("<span weight=\"bold\" size=\"larger\">" ^
-			    "Enter your name and preferred address</span>"))
+            Label.new ("<span weight=\"bold\" size=\"larger\">" ^
+		       "Enter your name and preferred address</span>")
 
     in  Label.set_use_markup topLabel true
-      ; Box.pack_start outerv topLabel (SOME false) (SOME false) (SOME 0)
+      ; Box.pack_start outerv topLabel false false 0
                   
       ; Container.add outerv (labelsAndEntries 
                                   [ ("_First name:",    firstname_entry)
                                   , ("_Last name:",     lastname_entry)
                                   , ("_Email address:", email_entry)])
-
       ; Signal.connect (Entry.asEditable firstname_entry) nameChanged_cb
       ; Signal.connect (Entry.asEditable lastname_entry)  nameChanged_cb
       ; Signal.connect w (Widget.delete_event_sig delete_event) 

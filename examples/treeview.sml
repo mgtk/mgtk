@@ -7,13 +7,13 @@ fun delete_event _ = ( GtkBasis.main_quit()
                      )
 
 fun setUpGui() = 
-    let val w = let val w = Window.new' ()
+    let val w = let val w = Window.new Window.TOPLEVEL
                 in  Window.set_title w "Tree"
                   ; Signal.connect w (Widget.delete_event_sig delete_event)
                   ; w
                 end
 
-        val vbox = let val vbox = VBox.new' ()
+        val vbox = let val vbox = VBox.new false 0
                    in  Container.set_border_width vbox 6
                      ; Container.add w vbox
                      ; vbox

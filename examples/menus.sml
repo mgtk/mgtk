@@ -13,7 +13,7 @@ val openActivated = say "Open"
 val rotateActivated = say "Rotate" 
 
 fun setUpGui() = 
-    let val w = let val w = Window.new' ()
+    let val w = let val w = Window.new Window.TOPLEVEL
                 in  Window.set_title w "Menus Example"
                   ; Window.set_default_size w 260 150
                   ; Signal.connect w (Widget.delete_event_sig delete_event)
@@ -82,8 +82,8 @@ fun setUpGui() =
 
         val _ = MenuShell.append transform_menu (MenuItem.new_with_mnemonic "_Flip")
 
-        val vbox = VBox.new' ()
-    in  Box.pack_start vbox mb (SOME false) (SOME false) (SOME 0)                 
+        val vbox = VBox.new false 0
+    in  Box.pack_start vbox mb false false 0
       ; Container.add w vbox
       ; Widget.show_all w
     end
