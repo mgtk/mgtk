@@ -3082,12 +3082,12 @@ structure Gtk  = struct
 			-> GValue.GValue
 	val iter_next : 'a t -> treeiter -> bool * treeiter
 	val iter_children : 'a t -> treeiter option -> bool * treeiter
-	val iter_children' : 'a t -> treeiter -> bool * treeiter
+	val iter_children' : 'a t -> bool * treeiter
 	val iter_has_child : 'a t -> treeiter -> bool
 	val iter_n_children : 'a t -> treeiter option -> int
 	val iter_n_children' : 'a t -> int
 	val iter_nth_child : 'a t -> treeiter option -> int -> bool * treeiter
-	val iter_nth_child' : 'a t -> treeiter -> int -> bool * treeiter
+	val iter_nth_child' : 'a t -> int -> bool * treeiter
 	val iter_parent : 'a t -> treeiter -> bool * treeiter
 	val ref_node : 'a t -> treeiter -> unit
 	val unref_node : 'a t -> treeiter -> unit
@@ -3173,10 +3173,10 @@ structure Gtk  = struct
 			 = iter_children_
 			     (repr self) (getOpt (parent, GObject.null))
 		 in (res0, res1) end
-	val iter_children' : 'a t -> treeiter -> bool * treeiter
-	    = fn self => fn iter =>
-		 let val (res0, res1) = iter_children_ (repr self) GObject.null
-		 in (res0, res1) end
+	val iter_children' : 'a t -> bool * treeiter
+	    = fn self => let val (res0, res1)
+				 = iter_children_ (repr self) GObject.null
+			 in (res0, res1) end
 	val iter_has_child_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_tree_model_iter_has_child")
 	val iter_has_child : 'a t -> treeiter -> bool
@@ -3196,8 +3196,8 @@ structure Gtk  = struct
 			 = iter_nth_child_
 			     (repr self) (getOpt (parent, GObject.null)) n
 		 in (res0, res1) end
-	val iter_nth_child' : 'a t -> treeiter -> int -> bool * treeiter
-	    = fn self => fn iter => fn n =>
+	val iter_nth_child' : 'a t -> int -> bool * treeiter
+	    = fn self => fn n =>
 		 let val (res0, res1) = iter_nth_child_
 					  (repr self) GObject.null n
 		 in (res0, res1) end
@@ -3633,7 +3633,7 @@ structure Gtk  = struct
 	val insert_after : 'a t -> treeiter -> treeiter -> treeiter
 	val prepend : 'a t -> treeiter -> treeiter
 	val append : 'a t -> treeiter option -> treeiter
-	val append' : 'a t -> treeiter -> treeiter
+	val append' : 'a t -> treeiter
 	val is_ancestor : 'a t -> treeiter -> treeiter -> bool
 	val storeiter_depth : 'a t -> treeiter -> int
 	val clear : 'a t -> unit
@@ -3704,9 +3704,9 @@ structure Gtk  = struct
 		 let val res0 = append_ (repr self)
 				        (getOpt (parent, GObject.null))
 		 in res0 end
-	val append' : 'a t -> treeiter -> treeiter
-	    = fn self => fn iter =>
-		 let val res0 = append_ (repr self) GObject.null in res0 end
+	val append' : 'a t -> treeiter
+	    = fn self => let val res0 = append_ (repr self) GObject.null
+			 in res0 end
 	val is_ancestor_ : cptr -> cptr -> cptr -> bool
 	    = app3 (symb"mgtk_gtk_tree_store_is_ancestor")
 	val is_ancestor : 'a t -> treeiter -> treeiter -> bool
