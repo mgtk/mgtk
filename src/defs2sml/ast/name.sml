@@ -201,7 +201,7 @@ structure Name :> NAME = struct
 	  | ify ("startiter"::rest) acc = ify rest ("iter"::"start"::acc)
 	  | ify ("unselectiter"::rest) acc = ify rest ("iter"::"unselect"::acc)
 	  | ify ("selectiter"::rest) acc = ify rest ("iter"::"select"::acc)
-	  | ify ("convteriter"::rest) acc = ify rest ("iter"::"converter"::acc)
+	  | ify ("converteriter"::rest) acc = ify rest ("iter"::"converter"::acc)
 	  | ify ("storeiter"::rest) acc = ify rest ("iter"::"store"::acc)
 	  | ify (w::rest) acc = ify rest (w::acc)	    
     in

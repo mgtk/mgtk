@@ -2,9 +2,19 @@ structure TinySML = struct
 
     val max_curried = 5
 
+    datatype 'a incl =
+        None
+      | StrOnly of 'a
+      | SigOnly of 'a
+      | Some of 'a
+	     
     type typeexp = SMLType.ty
     type tyvar = SMLType.tyvar
     type tyname = SMLType.tyname
+
+    datatype pat =
+        VarPat of string
+      | TupPat of pat list
 
     datatype exp =
 	Unit 
@@ -16,20 +26,10 @@ structure TinySML = struct
       | App of exp * exp list
       | Tup of exp list
       | Import of string * typeexp
-    infix ==>
-    fun x ==> e = Fn(x,e)
+      | Let of decl * exp
+      | SeqExp of exp list
 
-    datatype pat =
-        VarPat of string
-      | TupPat of pat list
-
-    datatype 'a incl =
-        None
-      | StrOnly of 'a
-      | SigOnly of 'a
-      | Some of 'a
-	     
-    datatype decl =
+    and decl =
 	ValDecl of pat * typeexp incl * exp
       | FunDecl of string * pat list * typeexp incl * exp
       | TypeDecl of (tyvar list * tyname) * typeexp incl
@@ -39,6 +39,9 @@ structure TinySML = struct
       | Open of string list
       | Infix of string list
       | Local of decl incl * decl incl
+
+    infix ==>
+    fun x ==> e = Fn(x,e)
 
     structure H = Polyhash
     exception NotFound
@@ -62,6 +65,33 @@ structure TinySML = struct
     fun toString (isStrMode,isSigMode) mode indent info =
 	let fun parens safe level s = if level > safe then "(" ^ s ^ ")"
 				      else s
+	    fun printing s =
+		List.exists (not o Char.isSpace) (String.explode s)
+
+	    local
+		fun str _ nil _ _ = ""
+		  | str p (h::t) sep needSep =
+		    let val ph = p h
+			val ns = printing ph
+			val s = p h ^ (str p t sep ns)
+		    in  if needSep then sep ^ s else s
+		    end
+	    in
+	    fun stringSep start finish sep p l = 
+		start ^ (str p l sep false) ^ finish
+	    end (* local *)
+
+	    fun show_pat pat =
+		case pat of
+		    VarPat x => mlify x
+		  | TupPat ps => Util.stringSep "(" ")" "," show_pat ps
+	    fun show_type_incl sep None = "" 
+	      | show_type_incl sep (Some ty) = sep ^ SMLType.toString ty
+	      | show_type_incl sep (StrOnly ty) = 
+		if isStrMode mode then sep ^ SMLType.toString ty else ""
+	      | show_type_incl sep (SigOnly ty) = 
+		if isSigMode mode then sep ^ SMLType.toString ty else ""
+
 	    fun show_exp level exp =
 		case exp of
 		    Unit => "()"
@@ -79,45 +109,22 @@ structure TinySML = struct
 		  | Tup es => Util.stringSep "(" ")" "," (show_exp 1) es
 		  | Import(cglobal,ty) =>
 		      "_import \"" ^ cglobal ^ "\" : " ^ SMLType.toString ty ^ ";"
-	    val show_exp = fn exp => show_exp 1 exp
-	    fun show_pat pat =
-		case pat of
-		    VarPat x => mlify x
-		  | TupPat ps => Util.stringSep "(" ")" "," show_pat ps
-	    fun show_type_incl sep None = "" 
-	      | show_type_incl sep (Some ty) = sep ^ SMLType.toString ty
-	      | show_type_incl sep (StrOnly ty) = 
-		if isStrMode mode then sep ^ SMLType.toString ty else ""
-	      | show_type_incl sep (SigOnly ty) = 
-		if isSigMode mode then sep ^ SMLType.toString ty else ""
+		  | SeqExp es => Util.stringSep "" "" "; " (show_exp 1) es
+		  | Let(d,e) =>
+		      "let " ^ show d ^ " in " ^ show_exp 1 e ^ " end"
 
-	    fun printing s =
-		List.exists (not o Char.isSpace) (String.explode s)
-	    local
-		fun str _ nil _ _ = ""
-		  | str p (h::t) sep needSep =
-		    let val ph = p h
-			val ns = printing ph
-			val s = p h ^ (str p t sep ns)
-		    in  if needSep then sep ^ s else s
-		    end
-	    in
-	    fun stringSep start finish sep p l = 
-		start ^ (str p l sep false) ^ finish
-	    end (* local *)
-
-	    fun show decl =
+	    and show decl =
 		case decl of
 		    ValDecl(pat,ty,exp) =>
 		       if isStrMode mode then
 			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
-			   ^ (if printing (show_type_incl " : " ty) then "\n" ^ indent ^ "    = " else " = ") ^ show_exp exp
+			   ^ (if printing (show_type_incl " : " ty) then "\n" ^ indent ^ "    = " else " = ") ^ show_exp 1 exp
 		       else
 			   indent ^ "val " ^ show_pat pat ^ show_type_incl " : " ty
 		  | FunDecl(name,pars,ty,exp) =>
 		       if isStrMode mode then
 			   indent ^ "fun " ^ name ^ Util.stringSep " " "" " " show_pat pars
-			   ^ " = " ^ show_exp exp
+			   ^ " = " ^ show_exp 1 exp
 		       else
 			   indent ^ "val " ^ name ^ show_type_incl " : " ty
 		  | TypeDecl((tvs,tname),ty) =>

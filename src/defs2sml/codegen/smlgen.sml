@@ -1,12 +1,106 @@
 (* mgtk --- an SML binding for GTK.                                          *)
 (* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003, 2004. *)
 
-functor GenSMLMLton(structure TypeInfo : TypeInfo) 
-	: GEN_SML where type typeinfo = TypeInfo.typeinfo =
+signature PRIMITIVES = sig
+    structure TypeInfo : TypeInfo
+    val mkMethodName : Name.name -> string
+    val ccall : string -> int -> SMLType.ty -> TinySML.exp
+    val getEnumsTy : int -> SMLType.ty
+    val getEnums : string -> Name.name list -> TinySML.exp
+    val unWrap: TinySML.exp -> TinySML.exp
+    val toPrimString : TinySML.exp -> TinySML.exp
+    val callStub : TypeInfo.typeinfo -> string  -> Name.name Type.ty
+		-> (TinySML.exp * Name.name Type.ty) list -> TinySML.exp
+    val strHeader : TinySML.decl list
+end (* signature PRIMTIVES *)
+
+functor MosmlPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES 
+= struct
+    structure TypeInfo = TypeInfo
+    open TinySML SMLType
+    val mkMethodName = Name.asCStub
+    fun ccall name args ty =
+	let val app = if args > max_curried then "app1" 
+		      else "app" ^ Int.toString args
+	in  App(Var app, [App(Var "symb", [Str name])])
+	end
+    fun getEnumsTy num =
+	ArrowTy([UnitTy], TupTy(List.tabulate(num, fn _ => IntTy)))
+    fun getEnums enum consts =
+	App(Var("get_" ^ enum ^ "_"), [Unit])
+
+    fun unWrap e = TinySML.App(TinySML.Var("repr"), [e])
+    val toPrimString = fn e => e
+
+    fun callStub tinfo name ret pars = 
+	App(Var(name^"_"),
+	    if List.length pars > max_curried
+	    then [Tup(List.map #1 pars)]
+	    else List.map #1 pars
+           )
+
+    val strHeader =
+        [ Open["Dynlib"]
+        , TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"])))
+        , ValDecl(VarPat"repr", None, Var("GObject.repr"))
+        , ValDecl(VarPat"symb", None, Var("GtkBasis.symb"))
+        , Comment NONE
+        ]
+end (* structure MosmlPrims *)
+
+functor MLtonPrims(structure TypeInfo : TypeInfo) :> PRIMITIVES 
+= struct
+    structure TypeInfo = TypeInfo
+    open TinySML SMLType
+    val mkMethodName = Name.asCFunc
+    fun ccall name args ty = Import(name, ty)
+    fun getEnumsTy num =
+	ArrowTy([TupTy(List.tabulate(num, fn _ => RefTy IntTy))], UnitTy)
+    fun getEnums enum consts =
+	let val fresh = List.tabulate(List.length consts, fn i => "x"^Int.toString i)
+	    fun refe e = App(Long(Name.fromString "ref"), [e])
+	    fun deref e = App(Var("!"), [e])
+	in  Let(ValDecl(TupPat(List.map VarPat fresh), None, 
+			Tup(List.map (fn _ => refe(Const "0")) fresh)),
+		SeqExp [ App(Var("get_"^enum^"_"), [Tup(List.map Var fresh)])
+		       , Tup(List.map (deref o Var) fresh)
+                       ]
+		)
+	end
+    val unWrap = fn e => e
+    local open TinySML in  
+        fun toPrimString e = App(Var("CString.fromString"), [e])
+    end
+
+    fun callStub tinfo name ret pars = 
+	let fun f ((Var v,t), c) =
+		if TypeInfo.isWrapped tinfo t
+		then App(Var"GObject.withPtr", [Tup[Var v, Fn(v, c)]])
+		else c
+	      | f ((e,t), c) =
+		if TypeInfo.isWrapped tinfo t then raise Fail("oops")
+		else c
+	    val stub = App(Var(name^"_"), [Tup(List.map #1 pars)])
+	    val call = if TypeInfo.isString tinfo ret
+		       then Let(ValDecl(VarPat"t",None,stub),
+				App(Var"CString.toString",[Var"t"]))
+		       else stub
+	in  List.foldr f call pars
+	end
+
+    val strHeader = 
+        [
+          TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"])))
+	]
+end (* structure MLtonPrims *)
+
+functor GenSML(structure Prims : PRIMITIVES)
+	: GEN_SML where type typeinfo = Prims.TypeInfo.typeinfo =
 struct
 
     (* convenience *)
     open TinySML
+    structure TypeInfo = Prims.TypeInfo
 
     infix ++
     fun d1 ++ d2 = Some(SeqDecl[d1,d2])
@@ -15,9 +109,6 @@ struct
     infix --> ==>
     fun ty1 --> ty2 = ArrowTy([ty1], ty2)
     fun tys ==> ty2 = ArrowTy(tys, ty2)
-
-    (* "primitives" *)
-    fun ccall name ty = Import(name, ty)
 
     type typeinfo = TypeInfo.typeinfo
     type 'a incl = 'a TinySML.incl
@@ -90,7 +181,7 @@ struct
                        = fn label => makeBut(new_with_label_ label)
             *)
 	    AST.Method ty => 
-		let val cname = Name.asCFunc name
+		let val cname = Prims.mkMethodName name
 		    val name = Name.asMethod name
 		    val parsty = Type.getParams ty
 		    val (pars,tys) = ListPair.unzip parsty
@@ -100,8 +191,12 @@ struct
 			(case Name.getFullPath n of "Gtk"::_ => true | _ => false)
 		      | isWidgetType (Type.Ptr t) = isWidgetType t
 		      | isWidgetType _ = false
-		    fun wrap (par,ty) = 
-			TypeInfo.toPrimValue tinfo ty (Var par)
+		    fun wrap (par,ty) =
+			(if TypeInfo.isWrapped tinfo ty
+			 then (Prims.unWrap (Var par),ty)
+			 else if TypeInfo.isString tinfo ty
+			 then (Prims.toPrimString (Var par),ty)
+			 else (Var par, ty))
 			handle TypeInfo.Unbound n => ubnd n
 		    val pars' = List.map wrap parsty
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
@@ -119,13 +214,13 @@ struct
 			TypeInfo.fromPrimValue tinfo ty e
 			handle TypeInfo.Unbound n => ubnd n
 		    val primty = primtypeFromType ty
+		    val stubcall = Prims.callStub tinfo name ret pars'
 		in  StrOnly(
-                       ValDecl(VarPat(name^"_"), Some(primty),
-			       ccall cname primty))
+                       ValDecl(VarPat(name^"_"), Some primty,
+			       Prims.ccall cname (List.length pars) primty))
                  ++ Some(
                        ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),
-			       List.foldr Fn (fromprim ret (App(Var(name^"_"), pars')))
-					  pars))
+			       List.foldr Fn (fromprim ret stubcall) pars))
 		end
 
             (* ENUMS 
@@ -141,15 +236,15 @@ struct
 	  | AST.Enum consts => 
 	        let val cname = Name.asCEnum name
 		    val name = Name.asEnum name
-		    val tup = TupTy(List.tabulate(List.length consts, fn _ => RefTy IntTy))
+		    val primty = Prims.getEnumsTy (List.length consts)
 		    val decs = List.map (fn c => SigOnly(ValDecl(VarPat(Name.asEnumConst c),Some(TyApp([],[name])),Const "1"))) consts
 		in  Some(SeqDecl(
 	            Some(TypeDecl(([],[name]), StrOnly IntTy))
                  :: decs
-                @ [ StrOnly(ValDecl(VarPat("get_" ^ name ^ "_"), Some(tup --> UnitTy),
-			    ccall ("mgtk_get_"^cname) (tup --> UnitTy)))
+                @ [ StrOnly(ValDecl(VarPat("get_" ^ name ^ "_"), Some primty,
+			    Prims.ccall ("mgtk_get_"^cname) 1 primty))
 		  , StrOnly(ValDecl(TupPat(List.map (VarPat o Name.asEnumConst) consts), None,
-			    App(Var("get_" ^ name ^ "_"), [Unit])))
+			    Prims.getEnums name consts))
                   ]))
 		end
 
@@ -160,7 +255,7 @@ struct
           | AST.Field ty => 
 		let val name = Name.asField name
 		in  StrOnly(ValDecl(VarPat ("get_"^name), None, 
-			    ccall ("mgtk_get_"^name) IntTy))
+			    Prims.ccall ("mgtk_get_"^name) 1 IntTy))
 		end
 
 (*
@@ -246,22 +341,18 @@ struct
 	    val type_t = "t"
 	    fun pRef id = Name.asModule parent ^ "." ^ id (* FIXME: Using names instead *)
 
-	in  Some(TypeDecl(([],[base_t]),StrOnly UnitTy))
+	in  Some(SeqDecl(List.map StrOnly Prims.strHeader))
+         ++ Some(TypeDecl(([],[base_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[witness_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[type_t]), 
 		    Some(TyApp([TyApp([TyVar "'a"],[witness_t])],[parent_t]))))
-(*mlton         ++ StrOnly(Open["Dynlib"])*)
-         ++ StrOnly(TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"]))))
-(*mlton  ++ StrOnly(ValDecl(VarPat"repr", None, Var("GObject.repr")))
-         ++ StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))
-         ++ Some(Comment NONE)
-*)
          ++ Some(FunDecl("inherit",[VarPat "w",VarPat "con"],
 		    (* 'a -> GObject.constructor -> 'a t *)
 		    SigOnly([TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"])),
 		    App(Var(pRef "inherit"),[Unit,Var "con"])))
 	 ++ StrOnly(FunDecl("make"(*^Name.asModule name*),[VarPat"ptr"],None,
 		    App(Var(pRef "inherit"),[Unit,Fn("()",Var"ptr")])))
+         ++ StrOnly(Comment NONE)
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)
 
@@ -289,19 +380,13 @@ struct
 	  | generate_member tinfo (Member{name,info}) = 
 	    [Member{name=name,info=trans tinfo (name,info)}]
     in  fun generate tinfo (Module{name,members,info}) = 
-	    Module{name=name,info=STRUCTURE(Name.asModule name, NONE),
-		   members=
-(*mlton
-		           Member{name=Name.fromString "structureheader",
-				  info = StrOnly(Open["Dynlib"])}  
-                           :: Member{name=Name.fromString "structureheader",
-				  info = StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))}
-*)
-                              Member{name=Name.fromString "structureheader",
-				  info = StrOnly(TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"]))))}
-                           :: Member{name=Name.fromString "structureheader",
-				  info = Some(TypeDecl(([],["base"]),StrOnly UnitTy))}
-			   :: List.concat(List.map (generate_member tinfo) members)}
+	    let fun f d = Member{name = Name.fromString "structureheader",
+				 info = StrOnly d}
+	    in  Module{name=name,info=STRUCTURE(Name.asModule name, NONE),
+		       members=
+		             List.map f Prims.strHeader
+			   @ List.concat(List.map (generate_member tinfo) members)}
+	    end
     end (* local *)
 
 end (* structure GenSML *)

@@ -53,14 +53,39 @@ regcomp-%: reggen-%
         fi
 
 mgtk.c mgtk.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
-	./$(MAIN) -co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gtk.defs 
+	./$(MAIN) -co mgtk.c -so mgtk.sml -cp lib/preamble.c -sp lib/preamble.sml api/pygtk/gtk.defs
+
+mgtk-mlton.c mgtk-mlton.sml: $(MAIN) api/pygtk/gtk.defs api/pygtk/gtk-types.defs lib/excludes.txt
+	./$(MAIN) --mlton -co mgtk-mlton.c -so mgtk-mlton.sml -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml api/pygtk/gtk.defs 
 
 compile: $(MAIN) mgtk.c mgtk.sml
 	mosmlc -toplevel -liberal -c mgtk.sml
 	gcc $(CINCLUDE) -c -o /dev/null mgtk.c > c.out 2>&1 
 
-mlton: $(MAIN)
-	@./$(MAIN) --mlton -sp lib/preamble-mlton.sml -q $(OPTIONS) -o minimgtk.sml test/regression/input/minigtk.defs
+MLTONHOME=/usr/lib/mlton
+MLTONINCLUDE=/usr/lib/mlton/include
+MLTONBIN=/usr/bin/
+
+minimgtk-mlton.c minimgtk-mlton.sml: $(MAIN) test/regression/input/minigtk.defs
+	@./$(MAIN) --mlton -cp lib/preamble-mlton.c -sp lib/preamble-mlton.sml -q $(OPTIONS) -co minimgtk-mlton.c -so minimgtk-mlton.sml test/regression/input/minigtk.defs
+
+mgtk-mlton.o: mgtk-mlton.c
+	gcc -c -O2 -I$(MLTONINCLUDE) \
+		   `pkg-config --cflags gtk+-2.0` mgtk-mlton.c
+
+minimgtk-mlton.o: minimgtk-mlton.c
+	gcc -c -O2 -I$(MLTONINCLUDE) \
+		   `pkg-config --cflags gtk+-2.0` minimgtk-mlton.c
+
+minimgtk-mlton: minimgtk-mlton.cm minimgtk-mlton.o \
+                      $(shell mlton -stop f minimgtk-mlton.cm)
+	$(MLTONBIN)/mlton -output minimgtk-mlton \
+			  -link-opt "`pkg-config --libs-only-l gtk+-2.0`" \
+	                  minimgtk-mlton.cm minimgtk-mlton.o
+
+
+mltoncompile: $(MAIN) mgtk-mlton.sml mgtk-mlton.o
+	mlton -link-opt "`pkg-config --libs-only-l gtk+-2.0`" mgtk.cm mgtk-mlton.o
 
 realclean:
 	rm -f c.out mgtk.c mgtk.sml

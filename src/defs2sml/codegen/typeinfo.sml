@@ -4,8 +4,7 @@
 signature PRIMTYPES = sig
     type ty = SMLType.ty
     val mkArrowTy : ty list * ty -> ty
-    val stringTy : ty
-    val toPrimString : TinySML.exp -> TinySML.exp
+    val stringTy : bool -> ty
 end (* signature PRIMTYPES *)
 
 structure MosmlPrimTypes : PRIMTYPES = struct
@@ -16,18 +15,16 @@ structure MosmlPrimTypes : PRIMTYPES = struct
 	   then [SMLType.TupTy pars]
 	   else pars
         ,  ret)
-    val stringTy = SMLType.StringTy
-    val toPrimString = fn e => e
+    val stringTy = fn _ => SMLType.StringTy
 end (* structure MosmlPrimTypes *)
 
 structure MLtonPrimTypes : PRIMTYPES = struct
     type ty = SMLType.ty
     fun mkArrowTy(pars,ret) =
 	SMLType.ArrowTy([SMLType.TupTy pars], ret)
-    val stringTy = SMLType.TyApp([],["CString", "cstring"])
-    local open TinySML in  
-        fun toPrimString e = App(Var("Cstring.cstring"), [e])
-    end
+    val stringTy = fn neg =>
+		      if neg then SMLType.TyApp([],["CString", "t"])
+		      else SMLType.TyApp([],["CString", "cstring"])
 end (* structure MosmlPrimTypes *)
 
 functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
@@ -46,7 +43,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		 fromc: TinyC.expr -> TinyC.expr,
 		 super: name option,
 		 fromprim: TinySML.exp -> TinySML.exp,
-		 toprim: TinySML.exp -> TinySML.exp
+		 wrapped: bool
 		}
     type typeinfo = (Name.name, info) Splaymap.dict
     exception NotFound = Splaymap.NotFound
@@ -56,7 +53,6 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 
     fun id x = x
     fun make e = TinySML.App(TinySML.Var("make"), [e])
-    fun repr e = TinySML.App(TinySML.Var("repr"), [e])
     fun ccall name = fn e => TinyC.Call(name,NONE,[e])
     val basic =
 	[("int",       (fn _ => SMLType.IntTy,SMLType.IntTy,
@@ -87,7 +83,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	let fun a ((n,i),t)=
 		add(t,Name.fromPaths([],[],[n]),
 		    {stype= #1 i,ptype= #2 i,toc= #3 i, 
-		     toprim = id, fromprim = id,
+		     wrapped = false, fromprim = id,
 		     fromc= #4 i,super= #5 i})
 	in  List.foldl a (Splaymap.mkDict Name.compare) basic
 	end
@@ -104,7 +100,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
 		    val info = {toc=ccall"GtkObj_val",fromc=ccall"Val_GtkObj",
 				ptype=SMLType.TyApp([],["cptr"]),
-				fromprim = make, toprim = repr,
+				fromprim = make, wrapped = true,
 				stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
 				super=NONE}
 		in  add(table',name,info)  end
@@ -117,7 +113,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
 			    {toc=ccall"Int_val", fromc=ccall"Val_int",
-			     fromprim=id, toprim=id,
+			     fromprim=id, wrapped = false,
 			     ptype=SMLType.IntTy, super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asEnum name])})
                     )
@@ -126,7 +122,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		        add(table,name,
 			    {toc=ccall(Name.asCBoxed name^"_val"), 
 			     fromc=ccall("Val_"^Name.asCBoxed name),
-			     fromprim=id, toprim=id,
+			     fromprim=id, wrapped = false,
 			     ptype=SMLType.TyApp([],["cptr"]),super=NONE,
 			     stype=fn _ => SMLType.TyApp([],[Name.asBoxed name])})
                     )
@@ -145,7 +141,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	end
 
     fun show os table =
-	let fun sinfo {stype,ptype,toc,fromc,super,fromprim,toprim} = 
+	let fun sinfo {stype,ptype,toc,fromc,super,fromprim,wrapped} = 
 		(SMLType.show ptype) ^ " x "  ^
 		(SMLType.show (stype (nextgen())))
 	in  List.app (fn (n,i) => 
@@ -210,10 +206,10 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	in  toSMLType tinfo next
 	end
 
-    fun toPrimType tinfo ty =
+    fun toPrimType negative tinfo ty = (* FIXME negative: ugly, but it works *)
 	case ty of 
 	    Type.Ptr(Type.Base n) => 
-	       if Name.asType n = "char" then Prim.stringTy
+	       if Name.asType n = "char" then Prim.stringTy negative
 	       else SMLType.TyApp([],["cptr"])
 	  | Type.Void => SMLType.UnitTy
 	  | Type.Base n => 
@@ -228,13 +224,13 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		end
 		    handle NotFound => raise Unbound n
                )
-	  | Type.Const ty => toPrimType tinfo ty
+	  | Type.Const ty => toPrimType negative tinfo ty
 	  | Type.Ptr ty => SMLType.TyApp([],["cptr"])
 	  | Type.Func(pars,ret) => 
-	       Prim.mkArrowTy(List.map (toPrimType tinfo o #2) pars,
-			      toPrimType tinfo ret)
+	       Prim.mkArrowTy(List.map (toPrimType negative tinfo o #2) pars,
+			      toPrimType (not negative) tinfo ret)
 	  | Type.Arr(len,ty) => SMLType.TyApp([],["..."]) (* FIXME *)
-
+    val toPrimType = toPrimType false
 
     fun call func arg = TinyC.Call(func, NONE, [arg])
 
@@ -253,26 +249,31 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 		    handle NotFound => raise Unbound n
 	       )
 	  | Type.Ptr ty => fromPrimValue tinfo ty (* FIXME: ? *)
+	  | Type.Const ty => fromPrimValue tinfo ty
 	  | _ => id
-    fun toPrimValue tinfo ty =
+    fun isWrapped tinfo ty =
 	case ty of
-	    Type.Ptr(ty as Type.Base n) =>
-	       if Name.asType n = "char" then Prim.toPrimString
-	       else toPrimValue tinfo ty
-	  | Type.Base n =>
+	    Type.Base n =>
 	       (let val info: info = lookup tinfo n
-		in  #toprim info
+		in  #wrapped info
 		end
 		    handle NotFound => raise Unbound n
 	       )
 	  | Type.Tname n =>
 	       (let val info: info = lookup tinfo n
-		in  #toprim info
+		in  #wrapped info
 		end
 		    handle NotFound => raise Unbound n
 	       )
-	  | Type.Ptr ty => toPrimValue tinfo ty (* FIXME: ? *)
-	  | _ => id
+	  | Type.Ptr ty => isWrapped tinfo ty
+	  | _ => false
+
+    fun isString tinfo ty =
+	case ty of
+	    Type.Ptr(ty as Type.Base n) =>
+               Name.asType n = "char"
+	  | Type.Const ty => isString tinfo ty
+	  | _ => false
 
     fun toCValue tinfo ty =
 	case ty of

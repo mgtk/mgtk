@@ -3,9 +3,12 @@
 
 structure MosmlTypeInfo = TypeInfo(structure Prim = MosmlPrimTypes)
 structure MLtonTypeInfo = TypeInfo(structure Prim = MLtonPrimTypes)
-structure GenSMLMosml = GenSMLMosml(structure TypeInfo = MosmlTypeInfo)
-structure GenSMLMLton = GenSMLMLton(structure TypeInfo = MLtonTypeInfo)
-structure GenC = GenC(structure TypeInfo = MosmlTypeInfo)
+structure MosmlPrims = MosmlPrims(structure TypeInfo = MosmlTypeInfo)
+structure MLtonPrims = MLtonPrims(structure TypeInfo = MLtonTypeInfo)
+structure GenSMLMosml = GenSML(structure Prims = MosmlPrims)
+structure GenSMLMLton = GenSML(structure Prims = MLtonPrims)
+structure GenCMosml = GenCMosml(structure TypeInfo = MosmlPrims.TypeInfo)
+structure GenCMLton = GenCMLton(structure TypeInfo = MLtonPrims.TypeInfo)
 
 fun main () =
     let 
@@ -162,22 +165,29 @@ fun main () =
 	(* 5. Generate code ... *)
         (*    ... SML *)
 	val _ = MsgUtil.print "Generating SML code ..."
-	val typeinfo = MLtonTypeInfo.build api
+	val typeinfo = MLtonPrims.TypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
 	val api' = GenSMLMLton.generate typeinfo api
 	val _ = GenSMLMLton.print (!smlPreamble) (!sep_struct) 
 				  (getOutFile()) api'
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
-	val _ = MsgUtil.print "No C code generated for MLton"
-	val _ = MsgUtil.close ""
+
+	val _ = MsgUtil.print "Generating C code ..."
+	val (getOutFile,closeOutFile) = outFileSetup cOutFile
+	val api'' = GenCMLton.generate typeinfo api
+		    handle (exn as Fail m) => (TextIO.output(TextIO.stdOut, "Caught Fail(" ^ m ^ ")\n"); raise exn)
+	val _ = Option.app (copyFile (getOutFile())) (!cPreamble)
+	val _ = GenCMLton.print typeinfo (getOutFile()) api''
+        val _ = closeOutFile()
+	val _ = MsgUtil.close "done"
 		in () end
         
 	    else let
 	(* 5. Generate code ... *)
         (*    ... SML *)
 	val _ = MsgUtil.print "Generating SML code ..."
-	val typeinfo = MosmlTypeInfo.build api
+	val typeinfo = MosmlPrims.TypeInfo.build api
 	val (getOutFile,closeOutFile) = outFileSetup smlOutFile
 	val api' = GenSMLMosml.generate typeinfo api
 	val _ = GenSMLMosml.print (!smlPreamble) (!sep_struct)
@@ -188,10 +198,10 @@ fun main () =
         (*    ... C *)
 	val _ = MsgUtil.print "Generating C code ..."
 	val (getOutFile,closeOutFile) = outFileSetup cOutFile
-	val api'' = GenC.generate typeinfo api
+	val api'' = GenCMosml.generate typeinfo api
 		    handle (exn as Fail m) => (TextIO.output(TextIO.stdOut, "Caught Fail(" ^ m ^ ")\n"); raise exn)
 	val _ = Option.app (copyFile (getOutFile())) (!cPreamble)
-	val _ = GenC.print typeinfo (getOutFile()) api''
+	val _ = GenCMosml.print typeinfo (getOutFile()) api''
         val _ = closeOutFile()
 	val _ = MsgUtil.close "done"
 		in () end
