@@ -1,0 +1,4 @@
+Gtk.sig
+Gtk.sml
+mgtk.c
+*.ui *.ui *.o *.so
