@@ -578,9 +578,22 @@ struct
       | mlConnectType (name, SOME cb) = 
 	mkArrowType (unitType, [(name,"wid"),(cb,"cb")])
 
-    fun mlConnectFunction NONE = "unit_connect"
-      | mlConnectFunction (SOME(TE.ARROW([(TE.PRIMTYPE "none",_)], _, _, TE.PRIMTYPE "bool"))) =
-        "bool_connect"
+    fun mlConvFun (TE.PRIMTYPE s) =
+        case s of
+            "none" => $"unit"
+          | "int"  => $s
+          | "bool" => $s
+          | _      => raise Fail("can only handle int and bool args in callback")
+
+    fun mlConnectFunction NONE = $"unit_connect"
+(*      | mlConnectFunction (SOME(TE.ARROW([(TE.PRIMTYPE "none",_)], _, _, TE.PRIMTYPE "bool"))) =
+        $"bool_connect"
+*)      | mlConnectFunction (SOME(TE.ARROW(args, _, _, ret))) =
+        let val ret  = $"return_" && mlConvFun ret
+            val conv = (prsep ($" --> ") (mlConvFun o #1) args) && $" --> " && ret
+        in  $"(fn wid => fn sign => fn cb => ignore(signalConnect wid (signal sign false " 
+             && $"(" && conv && $") cb)))"
+        end
       | mlConnectFunction (SOME _) = raise Fail("only know callbacks of type unit -> bool")
 
     (* Generation of C code
@@ -655,8 +668,8 @@ struct
 	   let val cnc_func = mlConnectFunction cbType
 	   in  mkValDecl' ($"connect_" && TI.MLSignalName signal, 
 			   TI.mkMLType(mlConnectType (name, cbType)),
-			   SOME($$["fn wid => fn cb => ", cnc_func,
-				   " wid \""] && TI.CSignalName signal && $"\" cb"))
+			   SOME($"fn wid => fn cb => " && cnc_func &&
+				   $" wid \"" && TI.CSignalName signal && $"\" cb"))
 	   end
       | mkMLStrdecl (A.BOXED_DECL(pos, name, _)) =
 	   mkMLBoxedVal name
