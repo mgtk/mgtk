@@ -34,6 +34,11 @@ sig
     val bool_connect : 'a GtkObject -> string -> (unit -> bool) -> unit
     val unit_connect : 'a GtkObject -> string -> (unit -> unit) -> unit   
 
+
+    type timeout_id
+    val timeout_add : int -> (unit -> bool) -> timeout_id
+    val timeout_remove : timeout_id -> unit
+
     type base
     type 'a widget_t
     type 'a GtkWidget = 'a widget_t GtkObject

@@ -50,7 +50,8 @@ treeexample2.sml | Like treeexample, but show how closures can be used to
                  | determine which item is signaled.
 menuexample.sml  | Shows how to use menus
 statusbar.sml    | Shows how to use statusbars
-moside/          | A larger example providing a small GUI for MosML
+stopwatch.sml    | Shows how to use timeouts
+moside/          | A larger example providing a small GUI for Moscow ML
                  | (This will probably not work under Windows!)
 
 

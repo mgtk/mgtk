@@ -177,7 +177,7 @@ void mgtk_callback_dispatch (GtkObject *object, gpointer data, guint nargs,
   valueptr mvp;
 
   Push_roots(r, 3);  // because both alloc_tuple and Val_GtkObj allocates
-    r[0] = Val_GtkObj(object);
+    r[0] = object == NULL ? Val_unit : Val_GtkObj(object);
     r[1] = wrap_GtkArg(args);
     res  = alloc_tuple(3);
     Field(res,0) = r[0]; 
@@ -221,6 +221,21 @@ EXTERNML value mgtk_signal_connect (value object, value name, value clb, value a
 				 Bool_val(after));
   return Val_long(res);
 }
+
+EXTERNML value mgtk_gtk_timeout_add(value interval, value clb) {
+  guint result;
+  result = gtk_timeout_add_full (Int_val(interval), NULL,
+                                 mgtk_callback_dispatch, (void*) clb,
+                                 mgtk_callback_destroy);
+  return Val_long(result);
+}
+
+EXTERNML value mgtk_gtk_timeout_remove(value id) {
+  gtk_timeout_remove (Int_val(id));
+  return Val_unit;
+}
+
+
 
 /* *** Convertion from ML to C *** */
 #define Mgtk_isCons(x) (Tag_val(x) != 0)

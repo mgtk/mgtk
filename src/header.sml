@@ -142,6 +142,8 @@ struct
 	fun register f = localId(fn id => (add (id, f); id))
 	val signal_connect : gtkobj -> string -> int -> bool -> int
 	                   = app4(symb"mgtk_signal_connect")
+        val timeout_add_ : int -> int -> int
+                         = app2(symb"mgtk_gtk_timeout_add")
     in
     datatype state = S of GtkArgs * int * int
     type ('a, 'b) trans   = 'a * state -> 'b * state
@@ -208,7 +210,16 @@ struct
 	in  ignore(signal_connect wid sign id true)
 	end
     *)
+        
+    type timeout_id = int
 
+    fun timeout_add interval f =
+        let fun wrap (_, arg, max) = setBool arg max (f())
+            val id = register wrap
+        in  timeout_add_ interval id
+        end
+
+    val timeout_remove : int -> unit = app1(symb"mgtk_gtk_timeout_remove") 
 
     end	
 
