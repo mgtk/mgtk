@@ -522,7 +522,14 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	    in  #default info end
 	  | Type.Tname tn => 
 	    let val info: info = lookup tinfo tn
-	    in  #default info end
+	    in  case #kind info of
+		    Boxed => 
+		       (case #default info of
+			    App(Var alloc, args) => App(Long(Name.fromPaths([],Name.getPath tn,[alloc])), args)
+			  | exp => exp
+                       )
+		    | _ => #default info
+	    end
 	  | Type.Const ty => defaultValue tinfo ty
 	  | Type.WithDefault(ty,v) => defaultValue tinfo ty
 	  | Type.Output(pass,ty) => defaultValue tinfo ty

@@ -7656,7 +7656,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toHScale : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> base t
+	val new' : unit -> base t
 	val new_with_range : real -> real -> real -> base t
       end = struct
 	open Dynlib
@@ -7672,8 +7673,10 @@ structure Gtk  = struct
 	val get_type_ : unit -> GType.t = app1 (symb"mgtk_gtk_hscale_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr = app1 (symb"mgtk_gtk_hscale_new")
-	val new : 'a Adjustment.t -> base t
-	    = fn adjustment => make (new_ (repr adjustment))
+	val new : 'a Adjustment.t option -> base t
+	    = fn adjustment => make (new_ (getOpt (Option.map repr adjustment, 
+						   GObject.null)))
+	val new' : unit -> base t = fn dummy => make (new_ GObject.null)
 	val new_with_range_ : real -> real -> real -> cptr
 	    = app3 (symb"mgtk_gtk_hscale_new_with_range")
 	val new_with_range : real -> real -> real -> base t
@@ -7711,7 +7714,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toHScrollbar : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> base t
+	val new' : unit -> base t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7727,8 +7731,10 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_hscrollbar_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr = app1 (symb"mgtk_gtk_hscrollbar_new")
-	val new : 'a Adjustment.t -> base t
-	    = fn adjustment => make (new_ (repr adjustment))
+	val new : 'a Adjustment.t option -> base t
+	    = fn adjustment => make (new_ (getOpt (Option.map repr adjustment, 
+						   GObject.null)))
+	val new' : unit -> base t = fn dummy => make (new_ GObject.null)
     end
     structure Separator :>
       sig
@@ -8279,7 +8285,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toLayout : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a Adjustment.t -> 'b Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> 'b Adjustment.t option -> base t
+	val new' : unit -> base t
 	val put : 'a t -> 'b Widget.t -> int -> int -> unit
 	val move : 'a t -> 'b Widget.t -> int -> int -> unit
 	val set_size : 'a t -> int -> int -> unit
@@ -8303,9 +8310,13 @@ structure Gtk  = struct
 	val get_type_ : unit -> GType.t = app1 (symb"mgtk_gtk_layout_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr -> cptr = app2 (symb"mgtk_gtk_layout_new")
-	val new : 'a Adjustment.t -> 'b Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> 'b Adjustment.t option -> base t
 	    = fn hadjustment => fn vadjustment =>
-		 make (new_ (repr hadjustment) (repr vadjustment))
+		 make
+		   (new_ (getOpt (Option.map repr hadjustment, GObject.null))
+			 (getOpt (Option.map repr vadjustment, GObject.null)))
+	val new' : unit -> base t
+	    = fn dummy => make (new_ GObject.null GObject.null)
 	val put_ : cptr -> cptr -> int -> int -> unit
 	    = app4 (symb"mgtk_gtk_layout_put")
 	val put : 'a t -> 'b Widget.t -> int -> int -> unit
@@ -9910,7 +9921,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toScrolledWindow : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a Adjustment.t -> 'b Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> 'b Adjustment.t option -> base t
+	val new' : unit -> base t
 	val set_hadjustment : 'a t -> 'b Adjustment.t -> unit
 	val set_vadjustment : 'a t -> 'b Adjustment.t -> unit
 	val get_hadjustment : 'a t -> base Adjustment.t
@@ -9940,9 +9952,13 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_scrolled_window_new")
-	val new : 'a Adjustment.t -> 'b Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> 'b Adjustment.t option -> base t
 	    = fn hadjustment => fn vadjustment =>
-		 make (new_ (repr hadjustment) (repr vadjustment))
+		 make
+		   (new_ (getOpt (Option.map repr hadjustment, GObject.null))
+			 (getOpt (Option.map repr vadjustment, GObject.null)))
+	val new' : unit -> base t
+	    = fn dummy => make (new_ GObject.null GObject.null)
 	val set_hadjustment_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_scrolled_window_set_hadjustment")
 	val set_hadjustment : 'a t -> 'b Adjustment.t -> unit
@@ -10157,7 +10173,8 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val configure : 'a t -> 'b Adjustment.t option -> real -> int -> unit
 	val configure' : 'a t -> real -> int -> unit
-	val new : 'a Adjustment.t -> real -> int -> base t
+	val new : 'a Adjustment.t option -> real -> int -> base t
+	val new' : real -> int -> base t
 	val new_with_range : real -> real -> real -> base t
 	val set_adjustment : 'a t -> 'b Adjustment.t -> unit
 	val get_adjustment : 'a t -> base Adjustment.t
@@ -10212,9 +10229,13 @@ structure Gtk  = struct
 		 configure_ (repr self) GObject.null climb_rate digits
 	val new_ : cptr -> real -> int -> cptr
 	    = app3 (symb"mgtk_gtk_spin_button_new")
-	val new : 'a Adjustment.t -> real -> int -> base t
+	val new : 'a Adjustment.t option -> real -> int -> base t
 	    = fn adjustment => fn climb_rate => fn digits =>
-		 make (new_ (repr adjustment) climb_rate digits)
+		 make (new_ (getOpt (Option.map repr adjustment, GObject.null))
+			    climb_rate digits)
+	val new' : real -> int -> base t
+	    = fn climb_rate => fn digits =>
+		 make (new_ GObject.null climb_rate digits)
 	val new_with_range_ : real -> real -> real -> cptr
 	    = app3 (symb"mgtk_gtk_spin_button_new_with_range")
 	val new_with_range : real -> real -> real -> base t
@@ -10605,7 +10626,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTextBuffer : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a TextTagTable.t -> base t
+	val new : 'a TextTagTable.t option -> base t
+	val new' : unit -> base t
 	val get_line_count : 'a t -> int
 	val get_char_count : 'a t -> int
 	val get_tag_table : 'a t -> base TextTagTable.t
@@ -10712,8 +10734,10 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_text_buffer_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr = app1 (symb"mgtk_gtk_text_buffer_new")
-	val new : 'a TextTagTable.t -> base t
-	    = fn table => make (new_ (repr table))
+	val new : 'a TextTagTable.t option -> base t
+	    = fn table => make (new_ (getOpt (Option.map repr table, 
+					      GObject.null)))
+	val new' : unit -> base t = fn dummy => make (new_ GObject.null)
 	val get_line_count_ : cptr -> int
 	    = app1 (symb"mgtk_gtk_text_buffer_get_line_count")
 	val get_line_count : 'a t -> int
@@ -12054,7 +12078,8 @@ structure Gtk  = struct
 	val TREE_VIEW_DROP_INTO_OR_AFTER : drop_position
 	val get_type : unit -> GType.t
 	val new : unit -> base t
-	val new_with_model : 'a TreeModel.t -> base t
+	val new_with_model : 'a TreeModel.t option -> base t
+	val new_with_model' : unit -> base t
 	val get_model : 'a t -> base TreeModel.t
 	val set_model : 'a t -> 'b TreeModel.t option -> unit
 	val set_model' : 'a t -> unit
@@ -12081,10 +12106,10 @@ structure Gtk  = struct
 	val set_expander_column : 'a t -> 'b TreeViewColumn.t -> unit
 	val get_expander_column : 'a t -> base TreeViewColumn.t
 	val scroll_to_point : 'a t -> int -> int -> unit
-	val scroll_to_cell : 'a t -> 'b TreePath.t 
+	val scroll_to_cell : 'a t -> 'b TreePath.t option 
 			  -> 'c TreeViewColumn.t option -> bool -> real -> real
 			     -> unit
-	val scroll_to_cell' : 'a t -> 'b TreePath.t -> unit
+	val scroll_to_cell' : 'a t -> unit
 	val row_activated
 	  : 'a t -> 'b TreePath.t -> 'c TreeViewColumn.t -> unit
 	val expand_all : 'a t -> unit
@@ -12153,8 +12178,12 @@ structure Gtk  = struct
 	val new : unit -> base t = fn dummy => make (new_ dummy)
 	val new_with_model_ : cptr -> cptr
 	    = app1 (symb"mgtk_gtk_tree_view_new_with_model")
-	val new_with_model : 'a TreeModel.t -> base t
-	    = fn model => make (new_with_model_ (repr model))
+	val new_with_model : 'a TreeModel.t option -> base t
+	    = fn model => make (new_with_model_
+				  (getOpt (Option.map repr model, 
+					   GObject.null)))
+	val new_with_model' : unit -> base t
+	    = fn dummy => make (new_with_model_ GObject.null)
 	val get_model_ : cptr -> cptr
 	    = app1 (symb"mgtk_gtk_tree_view_get_model")
 	val get_model : 'a t -> base TreeModel.t
@@ -12270,19 +12299,18 @@ structure Gtk  = struct
 		 scroll_to_point_ (repr self) tree_x tree_y
 	val scroll_to_cell_ : cptr * cptr * cptr * bool * real * real -> unit
 	    = app1 (symb"mgtk_gtk_tree_view_scroll_to_cell")
-	val scroll_to_cell : 'a t -> 'b TreePath.t 
+	val scroll_to_cell : 'a t -> 'b TreePath.t option 
 			  -> 'c TreeViewColumn.t option -> bool -> real -> real
 			     -> unit
 	    = fn self => fn path => fn column => fn use_align => 
 	      fn row_align => fn col_align =>
-		 scroll_to_cell_ (repr self, repr path, 
-				  getOpt (Option.map repr column, 
-					  GObject.null), 
-				  use_align, row_align, col_align)
-	val scroll_to_cell' : 'a t -> 'b TreePath.t -> unit
-	    = fn self => fn path =>
 		 scroll_to_cell_
-		   (repr self, repr path, GObject.null, false, 0.0, 0.0)
+		   (repr self, getOpt (Option.map repr path, GObject.null), 
+		    getOpt (Option.map repr column, GObject.null), use_align, 
+		    row_align, col_align)
+	val scroll_to_cell' : 'a t -> unit
+	    = fn self => scroll_to_cell_ (repr self, GObject.null, 
+					  GObject.null, false, 0.0, 0.0)
 	val row_activated_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_tree_view_row_activated")
 	val row_activated
@@ -12560,7 +12588,8 @@ structure Gtk  = struct
 	val insert_before : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
 	val insert_after : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
 	val prepend : 'a t -> TreeIter.t -> TreeIter.t
-	val append : 'a t -> TreeIter.t -> TreeIter.t
+	val append : 'a t -> TreeIter.t option -> TreeIter.t
+	val append' : 'a t -> TreeIter.t
 	val is_ancestor : 'a t -> TreeIter.t -> TreeIter.t -> bool
 	val storeiter_depth : 'a t -> TreeIter.t -> int
 	val clear : 'a t -> unit
@@ -12634,9 +12663,14 @@ structure Gtk  = struct
 		 let val res0 = prepend_ (repr self) parent in res0 end
 	val append_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_tree_store_append")
-	val append : 'a t -> TreeIter.t -> TreeIter.t
+	val append : 'a t -> TreeIter.t option -> TreeIter.t
 	    = fn self => fn parent =>
-		 let val res0 = append_ (repr self) parent in res0 end
+		 let val res0 = append_ (repr self)
+				        (getOpt (parent, GObject.null))
+		 in res0 end
+	val append' : 'a t -> TreeIter.t
+	    = fn self => let val res0 = append_ (repr self) GObject.null
+			 in res0 end
 	val is_ancestor_ : cptr -> cptr -> cptr -> bool
 	    = app3 (symb"mgtk_gtk_tree_store_is_ancestor")
 	val is_ancestor : 'a t -> TreeIter.t -> TreeIter.t -> bool
@@ -12859,7 +12893,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toViewport : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a Adjustment.t -> 'b Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> 'b Adjustment.t option -> base t
+	val new' : unit -> base t
 	val get_hadjustment : 'a t -> base Adjustment.t
 	val get_vadjustment : 'a t -> base Adjustment.t
 	val set_hadjustment : 'a t -> 'b Adjustment.t option -> unit
@@ -12885,9 +12920,13 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_viewport_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr -> cptr = app2 (symb"mgtk_gtk_viewport_new")
-	val new : 'a Adjustment.t -> 'b Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> 'b Adjustment.t option -> base t
 	    = fn hadjustment => fn vadjustment =>
-		 make (new_ (repr hadjustment) (repr vadjustment))
+		 make
+		   (new_ (getOpt (Option.map repr hadjustment, GObject.null))
+			 (getOpt (Option.map repr vadjustment, GObject.null)))
+	val new' : unit -> base t
+	    = fn dummy => make (new_ GObject.null GObject.null)
 	val get_hadjustment_ : cptr -> cptr
 	    = app1 (symb"mgtk_gtk_viewport_get_hadjustment")
 	val get_hadjustment : 'a t -> base Adjustment.t
@@ -12990,7 +13029,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toVScale : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> base t
+	val new' : unit -> base t
 	val new_with_range : real -> real -> real -> base t
       end = struct
 	open Dynlib
@@ -13006,8 +13046,10 @@ structure Gtk  = struct
 	val get_type_ : unit -> GType.t = app1 (symb"mgtk_gtk_vscale_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr = app1 (symb"mgtk_gtk_vscale_new")
-	val new : 'a Adjustment.t -> base t
-	    = fn adjustment => make (new_ (repr adjustment))
+	val new : 'a Adjustment.t option -> base t
+	    = fn adjustment => make (new_ (getOpt (Option.map repr adjustment, 
+						   GObject.null)))
+	val new' : unit -> base t = fn dummy => make (new_ GObject.null)
 	val new_with_range_ : real -> real -> real -> cptr
 	    = app3 (symb"mgtk_gtk_vscale_new_with_range")
 	val new_with_range : real -> real -> real -> base t
@@ -13022,7 +13064,8 @@ structure Gtk  = struct
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toVScrollbar : 'a t -> base t
 	val get_type : unit -> GType.t
-	val new : 'a Adjustment.t -> base t
+	val new : 'a Adjustment.t option -> base t
+	val new' : unit -> base t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -13038,8 +13081,10 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_vscrollbar_get_type")
 	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
 	val new_ : cptr -> cptr = app1 (symb"mgtk_gtk_vscrollbar_new")
-	val new : 'a Adjustment.t -> base t
-	    = fn adjustment => make (new_ (repr adjustment))
+	val new : 'a Adjustment.t option -> base t
+	    = fn adjustment => make (new_ (getOpt (Option.map repr adjustment, 
+						   GObject.null)))
+	val new' : unit -> base t = fn dummy => make (new_ GObject.null)
     end
     structure VSeparator :>
       sig

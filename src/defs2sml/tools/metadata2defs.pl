@@ -20,7 +20,7 @@ NODE: foreach $node ( @nodes ) {
 	       next NODE; }
     } elsif($metadatatype eq "array") {
 	$paramvariant = "(array foo)";
-    } elsif($metadatatype eq "null-ok") {
+    } elsif($metadatatype eq "null-ok" || $metadatatype eq "null_ok") {
 	$paramvariant = "(null-ok)";
     } elsif($metadatatype eq "type") {
 	$paramvariant = "";
