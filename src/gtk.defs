@@ -1315,7 +1315,7 @@
 ; Drawing primitives
 (define-func gdk_window_clear_area 
    none
-   ((GdkDrawable drawable)
+   ((GdkWindow window)
     (int x1) (int y1)
     (int x2) (int y2)))
 

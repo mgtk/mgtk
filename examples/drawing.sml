@@ -17,17 +17,16 @@ fun destroy _ = Gtk.main_quit()
 
 
 fun repaint widget =
-    let val drawable = Gtk.widget_get_drawable widget
-	val window = Gtk.widget_get_window widget
+    let val window = Gtk.widget_get_window widget
 	val style  = Gtk.widget_get_style widget
 	val state  = Gtk.widget_get_state widget
 	val gc = Gtk.widget_get_style_fg_gc widget state
 	val size as (width, height, _, _) = Gtk.widget_get_allocation widget
 	val centx = width div 2
 	val centy = height div 2
-    in  Gtk.gdk_window_clear_area drawable 0 0 width height
+    in  Gtk.gdk_window_clear_area window 0 0 width height
     ;   Gtk.gdk_gc_set_foreground gc yellow
-    ;   Gtk.gdk_draw_arc drawable gc true centx centy (width div 3) (height div 3) (64 * 0) (64 * 360)
+    ;   Gtk.gdk_draw_arc window gc true centx centy (width div 3) (height div 3) (64 * 0) (64 * 360)
     ;   Gtk.gdk_gc_set_foreground gc blue
     ;   Gtk.draw_string style window state (centx - 45) centy "mGtk rules!"
     end

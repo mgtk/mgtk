@@ -4,8 +4,8 @@ MOSMLINCLUDE=-I $(LIBDIR)
 
 OBJS= FunInput.uo valuta.uo helloworld2.uo helloworld.uo entrylabel.uo\
       fileedit.uo fileedit2.uo counter.uo comboexample.uo\
-      treeexample.uo treeexample2.uo drawing.uo twowindows.uo calendar.uo\
-      menuexample.uo
+      treeexample.uo treeexample2.uo drawing.uo pixmap.uo\
+      twowindows.uo calendar.uo menuexample.uo
 
 SUBDIRS= moside
 

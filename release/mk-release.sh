@@ -119,6 +119,7 @@ cp $EXAMPLES/README $TRGT/examples
 cp $EXAMPLES/Makefile.w32 $TRGT/examples
 cp $EXAMPLES/*.sig $TRGT/examples
 cp $EXAMPLES/*.sml $TRGT/examples
+cp $EXAMPLES/*.xpm $TRGT/examples
 #   We have to treat the Makefile specially since it
 #   refers to the ../src/Makefile.inc
 #   Wont do: cp $EXAMPLES/Makefile $TRGT/examples
