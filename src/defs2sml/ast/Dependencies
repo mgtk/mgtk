@@ -4,3 +4,4 @@ fromdefs: /util/pretty/pretty name /defs/defs ast + /util/ /util/
 resolvenames: /util/pretty/pretty ast name type + /util/
 type: /util/pretty/pretty + /util/util
 resolvetypes: ast name type /util/pretty/pretty /util/ resolvenames
+dependency: ast type /util/util

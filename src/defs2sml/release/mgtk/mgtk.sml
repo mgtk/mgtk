@@ -338,15 +338,6 @@ structure Gtk  = struct
     type cptr = GObject.cptr
     val repr = GObject.repr
     val symb = GtkBasis.symb
-    type border = GObject.cptr
-    type icon_info = GObject.cptr
-    type icon_set = GObject.cptr
-    type requisition = GObject.cptr
-    type selection_data = GObject.cptr
-    type text_attributes = GObject.cptr
-    type textiter = GObject.cptr
-    type treeiter = GObject.cptr
-    type tree_row_reference = GObject.cptr
     type anchortype = int
     val get_anchortype_
       : unit -> int * int * int * int * int * int * int * int * int * int 
@@ -826,7 +817,6 @@ structure Gtk  = struct
 	 HAS_GRAB, RC_STYLE, COMPOSITE_CHILD, NO_REPARENT, APP_PAINTABLE, 
 	 RECEIVES_DEFAULT, DOUBLE_BUFFERED, NO_SHOW_ALL)
 	= get_widget_flags_ ()
-    type ctree_node = GObject.cptr
     
     
     val accelerator_get_default_mod_mask_ : unit -> int
@@ -916,20 +906,6 @@ structure Gtk  = struct
 	= app1 (symb"mgtk_gtk_icon_size_get_name")
     val icon_size_get_name : icon_size -> string
 	= fn size => icon_size_get_name_ size
-    val icon_set_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_icon_set_get_type")
-    val icon_set_get_type : unit -> GType.t
-	= fn dummy => icon_set_get_type_ dummy
-    val icon_set_new_ : unit -> cptr = app1 (symb"mgtk_gtk_icon_set_new")
-    val icon_set_new : unit -> icon_set = fn dummy => icon_set_new_ dummy
-    val icon_source_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_icon_source_get_type")
-    val icon_source_get_type : unit -> GType.t
-	= fn dummy => icon_source_get_type_ dummy
-    val icon_info_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_icon_info_get_type")
-    val icon_info_get_type : unit -> GType.t
-	= fn dummy => icon_info_get_type_ dummy
     val check_version_ : int -> int -> int -> string
 	= app3 (symb"mgtk_gtk_check_version")
     val check_version : int -> int -> int -> string
@@ -1004,26 +980,11 @@ structure Gtk  = struct
     val rc_get_im_module_file : unit -> string
 	= fn dummy => rc_get_im_module_file_ dummy
     
-    val selection_data_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_selection_data_get_type")
-    val selection_data_get_type : unit -> GType.t
-	= fn dummy => selection_data_get_type_ dummy
     
     
     
     
-    val border_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_border_get_type")
-    val border_get_type : unit -> GType.t = fn dummy => border_get_type_ dummy
     
-    val textiter_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_textiter_get_type")
-    val textiter_get_type : unit -> GType.t
-	= fn dummy => textiter_get_type_ dummy
-    val text_attributes_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_text_attributes_get_type")
-    val text_attributes_get_type : unit -> GType.t
-	= fn dummy => text_attributes_get_type_ dummy
     val tips_query_get_type_ : unit -> GType.t
 	= app1 (symb"mgtk_gtk_tips_query_get_type")
     val tips_query_get_type : unit -> GType.t
@@ -1031,21 +992,95 @@ structure Gtk  = struct
     
     
     
-    val tree_row_reference_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_tree_row_reference_get_type")
-    val tree_row_reference_get_type : unit -> GType.t
-	= fn dummy => tree_row_reference_get_type_ dummy
-    
-    
-    
-    val treeiter_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_treeiter_get_type")
-    val treeiter_get_type : unit -> GType.t
-	= fn dummy => treeiter_get_type_ dummy
-    val requisition_get_type_ : unit -> GType.t
-	= app1 (symb"mgtk_gtk_requisition_get_type")
-    val requisition_get_type : unit -> GType.t
-	= fn dummy => requisition_get_type_ dummy
+    structure Border :>
+      sig
+	type t
+	val get_type : unit -> GType.t
+	val copy : t -> t
+	val free : t -> unit
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val get_type_ : unit -> GType.t = app1 (symb"mgtk_gtk_border_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_border_copy")
+	val copy : t -> t = fn self => copy_ self
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_border_free")
+	val free : t -> unit = fn self => free_ self
+    end
+    structure IconInfo :>
+      sig
+	type t
+	val get_type : unit -> GType.t
+	val copy : t -> t
+	val free : t -> unit
+	val get_base_size : t -> int
+	val get_filename : t -> string
+	val set_raw_coordinates : t -> bool -> unit
+	val get_display_name : t -> string
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_icon_info_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_icon_info_copy")
+	val copy : t -> t = fn self => copy_ self
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_icon_info_free")
+	val free : t -> unit = fn self => free_ self
+	val get_base_size_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_icon_info_get_base_size")
+	val get_base_size : t -> int = fn self => get_base_size_ self
+	val get_filename_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_icon_info_get_filename")
+	val get_filename : t -> string = fn self => get_filename_ self
+	val set_raw_coordinates_ : cptr -> bool -> unit
+	    = app2 (symb"mgtk_gtk_icon_info_set_raw_coordinates")
+	val set_raw_coordinates : t -> bool -> unit
+	    = fn self => fn raw_coordinates =>
+		 set_raw_coordinates_ self raw_coordinates
+	val get_display_name_ : cptr -> string
+	    = app1 (symb"mgtk_gtk_icon_info_get_display_name")
+	val get_display_name : t -> string = fn self => get_display_name_ self
+    end
+    structure IconSet :>
+      sig
+	type t
+	val get_type : unit -> GType.t
+	val new : unit -> t
+	val refe : t -> t
+	val unref : t -> unit
+	val copy : t -> t
+	val get_sizes : t -> icon_size -> int -> unit
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_icon_set_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val new_ : unit -> cptr = app1 (symb"mgtk_gtk_icon_set_new")
+	val new : unit -> t = fn dummy => new_ dummy
+	val ref_ : cptr -> cptr = app1 (symb"mgtk_gtk_icon_set_ref")
+	val refe : t -> t = fn self => ref_ self
+	val unref_ : cptr -> unit = app1 (symb"mgtk_gtk_icon_set_unref")
+	val unref : t -> unit = fn self => unref_ self
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_icon_set_copy")
+	val copy : t -> t = fn self => copy_ self
+	val get_sizes_ : cptr -> cptr -> cptr -> unit
+	    = app3 (symb"mgtk_gtk_icon_set_get_sizes")
+	val get_sizes : t -> icon_size -> int -> unit
+	    = fn self => fn sizes => fn n_sizes =>
+		 get_sizes_ self sizes n_sizes
+    end
     structure IconTheme :>
       sig
 	type base
@@ -1066,7 +1101,7 @@ structure Gtk  = struct
 	val set_custom_theme : 'a t -> string -> unit
 	val has_icon : 'a t -> string -> bool
 	val lookup_icon
-	  : 'a t -> string -> int -> icon_lookup_flags list -> icon_info
+	  : 'a t -> string -> int -> icon_lookup_flags list -> Info.t
 	val get_example_icon_name : 'a t -> string
 	val rescan_if_needed : 'a t -> bool
       end = struct
@@ -1123,7 +1158,7 @@ structure Gtk  = struct
 	val lookup_icon_ : cptr -> string -> int -> int -> cptr
 	    = app4 (symb"mgtk_gtk_icon_theme_lookup_icon")
 	val lookup_icon
-	  : 'a t -> string -> int -> icon_lookup_flags list -> icon_info
+	  : 'a t -> string -> int -> icon_lookup_flags list -> Info.t
 	    = fn self => fn icon_name => fn size => fn flags =>
 		 lookup_icon_ (repr self) icon_name size (Flags.set flags)
 	val get_example_icon_name_ : cptr -> string
@@ -1134,6 +1169,567 @@ structure Gtk  = struct
 	    = app1 (symb"mgtk_gtk_icon_theme_rescan_if_needed")
 	val rescan_if_needed : 'a t -> bool
 	    = fn self => rescan_if_needed_ (repr self)
+    end
+    structure Requisition :>
+      sig
+	type t
+	val get_type : unit -> GType.t
+	val copy : t -> t
+	val free : t -> unit
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_requisition_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_requisition_copy")
+	val copy : t -> t = fn self => copy_ self
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_requisition_free")
+	val free : t -> unit = fn self => free_ self
+    end
+    structure SelectionData :>
+      sig
+	type t
+	val set_text : t -> string -> int option -> bool
+	val set_text' : t -> string -> bool
+	val targets_include_text : t -> bool
+	val get_type : unit -> GType.t
+	val copy : t -> t
+	val free : t -> unit
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val set_text_ : cptr -> string -> int -> bool
+	    = app3 (symb"mgtk_gtk_selection_data_set_text")
+	val set_text : t -> string -> int option -> bool
+	    = fn self => fn str => fn len =>
+		 set_text_ self str (getOpt (len, ~1))
+	val set_text' : t -> string -> bool
+	    = fn self => fn str => set_text_ self str ~1
+	val targets_include_text_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_selection_data_targets_include_text")
+	val targets_include_text : t -> bool
+	    = fn self => targets_include_text_ self
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_selection_data_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_selection_data_copy")
+	val copy : t -> t = fn self => copy_ self
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_selection_data_free")
+	val free : t -> unit = fn self => free_ self
+    end
+    structure TextAttributes :>
+      sig
+	type t
+	val new : unit -> t
+	val copy : t -> t
+	val copy_values : t -> t -> unit
+	val unref : t -> unit
+	val refe : t -> unit
+	val get_type : unit -> GType.t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val new_ : unit -> cptr = app1 (symb"mgtk_gtk_text_attributes_new")
+	val new : unit -> t = fn dummy => new_ dummy
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_text_attributes_copy")
+	val copy : t -> t = fn self => copy_ self
+	val copy_values_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_text_attributes_copy_values")
+	val copy_values : t -> t -> unit
+	    = fn self => fn dest => copy_values_ self dest
+	val unref_ : cptr -> unit = app1 (symb"mgtk_gtk_text_attributes_unref")
+	val unref : t -> unit = fn self => unref_ self
+	val ref_ : cptr -> unit = app1 (symb"mgtk_gtk_text_attributes_ref")
+	val refe : t -> unit = fn self => ref_ self
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_text_attributes_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+    end
+    structure TextIter :>
+      sig
+	type t
+	val get_buffer : t -> base t
+	val copy : t -> t
+	val free : t -> unit
+	val get_type : unit -> GType.t
+	val get_offset : t -> int
+	val get_line : t -> int
+	val get_line_offset : t -> int
+	val get_line_index : t -> int
+	val get_visible_line_offset : t -> int
+	val get_visible_line_index : t -> int
+	val get_char : t -> char
+	val get_slice : t -> t -> string
+	val get_text : t -> t -> string
+	val get_visible_slice : t -> t -> string
+	val get_visible_text : t -> t -> string
+	val get_child_anchor : t -> base t
+	val begins_tag : t -> 'a t option -> bool
+	val begins_tag' : t -> bool
+	val ends_tag : t -> 'a t option -> bool
+	val ends_tag' : t -> bool
+	val toggles_tag : t -> 'a t option -> bool
+	val toggles_tag' : t -> bool
+	val has_tag : t -> 'a t -> bool
+	val editable : t -> bool -> bool
+	val can_insert : t -> bool -> bool
+	val starts_word : t -> bool
+	val ends_word : t -> bool
+	val inside_word : t -> bool
+	val starts_sentence : t -> bool
+	val ends_sentence : t -> bool
+	val inside_sentence : t -> bool
+	val starts_line : t -> bool
+	val ends_line : t -> bool
+	val is_cursor_position : t -> bool
+	val get_chars_in_line : t -> int
+	val get_bytes_in_line : t -> int
+	val get_attributes : t -> Text.Attributes.t -> bool
+	val is_end : t -> bool
+	val is_start : t -> bool
+	val forward_char : t -> bool
+	val backward_char : t -> bool
+	val forward_chars : t -> int -> bool
+	val backward_chars : t -> int -> bool
+	val forward_line : t -> bool
+	val backward_line : t -> bool
+	val forward_lines : t -> int -> bool
+	val backward_lines : t -> int -> bool
+	val forward_word_end : t -> bool
+	val backward_word_start : t -> bool
+	val forward_word_ends : t -> int -> bool
+	val backward_word_starts : t -> int -> bool
+	val forward_visible_word_end : t -> bool
+	val backward_visible_word_start : t -> bool
+	val forward_visible_word_ends : t -> int -> bool
+	val backward_visible_word_starts : t -> int -> bool
+	val forward_sentence_end : t -> bool
+	val backward_sentence_start : t -> bool
+	val forward_sentence_ends : t -> int -> bool
+	val backward_sentence_starts : t -> int -> bool
+	val forward_cursor_position : t -> bool
+	val backward_cursor_position : t -> bool
+	val forward_cursor_positions : t -> int -> bool
+	val backward_cursor_positions : t -> int -> bool
+	val forward_visible_cursor_position : t -> bool
+	val backward_visible_cursor_position : t -> bool
+	val forward_visible_cursor_positions : t -> int -> bool
+	val backward_visible_cursor_positions : t -> int -> bool
+	val set_offset : t -> int -> unit
+	val set_line : t -> int -> unit
+	val set_line_offset : t -> int -> unit
+	val set_line_index : t -> int -> unit
+	val forward_to_end : t -> unit
+	val forward_to_line_end : t -> bool
+	val set_visible_line_offset : t -> int -> unit
+	val set_visible_line_index : t -> int -> unit
+	val forward_to_tag_toggle : t -> 'a t option -> bool
+	val forward_to_tag_toggle' : t -> bool
+	val backward_to_tag_toggle : t -> 'a t option -> bool
+	val backward_to_tag_toggle' : t -> bool
+	val forward_search
+	  : t -> string -> text_search_flags list -> t option -> bool * t * t
+	val forward_search'
+	  : t -> string -> text_search_flags list -> bool * t * t
+	val backward_search
+	  : t -> string -> text_search_flags list -> t option -> bool * t * t
+	val backward_search'
+	  : t -> string -> text_search_flags list -> bool * t * t
+	val equal : t -> t -> bool
+	val compare : t -> t -> int
+	val in_range : t -> t -> t -> bool
+	val order : t -> t -> unit
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val get_buffer_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_textiter_get_buffer")
+	val get_buffer : t -> base t = fn self => make (get_buffer_ self)
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_textiter_copy")
+	val copy : t -> t = fn self => copy_ self
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_textiter_free")
+	val free : t -> unit = fn self => free_ self
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_textiter_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val get_offset_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_textiter_get_offset")
+	val get_offset : t -> int = fn self => get_offset_ self
+	val get_line_ : cptr -> int = app1 (symb"mgtk_gtk_textiter_get_line")
+	val get_line : t -> int = fn self => get_line_ self
+	val get_line_offset_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_textiter_get_line_offset")
+	val get_line_offset : t -> int = fn self => get_line_offset_ self
+	val get_line_index_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_textiter_get_line_index")
+	val get_line_index : t -> int = fn self => get_line_index_ self
+	val get_visible_line_offset_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_textiter_get_visible_line_offset")
+	val get_visible_line_offset : t -> int
+	    = fn self => get_visible_line_offset_ self
+	val get_visible_line_index_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_textiter_get_visible_line_index")
+	val get_visible_line_index : t -> int
+	    = fn self => get_visible_line_index_ self
+	val get_char_ : cptr -> char = app1 (symb"mgtk_gtk_textiter_get_char")
+	val get_char : t -> char = fn self => get_char_ self
+	val get_slice_ : cptr -> cptr -> string
+	    = app2 (symb"mgtk_gtk_textiter_get_slice")
+	val get_slice : t -> t -> string
+	    = fn self => fn en => get_slice_ self en
+	val get_text_ : cptr -> cptr -> string
+	    = app2 (symb"mgtk_gtk_textiter_get_text")
+	val get_text : t -> t -> string = fn self => fn en => get_text_ self en
+	val get_visible_slice_ : cptr -> cptr -> string
+	    = app2 (symb"mgtk_gtk_textiter_get_visible_slice")
+	val get_visible_slice : t -> t -> string
+	    = fn self => fn en => get_visible_slice_ self en
+	val get_visible_text_ : cptr -> cptr -> string
+	    = app2 (symb"mgtk_gtk_textiter_get_visible_text")
+	val get_visible_text : t -> t -> string
+	    = fn self => fn en => get_visible_text_ self en
+	val get_child_anchor_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_textiter_get_child_anchor")
+	val get_child_anchor : t -> base t
+	    = fn self => make (get_child_anchor_ self)
+	val begins_tag_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_begins_tag")
+	val begins_tag : t -> 'a t option -> bool
+	    = fn self => fn tag =>
+		 begins_tag_ self (getOpt (Option.map repr tag, GObject.null))
+	val begins_tag' : t -> bool = fn self => begins_tag_ self GObject.null
+	val ends_tag_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_ends_tag")
+	val ends_tag : t -> 'a t option -> bool
+	    = fn self => fn tag =>
+		 ends_tag_ self (getOpt (Option.map repr tag, GObject.null))
+	val ends_tag' : t -> bool = fn self => ends_tag_ self GObject.null
+	val toggles_tag_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_toggles_tag")
+	val toggles_tag : t -> 'a t option -> bool
+	    = fn self => fn tag =>
+		 toggles_tag_ self (getOpt (Option.map repr tag, GObject.null))
+	val toggles_tag' : t -> bool
+	    = fn self => toggles_tag_ self GObject.null
+	val has_tag_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_has_tag")
+	val has_tag : t -> 'a t -> bool
+	    = fn self => fn tag => has_tag_ self (repr tag)
+	val editable_ : cptr -> bool -> bool
+	    = app2 (symb"mgtk_gtk_textiter_editable")
+	val editable : t -> bool -> bool = fn self => fn default_setting =>
+					      editable_ self default_setting
+	val can_insert_ : cptr -> bool -> bool
+	    = app2 (symb"mgtk_gtk_textiter_can_insert")
+	val can_insert : t -> bool -> bool
+	    = fn self => fn default_editability =>
+		 can_insert_ self default_editability
+	val starts_word_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_starts_word")
+	val starts_word : t -> bool = fn self => starts_word_ self
+	val ends_word_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_ends_word")
+	val ends_word : t -> bool = fn self => ends_word_ self
+	val inside_word_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_inside_word")
+	val inside_word : t -> bool = fn self => inside_word_ self
+	val starts_sentence_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_starts_sentence")
+	val starts_sentence : t -> bool = fn self => starts_sentence_ self
+	val ends_sentence_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_ends_sentence")
+	val ends_sentence : t -> bool = fn self => ends_sentence_ self
+	val inside_sentence_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_inside_sentence")
+	val inside_sentence : t -> bool = fn self => inside_sentence_ self
+	val starts_line_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_starts_line")
+	val starts_line : t -> bool = fn self => starts_line_ self
+	val ends_line_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_ends_line")
+	val ends_line : t -> bool = fn self => ends_line_ self
+	val is_cursor_position_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_is_cursor_position")
+	val is_cursor_position : t -> bool
+	    = fn self => is_cursor_position_ self
+	val get_chars_in_line_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_textiter_get_chars_in_line")
+	val get_chars_in_line : t -> int = fn self => get_chars_in_line_ self
+	val get_bytes_in_line_ : cptr -> int
+	    = app1 (symb"mgtk_gtk_textiter_get_bytes_in_line")
+	val get_bytes_in_line : t -> int = fn self => get_bytes_in_line_ self
+	val get_attributes_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_get_attributes")
+	val get_attributes : t -> Text.Attributes.t -> bool
+	    = fn self => fn values => get_attributes_ self values
+	val is_end_ : cptr -> bool = app1 (symb"mgtk_gtk_textiter_is_end")
+	val is_end : t -> bool = fn self => is_end_ self
+	val is_start_ : cptr -> bool = app1 (symb"mgtk_gtk_textiter_is_start")
+	val is_start : t -> bool = fn self => is_start_ self
+	val forward_char_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_char")
+	val forward_char : t -> bool = fn self => forward_char_ self
+	val backward_char_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_backward_char")
+	val backward_char : t -> bool = fn self => backward_char_ self
+	val forward_chars_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_chars")
+	val forward_chars : t -> int -> bool
+	    = fn self => fn count => forward_chars_ self count
+	val backward_chars_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_chars")
+	val backward_chars : t -> int -> bool
+	    = fn self => fn count => backward_chars_ self count
+	val forward_line_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_line")
+	val forward_line : t -> bool = fn self => forward_line_ self
+	val backward_line_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_backward_line")
+	val backward_line : t -> bool = fn self => backward_line_ self
+	val forward_lines_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_lines")
+	val forward_lines : t -> int -> bool
+	    = fn self => fn count => forward_lines_ self count
+	val backward_lines_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_lines")
+	val backward_lines : t -> int -> bool
+	    = fn self => fn count => backward_lines_ self count
+	val forward_word_end_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_word_end")
+	val forward_word_end : t -> bool = fn self => forward_word_end_ self
+	val backward_word_start_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_backward_word_start")
+	val backward_word_start : t -> bool
+	    = fn self => backward_word_start_ self
+	val forward_word_ends_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_word_ends")
+	val forward_word_ends : t -> int -> bool
+	    = fn self => fn count => forward_word_ends_ self count
+	val backward_word_starts_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_word_starts")
+	val backward_word_starts : t -> int -> bool
+	    = fn self => fn count => backward_word_starts_ self count
+	val forward_visible_word_end_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_visible_word_end")
+	val forward_visible_word_end : t -> bool
+	    = fn self => forward_visible_word_end_ self
+	val backward_visible_word_start_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_backward_visible_word_start")
+	val backward_visible_word_start : t -> bool
+	    = fn self => backward_visible_word_start_ self
+	val forward_visible_word_ends_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_visible_word_ends")
+	val forward_visible_word_ends : t -> int -> bool
+	    = fn self => fn count => forward_visible_word_ends_ self count
+	val backward_visible_word_starts_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_visible_word_starts")
+	val backward_visible_word_starts : t -> int -> bool
+	    = fn self => fn count => backward_visible_word_starts_ self count
+	val forward_sentence_end_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_sentence_end")
+	val forward_sentence_end : t -> bool
+	    = fn self => forward_sentence_end_ self
+	val backward_sentence_start_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_backward_sentence_start")
+	val backward_sentence_start : t -> bool
+	    = fn self => backward_sentence_start_ self
+	val forward_sentence_ends_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_sentence_ends")
+	val forward_sentence_ends : t -> int -> bool
+	    = fn self => fn count => forward_sentence_ends_ self count
+	val backward_sentence_starts_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_sentence_starts")
+	val backward_sentence_starts : t -> int -> bool
+	    = fn self => fn count => backward_sentence_starts_ self count
+	val forward_cursor_position_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_cursor_position")
+	val forward_cursor_position : t -> bool
+	    = fn self => forward_cursor_position_ self
+	val backward_cursor_position_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_backward_cursor_position")
+	val backward_cursor_position : t -> bool
+	    = fn self => backward_cursor_position_ self
+	val forward_cursor_positions_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_cursor_positions")
+	val forward_cursor_positions : t -> int -> bool
+	    = fn self => fn count => forward_cursor_positions_ self count
+	val backward_cursor_positions_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_cursor_positions")
+	val backward_cursor_positions : t -> int -> bool
+	    = fn self => fn count => backward_cursor_positions_ self count
+	val forward_visible_cursor_position_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_visible_cursor_position")
+	val forward_visible_cursor_position : t -> bool
+	    = fn self => forward_visible_cursor_position_ self
+	val backward_visible_cursor_position_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_backward_visible_cursor_position")
+	val backward_visible_cursor_position : t -> bool
+	    = fn self => backward_visible_cursor_position_ self
+	val forward_visible_cursor_positions_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_visible_cursor_positions")
+	val forward_visible_cursor_positions : t -> int -> bool
+	    = fn self => fn count =>
+		 forward_visible_cursor_positions_ self count
+	val backward_visible_cursor_positions_ : cptr -> int -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_visible_cursor_positions")
+	val backward_visible_cursor_positions : t -> int -> bool
+	    = fn self => fn count =>
+		 backward_visible_cursor_positions_ self count
+	val set_offset_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_textiter_set_offset")
+	val set_offset : t -> int -> unit
+	    = fn self => fn char_offset => set_offset_ self char_offset
+	val set_line_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_textiter_set_line")
+	val set_line : t -> int -> unit
+	    = fn self => fn line_number => set_line_ self line_number
+	val set_line_offset_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_textiter_set_line_offset")
+	val set_line_offset : t -> int -> unit
+	    = fn self => fn char_on_line => set_line_offset_ self char_on_line
+	val set_line_index_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_textiter_set_line_index")
+	val set_line_index : t -> int -> unit
+	    = fn self => fn byte_on_line => set_line_index_ self byte_on_line
+	val forward_to_end_ : cptr -> unit
+	    = app1 (symb"mgtk_gtk_textiter_forward_to_end")
+	val forward_to_end : t -> unit = fn self => forward_to_end_ self
+	val forward_to_line_end_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_textiter_forward_to_line_end")
+	val forward_to_line_end : t -> bool
+	    = fn self => forward_to_line_end_ self
+	val set_visible_line_offset_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_textiter_set_visible_line_offset")
+	val set_visible_line_offset : t -> int -> unit
+	    = fn self => fn char_on_line =>
+		 set_visible_line_offset_ self char_on_line
+	val set_visible_line_index_ : cptr -> int -> unit
+	    = app2 (symb"mgtk_gtk_textiter_set_visible_line_index")
+	val set_visible_line_index : t -> int -> unit
+	    = fn self => fn byte_on_line =>
+		 set_visible_line_index_ self byte_on_line
+	val forward_to_tag_toggle_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_forward_to_tag_toggle")
+	val forward_to_tag_toggle : t -> 'a t option -> bool
+	    = fn self => fn tag =>
+		 forward_to_tag_toggle_
+		   self (getOpt (Option.map repr tag, GObject.null))
+	val forward_to_tag_toggle' : t -> bool
+	    = fn self => forward_to_tag_toggle_ self GObject.null
+	val backward_to_tag_toggle_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_backward_to_tag_toggle")
+	val backward_to_tag_toggle : t -> 'a t option -> bool
+	    = fn self => fn tag =>
+		 backward_to_tag_toggle_
+		   self (getOpt (Option.map repr tag, GObject.null))
+	val backward_to_tag_toggle' : t -> bool
+	    = fn self => backward_to_tag_toggle_ self GObject.null
+	val forward_search_ : cptr -> string -> int -> cptr
+			      -> bool * cptr * cptr
+	    = app4 (symb"mgtk_gtk_textiter_forward_search")
+	val forward_search
+	  : t -> string -> text_search_flags list -> t option -> bool * t * t
+	    = fn self => fn str => fn flags => fn limit =>
+		 let val (res0, res1, res2)
+			 = forward_search_ self str (Flags.set flags)
+					   (getOpt (limit, GObject.null))
+		 in (res0, res1, res2) end
+	val forward_search'
+	  : t -> string -> text_search_flags list -> bool * t * t
+	    = fn self => fn str => fn flags =>
+		 let val (res0, res1, res2)
+			 = forward_search_
+			     self str (Flags.set flags) GObject.null
+		 in (res0, res1, res2) end
+	val backward_search_ : cptr -> string -> int -> cptr
+			       -> bool * cptr * cptr
+	    = app4 (symb"mgtk_gtk_textiter_backward_search")
+	val backward_search
+	  : t -> string -> text_search_flags list -> t option -> bool * t * t
+	    = fn self => fn str => fn flags => fn limit =>
+		 let val (res0, res1, res2)
+			 = backward_search_ self str (Flags.set flags)
+					    (getOpt (limit, GObject.null))
+		 in (res0, res1, res2) end
+	val backward_search'
+	  : t -> string -> text_search_flags list -> bool * t * t
+	    = fn self => fn str => fn flags =>
+		 let val (res0, res1, res2)
+			 = backward_search_
+			     self str (Flags.set flags) GObject.null
+		 in (res0, res1, res2) end
+	val equal_ : cptr -> cptr -> bool
+	    = app2 (symb"mgtk_gtk_textiter_equal")
+	val equal : t -> t -> bool = fn self => fn rhs => equal_ self rhs
+	val compare_ : cptr -> cptr -> int
+	    = app2 (symb"mgtk_gtk_textiter_compare")
+	val compare : t -> t -> int = fn self => fn rhs => compare_ self rhs
+	val in_range_ : cptr -> cptr -> cptr -> bool
+	    = app3 (symb"mgtk_gtk_textiter_in_range")
+	val in_range : t -> t -> t -> bool
+	    = fn self => fn start => fn en => in_range_ self start en
+	val order_ : cptr -> cptr -> unit
+	    = app2 (symb"mgtk_gtk_textiter_order")
+	val order : t -> t -> unit = fn self => fn second => order_ self second
+    end
+    structure TreeIter :>
+      sig
+	type t
+	val copy : t -> t
+	val free : t -> unit
+	val get_type : unit -> GType.t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val copy_ : cptr -> cptr = app1 (symb"mgtk_gtk_treeiter_copy")
+	val copy : t -> t = fn self => copy_ self
+	val free_ : cptr -> unit = app1 (symb"mgtk_gtk_treeiter_free")
+	val free : t -> unit = fn self => free_ self
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_treeiter_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+    end
+    structure TreeRowReference :>
+      sig
+	type t
+	val get_type : unit -> GType.t
+	val valid : t -> bool
+	val copy : t -> t
+	val free : t -> unit
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+	val get_type_ : unit -> GType.t
+	    = app1 (symb"mgtk_gtk_tree_row_reference_get_type")
+	val get_type : unit -> GType.t = fn dummy => get_type_ dummy
+	val valid_ : cptr -> bool
+	    = app1 (symb"mgtk_gtk_tree_row_reference_valid")
+	val valid : t -> bool = fn self => valid_ self
+	val copy_ : cptr -> cptr
+	    = app1 (symb"mgtk_gtk_tree_row_reference_copy")
+	val copy : t -> t = fn self => copy_ self
+	val free_ : cptr -> unit
+	    = app1 (symb"mgtk_gtk_tree_row_reference_free")
+	val free : t -> unit = fn self => free_ self
     end
     structure CellEditable :>
       sig
@@ -1607,23 +2203,24 @@ structure Gtk  = struct
 	val get_flags : 'a t -> treemodel_flags list
 	val get_n_columns : 'a t -> int
 	val get_columntype : 'a t -> int -> GType.t
-	val getiter_from_string : 'a t -> string -> bool * treeiter
-	val get_string_fromiter : 'a t -> treeiter -> string
-	val getiter_first : 'a t -> bool * treeiter
-	val get_value : 'a t -> treeiter -> int -> GValue.GValue
+	val getiter_from_string : 'a t -> string -> bool * TreeIter.t
+	val get_string_fromiter : 'a t -> TreeIter.t -> string
+	val getiter_first : 'a t -> bool * TreeIter.t
+	val get_value : 'a t -> TreeIter.t -> int -> GValue.GValue
 			-> GValue.GValue
-	val iter_next : 'a t -> treeiter -> bool * treeiter
-	val iter_children : 'a t -> treeiter option -> bool * treeiter
-	val iter_children' : 'a t -> bool * treeiter
-	val iter_has_child : 'a t -> treeiter -> bool
-	val iter_n_children : 'a t -> treeiter option -> int
+	val iter_next : 'a t -> TreeIter.t -> bool * TreeIter.t
+	val iter_children : 'a t -> TreeIter.t option -> bool * TreeIter.t
+	val iter_children' : 'a t -> bool * TreeIter.t
+	val iter_has_child : 'a t -> TreeIter.t -> bool
+	val iter_n_children : 'a t -> TreeIter.t option -> int
 	val iter_n_children' : 'a t -> int
-	val iter_nth_child : 'a t -> treeiter option -> int -> bool * treeiter
-	val iter_nth_child' : 'a t -> int -> bool * treeiter
-	val iter_parent : 'a t -> treeiter -> bool * treeiter
-	val ref_node : 'a t -> treeiter -> unit
-	val unref_node : 'a t -> treeiter -> unit
-	val get : 'a t -> treeiter -> unit
+	val iter_nth_child : 'a t -> TreeIter.t option -> int
+			     -> bool * TreeIter.t
+	val iter_nth_child' : 'a t -> int -> bool * TreeIter.t
+	val iter_parent : 'a t -> TreeIter.t -> bool * TreeIter.t
+	val ref_node : 'a t -> TreeIter.t -> unit
+	val unref_node : 'a t -> TreeIter.t -> unit
+	val get : 'a t -> TreeIter.t -> unit
 	val filter_get_type : unit -> GType.t
 	val sort_get_type : unit -> GType.t
       end = struct
@@ -1653,85 +2250,86 @@ structure Gtk  = struct
 	    = fn self => fn index => get_columntype_ (repr self) index
 	val getiter_from_string_ : cptr -> string -> bool * cptr
 	    = app2 (symb"mgtk_gtk_tree_model_get_iter_from_string")
-	val getiter_from_string : 'a t -> string -> bool * treeiter
+	val getiter_from_string : 'a t -> string -> bool * TreeIter.t
 	    = fn self => fn path_string =>
 		 let val (res0, res1) = getiter_from_string_
 					  (repr self) path_string
 		 in (res0, res1) end
 	val get_string_fromiter_ : cptr -> cptr -> string
 	    = app2 (symb"mgtk_gtk_tree_model_get_string_fromiter")
-	val get_string_fromiter : 'a t -> treeiter -> string
+	val get_string_fromiter : 'a t -> TreeIter.t -> string
 	    = fn self => fn iter => get_string_fromiter_ (repr self) iter
 	val getiter_first_ : cptr -> bool * cptr
 	    = app1 (symb"mgtk_gtk_tree_model_get_iter_first")
-	val getiter_first : 'a t -> bool * treeiter
+	val getiter_first : 'a t -> bool * TreeIter.t
 	    = fn self => let val (res0, res1) = getiter_first_ (repr self)
 			 in (res0, res1) end
 	val get_value_ : cptr -> cptr -> int -> GValue.GValue -> GValue.GValue
 	    = app4 (symb"mgtk_gtk_tree_model_get_value")
-	val get_value : 'a t -> treeiter -> int -> GValue.GValue
+	val get_value : 'a t -> TreeIter.t -> int -> GValue.GValue
 			-> GValue.GValue
 	    = fn self => fn iter => fn column => fn value =>
 		 let val res0 = get_value_ (repr self) iter column value
 		 in res0 end
 	val iter_next_ : cptr -> cptr -> bool * cptr
 	    = app2 (symb"mgtk_gtk_tree_model_iter_next")
-	val iter_next : 'a t -> treeiter -> bool * treeiter
+	val iter_next : 'a t -> TreeIter.t -> bool * TreeIter.t
 	    = fn self => fn iter =>
 		 let val (res0, res1) = iter_next_ (repr self) iter
 		 in (res0, res1) end
 	val iter_children_ : cptr -> cptr -> bool * cptr
 	    = app2 (symb"mgtk_gtk_tree_model_iter_children")
-	val iter_children : 'a t -> treeiter option -> bool * treeiter
+	val iter_children : 'a t -> TreeIter.t option -> bool * TreeIter.t
 	    = fn self => fn parent =>
 		 let val (res0, res1)
 			 = iter_children_
 			     (repr self) (getOpt (parent, GObject.null))
 		 in (res0, res1) end
-	val iter_children' : 'a t -> bool * treeiter
+	val iter_children' : 'a t -> bool * TreeIter.t
 	    = fn self => let val (res0, res1)
 				 = iter_children_ (repr self) GObject.null
 			 in (res0, res1) end
 	val iter_has_child_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_tree_model_iter_has_child")
-	val iter_has_child : 'a t -> treeiter -> bool
+	val iter_has_child : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => iter_has_child_ (repr self) iter
 	val iter_n_children_ : cptr -> cptr -> int
 	    = app2 (symb"mgtk_gtk_tree_model_iter_n_children")
-	val iter_n_children : 'a t -> treeiter option -> int
+	val iter_n_children : 'a t -> TreeIter.t option -> int
 	    = fn self => fn iter =>
 		 iter_n_children_ (repr self) (getOpt (iter, GObject.null))
 	val iter_n_children' : 'a t -> int
 	    = fn self => iter_n_children_ (repr self) GObject.null
 	val iter_nth_child_ : cptr -> cptr -> int -> bool * cptr
 	    = app3 (symb"mgtk_gtk_tree_model_iter_nth_child")
-	val iter_nth_child : 'a t -> treeiter option -> int -> bool * treeiter
+	val iter_nth_child : 'a t -> TreeIter.t option -> int
+			     -> bool * TreeIter.t
 	    = fn self => fn parent => fn n =>
 		 let val (res0, res1)
 			 = iter_nth_child_
 			     (repr self) (getOpt (parent, GObject.null)) n
 		 in (res0, res1) end
-	val iter_nth_child' : 'a t -> int -> bool * treeiter
+	val iter_nth_child' : 'a t -> int -> bool * TreeIter.t
 	    = fn self => fn n =>
 		 let val (res0, res1) = iter_nth_child_
 					  (repr self) GObject.null n
 		 in (res0, res1) end
 	val iter_parent_ : cptr -> cptr -> bool * cptr
 	    = app2 (symb"mgtk_gtk_tree_model_iter_parent")
-	val iter_parent : 'a t -> treeiter -> bool * treeiter
+	val iter_parent : 'a t -> TreeIter.t -> bool * TreeIter.t
 	    = fn self => fn child =>
 		 let val (res0, res1) = iter_parent_ (repr self) child
 		 in (res0, res1) end
 	val ref_node_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_tree_model_ref_node")
-	val ref_node : 'a t -> treeiter -> unit
+	val ref_node : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => ref_node_ (repr self) iter
 	val unref_node_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_tree_model_unref_node")
-	val unref_node : 'a t -> treeiter -> unit
+	val unref_node : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => unref_node_ (repr self) iter
 	val get_ : cptr -> cptr -> unit = app2 (symb"mgtk_gtk_tree_model_get")
-	val get : 'a t -> treeiter -> unit
+	val get : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => get_ (repr self) iter
 	val filter_get_type_ : unit -> GType.t
 	    = app1 (symb"mgtk_gtk_tree_model_filter_get_type")
@@ -1887,7 +2485,7 @@ structure Gtk  = struct
 	val queue_clear_area : 'a t -> int -> int -> int -> int -> unit
 	val queue_resize : 'a t -> unit
 	val queue_resize_no_redraw : 'a t -> unit
-	val get_child_requisition : 'a t -> requisition -> unit
+	val get_child_requisition : 'a t -> Requisition.t -> unit
 	val set_accel_path : 'a t -> string -> 'b AccelGroup.t -> unit
 	val can_activate_accel : 'a t -> int -> bool
 	val mnemonic_activate : 'a t -> bool -> bool
@@ -2078,7 +2676,7 @@ structure Gtk  = struct
 	    = fn self => queue_resize_no_redraw_ (repr self)
 	val get_child_requisition_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_widget_get_child_requisition")
-	val get_child_requisition : 'a t -> requisition -> unit
+	val get_child_requisition : 'a t -> Requisition.t -> unit
 	    = fn self => fn requisition =>
 		 get_child_requisition_ (repr self) requisition
 	val set_accel_path_ : cptr -> string -> cptr -> unit
@@ -4792,8 +5390,8 @@ structure Gtk  = struct
 	val set_column_span_column : 'a t -> int -> unit
 	val get_active : 'a t -> int
 	val set_active : 'a t -> int -> unit
-	val get_activeiter : 'a t -> treeiter -> bool
-	val set_activeiter : 'a t -> treeiter -> unit
+	val get_activeiter : 'a t -> TreeIter.t -> bool
+	val set_activeiter : 'a t -> TreeIter.t -> unit
 	val set_model : 'a t -> 'b TreeModel.t -> unit
 	val get_model : 'a t -> base TreeModel.t
 	val append_text : 'a t -> string -> unit
@@ -4843,11 +5441,11 @@ structure Gtk  = struct
 	    = fn self => fn index => set_active_ (repr self) index
 	val get_activeiter_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_combo_box_get_activeiter")
-	val get_activeiter : 'a t -> treeiter -> bool
+	val get_activeiter : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => get_activeiter_ (repr self) iter
 	val set_activeiter_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_combo_box_set_activeiter")
-	val set_activeiter : 'a t -> treeiter -> unit
+	val set_activeiter : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => set_activeiter_ (repr self) iter
 	val set_model_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_combo_box_set_model")
@@ -6336,11 +6934,11 @@ structure Gtk  = struct
 	val toIconFactory : 'a t -> base t
 	val get_type : unit -> GType.t
 	val new : unit -> base t
-	val add : 'a t -> string -> icon_set -> unit
-	val lookup : 'a t -> string -> icon_set
+	val add : 'a t -> string -> Set.t -> unit
+	val lookup : 'a t -> string -> Set.t
 	val add_default : 'a t -> unit
 	val remove_default : 'a t -> unit
-	val lookup_default : string -> icon_set
+	val lookup_default : string -> Set.t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -6359,12 +6957,12 @@ structure Gtk  = struct
 	val new : unit -> base t = fn dummy => make (new_ dummy)
 	val add_ : cptr -> string -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_icon_factory_add")
-	val add : 'a t -> string -> icon_set -> unit
+	val add : 'a t -> string -> Set.t -> unit
 	    = fn self => fn stock_id => fn icon_set =>
 		 add_ (repr self) stock_id icon_set
 	val lookup_ : cptr -> string -> cptr
 	    = app2 (symb"mgtk_gtk_icon_factory_lookup")
-	val lookup : 'a t -> string -> icon_set
+	val lookup : 'a t -> string -> Set.t
 	    = fn self => fn stock_id => lookup_ (repr self) stock_id
 	val add_default_ : cptr -> unit
 	    = app1 (symb"mgtk_gtk_icon_factory_add_default")
@@ -6375,7 +6973,7 @@ structure Gtk  = struct
 	    = fn self => remove_default_ (repr self)
 	val lookup_default_ : string -> cptr
 	    = app1 (symb"mgtk_gtk_icon_factory_lookup_default")
-	val lookup_default : string -> icon_set
+	val lookup_default : string -> Set.t
 	    = fn stock_id => lookup_default_ stock_id
     end
     structure Image :>
@@ -6389,11 +6987,11 @@ structure Gtk  = struct
 	val new : unit -> base t
 	val new_from_file : string -> base t
 	val new_from_stock : string -> icon_size -> base t
-	val new_from_icon_set : icon_set -> icon_size -> base t
+	val new_from_icon_set : Icon.Set.t -> icon_size -> base t
 	val set_from_file : 'a t -> string option -> unit
 	val set_from_file' : 'a t -> unit
 	val set_from_stock : 'a t -> string -> icon_size -> unit
-	val set_from_icon_set : 'a t -> icon_set -> icon_size -> unit
+	val set_from_icon_set : 'a t -> Icon.Set.t -> icon_size -> unit
 	val get_storagetype : 'a t -> imagetype
 	val menu_item_get_type : unit -> GType.t
       end = struct
@@ -6421,7 +7019,7 @@ structure Gtk  = struct
 	    = fn stock_id => fn size => make (new_from_stock_ stock_id size)
 	val new_from_icon_set_ : cptr -> int -> cptr
 	    = app2 (symb"mgtk_gtk_image_new_from_icon_set")
-	val new_from_icon_set : icon_set -> icon_size -> base t
+	val new_from_icon_set : Icon.Set.t -> icon_size -> base t
 	    = fn icon_set => fn size => make (new_from_icon_set_ icon_set size)
 	val set_from_file_ : cptr -> string -> unit
 	    = app2 (symb"mgtk_gtk_image_set_from_file")
@@ -6437,7 +7035,7 @@ structure Gtk  = struct
 		 set_from_stock_ (repr self) stock_id size
 	val set_from_icon_set_ : cptr -> cptr -> int -> unit
 	    = app3 (symb"mgtk_gtk_image_set_from_icon_set")
-	val set_from_icon_set : 'a t -> icon_set -> icon_size -> unit
+	val set_from_icon_set : 'a t -> Icon.Set.t -> icon_size -> unit
 	    = fn self => fn icon_set => fn size =>
 		 set_from_icon_set_ (repr self) icon_set size
 	val get_storagetype_ : cptr -> int
@@ -6961,22 +7559,22 @@ structure Gtk  = struct
 	val new : int -> base t
 	val newv : int -> GType.t -> base t
 	val set_column_types : 'a t -> int -> GType.t list -> unit
-	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
-	val set : 'a t -> treeiter -> unit
-	val remove : 'a t -> treeiter -> bool * treeiter
-	val insert : 'a t -> int -> treeiter
-	val insert_before : 'a t -> treeiter -> treeiter
-	val insert_after : 'a t -> treeiter -> treeiter
-	val prepend : 'a t -> treeiter
-	val append : 'a t -> treeiter
+	val set_value : 'a t -> TreeIter.t -> int -> GValue.GValue -> unit
+	val set : 'a t -> TreeIter.t -> unit
+	val remove : 'a t -> TreeIter.t -> bool * TreeIter.t
+	val insert : 'a t -> int -> TreeIter.t
+	val insert_before : 'a t -> TreeIter.t -> TreeIter.t
+	val insert_after : 'a t -> TreeIter.t -> TreeIter.t
+	val prepend : 'a t -> TreeIter.t
+	val append : 'a t -> TreeIter.t
 	val clear : 'a t -> unit
-	val storeiter_is_valid : 'a t -> treeiter -> bool
+	val storeiter_is_valid : 'a t -> TreeIter.t -> bool
 	val reorder : 'a t -> int list -> unit
-	val swap : 'a t -> treeiter -> treeiter -> unit
-	val move_after : 'a t -> treeiter -> treeiter option -> unit
-	val move_after' : 'a t -> treeiter -> unit
-	val move_before : 'a t -> treeiter -> treeiter option -> unit
-	val move_before' : 'a t -> treeiter -> unit
+	val swap : 'a t -> TreeIter.t -> TreeIter.t -> unit
+	val move_after : 'a t -> TreeIter.t -> TreeIter.t option -> unit
+	val move_after' : 'a t -> TreeIter.t -> unit
+	val move_before : 'a t -> TreeIter.t -> TreeIter.t option -> unit
+	val move_before' : 'a t -> TreeIter.t -> unit
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -7006,44 +7604,44 @@ structure Gtk  = struct
 		 set_column_types_ (repr self) n_columns types
 	val set_value_ : cptr -> cptr -> int -> GValue.GValue -> unit
 	    = app4 (symb"mgtk_gtk_list_store_set_value")
-	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
+	val set_value : 'a t -> TreeIter.t -> int -> GValue.GValue -> unit
 	    = fn self => fn iter => fn column => fn value =>
 		 set_value_ (repr self) iter column value
 	val set_ : cptr -> cptr -> unit = app2 (symb"mgtk_gtk_list_store_set")
-	val set : 'a t -> treeiter -> unit
+	val set : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => set_ (repr self) iter
 	val remove_ : cptr -> cptr -> bool * cptr
 	    = app2 (symb"mgtk_gtk_list_store_remove")
-	val remove : 'a t -> treeiter -> bool * treeiter
+	val remove : 'a t -> TreeIter.t -> bool * TreeIter.t
 	    = fn self => fn iter =>
 		 let val (res0, res1) = remove_ (repr self) iter
 		 in (res0, res1) end
 	val insert_ : cptr -> int -> cptr
 	    = app2 (symb"mgtk_gtk_list_store_insert")
-	val insert : 'a t -> int -> treeiter
+	val insert : 'a t -> int -> TreeIter.t
 	    = fn self => fn position =>
 		 let val res0 = insert_ (repr self) position in res0 end
 	val insert_before_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_list_store_insert_before")
-	val insert_before : 'a t -> treeiter -> treeiter
+	val insert_before : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn sibling =>
 		 let val res0 = insert_before_ (repr self) sibling in res0 end
 	val insert_after_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_list_store_insert_after")
-	val insert_after : 'a t -> treeiter -> treeiter
+	val insert_after : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn sibling =>
 		 let val res0 = insert_after_ (repr self) sibling in res0 end
 	val prepend_ : cptr -> cptr = app1 (symb"mgtk_gtk_list_store_prepend")
-	val prepend : 'a t -> treeiter
+	val prepend : 'a t -> TreeIter.t
 	    = fn self => let val res0 = prepend_ (repr self) in res0 end
 	val append_ : cptr -> cptr = app1 (symb"mgtk_gtk_list_store_append")
-	val append : 'a t -> treeiter
+	val append : 'a t -> TreeIter.t
 	    = fn self => let val res0 = append_ (repr self) in res0 end
 	val clear_ : cptr -> unit = app1 (symb"mgtk_gtk_list_store_clear")
 	val clear : 'a t -> unit = fn self => clear_ (repr self)
 	val storeiter_is_valid_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_list_store_iter_is_valid")
-	val storeiter_is_valid : 'a t -> treeiter -> bool
+	val storeiter_is_valid : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => storeiter_is_valid_ (repr self) iter
 	val reorder_ : cptr -> int list -> unit
 	    = app2 (symb"mgtk_gtk_list_store_reorder")
@@ -7051,22 +7649,22 @@ structure Gtk  = struct
 	    = fn self => fn new_order => reorder_ (repr self) new_order
 	val swap_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_list_store_swap")
-	val swap : 'a t -> treeiter -> treeiter -> unit
+	val swap : 'a t -> TreeIter.t -> TreeIter.t -> unit
 	    = fn self => fn a => fn b => swap_ (repr self) a b
 	val move_after_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_list_store_move_after")
-	val move_after : 'a t -> treeiter -> treeiter option -> unit
+	val move_after : 'a t -> TreeIter.t -> TreeIter.t option -> unit
 	    = fn self => fn iter => fn position =>
 		 move_after_ (repr self) iter (getOpt (position, GObject.null))
-	val move_after' : 'a t -> treeiter -> unit
+	val move_after' : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => move_after_ (repr self) iter GObject.null
 	val move_before_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_list_store_move_before")
-	val move_before : 'a t -> treeiter -> treeiter option -> unit
+	val move_before : 'a t -> TreeIter.t -> TreeIter.t option -> unit
 	    = fn self => fn iter => fn position =>
 		 move_before_ (repr self) iter
 			      (getOpt (position, GObject.null))
-	val move_before' : 'a t -> treeiter -> unit
+	val move_before' : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => move_before_ (repr self) iter GObject.null
     end
     structure MenuShell :>
@@ -9033,7 +9631,7 @@ structure Gtk  = struct
 	val detach : 'a t -> unit
 	val refe : 'a t -> base t
 	val unref : 'a t -> unit
-	val lookup_icon_set : 'a t -> string -> icon_set
+	val lookup_icon_set : 'a t -> string -> Icon.Set.t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9059,7 +9657,7 @@ structure Gtk  = struct
 	val unref : 'a t -> unit = fn self => unref_ (repr self)
 	val lookup_icon_set_ : cptr -> string -> cptr
 	    = app2 (symb"mgtk_gtk_style_lookup_icon_set")
-	val lookup_icon_set : 'a t -> string -> icon_set
+	val lookup_icon_set : 'a t -> string -> Icon.Set.t
 	    = fn self => fn stock_id => lookup_icon_set_ (repr self) stock_id
     end
     structure Table :>
@@ -9197,56 +9795,62 @@ structure Gtk  = struct
 	val get_char_count : 'a t -> int
 	val get_tag_table : 'a t -> base t
 	val set_text : 'a t -> string -> int -> unit
-	val insert : 'a t -> textiter -> string -> int option -> unit
-	val insert' : 'a t -> textiter -> string -> unit
+	val insert : 'a t -> TextIter.t -> string -> int option -> unit
+	val insert' : 'a t -> TextIter.t -> string -> unit
 	val insert_at_cursor : 'a t -> string -> int option -> unit
 	val insert_at_cursor' : 'a t -> string -> unit
 	val insert_interactive
-	  : 'a t -> textiter -> string -> int -> bool -> bool
+	  : 'a t -> TextIter.t -> string -> int -> bool -> bool
 	val insert_interactive_at_cursor
 	  : 'a t -> string -> int -> bool -> bool
-	val insert_range : 'a t -> textiter -> textiter -> textiter -> unit
+	val insert_range
+	  : 'a t -> TextIter.t -> TextIter.t -> TextIter.t -> unit
 	val insert_range_interactive
-	  : 'a t -> textiter -> textiter -> textiter -> bool -> bool
+	  : 'a t -> TextIter.t -> TextIter.t -> TextIter.t -> bool -> bool
 	val insert_with_tags
-	  : 'a t -> textiter -> string -> int -> 'b t -> unit
+	  : 'a t -> TextIter.t -> string -> int -> 'b t -> unit
 	val insert_with_tags_by_name
-	  : 'a t -> textiter -> string -> int -> string -> unit
-	val delete : 'a t -> textiter -> textiter -> unit
-	val delete_interactive : 'a t -> textiter -> textiter -> bool -> bool
-	val get_text : 'a t -> textiter -> textiter -> bool option -> string
-	val get_text' : 'a t -> textiter -> textiter -> string
-	val get_slice : 'a t -> textiter -> textiter -> bool option -> string
-	val get_slice' : 'a t -> textiter -> textiter -> string
-	val insert_child_anchor : 'a t -> textiter -> 'b t -> unit
-	val create_child_anchor : 'a t -> textiter -> base t
+	  : 'a t -> TextIter.t -> string -> int -> string -> unit
+	val delete : 'a t -> TextIter.t -> TextIter.t -> unit
+	val delete_interactive
+	  : 'a t -> TextIter.t -> TextIter.t -> bool -> bool
+	val get_text
+	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
+	val get_text' : 'a t -> TextIter.t -> TextIter.t -> string
+	val get_slice
+	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
+	val get_slice' : 'a t -> TextIter.t -> TextIter.t -> string
+	val insert_child_anchor : 'a t -> TextIter.t -> 'b t -> unit
+	val create_child_anchor : 'a t -> TextIter.t -> base t
 	val create_mark
-	  : 'a t -> string option -> textiter -> bool option -> base t
-	val create_mark' : 'a t -> textiter -> base t
-	val move_mark : 'a t -> 'b t -> textiter -> unit
+	  : 'a t -> string option -> TextIter.t -> bool option -> base t
+	val create_mark' : 'a t -> TextIter.t -> base t
+	val move_mark : 'a t -> 'b t -> TextIter.t -> unit
 	val delete_mark : 'a t -> 'b t -> unit
 	val get_mark : 'a t -> string -> base t
-	val move_mark_by_name : 'a t -> string -> textiter -> unit
+	val move_mark_by_name : 'a t -> string -> TextIter.t -> unit
 	val delete_mark_by_name : 'a t -> string -> unit
 	val get_insert : 'a t -> base t
 	val get_selection_bound : 'a t -> base t
-	val place_cursor : 'a t -> textiter -> unit
-	val select_range : 'a t -> textiter -> textiter -> unit
-	val apply_tag : 'a t -> 'b t -> textiter -> textiter -> unit
-	val remove_tag : 'a t -> 'b t -> textiter -> textiter -> unit
-	val apply_tag_by_name : 'a t -> string -> textiter -> textiter -> unit
-	val remove_tag_by_name : 'a t -> string -> textiter -> textiter -> unit
-	val remove_all_tags : 'a t -> textiter -> textiter -> unit
+	val place_cursor : 'a t -> TextIter.t -> unit
+	val select_range : 'a t -> TextIter.t -> TextIter.t -> unit
+	val apply_tag : 'a t -> 'b t -> TextIter.t -> TextIter.t -> unit
+	val remove_tag : 'a t -> 'b t -> TextIter.t -> TextIter.t -> unit
+	val apply_tag_by_name
+	  : 'a t -> string -> TextIter.t -> TextIter.t -> unit
+	val remove_tag_by_name
+	  : 'a t -> string -> TextIter.t -> TextIter.t -> unit
+	val remove_all_tags : 'a t -> TextIter.t -> TextIter.t -> unit
 	val create_tag : 'a t -> string -> string -> base t
-	val getiter_at_line_offset : 'a t -> int -> int -> textiter
-	val getiter_at_line_index : 'a t -> int -> int -> textiter
-	val getiter_at_offset : 'a t -> int -> textiter
-	val getiter_at_line : 'a t -> int -> textiter
-	val get_startiter : 'a t -> textiter
-	val get_enditer : 'a t -> textiter
-	val get_bounds : 'a t -> textiter * textiter
-	val getiter_at_mark : 'a t -> 'b t -> textiter
-	val getiter_at_child_anchor : 'a t -> 'b t -> textiter
+	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
+	val getiter_at_line_index : 'a t -> int -> int -> TextIter.t
+	val getiter_at_offset : 'a t -> int -> TextIter.t
+	val getiter_at_line : 'a t -> int -> TextIter.t
+	val get_startiter : 'a t -> TextIter.t
+	val get_enditer : 'a t -> TextIter.t
+	val get_bounds : 'a t -> TextIter.t * TextIter.t
+	val getiter_at_mark : 'a t -> 'b t -> TextIter.t
+	val getiter_at_child_anchor : 'a t -> 'b t -> TextIter.t
 	val get_modified : 'a t -> bool
 	val set_modified : 'a t -> bool -> unit
 	val add_selection_clipboard : 'a t -> 'b Clipboard.t -> unit
@@ -9254,9 +9858,9 @@ structure Gtk  = struct
 	val cut_clipboard : 'a t -> 'b Clipboard.t -> bool -> unit
 	val copy_clipboard : 'a t -> 'b Clipboard.t -> unit
 	val paste_clipboard
-	  : 'a t -> 'b Clipboard.t -> textiter option -> bool -> unit
+	  : 'a t -> 'b Clipboard.t -> TextIter.t option -> bool -> unit
 	val paste_clipboard' : 'a t -> 'b Clipboard.t -> bool -> unit
-	val get_selection_bounds : 'a t -> bool * textiter * textiter
+	val get_selection_bounds : 'a t -> bool * TextIter.t * TextIter.t
 	val delete_selection : 'a t -> bool -> bool -> bool
 	val begin_user_action : 'a t -> unit
 	val end_user_action : 'a t -> unit
@@ -9294,10 +9898,10 @@ structure Gtk  = struct
 	    = fn self => fn text => fn len => set_text_ (repr self) text len
 	val insert_ : cptr -> cptr -> string -> int -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_insert")
-	val insert : 'a t -> textiter -> string -> int option -> unit
+	val insert : 'a t -> TextIter.t -> string -> int option -> unit
 	    = fn self => fn iter => fn text => fn len =>
 		 insert_ (repr self) iter text (getOpt (len, ~1))
-	val insert' : 'a t -> textiter -> string -> unit
+	val insert' : 'a t -> TextIter.t -> string -> unit
 	    = fn self => fn iter => fn text => insert_ (repr self) iter text ~1
 	val insert_at_cursor_ : cptr -> string -> int -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_insert_at_cursor")
@@ -9309,7 +9913,7 @@ structure Gtk  = struct
 	val insert_interactive_ : cptr -> cptr -> string -> int -> bool -> bool
 	    = app5 (symb"mgtk_gtk_text_buffer_insert_interactive")
 	val insert_interactive
-	  : 'a t -> textiter -> string -> int -> bool -> bool
+	  : 'a t -> TextIter.t -> string -> int -> bool -> bool
 	    = fn self => fn iter => fn text => fn len => fn default_editable =>
 		 insert_interactive_ (repr self) iter text len default_editable
 	val insert_interactive_at_cursor_
@@ -9322,82 +9926,86 @@ structure Gtk  = struct
 		   (repr self) text len default_editable
 	val insert_range_ : cptr -> cptr -> cptr -> cptr -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_insert_range")
-	val insert_range : 'a t -> textiter -> textiter -> textiter -> unit
+	val insert_range
+	  : 'a t -> TextIter.t -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn iter => fn start => fn en =>
 		 insert_range_ (repr self) iter start en
 	val insert_range_interactive_
 	  : cptr -> cptr -> cptr -> cptr -> bool -> bool
 	    = app5 (symb"mgtk_gtk_text_buffer_insert_range_interactive")
 	val insert_range_interactive
-	  : 'a t -> textiter -> textiter -> textiter -> bool -> bool
+	  : 'a t -> TextIter.t -> TextIter.t -> TextIter.t -> bool -> bool
 	    = fn self => fn iter => fn start => fn en => fn default_editable =>
 		 insert_range_interactive_
 		   (repr self) iter start en default_editable
 	val insert_with_tags_ : cptr -> cptr -> string -> int -> cptr -> unit
 	    = app5 (symb"mgtk_gtk_text_buffer_insert_with_tags")
 	val insert_with_tags
-	  : 'a t -> textiter -> string -> int -> 'b t -> unit
+	  : 'a t -> TextIter.t -> string -> int -> 'b t -> unit
 	    = fn self => fn iter => fn text => fn len => fn first_tag =>
 		 insert_with_tags_ (repr self) iter text len (repr first_tag)
 	val insert_with_tags_by_name_
 	  : cptr -> cptr -> string -> int -> string -> unit
 	    = app5 (symb"mgtk_gtk_text_buffer_insert_with_tags_by_name")
 	val insert_with_tags_by_name
-	  : 'a t -> textiter -> string -> int -> string -> unit
+	  : 'a t -> TextIter.t -> string -> int -> string -> unit
 	    = fn self => fn iter => fn text => fn len => fn first_tag_name =>
 		 insert_with_tags_by_name_
 		   (repr self) iter text len first_tag_name
 	val delete_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_delete")
-	val delete : 'a t -> textiter -> textiter -> unit
+	val delete : 'a t -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn start => fn en => delete_ (repr self) start en
 	val delete_interactive_ : cptr -> cptr -> cptr -> bool -> bool
 	    = app4 (symb"mgtk_gtk_text_buffer_delete_interactive")
-	val delete_interactive : 'a t -> textiter -> textiter -> bool -> bool
+	val delete_interactive
+	  : 'a t -> TextIter.t -> TextIter.t -> bool -> bool
 	    = fn self => fn start_iter => fn end_iter => fn default_editable =>
 		 delete_interactive_
 		   (repr self) start_iter end_iter default_editable
 	val get_text_ : cptr -> cptr -> cptr -> bool -> string
 	    = app4 (symb"mgtk_gtk_text_buffer_get_text")
-	val get_text : 'a t -> textiter -> textiter -> bool option -> string
+	val get_text
+	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
 	    = fn self => fn start => fn en => fn include_hidden_chars =>
 		 get_text_ (repr self) start en
 			   (getOpt (include_hidden_chars, true))
-	val get_text' : 'a t -> textiter -> textiter -> string
+	val get_text' : 'a t -> TextIter.t -> TextIter.t -> string
 	    = fn self => fn start => fn en =>
 		 get_text_ (repr self) start en true
 	val get_slice_ : cptr -> cptr -> cptr -> bool -> string
 	    = app4 (symb"mgtk_gtk_text_buffer_get_slice")
-	val get_slice : 'a t -> textiter -> textiter -> bool option -> string
+	val get_slice
+	  : 'a t -> TextIter.t -> TextIter.t -> bool option -> string
 	    = fn self => fn start => fn en => fn include_hidden_chars =>
 		 get_slice_ (repr self) start en
 			    (getOpt (include_hidden_chars, true))
-	val get_slice' : 'a t -> textiter -> textiter -> string
+	val get_slice' : 'a t -> TextIter.t -> TextIter.t -> string
 	    = fn self => fn start => fn en =>
 		 get_slice_ (repr self) start en true
 	val insert_child_anchor_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_insert_child_anchor")
-	val insert_child_anchor : 'a t -> textiter -> 'b t -> unit
+	val insert_child_anchor : 'a t -> TextIter.t -> 'b t -> unit
 	    = fn self => fn iter => fn anchor =>
 		 insert_child_anchor_ (repr self) iter (repr anchor)
 	val create_child_anchor_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_text_buffer_create_child_anchor")
-	val create_child_anchor : 'a t -> textiter -> base t
+	val create_child_anchor : 'a t -> TextIter.t -> base t
 	    = fn self => fn iter =>
 		 make (create_child_anchor_ (repr self) iter)
 	val create_mark_ : cptr -> string -> cptr -> bool -> cptr
 	    = app4 (symb"mgtk_gtk_text_buffer_create_mark")
 	val create_mark
-	  : 'a t -> string option -> textiter -> bool option -> base t
+	  : 'a t -> string option -> TextIter.t -> bool option -> base t
 	    = fn self => fn mark_name => fn wher => fn left_gravity =>
 		 make (create_mark_ (repr self) (getOpt (mark_name, "")) wher
 				    (getOpt (left_gravity, false)))
-	val create_mark' : 'a t -> textiter -> base t
+	val create_mark' : 'a t -> TextIter.t -> base t
 	    = fn self => fn wher =>
 		 make (create_mark_ (repr self) "" wher false)
 	val move_mark_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_move_mark")
-	val move_mark : 'a t -> 'b t -> textiter -> unit
+	val move_mark : 'a t -> 'b t -> TextIter.t -> unit
 	    = fn self => fn mark => fn wher =>
 		 move_mark_ (repr self) (repr mark) wher
 	val delete_mark_ : cptr -> cptr -> unit
@@ -9410,7 +10018,7 @@ structure Gtk  = struct
 	    = fn self => fn name => make (get_mark_ (repr self) name)
 	val move_mark_by_name_ : cptr -> string -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_move_mark_by_name")
-	val move_mark_by_name : 'a t -> string -> textiter -> unit
+	val move_mark_by_name : 'a t -> string -> TextIter.t -> unit
 	    = fn self => fn name => fn wher =>
 		 move_mark_by_name_ (repr self) name wher
 	val delete_mark_by_name_ : cptr -> string -> unit
@@ -9427,36 +10035,38 @@ structure Gtk  = struct
 	    = fn self => make (get_selection_bound_ (repr self))
 	val place_cursor_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_text_buffer_place_cursor")
-	val place_cursor : 'a t -> textiter -> unit
+	val place_cursor : 'a t -> TextIter.t -> unit
 	    = fn self => fn wher => place_cursor_ (repr self) wher
 	val select_range_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_select_range")
-	val select_range : 'a t -> textiter -> textiter -> unit
+	val select_range : 'a t -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn ins => fn bound =>
 		 select_range_ (repr self) ins bound
 	val apply_tag_ : cptr -> cptr -> cptr -> cptr -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_apply_tag")
-	val apply_tag : 'a t -> 'b t -> textiter -> textiter -> unit
+	val apply_tag : 'a t -> 'b t -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn tag => fn start => fn en =>
 		 apply_tag_ (repr self) (repr tag) start en
 	val remove_tag_ : cptr -> cptr -> cptr -> cptr -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_remove_tag")
-	val remove_tag : 'a t -> 'b t -> textiter -> textiter -> unit
+	val remove_tag : 'a t -> 'b t -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn tag => fn start => fn en =>
 		 remove_tag_ (repr self) (repr tag) start en
 	val apply_tag_by_name_ : cptr -> string -> cptr -> cptr -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_apply_tag_by_name")
-	val apply_tag_by_name : 'a t -> string -> textiter -> textiter -> unit
+	val apply_tag_by_name
+	  : 'a t -> string -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn name => fn start => fn en =>
 		 apply_tag_by_name_ (repr self) name start en
 	val remove_tag_by_name_ : cptr -> string -> cptr -> cptr -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_remove_tag_by_name")
-	val remove_tag_by_name : 'a t -> string -> textiter -> textiter -> unit
+	val remove_tag_by_name
+	  : 'a t -> string -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn name => fn start => fn en =>
 		 remove_tag_by_name_ (repr self) name start en
 	val remove_all_tags_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_text_buffer_remove_all_tags")
-	val remove_all_tags : 'a t -> textiter -> textiter -> unit
+	val remove_all_tags : 'a t -> TextIter.t -> TextIter.t -> unit
 	    = fn self => fn start => fn en =>
 		 remove_all_tags_ (repr self) start en
 	val create_tag_ : cptr -> string -> string -> cptr
@@ -9466,52 +10076,52 @@ structure Gtk  = struct
 		 make (create_tag_ (repr self) tag_name first_property_name)
 	val getiter_at_line_offset_ : cptr -> int -> int -> cptr
 	    = app3 (symb"mgtk_gtk_text_buffer_get_iter_at_line_offset")
-	val getiter_at_line_offset : 'a t -> int -> int -> textiter
+	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn line_number => fn char_offset =>
 		 let val res0 = getiter_at_line_offset_
 				  (repr self) line_number char_offset
 		 in res0 end
 	val getiter_at_line_index_ : cptr -> int -> int -> cptr
 	    = app3 (symb"mgtk_gtk_text_buffer_get_iter_at_line_index")
-	val getiter_at_line_index : 'a t -> int -> int -> textiter
+	val getiter_at_line_index : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn line_number => fn byte_index =>
 		 let val res0 = getiter_at_line_index_
 				  (repr self) line_number byte_index
 		 in res0 end
 	val getiter_at_offset_ : cptr -> int -> cptr
 	    = app2 (symb"mgtk_gtk_text_buffer_get_iter_at_offset")
-	val getiter_at_offset : 'a t -> int -> textiter
+	val getiter_at_offset : 'a t -> int -> TextIter.t
 	    = fn self => fn char_offset =>
 		 let val res0 = getiter_at_offset_ (repr self) char_offset
 		 in res0 end
 	val getiter_at_line_ : cptr -> int -> cptr
 	    = app2 (symb"mgtk_gtk_text_buffer_get_iter_at_line")
-	val getiter_at_line : 'a t -> int -> textiter
+	val getiter_at_line : 'a t -> int -> TextIter.t
 	    = fn self => fn line_number =>
 		 let val res0 = getiter_at_line_ (repr self) line_number
 		 in res0 end
 	val get_startiter_ : cptr -> cptr
 	    = app1 (symb"mgtk_gtk_text_buffer_get_start_iter")
-	val get_startiter : 'a t -> textiter
+	val get_startiter : 'a t -> TextIter.t
 	    = fn self => let val res0 = get_startiter_ (repr self) in res0 end
 	val get_enditer_ : cptr -> cptr
 	    = app1 (symb"mgtk_gtk_text_buffer_get_end_iter")
-	val get_enditer : 'a t -> textiter
+	val get_enditer : 'a t -> TextIter.t
 	    = fn self => let val res0 = get_enditer_ (repr self) in res0 end
 	val get_bounds_ : cptr -> cptr * cptr
 	    = app1 (symb"mgtk_gtk_text_buffer_get_bounds")
-	val get_bounds : 'a t -> textiter * textiter
+	val get_bounds : 'a t -> TextIter.t * TextIter.t
 	    = fn self => let val (res0, res1) = get_bounds_ (repr self)
 			 in (res0, res1) end
 	val getiter_at_mark_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_text_buffer_get_iter_at_mark")
-	val getiter_at_mark : 'a t -> 'b t -> textiter
+	val getiter_at_mark : 'a t -> 'b t -> TextIter.t
 	    = fn self => fn mark =>
 		 let val res0 = getiter_at_mark_ (repr self) (repr mark)
 		 in res0 end
 	val getiter_at_child_anchor_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_text_buffer_get_iter_at_child_anchor")
-	val getiter_at_child_anchor : 'a t -> 'b t -> textiter
+	val getiter_at_child_anchor : 'a t -> 'b t -> TextIter.t
 	    = fn self => fn anchor =>
 		 let val res0 = getiter_at_child_anchor_
 				  (repr self) (repr anchor)
@@ -9546,7 +10156,7 @@ structure Gtk  = struct
 	val paste_clipboard_ : cptr -> cptr -> cptr -> bool -> unit
 	    = app4 (symb"mgtk_gtk_text_buffer_paste_clipboard")
 	val paste_clipboard
-	  : 'a t -> 'b Clipboard.t -> textiter option -> bool -> unit
+	  : 'a t -> 'b Clipboard.t -> TextIter.t option -> bool -> unit
 	    = fn self => fn clipboard => fn override_location => 
 	      fn default_editable =>
 		 paste_clipboard_ (repr self) (repr clipboard)
@@ -9558,7 +10168,7 @@ structure Gtk  = struct
 				  default_editable
 	val get_selection_bounds_ : cptr -> bool * cptr * cptr
 	    = app1 (symb"mgtk_gtk_text_buffer_get_selection_bounds")
-	val get_selection_bounds : 'a t -> bool * textiter * textiter
+	val get_selection_bounds : 'a t -> bool * TextIter.t * TextIter.t
 	    = fn self => let val (res0, res1, res2)
 				 = get_selection_bounds_ (repr self)
 			 in (res0, res1, res2) end
@@ -9750,10 +10360,10 @@ structure Gtk  = struct
 	val new_withbuffer : 'a TextBuffer.t -> base t
 	val setbuffer : 'a t -> 'b TextBuffer.t -> unit
 	val get_buffer : 'a t -> base TextBuffer.t
-	val scroll_toiter : 'a t -> textiter -> real -> bool option 
+	val scroll_toiter : 'a t -> TextIter.t -> real -> bool option 
 			 -> real option -> real option
 			    -> bool
-	val scroll_toiter' : 'a t -> textiter -> real -> bool
+	val scroll_toiter' : 'a t -> TextIter.t -> real -> bool
 	val scroll_to_mark : 'a t -> 'b TextMark.t -> real -> bool option 
 			  -> real option -> real option
 			     -> unit
@@ -9763,15 +10373,15 @@ structure Gtk  = struct
 	val place_cursor_onscreen : 'a t -> bool
 	val set_cursor_visible : 'a t -> bool -> unit
 	val get_cursor_visible : 'a t -> bool
-	val getiter_at_location : 'a t -> int -> int -> textiter
+	val getiter_at_location : 'a t -> int -> int -> TextIter.t
 	val set_border_window_size : 'a t -> text_window_type_t -> int -> unit
 	val get_border_window_size : 'a t -> text_window_type_t -> int
-	val forward_display_line : 'a t -> textiter -> bool
-	val backward_display_line : 'a t -> textiter -> bool
-	val forward_display_line_end : 'a t -> textiter -> bool
-	val backward_display_line_start : 'a t -> textiter -> bool
-	val starts_display_line : 'a t -> textiter -> bool
-	val move_visually : 'a t -> textiter -> int -> bool
+	val forward_display_line : 'a t -> TextIter.t -> bool
+	val backward_display_line : 'a t -> TextIter.t -> bool
+	val forward_display_line_end : 'a t -> TextIter.t -> bool
+	val backward_display_line_start : 'a t -> TextIter.t -> bool
+	val starts_display_line : 'a t -> TextIter.t -> bool
+	val move_visually : 'a t -> TextIter.t -> int -> bool
 	val add_child_at_anchor
 	  : 'a t -> 'b Widget.t -> 'c TextChildAnchor.t -> unit
 	val add_child_in_window
@@ -9799,7 +10409,7 @@ structure Gtk  = struct
 	val get_right_margin : 'a t -> int
 	val set_indent : 'a t -> int -> unit
 	val get_indent : 'a t -> int
-	val get_default_attributes : 'a t -> text_attributes
+	val get_default_attributes : 'a t -> Text.Attributes.t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -9831,7 +10441,7 @@ structure Gtk  = struct
 			   () (fn () => get_buffer_ (repr self))
 	val scroll_toiter_ : cptr * cptr * real * bool * real * real -> bool
 	    = app1 (symb"mgtk_gtk_text_view_scroll_to_iter")
-	val scroll_toiter : 'a t -> textiter -> real -> bool option 
+	val scroll_toiter : 'a t -> TextIter.t -> real -> bool option 
 			 -> real option -> real option
 			    -> bool
 	    = fn self => fn iter => fn within_margin => fn use_align => 
@@ -9839,7 +10449,7 @@ structure Gtk  = struct
 		 scroll_toiter_ (repr self, iter, within_margin, 
 				 getOpt (use_align, false), 
 				 getOpt (xalign, 0.5), getOpt (yalign, 0.5))
-	val scroll_toiter' : 'a t -> textiter -> real -> bool
+	val scroll_toiter' : 'a t -> TextIter.t -> real -> bool
 	    = fn self => fn iter => fn within_margin =>
 		 scroll_toiter_
 		   (repr self, iter, within_margin, false, 0.5, 0.5)
@@ -9880,7 +10490,7 @@ structure Gtk  = struct
 	    = fn self => get_cursor_visible_ (repr self)
 	val getiter_at_location_ : cptr -> int -> int -> cptr
 	    = app3 (symb"mgtk_gtk_text_view_get_iter_at_location")
-	val getiter_at_location : 'a t -> int -> int -> textiter
+	val getiter_at_location : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn x => fn y =>
 		 let val res0 = getiter_at_location_ (repr self) x y
 		 in res0 end
@@ -9895,28 +10505,28 @@ structure Gtk  = struct
 	    = fn self => fn typ => get_border_window_size_ (repr self) typ
 	val forward_display_line_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_text_view_forward_display_line")
-	val forward_display_line : 'a t -> textiter -> bool
+	val forward_display_line : 'a t -> TextIter.t -> bool
 	    = fn self => fn iter => forward_display_line_ (repr self) iter
 	val backward_display_line_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_text_view_backward_display_line")
-	val backward_display_line : 'a t -> textiter -> bool
+	val backward_display_line : 'a t -> TextIter.t -> bool
 	    = fn self => fn iter => backward_display_line_ (repr self) iter
 	val forward_display_line_end_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_text_view_forward_display_line_end")
-	val forward_display_line_end : 'a t -> textiter -> bool
+	val forward_display_line_end : 'a t -> TextIter.t -> bool
 	    = fn self => fn iter => forward_display_line_end_ (repr self) iter
 	val backward_display_line_start_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_text_view_backward_display_line_start")
-	val backward_display_line_start : 'a t -> textiter -> bool
+	val backward_display_line_start : 'a t -> TextIter.t -> bool
 	    = fn self => fn iter =>
 		 backward_display_line_start_ (repr self) iter
 	val starts_display_line_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_text_view_starts_display_line")
-	val starts_display_line : 'a t -> textiter -> bool
+	val starts_display_line : 'a t -> TextIter.t -> bool
 	    = fn self => fn iter => starts_display_line_ (repr self) iter
 	val move_visually_ : cptr -> cptr -> int -> bool
 	    = app3 (symb"mgtk_gtk_text_view_move_visually")
-	val move_visually : 'a t -> textiter -> int -> bool
+	val move_visually : 'a t -> TextIter.t -> int -> bool
 	    = fn self => fn iter => fn count =>
 		 move_visually_ (repr self) iter count
 	val add_child_at_anchor_ : cptr -> cptr -> cptr -> unit
@@ -10032,7 +10642,7 @@ structure Gtk  = struct
 	val get_indent : 'a t -> int = fn self => get_indent_ (repr self)
 	val get_default_attributes_ : cptr -> cptr
 	    = app1 (symb"mgtk_gtk_text_view_get_default_attributes")
-	val get_default_attributes : 'a t -> text_attributes
+	val get_default_attributes : 'a t -> Text.Attributes.t
 	    = fn self => get_default_attributes_ (repr self)
     end
     structure Toolbar :>
@@ -10295,8 +10905,8 @@ structure Gtk  = struct
 	val asTreeDragSource : 'a t -> base TreeDragSource.t
 	val set_visible_column : 'a t -> int -> unit
 	val get_model : 'a t -> base t
-	val convert_childiter_toiter : 'a t -> treeiter -> treeiter -> unit
-	val convertiter_to_childiter : 'a t -> treeiter -> treeiter -> unit
+	val convert_childiter_toiter : 'a t -> TreeIter.t -> TreeIter.t -> unit
+	val convertiter_to_childiter : 'a t -> TreeIter.t -> TreeIter.t -> unit
 	val refilter : 'a t -> unit
 	val clear_cache : 'a t -> unit
       end = struct
@@ -10324,13 +10934,13 @@ structure Gtk  = struct
 	val convert_childiter_toiter_ : cptr -> cptr -> cptr -> unit
 	    = app3
 		(symb"mgtk_gtk_tree_model_filter_convert_child_iter_to_iter")
-	val convert_childiter_toiter : 'a t -> treeiter -> treeiter -> unit
+	val convert_childiter_toiter : 'a t -> TreeIter.t -> TreeIter.t -> unit
 	    = fn self => fn filter_iter => fn child_iter =>
 		 convert_childiter_toiter_ (repr self) filter_iter child_iter
 	val convertiter_to_childiter_ : cptr -> cptr -> cptr -> unit
 	    = app3
 		(symb"mgtk_gtk_tree_model_filter_convert_iter_to_child_iter")
-	val convertiter_to_childiter : 'a t -> treeiter -> treeiter -> unit
+	val convertiter_to_childiter : 'a t -> TreeIter.t -> TreeIter.t -> unit
 	    = fn self => fn child_iter => fn filter_iter =>
 		 convertiter_to_childiter_ (repr self) child_iter filter_iter
 	val refilter_ : cptr -> unit
@@ -10351,11 +10961,11 @@ structure Gtk  = struct
 	val asTreeSortable : 'a t -> base TreeSortable.t
 	val new_with_model : 'a t -> base t
 	val get_model : 'a t -> base t
-	val convert_childiter_toiter : 'a t -> treeiter -> treeiter
-	val convertiter_to_childiter : 'a t -> treeiter -> treeiter
+	val convert_childiter_toiter : 'a t -> TreeIter.t -> TreeIter.t
+	val convertiter_to_childiter : 'a t -> TreeIter.t -> TreeIter.t
 	val reset_default_sort_func : 'a t -> unit
 	val clear_cache : 'a t -> unit
-	val sortiter_is_valid : 'a t -> treeiter -> bool
+	val sortiter_is_valid : 'a t -> TreeIter.t -> bool
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -10379,14 +10989,14 @@ structure Gtk  = struct
 	    = fn self => make (get_model_ (repr self))
 	val convert_childiter_toiter_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_tree_model_sort_convert_child_iter_to_iter")
-	val convert_childiter_toiter : 'a t -> treeiter -> treeiter
+	val convert_childiter_toiter : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn child_iter =>
 		 let val res0 = convert_childiter_toiter_
 				  (repr self) child_iter
 		 in res0 end
 	val convertiter_to_childiter_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_tree_model_sort_convert_iter_to_child_iter")
-	val convertiter_to_childiter : 'a t -> treeiter -> treeiter
+	val convertiter_to_childiter : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn sorted_iter =>
 		 let val res0 = convertiter_to_childiter_
 				  (repr self) sorted_iter
@@ -10400,7 +11010,7 @@ structure Gtk  = struct
 	val clear_cache : 'a t -> unit = fn self => clear_cache_ (repr self)
 	val sortiter_is_valid_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_tree_model_sortiter_is_valid")
-	val sortiter_is_valid : 'a t -> treeiter -> bool
+	val sortiter_is_valid : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => sortiter_is_valid_ (repr self) iter
     end
     structure TreeSelection :>
@@ -10416,9 +11026,9 @@ structure Gtk  = struct
 	val get_user_data : 'a t -> cptr
 	val get_treeview : 'a t -> base t
 	val count_selected_rows : 'a t -> int
-	val selectiter : 'a t -> treeiter -> unit
-	val unselectiter : 'a t -> treeiter -> unit
-	val iter_is_selected : 'a t -> treeiter -> bool
+	val selectiter : 'a t -> TreeIter.t -> unit
+	val unselectiter : 'a t -> TreeIter.t -> unit
+	val iter_is_selected : 'a t -> TreeIter.t -> bool
 	val select_all : 'a t -> unit
 	val unselect_all : 'a t -> unit
       end = struct
@@ -10457,15 +11067,15 @@ structure Gtk  = struct
 	    = fn self => count_selected_rows_ (repr self)
 	val selectiter_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_tree_selection_select_iter")
-	val selectiter : 'a t -> treeiter -> unit
+	val selectiter : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => selectiter_ (repr self) iter
 	val unselectiter_ : cptr -> cptr -> unit
 	    = app2 (symb"mgtk_gtk_tree_selection_unselect_iter")
-	val unselectiter : 'a t -> treeiter -> unit
+	val unselectiter : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => unselectiter_ (repr self) iter
 	val iter_is_selected_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_tree_selection_iter_is_selected")
-	val iter_is_selected : 'a t -> treeiter -> bool
+	val iter_is_selected : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => iter_is_selected_ (repr self) iter
 	val select_all_ : cptr -> unit
 	    = app1 (symb"mgtk_gtk_tree_selection_select_all")
@@ -10488,24 +11098,24 @@ structure Gtk  = struct
 	val get_type : unit -> GType.t
 	val new : int -> base t
 	val newv : int -> GType.t -> base t
-	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
-	val set : 'a t -> treeiter -> unit
-	val remove : 'a t -> treeiter -> bool * treeiter
-	val insert : 'a t -> treeiter -> int -> treeiter
-	val insert_before : 'a t -> treeiter -> treeiter -> treeiter
-	val insert_after : 'a t -> treeiter -> treeiter -> treeiter
-	val prepend : 'a t -> treeiter -> treeiter
-	val append : 'a t -> treeiter -> treeiter
-	val is_ancestor : 'a t -> treeiter -> treeiter -> bool
-	val storeiter_depth : 'a t -> treeiter -> int
+	val set_value : 'a t -> TreeIter.t -> int -> GValue.GValue -> unit
+	val set : 'a t -> TreeIter.t -> unit
+	val remove : 'a t -> TreeIter.t -> bool * TreeIter.t
+	val insert : 'a t -> TreeIter.t -> int -> TreeIter.t
+	val insert_before : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
+	val insert_after : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
+	val prepend : 'a t -> TreeIter.t -> TreeIter.t
+	val append : 'a t -> TreeIter.t -> TreeIter.t
+	val is_ancestor : 'a t -> TreeIter.t -> TreeIter.t -> bool
+	val storeiter_depth : 'a t -> TreeIter.t -> int
 	val clear : 'a t -> unit
-	val storeiter_is_valid : 'a t -> treeiter -> bool
-	val reorder : 'a t -> treeiter -> int list -> unit
-	val swap : 'a t -> treeiter -> treeiter -> unit
-	val move_after : 'a t -> treeiter -> treeiter option -> unit
-	val move_after' : 'a t -> treeiter -> unit
-	val move_before : 'a t -> treeiter -> treeiter option -> unit
-	val move_before' : 'a t -> treeiter -> unit
+	val storeiter_is_valid : 'a t -> TreeIter.t -> bool
+	val reorder : 'a t -> TreeIter.t -> int list -> unit
+	val swap : 'a t -> TreeIter.t -> TreeIter.t -> unit
+	val move_after : 'a t -> TreeIter.t -> TreeIter.t option -> unit
+	val move_after' : 'a t -> TreeIter.t -> unit
+	val move_before : 'a t -> TreeIter.t -> TreeIter.t option -> unit
+	val move_before' : 'a t -> TreeIter.t -> unit
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -10533,83 +11143,83 @@ structure Gtk  = struct
 	    = fn n_columns => fn types => make (newv_ n_columns types)
 	val set_value_ : cptr -> cptr -> int -> GValue.GValue -> unit
 	    = app4 (symb"mgtk_gtk_tree_store_set_value")
-	val set_value : 'a t -> treeiter -> int -> GValue.GValue -> unit
+	val set_value : 'a t -> TreeIter.t -> int -> GValue.GValue -> unit
 	    = fn self => fn iter => fn column => fn value =>
 		 set_value_ (repr self) iter column value
 	val set_ : cptr -> cptr -> unit = app2 (symb"mgtk_gtk_tree_store_set")
-	val set : 'a t -> treeiter -> unit
+	val set : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => set_ (repr self) iter
 	val remove_ : cptr -> cptr -> bool * cptr
 	    = app2 (symb"mgtk_gtk_tree_store_remove")
-	val remove : 'a t -> treeiter -> bool * treeiter
+	val remove : 'a t -> TreeIter.t -> bool * TreeIter.t
 	    = fn self => fn iter =>
 		 let val (res0, res1) = remove_ (repr self) iter
 		 in (res0, res1) end
 	val insert_ : cptr -> cptr -> int -> cptr
 	    = app3 (symb"mgtk_gtk_tree_store_insert")
-	val insert : 'a t -> treeiter -> int -> treeiter
+	val insert : 'a t -> TreeIter.t -> int -> TreeIter.t
 	    = fn self => fn parent => fn position =>
 		 let val res0 = insert_ (repr self) parent position in res0 end
 	val insert_before_ : cptr -> cptr -> cptr -> cptr
 	    = app3 (symb"mgtk_gtk_tree_store_insert_before")
-	val insert_before : 'a t -> treeiter -> treeiter -> treeiter
+	val insert_before : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent => fn sibling =>
 		 let val res0 = insert_before_ (repr self) parent sibling
 		 in res0 end
 	val insert_after_ : cptr -> cptr -> cptr -> cptr
 	    = app3 (symb"mgtk_gtk_tree_store_insert_after")
-	val insert_after : 'a t -> treeiter -> treeiter -> treeiter
+	val insert_after : 'a t -> TreeIter.t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent => fn sibling =>
 		 let val res0 = insert_after_ (repr self) parent sibling
 		 in res0 end
 	val prepend_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_tree_store_prepend")
-	val prepend : 'a t -> treeiter -> treeiter
+	val prepend : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent =>
 		 let val res0 = prepend_ (repr self) parent in res0 end
 	val append_ : cptr -> cptr -> cptr
 	    = app2 (symb"mgtk_gtk_tree_store_append")
-	val append : 'a t -> treeiter -> treeiter
+	val append : 'a t -> TreeIter.t -> TreeIter.t
 	    = fn self => fn parent =>
 		 let val res0 = append_ (repr self) parent in res0 end
 	val is_ancestor_ : cptr -> cptr -> cptr -> bool
 	    = app3 (symb"mgtk_gtk_tree_store_is_ancestor")
-	val is_ancestor : 'a t -> treeiter -> treeiter -> bool
+	val is_ancestor : 'a t -> TreeIter.t -> TreeIter.t -> bool
 	    = fn self => fn iter => fn descendant =>
 		 is_ancestor_ (repr self) iter descendant
 	val storeiter_depth_ : cptr -> cptr -> int
 	    = app2 (symb"mgtk_gtk_tree_store_iter_depth")
-	val storeiter_depth : 'a t -> treeiter -> int
+	val storeiter_depth : 'a t -> TreeIter.t -> int
 	    = fn self => fn iter => storeiter_depth_ (repr self) iter
 	val clear_ : cptr -> unit = app1 (symb"mgtk_gtk_tree_store_clear")
 	val clear : 'a t -> unit = fn self => clear_ (repr self)
 	val storeiter_is_valid_ : cptr -> cptr -> bool
 	    = app2 (symb"mgtk_gtk_tree_store_iter_is_valid")
-	val storeiter_is_valid : 'a t -> treeiter -> bool
+	val storeiter_is_valid : 'a t -> TreeIter.t -> bool
 	    = fn self => fn iter => storeiter_is_valid_ (repr self) iter
 	val reorder_ : cptr -> cptr -> int list -> unit
 	    = app3 (symb"mgtk_gtk_tree_store_reorder")
-	val reorder : 'a t -> treeiter -> int list -> unit
+	val reorder : 'a t -> TreeIter.t -> int list -> unit
 	    = fn self => fn parent => fn new_order =>
 		 reorder_ (repr self) parent new_order
 	val swap_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_tree_store_swap")
-	val swap : 'a t -> treeiter -> treeiter -> unit
+	val swap : 'a t -> TreeIter.t -> TreeIter.t -> unit
 	    = fn self => fn a => fn b => swap_ (repr self) a b
 	val move_after_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_tree_store_move_after")
-	val move_after : 'a t -> treeiter -> treeiter option -> unit
+	val move_after : 'a t -> TreeIter.t -> TreeIter.t option -> unit
 	    = fn self => fn iter => fn position =>
 		 move_after_ (repr self) iter (getOpt (position, GObject.null))
-	val move_after' : 'a t -> treeiter -> unit
+	val move_after' : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => move_after_ (repr self) iter GObject.null
 	val move_before_ : cptr -> cptr -> cptr -> unit
 	    = app3 (symb"mgtk_gtk_tree_store_move_before")
-	val move_before : 'a t -> treeiter -> treeiter option -> unit
+	val move_before : 'a t -> TreeIter.t -> TreeIter.t option -> unit
 	    = fn self => fn iter => fn position =>
 		 move_before_ (repr self) iter
 			      (getOpt (position, GObject.null))
-	val move_before' : 'a t -> treeiter -> unit
+	val move_before' : 'a t -> TreeIter.t -> unit
 	    = fn self => fn iter => move_before_ (repr self) iter GObject.null
     end
     structure TreeView :>
@@ -10884,7 +11494,7 @@ structure Gtk  = struct
 	val set_sort_order : 'a t -> sorttype -> unit
 	val get_sort_order : 'a t -> sorttype
 	val cell_set_cell_data
-	  : 'a t -> 'b TreeModel.t -> treeiter -> bool -> bool -> unit
+	  : 'a t -> 'b TreeModel.t -> TreeIter.t -> bool -> bool -> unit
 	val cell_is_visible : 'a t -> bool
 	val focus_cell : 'a t -> 'b CellRenderer.t -> unit
 	val cell_get_position : 'a t -> 'b CellRenderer.t -> int * int
@@ -11080,7 +11690,7 @@ structure Gtk  = struct
 	val cell_set_cell_data_ : cptr -> cptr -> cptr -> bool -> bool -> unit
 	    = app5 (symb"mgtk_gtk_tree_view_column_cell_set_cell_data")
 	val cell_set_cell_data
-	  : 'a t -> 'b TreeModel.t -> treeiter -> bool -> bool -> unit
+	  : 'a t -> 'b TreeModel.t -> TreeIter.t -> bool -> bool -> unit
 	    = fn self => fn tree_model => fn iter => fn is_expander => 
 	      fn is_expanded =>
 		 cell_set_cell_data_ (repr self) (repr tree_model) iter
@@ -11482,5 +12092,15 @@ structure Gtk  = struct
 	    = app2 (symb"mgtk_gtk_window_group_remove_window")
 	val remove_window : 'a t -> 'b t -> unit
 	    = fn self => fn window => remove_window_ (repr self) (repr window)
+    end
+    structure CTreeNode :>
+      sig
+	type t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
     end
 end

@@ -23,7 +23,7 @@ structure ResolveTypes :> ResolveTypes = struct
 	val bool = $"gboolean" >> (fn _ => Base "bool": string ty)
 	val ptr = $"gpointer" >> (fn _ => Base "ptr": string ty)
 	val char = ($"gchar" || $"char") >> (fn _ => Base "char": string ty)
-	val int = $"gint" >> (fn _ => Base "int": string ty)
+	val int = ($"int" || $"gint") >> (fn _ => Base "int": string ty)
 	val uint = ($"guint16" || $"guint32" || $"guint") 
 		       >> (fn _ => Base "uint": string ty)
 	val float = $"gfloat" >> (fn _ => Base "float": string ty)

@@ -168,7 +168,10 @@ fun main () =
         end
 
         (* 4. Resolve types and names *)
-	val api = ResolveNames.resolve (ResolveTypes.resolve api)
+	val api = ResolveTypes.resolve api
+	val api = DependencyReorder.reorder api
+
+	val api = ResolveNames.resolve api
 	val _ = debug api (* resolvetypes only knows how to handle
 			     stringe'd versions of ASTs *)
 

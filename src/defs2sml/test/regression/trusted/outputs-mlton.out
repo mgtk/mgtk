@@ -151,6 +151,15 @@ structure Gtk  = struct
 	fun toCellEditable obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
     end
+    structure TextIter :>
+      sig
+	type t
+	val alloc_GtkTextIter : unit -> t
+      end = struct
+	type cptr = GObject.cptr
+	type t = GObject.cptr
+	val alloc_GtkTextIter = _import "alloc_GtkTextIter" : unit -> t;
+    end
     structure TextBuffer :>
       sig
 	type base
@@ -158,7 +167,7 @@ structure Gtk  = struct
 	type 'a t = 'a textbuffer_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTextBuffer : 'a t -> base t
-	val getiter_at_line_offset : 'a t -> int -> int -> t
+	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -171,7 +180,7 @@ structure Gtk  = struct
 	val getiter_at_line_offset_ : cptr * cptr * int * int -> unit
 	    = _import "gtk_text_buffer_get_iter_at_line_offset"
 		      : cptr * cptr * int * int -> unit;
-	val getiter_at_line_offset : 'a t -> int -> int -> t
+	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn line_number => fn char_offset =>
 		 let val iter = alloc_GtkTextIter ()
 		     val ret = GObject.withPtr
@@ -180,15 +189,6 @@ structure Gtk  = struct
 					       (self, iter, line_number, 
 						char_offset))
 		 in iter end
-    end
-    structure TextIter :>
-      sig
-	type t
-	val alloc_GtkTextIter : unit -> t
-      end = struct
-	type cptr = GObject.cptr
-	type t = GObject.cptr
-	val alloc_GtkTextIter = _import "alloc_GtkTextIter" : unit -> t;
     end
     structure TreePath :>
       sig
@@ -199,6 +199,15 @@ structure Gtk  = struct
 	type t = GObject.cptr
 	val alloc_GtkTreePath = _import "alloc_GtkTreePath" : unit -> t;
     end
+    structure TreeIter :>
+      sig
+	type t
+	val alloc_GtkTreeIter : unit -> t
+      end = struct
+	type cptr = GObject.cptr
+	type t = GObject.cptr
+	val alloc_GtkTreeIter = _import "alloc_GtkTreeIter" : unit -> t;
+    end
     structure TreeModel :>
       sig
 	type base
@@ -206,7 +215,7 @@ structure Gtk  = struct
 	type 'a t = 'a treemodel_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTreeModel : 'a t -> base t
-	val iter_next : 'a t -> t -> bool * t
+	val iter_next : 'a t -> TreeIter.t -> bool * TreeIter.t
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -218,21 +227,12 @@ structure Gtk  = struct
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
 	val iter_next_ : cptr * cptr -> bool
 	    = _import "gtk_tree_model_iter_next" : cptr * cptr -> bool;
-	val iter_next : 'a t -> t -> bool * t
+	val iter_next : 'a t -> TreeIter.t -> bool * TreeIter.t
 	    = fn self => fn iter =>
 		 let val iter = iter
 		     val ret = GObject.withPtr
 				 (self, fn self => iter_next_ (self, iter))
 		 in (ret, iter) end
-    end
-    structure TreeIter :>
-      sig
-	type t
-	val alloc_GtkTreeIter : unit -> t
-      end = struct
-	type cptr = GObject.cptr
-	type t = GObject.cptr
-	val alloc_GtkTreeIter = _import "alloc_GtkTreeIter" : unit -> t;
     end
     structure TreeSelection :>
       sig
@@ -372,9 +372,6 @@ EXTERNML void mgtk_get_gtk_icon_size(int* x0, int* x1, int* x2, int* x3, int* x4
 /* *** CellEditable *** */
 
 
-/* *** TextBuffer *** */
-
-
 /* *** TextIter *** */
 EXTERNML GtkTextIter* alloc_GtkTextIter() {
     GtkTextIter res;
@@ -383,10 +380,10 @@ EXTERNML GtkTextIter* alloc_GtkTextIter() {
 
 
 
+/* *** TextBuffer *** */
+
+
 /* *** TreePath *** */
-
-
-/* *** TreeModel *** */
 
 
 /* *** TreeIter *** */
@@ -395,6 +392,9 @@ EXTERNML GtkTreeIter* alloc_GtkTreeIter() {
     return gtk_tree_iter_copy(&res);
 }
 
+
+
+/* *** TreeModel *** */
 
 
 /* *** TreeSelection *** */

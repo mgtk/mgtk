@@ -32,6 +32,21 @@ structure Type :> TYPE = struct
     fun mapi f ty = mapiv f (fn (_,d) => d) ty
     fun map f ty = mapi (fn (_,n) => f n) ty
 
+    fun freeTyNames ty =
+	let fun loop (Void, acc) = acc
+	      | loop (Base _, acc) = acc
+	      | loop (Tname n, acc) = n :: acc
+	      | loop (Ptr ty, acc) = loop (ty, acc)
+	      | loop (Const ty, acc) = loop (ty, acc)
+	      | loop (Array ty, acc) = loop (ty, acc)
+	      | loop (WithDefault(ty, _), acc) = loop (ty, acc)
+	      | loop (Output(_, ty), acc) = loop (ty, acc)
+	      | loop (Func(args,ret), acc) = 
+		  loop(ret, List.foldl loop' acc args)
+	    and loop' ((p,ty), acc) = loop(ty, acc)
+	in  rev(loop (ty, []))
+	end
+
     local open Pretty
     in
       fun parens my safe tree = if my<=safe then bracket "(#)" tree else tree

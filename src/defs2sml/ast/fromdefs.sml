@@ -6,6 +6,7 @@ structure FromDefs :> FromDefs = struct
     open Defs
 
     structure Map = Splaymap
+    structure Set = Splayset
     structure A = AST
 
     type module_info = string option (* name *)
@@ -36,13 +37,24 @@ structure FromDefs :> FromDefs = struct
 	in  Map.insert(map, name, md) end
 
     val dependencies = ref (Map.mkDict(String.compare))
-    fun addDependencies name dep = 
-	dependencies := Map.insert(!dependencies, name, dep)
+    fun fromList l = Set.addList(Set.empty String.compare, l)
     fun getDependencies name =
 	case Map.peek(!dependencies,name) of
 	    NONE => []
-	  | SOME d => d
+	  | SOME d => Set.listItems d
+    fun addDependencies name dep = 
+	dependencies := Map.insert(!dependencies, name, fromList(getDependencies name @ dep))
 
+    fun freeTyNames ty =
+	let fun loop (A.ApiTy tyname, acc) = tyname::acc
+	      | loop (A.ArrowTy(args,ret), acc) =
+		  loop(ret, List.foldl loop' acc args)
+	      | loop (A.Defaulted(ty,_), acc) = loop(ty, acc)
+	      | loop (A.Output(_,ty), acc) = loop(ty, acc)
+	      | loop (A.Array ty, acc) = loop(ty, acc)
+	    and loop' ((_, ty),acc) = loop(ty,acc)
+	in  rev(loop(ty,[])) 
+	end
     fun trans top metadata (def, map) =
 	let val name = getName def handle AttribNotFound _ => #1 def
 	    fun probableModule nothing split name = 
@@ -105,9 +117,10 @@ structure FromDefs :> FromDefs = struct
 		       val rt = if not(md = top) andalso isConst 
 				then SOME md
 				else NONE
-		       val mem = Member{name=name,
-					info=A.Method(functype (getMeta md) NONE rt def)}
-		   in  insert map md mem end
+		       val ty = functype (getMeta md) NONE rt def
+		       val mem = Member{name=name, info=A.Method ty}
+		   in  insert map md mem
+		   end
 		       handle AttribNotFound msg => 
 			      ( TextIO.print("Problems ("^msg^") with " ^ name)
 			      ; raise AttribNotFound msg)
@@ -115,9 +128,10 @@ structure FromDefs :> FromDefs = struct
 	      | Method => 
                    (
 		   let val md = getObject def
-		       val mem = Member{name=name,
-					info=A.Method(functype (getMeta md) (SOME md) NONE def)}
-		   in  insert map md mem end
+		       val ty = functype (getMeta md) (SOME md) NONE def
+		       val mem = Member{name=name,info=A.Method ty}
+		   in  insert map md mem
+		   end
 		       handle AttribNotFound msg => 
 			      ( TextIO.print("Problems ("^msg^") with " ^ name)
 			      ; raise AttribNotFound msg)
@@ -221,6 +235,8 @@ structure FromDefs :> FromDefs = struct
 		if !done then []
 		else let val _ = done := true
 			 val deps = getDependencies name
+			 val showdeps = Util.stringSep "[" "]" "," (fn s=>s)
+			 val _ = MsgUtil.debug(name ^ " dependencies " ^ showdeps deps ^ "\n")
 		     in  (cmap (process name) deps) @
 		         [A.Module{name=name,info=info,
 				   members=cmap loop (rev(!mbs))}

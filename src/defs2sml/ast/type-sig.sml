@@ -24,6 +24,8 @@ signature TYPE = sig
     val mapiv: ((('n1,'v1) ty * 'n1) -> 'n2) -> (('n1,'v1) ty * 'v1 -> 'v2)
              -> ('n1,'v1) ty -> ('n2,'v2) ty
 
+    val freeTyNames : ('n, 'v) ty -> 'n list
+
     val getParams: ('n,'v) ty -> (string * ('n,'v) ty) list
     val getRetType: ('n,'v) ty -> ('n,'v) ty
 

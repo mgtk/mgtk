@@ -125,6 +125,16 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toCellEditable obj = inherit () (fn () => repr obj)
     end
+    structure TextIter :>
+      sig
+	type t
+      end = struct
+	open Dynlib
+	type cptr = GObject.cptr
+	val repr = GObject.repr
+	val symb = GtkBasis.symb
+	type t = GObject.cptr
+    end
     structure TextBuffer :>
       sig
 	type base
@@ -132,7 +142,7 @@ structure Gtk  = struct
 	type 'a t = 'a textbuffer_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTextBuffer : 'a t -> base t
-	val getiter_at_line_offset : 'a t -> int -> int -> t
+	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -146,13 +156,13 @@ structure Gtk  = struct
 	fun toTextBuffer obj = inherit () (fn () => repr obj)
 	val getiter_at_line_offset_ : cptr -> int -> int -> cptr
 	    = app3 (symb"mgtk_gtk_text_buffer_get_iter_at_line_offset")
-	val getiter_at_line_offset : 'a t -> int -> int -> t
+	val getiter_at_line_offset : 'a t -> int -> int -> TextIter.t
 	    = fn self => fn line_number => fn char_offset =>
 		 let val res0 = getiter_at_line_offset_
 				  (repr self) line_number char_offset
 		 in res0 end
     end
-    structure TextIter :>
+    structure TreePath :>
       sig
 	type t
       end = struct
@@ -162,7 +172,7 @@ structure Gtk  = struct
 	val symb = GtkBasis.symb
 	type t = GObject.cptr
     end
-    structure TreePath :>
+    structure TreeIter :>
       sig
 	type t
       end = struct
@@ -179,7 +189,7 @@ structure Gtk  = struct
 	type 'a t = 'a treemodel_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTreeModel : 'a t -> base t
-	val iter_next : 'a t -> t -> bool * t
+	val iter_next : 'a t -> TreeIter.t -> bool * TreeIter.t
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -193,20 +203,10 @@ structure Gtk  = struct
 	fun toTreeModel obj = inherit () (fn () => repr obj)
 	val iter_next_ : cptr -> cptr -> bool * cptr
 	    = app2 (symb"mgtk_gtk_tree_model_iter_next")
-	val iter_next : 'a t -> t -> bool * t
+	val iter_next : 'a t -> TreeIter.t -> bool * TreeIter.t
 	    = fn self => fn iter =>
 		 let val (res0, res1) = iter_next_ (repr self) iter
 		 in (res0, res1) end
-    end
-    structure TreeIter :>
-      sig
-	type t
-      end = struct
-	open Dynlib
-	type cptr = GObject.cptr
-	val repr = GObject.repr
-	val symb = GtkBasis.symb
-	type t = GObject.cptr
     end
     structure TreeSelection :>
       sig
@@ -397,16 +397,6 @@ EXTERNML value mgtk_gtk_editable_insert_text(value self, value new_text, value n
 /* *** CellEditable *** */
 
 
-/* *** TextBuffer *** */
-/* ML type: cptr -> int -> int -> unit */
-EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line_offset(value self, value line_number, value char_offset) { /* ML */
-    GtkTextIter iter;
-    gtk_text_buffer_get_iter_at_line_offset(GtkObj_val(self), &iter, Int_val(line_number), Int_val(char_offset));
-    return Val_GtkTextIter(&iter);
-}
-
-
-
 /* *** TextIter *** */
 #define GtkTextIter_val(x) (((void*) Field(x, 1)))
 
@@ -421,6 +411,16 @@ value Val_GtkTextIter(void* obj) {
     res = alloc_final(2, ml_finalize_GtkTextIter, 0, 1);
     GtkTextIter_val_nocast(res) = (value) gtk_text_iter_copy(obj);
     return res;
+}
+
+
+
+/* *** TextBuffer *** */
+/* ML type: cptr -> int -> int -> unit */
+EXTERNML value mgtk_gtk_text_buffer_get_iter_at_line_offset(value self, value line_number, value char_offset) { /* ML */
+    GtkTextIter iter;
+    gtk_text_buffer_get_iter_at_line_offset(GtkObj_val(self), &iter, Int_val(line_number), Int_val(char_offset));
+    return Val_GtkTextIter(&iter);
 }
 
 
@@ -442,21 +442,6 @@ value Val_GtkTreePath(void* obj) {
 
 
 
-/* *** TreeModel *** */
-/* ML type: cptr -> cptr -> bool * cptr */
-EXTERNML value mgtk_gtk_tree_model_iter_next(value self, value iter_in) { /* ML */
-    value result;
-    value res;
-    GtkTreeIter iter = *((GtkTreeIter*) GtkTreeIter_val(iter_in));
-    res = Val_bool(gtk_tree_model_iter_next(GtkObj_val(self), &iter));
-    result = alloc_tuple(2);
-    Field(result, 0) = res;
-    Field(result, 1) = Val_GtkTreeIter(&iter);
-    return result;
-}
-
-
-
 /* *** TreeIter *** */
 #define GtkTreeIter_val(x) (((void*) Field(x, 1)))
 
@@ -471,6 +456,21 @@ value Val_GtkTreeIter(void* obj) {
     res = alloc_final(2, ml_finalize_GtkTreeIter, 0, 1);
     GtkTreeIter_val_nocast(res) = (value) gtk_tree_iter_copy(obj);
     return res;
+}
+
+
+
+/* *** TreeModel *** */
+/* ML type: cptr -> cptr -> bool * cptr */
+EXTERNML value mgtk_gtk_tree_model_iter_next(value self, value iter_in) { /* ML */
+    value result;
+    value res;
+    GtkTreeIter iter = *((GtkTreeIter*) GtkTreeIter_val(iter_in));
+    res = Val_bool(gtk_tree_model_iter_next(GtkObj_val(self), &iter));
+    result = alloc_tuple(2);
+    Field(result, 0) = res;
+    Field(result, 1) = Val_GtkTreeIter(&iter);
+    return result;
 }
 
 
