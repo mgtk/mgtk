@@ -1,11 +1,11 @@
 (* mgtk --- an SML binding for GTK.                                          *)
-(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001.                   *)
+(* (c) Ken Friis Larsen and Henning Niss 1999, 2000, 2001, 2002, 2003.       *)
 (*
 app load ["Dynlib", "Polyhash", "Callback"];
 *)
 structure Gtk :> Gtk =
 struct
-    prim_type gtkobj
+    prim_type cptr
 
     open Dynlib
     local 
@@ -33,7 +33,7 @@ struct
     val main_quit : unit -> unit = app1(symb "mgtk_main_quit")
 
     (* A litle type cleverness *)
-    datatype 'a GtkObject = OBJ of gtkobj
+    datatype 'a GtkObject = OBJ of cptr
 
     (* Typecast function *)
     fun super (OBJ obj) = OBJ obj
@@ -59,6 +59,8 @@ struct
 	val add  = Polyhash.insert callbackTable
 	val peek = Polyhash.peek callbackTable
 
+        val destroy = Polyhash.remove callbackTable
+
 	local
 	    val intern = ref 0;
 	in
@@ -72,11 +74,13 @@ struct
 	      | NONE   => raise Fail("mgtk: Unknown callback function (id: "^
 				     Int.toString id^")")
 
-        fun destroy id = Polyhash.remove callbackTable id
-
 	val dummy = ( Callback.register "mgtk_callback_dispatch" dispatch
                     ; Callback.register "mgtk_callback_destroy" destroy
 		    )
+
+	fun register f = localId(fn id => (add (id, f); id))
+	val signal_connect : cptr -> string -> int -> bool -> int
+	                   = app4(symb"mgtk_signal_connect")
 
         (* UNSAFE: no error checking in the set and get functions! *)
         type 'a setter = GValue -> 'a -> unit
@@ -91,9 +95,6 @@ struct
         val getChar   : char getter   = app2(symb "mgtk_get_pos_char")
         val getString : string getter = app2(symb "mgtk_get_pos_string")
 *)
-	fun register f = localId(fn id => (add (id, f); id))
-	val signal_connect : gtkobj -> string -> int -> bool -> int
-	                   = app4(symb"mgtk_signal_connect")
     in
     datatype state = S of GValue * GValues * int * int
     type ('a, 'b) trans   = 'a * state -> 'b * state
@@ -109,8 +110,7 @@ struct
         if next < max  (* FIXME: it should be < but that gives problems with
                                   return_unit.  Currently unsafe! *)
         then (f (get arg next), S(ret, arg, max, next+1))
-        else (app print ["next = ", Int.toString next," max = ",Int.toString max, "\n"]; raise Subscript)
-
+        else raise Subscript
 
     fun drop (f, S(ret, arg, max, next)) = 
         if next < max then (f, S(ret, arg, max, next+1))
@@ -118,10 +118,7 @@ struct
 
     fun setter set (x, dummy as S(ret, arg, max, next)) =
         if next = max then (set ret x; ((),dummy))
-        else (app print ["next = ", 
-                         Int.toString next,
-                         " max = ",
-                         Int.toString max, "\n"]; raise Subscript)
+        else raise Subscript
 
     fun int x        = getter getInt x
     fun return_int x = setter setInt x
@@ -167,17 +164,17 @@ struct
     type 'a widget_t = base
     type 'a GtkWidget = 'a widget_t GtkObject
 
-    val widget_destroy_: gtkobj -> unit
+    val widget_destroy_: cptr -> unit
         = app1(symb"mgtk_gtk_widget_destroy")
     val widget_destroy: 'a GtkWidget -> unit
         = fn OBJ widget => widget_destroy_ widget
 
-    val widget_show_: gtkobj -> unit
+    val widget_show_: cptr -> unit
         = app1(symb"mgtk_gtk_widget_show")
     val widget_show: 'a GtkWidget -> unit
         = fn OBJ widget => widget_show_ widget
 
-    val widget_show_all_: gtkobj -> unit
+    val widget_show_all_: cptr -> unit
         = app1(symb"mgtk_gtk_widget_show_all")
     val widget_show_all: 'a GtkWidget -> unit
         = fn OBJ widget => widget_show_all_ widget
@@ -188,17 +185,17 @@ struct
     type 'a GtkContainer = 'a container_t GtkWidget
 
 
-    val container_set_border_width_: gtkobj -> int -> unit
+    val container_set_border_width_: cptr -> int -> unit
         = app2(symb"mgtk_gtk_container_set_border_width")
     val container_set_border_width: 'a GtkContainer -> int -> unit
         = fn OBJ container => fn border_width => container_set_border_width_ container border_width
 
-    val container_add_: gtkobj -> gtkobj -> unit
+    val container_add_: cptr -> cptr -> unit
         = app2(symb"mgtk_gtk_container_add")
     val container_add: 'a GtkContainer -> 'b GtkWidget -> unit
         = fn OBJ container => fn OBJ widget => container_add_ container widget
 
-    val container_remove_: gtkobj -> gtkobj -> unit
+    val container_remove_: cptr -> cptr -> unit
         = app2(symb"mgtk_gtk_container_remove")
     val container_remove: 'a GtkContainer -> 'b GtkWidget -> unit
         = fn OBJ container => fn OBJ widget => container_remove_ container widget
@@ -209,12 +206,12 @@ struct
     type 'a GtkButton = 'a button_t GtkContainer
 
 
-    val button_new_: unit -> gtkobj
+    val button_new_: unit -> cptr
         = app1(symb"mgtk_gtk_button_new")
     val button_new: unit -> base GtkButton
         = fn dummy => OBJ(button_new_ dummy)
 
-    val button_new_with_label_: string -> gtkobj
+    val button_new_with_label_: string -> cptr
         = app1(symb"mgtk_gtk_button_new_with_label")
     val button_new_with_label: string -> base GtkButton
         = fn label => OBJ(button_new_with_label_ label)
@@ -225,7 +222,7 @@ struct
     type 'a GtkWindow = 'a window_t GtkContainer
 
 
-    val window_new_: int -> gtkobj
+    val window_new_: int -> cptr
         = app1(symb"mgtk_gtk_window_new")
     val window_new: unit -> base GtkWindow
         = fn typ => OBJ(window_new_ 0)
