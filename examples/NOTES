@@ -35,22 +35,12 @@ An example adopted from "Mono, A Developers Notebook"
 (04-gtk/07-treeview).  Shows how to use TreeView as a tree-view
 widget.
 
-Defects:
-  - The program does not compile.
-  - We need to handle GtkTreeIter, in particullar as the return
-    (actually out-param) for append. 
-
 
 listview.sml
 ------------
 An example adopted from "Mono, A Developers Notebook"
 (04-gtk/07-listview).  Shows how to use TreeView as a grid-like
 widget.
-
-Defects:
-  - The program does not compile.
-  - We need to handle GtkTreeIter, in particullar as the return
-    (actually out-param) for append. 
 
 
 menus.sml
@@ -78,6 +68,18 @@ Defects:
 
 
 OLD DEFECTS:
+
+treeview.sml & listview.sml  (2004/10/28)
+-----------------------------------------
+
+  - The program does not compile.
+  - We need to handle GtkTreeIter, in particullar as the return
+    (actually out-param) for append. 
+
+  => wrapped missing parts of GtkTreeIter (output params) to make
+     the examples compile
+  => fixed more bugs in output param handling to make them run
+
 
 listview.sml  (2004/09/28)
 --------------------------

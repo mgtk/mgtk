@@ -34,8 +34,6 @@ fun setUpGui() =
                      ; col
                    end
                                    
-        (*** DEFECTS CITY STARTS HERE ***)
-                       
         val store = let val store = TreeStore.newv 1 [GType.string]
                     in  TreeView.set_model tv (SOME (TreeStore.asTreeModel store))
                       ; store
@@ -44,7 +42,7 @@ fun setUpGui() =
         fun populate n = 
             let fun loop i = 
                     if i < n then 
-                        let val parent = TreeStore.append store NONE
+                        let val parent = TreeStore.append' store
                             fun inner j = 
                                 if j >= 0 then 
                                     let val child = TreeStore.append store (SOME parent)

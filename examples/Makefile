@@ -15,7 +15,7 @@ MGTKHOME=../src/defs2sml/release/mgtk
 
 all: mosml mlton
 
-mosml: helloworld-new buttons-galore signup menus listview treeview
+mosml: helloworld buttons-galore signup menus listview treeview
 
 mlton: helloworld-mlton buttons-galore-mlton signup-mlton listview treeview
 
