@@ -1,17 +1,15 @@
 \documentclass[workingdraft,endnotes]{usetex-v1}
-% 1. workingdraft:
-%
-%       For initial submission and shepherding.  Features prominent
-%       date, notice of draft status, page numbers, and annotation
-%       facilities.  The three supported annotation macros are:
-%               \edannote{text}         -- anonymous annotation note
-%               \begin{ednote}{who}     -- annotation note attributed
-%                 text                          to ``who''
-%               \end{ednote}
-%               \HERE                   -- a marker that can be left
-%                                               in the text and easily
-%                                               searched for later
-%
+
+%% For intial submission uncomment the following code to remove ednote
+%% comments
+
+%\makeatletter{}
+%\newsavebox{\kfl@discard}
+%\renewenvironment{ednote}[1]{\@latex@warning
+%  {Leftover ednote environment in final version ignored}%
+%  \begin{lrbox}{\kfl@discard}}{\end{lrbox}}
+%\makeatother{}
+
 % In addition, the option "endnotes" permits the use of the
 % otherwise-disabled, Usenix-deprecated footnote{} command in
 % documents.  In this case, be sure to include a
@@ -101,6 +99,7 @@ instead we refer the interested reading to one of the fine textbooks
 
 \begin{ednote}{Ken}
   Skulle vi have et lille fac og fib eksempel?
+  (drop for extended abstract)
 \end{ednote}
 
 \sml is one of the few languages with a formal definition
@@ -116,20 +115,21 @@ interactive \emph{read--eval--print--loops} (REPLs) to aggresively
 optimizing whole-program compilers targeting native code.
 
 
-\begin{ednote}{}
+\begin{ednote}{Ken}
   Introduce modules.  Just signatures and (nested) structures.
+  (måske drop for extended abstract)
 \end{ednote}
 
 
 \subsection{\gtk}
 \label{sec:gtk}
 
+\gtk (GIMP Toolkit) is a library for creating graphical user
+interfaces. It is licensed using the LGPL. It is the graphical toolkit
+used in the \gnome platform.  \gtk is implemented in C, but from the
+beginning the \gtk developers have paid attention on making feasible
+and pratical to make bindings for other programming languages than C.
 
-\begin{ednote}{Ken}
-  * Gtk+ er interessant (og C var et godt
-    impl. valg)  
-\end{ednote}
-  
 
 \subsection{Overview of this paper}
 \label{sec:overview-this-paper}
@@ -433,7 +433,13 @@ by the Moscow ML compiler
 
 \begin{ednote}{Ken}
   Explain the cool signal thing.
+  (drop for extended abstract)
 \end{ednote}
+
+\begin{ednote}{Ken}
+  How about the implementation of the binding with finalizers and all?
+\end{ednote}
+
 
 \section{Process}
 \label{sec:process}
@@ -527,6 +533,7 @@ of a signal on buttons.
 
 \begin{ednote}{Henning}
   SML + Gtk+ er godt
+  (drop for extended abstract?)
 \end{ednote}
 
 
@@ -542,16 +549,33 @@ of a signal on buttons.
 \section{Related work}
 \label{sec:related-work}
 
- Brainstorm of related work:
+Brainstorm of related work:
 \begin{itemize}
-\item SML-GTK 
-\url{http://www.cs.nyu.edu/phd_students/leunga/sml-gtk/sml-gtk.html}
+\item There is another bind from \sml to \gtk called !SML-GTK! which
+  can be found at: 
+  \begin{center}
+    \url{http://www.cs.nyu.edu/phd_students/leunga/sml-gtk/sml-gtk.html}
+  \end{center}
+  
+  This binding is different from \mgtk in that it is made the ml-nlffi
+  bindings generator \cite{Blume:2001:nlffi}, which is currently
+  specific to the SML/NJ compiler.  Also the !SML-GTK! does not handle
+  memory management.
 
-\item gtk+hs
-\url{http://www.cse.unsw.edu.au/~chak/haskell/gtk}
 
-\item lablgtk
-\url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
+\item !gtk+hs! is language binding for Haskell to \gtk 
+  \begin{center}
+    \url{http://www.cse.unsw.edu.au/~chak/haskell/gtk}
+  \end{center}
+
+\item !lablgtk! is language binding for O'Caml to \gtk 
+  \begin{center}
+    \url{http://wwwfun.kurims.kyoto-u.ac.jp/soft/olabl/lablgtk.html}
+  \end{center}
+
+  O'Caml is a ML dialect different from \sml which (among other
+  things) has object-orianted features. This binding is different from
+  \mgtk because it uses the object oriented features.
 
 \item sml\_tk
 \url{http://www.informatik.uni-bremen.de/~cxl/sml_tk}
@@ -562,9 +586,9 @@ of a signal on buttons.
 
 \item SWIG also used to generate language bindings
 
-\item ``Calling Heaven from Hell''
+\item ``Calling Hell from Heaven'' \cite{Finne:1999:CallingHellFromHeaven}
 
-\item nlffi
+\item ml-nlffi \cite{Blume:2001:nlffi}
 
 \end{itemize}
 
@@ -583,7 +607,17 @@ of a signal on buttons.
 \label{sec:conclusion}
 
 In this paper we have demonstrated that is theoretical and practically
-possible to make an interface from SML to GTK.
+possible to make an interface from \sml to \gtk.  This is interesting
+because \sml is not for serveral reasons: first, the \sml community
+gets access to a graphical library which is sourly needed; secord,
+that is possible to make an \sml binding to \gtk really tests the
+claimed ``interfaceability'' of \gtk because \sml is so radically
+different from C in abstraction level and paradigm; finally, we think
+that we have demonstrated that it is possible to bind the whole \gnome
+platform using mainly machine generated code.
+
+
+
 
 \bibliographystyle{alpha}
 \bibliography{mgtk}
