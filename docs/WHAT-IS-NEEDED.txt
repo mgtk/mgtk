@@ -1,0 +1,75 @@
+                Features that mGTK needs from a C-FFI
+                =====================================
+                    Ken Friis Larsen <kfl@it.edu>
+                     Henning Niss <hniss@it.edu>
+
+                        Last modified: $Date: 2003/03/06 15:30:00 $
+
+
+
+This note contains a brief overview of the features that mGTK need
+from a C-FFI to work.  The note does not contain any background
+information about the GNOME platform (that is, gtk+, glib, pango,
+atk,...).   For information about GNOME and gtk+ see:
+
+            http://gtk.org
+            http://developer.gnome.org
+
+
+Summary of the needed features in order of importance:
+
+   * Callback (ie., call a SML function from C).  This has been
+     restricted so as only two specific SML functions need to be
+     called.
+
+
+   * Finalized values.  We need a way to hook-up the memory management
+     from GObject with the SML GC.
+
+   
+   * Allocation of SML aggregate values (tuples, lists, vectors,
+     arrays) from C.  Some C functions return a dynamically sized
+     datastucture (for example, a list of selected cells in a grid
+     widget).
+
+
+   * Dynamic loading of C libraries.  Not essential, but we use that
+     feature from Moscow ML now.
+
+
+
+
+Callback
+--------
+
+
+
+Finalized values
+----------------
+
+
+Allocation of SML aggregate values from C
+-----------------------------------------
+
+The places we allocate aggregate values in C can be split into four
+cases in reverse order of importance:
+
+  * The return value from gtk_init
+
+  * We allocate a number of tuples to transfer some constants.  These
+    could be eliminated.
+
+  * We allocate a triple each time we do a callback
+
+  * When a C function returns a dynamically sized datastucture
+
+
+Dynamic loading of C libraries
+------------------------------
+
+Isn't important as such, but very convenient especially if you want to
+be able to download a new mGTK widget from the net.
+
+See also the documentation for the Moscow ML Dynlib library:
+    http://www.dina.dk/~sestoft/mosmllib/Dynlib.html
+
