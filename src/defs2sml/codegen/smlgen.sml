@@ -10,12 +10,17 @@ structure GenSML :>
 	type sml_info
 	type 'a incl
 	type mode
-	val generate: TypeInfo.typeinfo -> (name,(typeexp*name option)option,typeexp AST.api_info) AST.module -> 
+
+	val max_curried : int
+
+	val generate: TypeInfo.typeinfo -> (name,(name*name option)option,typeexp AST.api_info) AST.module -> 
 		      (name,mode,sml_info incl) AST.module
-	val print: TextIO.outstream -> (name,mode,sml_info incl) AST.module 
+	val print: string option -> TextIO.outstream -> (name,mode,sml_info incl) AST.module 
                    -> unit
     end =
 struct
+
+    val max_curried = 5
 
     datatype exp =
 	Unit 
@@ -49,6 +54,7 @@ struct
       | SeqDecl of sml_info incl list
       | EmptyDecl
       | Comment of string option (* an empty comment prints as newline *)
+      | Open of string list
 
     (* convenience *)
     infix ++
@@ -61,7 +67,7 @@ struct
 
     (* "primitives" *)
     fun ccall name args =
-	let val app = if args > 5 then "app1" (* FIXME: need to tuple args *)
+	let val app = if args > max_curried then "app1" 
 		      else "app" ^ Int.toString args
 	in  App(Var app, [App(Var "symb", [Str name])])
 	end
@@ -138,6 +144,7 @@ struct
 		  | EmptyDecl => ""
 		  | Comment NONE => ""
 		  | Comment(SOME c) => "(*" ^ c ^ "*)"
+		  | Open strs => indent ^ Util.stringSep "open " "" " " (fn s=>s) strs
 	    and show' (None) = ""
 	      | show' (Some decl) = show decl
 	      | show' (StrOnly decl) = if mode=STRUCTURE then show decl else ""
@@ -146,8 +153,15 @@ struct
 	in  show' info ^ "\n"
 	end
 	    
-    fun print os module =
+    fun print preamble os module =
 	let fun dump s = TextIO.output(os, s)
+	    fun dump_preamble (SOME file) =
+		let val is = TextIO.openIn file
+		    val s = TextIO.inputAll is
+		in  TextIO.output(os, s) 
+                  ; TextIO.closeIn is
+		end
+	      | dump_preamble NONE = ()
 	    fun spaces n = String.implode(List.tabulate(n,fn _ => #" "))
 	    fun indent cols str = spaces cols ^ str
 	    fun print_member mode indent (AST.Member{name,info}) = 
@@ -160,7 +174,13 @@ struct
 		; List.app (print_member info (indent+4)) members
 		; dump(spaces indent ^ "end\n")
 		)
-	in  print_module 0 module
+	    fun print_toplevel (AST.Module{name,members,info}) =
+                ( dump("structure " ^Name.asModule name ^ " = struct\n")
+                ; dump_preamble preamble
+                ; List.app (print_member info 4) members
+                ; dump("end\n")
+                )
+	in  print_toplevel module
 	end
 
     (* code generation *)
@@ -186,26 +206,38 @@ struct
 		    val (pars,tys) = ListPair.unzip parsty
 		    fun isWidgetType (Type.Tname n) = (* FIXME *)
 			(case Name.getFullPath n of "Gtk"::_ => true | _ => false)
+		      | isWidgetType (Type.Ptr t) = isWidgetType t
 		      | isWidgetType _ = false
 		    fun wrap (par,ty) = if isWidgetType ty 
 					then App (Var"repr",[Var par])
 					else Var par
-		    val pars' = List.map wrap parsty
+		    val pars' = if List.length pars > max_curried
+				then [Tup(List.map wrap parsty)]
+				else List.map wrap parsty
 		    fun ubnd n =
-			raise Skip("Unbound type name: " ^ Name.toString n)
+			raise Skip("Unbound type name: "^Name.toString' n)
 		    val fromtype' = TypeInfo.toSMLTypeSeq tinfo
 		    fun fromtype ty = 
-			fromtype' ty
-			handle TypeInfo.Unbound n => ubnd n
+			fromtype' ty handle TypeInfo.Unbound n => ubnd n
 		    fun primtypeFromType ty = 
 			TypeInfo.toPrimType tinfo ty
 			handle TypeInfo.Unbound n => ubnd n
+		    val params = Type.getParams ty
+		    val ret    = Type.getRetType ty
+		    val params' = List.map (fromtype o #2) params
+		    val ret'    = TypeInfo.toSMLType tinfo (fn _ => "base") ret
+				  
+		    fun make e = 
+			(* FIXME *)
+			if isWidgetType ret then App(Var("make"), [e])
+			else e
 		in  StrOnly(
                        ValDecl(VarPat(name^"_"), Some(primtypeFromType ty), 
 			       ccall cname (List.length pars)))
                  ++ Some(
-                       ValDecl(VarPat name, Some(fromtype ty),
- 			       List.foldr Fn (App(Var(name^"_"), pars')) pars))
+                       ValDecl(VarPat name, Some(SMLType.ArrowTy(params',ret')),
+			       List.foldr Fn (make(App(Var(name^"_"), pars')))
+					  pars))
 		end
 
             (* ENUMS 
@@ -231,7 +263,7 @@ struct
 
 	  | AST.Boxed funcs =>
 	        let val name = Name.asBoxed name
-		in  Some(TypeDecl(([],[name]), StrOnly(TyApp([],["cptr"]))))
+		in  Some(TypeDecl(([],[name]), StrOnly(TyApp([],["GObject.cptr"]))))
 		end
           | AST.Field ty => 
 		let val name = Name.asField name
@@ -244,36 +276,37 @@ struct
 		in  Some(ValDecl(VarPat name, None, Var name))
 		end
 
-    fun header name info =
+    fun header tinfo (name, info) =
 	let val (typ,parent) = 
 		case info of
-		    SOME (Type.Tname n,parent) => 
-		       (Name.asType n, 
+		    SOME (n,parent) => 
+		       (Name.asType n,
 			case parent of SOME(p) => p
 		                     | _ => raise Skip("No parent")
                        )
 		  | _ => raise Skip("No type information")
 
 	    val base_t = "base"
-	    val witness_t = typ ^ "_t"
+	    val witness_t = typ^"_t"
 	    val parent_t = Name.asModule parent ^ ".t"
 
 	    val type_t = "t"
 	    fun pRef id = Name.asModule parent ^ "." ^ id (* FIXME: Using names instead *)
 
-	in  StrOnly(TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"]))))
-         ++ StrOnly(ValDecl(VarPat"repr", None, Var("GObject.repr")))
-         ++ StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))
-         ++ Some(TypeDecl(([],[base_t]),StrOnly UnitTy))
+	in  Some(TypeDecl(([],[base_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[witness_t]),StrOnly UnitTy))
          ++ Some(TypeDecl((["'a"],[type_t]), 
 		    Some(TyApp([TyApp([TyVar "'a"],[witness_t])],[parent_t]))))
+         ++ StrOnly(Open["Dynlib"])
+         ++ StrOnly(TypeDecl(([],["cptr"]), Some(TyApp([],["GObject.cptr"]))))
+         ++ StrOnly(ValDecl(VarPat"repr", None, Var("GObject.repr")))
+         ++ StrOnly(ValDecl(VarPat"symb", None, Var("GtkBasis.symb")))
          ++ Some(Comment NONE)
          ++ Some(FunDecl("inherit",[VarPat "w",VarPat "con"],
 		    (* 'a -> GObject.constructor -> 'a t *)
 		    SigOnly([TyVar "'a", TyApp([],["GObject","constructor"])] ==> TyApp([TyVar"'a"],["t"])),
 		    App(Var(pRef "inherit"),[Unit,Var "con"])))
-	 ++ StrOnly(FunDecl("make"^Name.asModule name,[VarPat"ptr"],None,
+	 ++ StrOnly(FunDecl("make"(*^Name.asModule name*),[VarPat"ptr"],None,
 		    App(Var(pRef "inherit"),[Unit,Fn("()",App(Var "repr",[Var"ptr"]))])))
 	end
 	    handle Skip msg => None (* Was EmptyDecl *)
@@ -289,11 +322,11 @@ struct
 	    let val subs = List.concat(List.map (generate_member tinfo) members)
 	    in  [ Module{name=name, info=SIGNATURE, 
 			 members=Member{name=Name.fromString "signatureheader",
-					info=header name info}
+					info=header tinfo (name,info)}
 				 :: subs}
 		, Module{name=name, info=STRUCTURE,
 			 members=Member{name=Name.fromString "structureheader",
-					info=header name info}
+					info=header tinfo (name,info)}
 				 :: subs}
 		]
 	    end

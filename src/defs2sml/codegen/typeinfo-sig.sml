@@ -11,7 +11,7 @@ signature TypeInfo = sig
 		 fromc: TinyC.expr -> TinyC.expr,
 		 super: name option}
     type typeinfo
-    val build: (name,(ty * name option)option,ty AST.api_info) AST.module 
+    val build: (name,(name * name option)option,ty AST.api_info) AST.module 
 	       -> typeinfo
 
     exception Unbound of name

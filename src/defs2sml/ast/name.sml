@@ -68,15 +68,15 @@ structure Name :> NAME = struct
         ^ Util.stringSep "[" "]" "." (fn s=>s) (#fullpath name)
         ^ Util.stringSep "<" ">" "." (fn s=>s) (#base name)
 
-(*
     fun compare (n1, n2) =
-	case Util.listCmp String.compare (#fullpath n1, #fullpath n2) of
+	case Util.listCmp String.compare (#path n1, #path n2) of
 	    EQUAL => Util.listCmp String.compare(#base n1, #base n2)
 	  | order => order
-*)
 
+(*
     (* FIXME *)
     fun compare (n1, n2) = Util.listCmp String.compare (#base n1, #base n2)
+*)
 
     fun fromString base = (* FIXME *)
 	{path=[],fullpath=[],base=separateWords base}

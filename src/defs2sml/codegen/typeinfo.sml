@@ -57,13 +57,27 @@ structure TypeInfo :> TypeInfo = struct
 
 
     fun build module =
-	let fun bmod (AST.Module{name,members,info=SOME(Type.Tname n,parent)},table) = 
+	let fun bmod (AST.Module{name,members,info=SOME(n,parent)},table) = 
 		let val table' = List.foldl bmem table members
+		    val md = case Name.getBase name of [md] => md
+						     | _ => raise Fail("build")
+(*		    val name' = Name.fromPaths(Name.getFullPath name@[md],
+					       Name.getPath name,
+					       [Name.toLower md^"_t"])
+*)
+(*
+		    val tname = Name.fromPaths(Name.getFullPath name@[md],
+					       Name.getPath name,
+					       [Name.toLower md^"_t"])
+*)
+		    val name' = Name.fromPaths(Name.getFullPath name@[md],
+					       Name.getPath name,
+					       [md])
 		    val info = {toc=ccall"GtkObj_val",fromc=ccall"Val_GtkObj",
 				ptype=SMLType.TyApp([],["cptr"]),
-				stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],Name.getBase n@["t"]),
+				stype=fn fresh => SMLType.TyApp([SMLType.TyVar(fresh())],["t"]),
 				super=NONE}
-		in  add(table',name,info)  end
+		in  add(table',name',info)  end
 	      | bmod (AST.Module{name,members,info=NONE},table) = 
 		List.foldl bmem table members
 	    and bmem (AST.Sub module,table) = bmod(module,table)
@@ -84,8 +98,20 @@ structure TypeInfo :> TypeInfo = struct
 	in  bmod (module,init())
 	end
 
+    fun nextgen () =
+	let val no = ref 0
+	    val orda = Char.ord #"a"
+	    fun next () = if(!no<26) then ("'"^Char.toString(Char.chr(!no+orda))
+				           before
+					   no := !no + 1)
+			  else raise Fail("Not implemented: fromTypeSeq.next()")
+	in  next
+	end
+
     fun show os table =
-	let fun sinfo {stype,ptype,toc,fromc,super} = SMLType.show ptype
+	let fun sinfo {stype,ptype,toc,fromc,super} = 
+		(SMLType.show ptype) ^ " x "  ^
+		(SMLType.show (stype (nextgen())))
 	in  List.app (fn (n,i) => 
 			 TextIO.output(os,Name.toString' n^" -> "^sinfo i^"\n"))
 		     (Splaymap.listItems table)
@@ -99,6 +125,12 @@ structure TypeInfo :> TypeInfo = struct
                      ; TextIO.closeOut os
 		     ; table
 		   end
+
+    fun prependPath path ty =
+	case ty of
+	    SMLType.TyApp(alphas, tyname) =>
+	        SMLType.TyApp(alphas, path @ tyname)
+	  | _ => ty
 
     fun toSMLType tinfo fresh ty =
 	case ty of
@@ -117,7 +149,7 @@ structure TypeInfo :> TypeInfo = struct
                )
 	  | Type.Tname n => 
 	       (let val info: info = lookup tinfo n
-		in  #stype info fresh
+		in  prependPath (Name.getPath n) (#stype info fresh)
 		end
 		    handle NotFound => raise Unbound n
                )
@@ -196,7 +228,7 @@ structure TypeInfo :> TypeInfo = struct
     fun fromCValue tinfo ty =
 	case ty of 
 	    Type.Ptr(ty as Type.Base n) => 
-	       if Name.asType n = "char" then call "copy_string"
+	       if Name.asType n = "char" then call "my_copy_string"
 	       else fromCValue tinfo ty
 	  | Type.Base n => 
                (let val info:info = lookup tinfo n

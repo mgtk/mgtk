@@ -121,7 +121,7 @@ structure FromDefs :> FromDefs = struct
     val fromDefs = fn top => fn defs => 
         let fun pptype (AST.ApiTy s) = s
 	      | pptype (AST.ArrowTy (pars,ret)) =
-		Util.stringSep "[" ("]"^pptype ret) ", " (fn (s,ty)=>s^":"^pptype ty) pars
+		Util.stringSep "[" ("] -> "^pptype ret) ", " (fn (s,ty)=>s^":"^pptype ty) pars
 	    fun ppmodi (SOME(ty, parent)) = 
 		": " ^ pptype ty ^
 		   (case parent of NONE => "" | SOME ty => " extends " ^ pptype ty)
@@ -138,4 +138,5 @@ structure FromDefs :> FromDefs = struct
           ; module'
         end
 *)
+
 end (* structure FromDefs *)
