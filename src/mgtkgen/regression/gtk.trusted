@@ -10203,7 +10203,7 @@ end
     val widget_get_extension_events_: gtkobj -> int
         = app1(symb"mgtk_widget_get_extension_events")
     val widget_get_extension_events: 'a GtkWidget -> gdk_event_mask list
-        = fn OBJ widget => widget_get_extension_events_ widget
+        = fn OBJ widget => getFlags(widget_get_extension_events_ widget)
 
     val widget_get_toplevel_: gtkobj -> gtkobj
         = app1(symb"mgtk_widget_get_toplevel")
@@ -10223,7 +10223,7 @@ end
     val widget_get_events_: gtkobj -> int
         = app1(symb"mgtk_widget_get_events")
     val widget_get_events: 'a GtkWidget -> gdk_event_mask list
-        = fn OBJ widget => widget_get_events_ widget
+        = fn OBJ widget => getFlags(widget_get_events_ widget)
 
     val widget_is_ancestor_: gtkobj -> gtkobj -> bool
         = app2(symb"mgtk_widget_is_ancestor")

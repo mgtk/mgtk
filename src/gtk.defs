@@ -819,7 +819,7 @@
    (visibility-notify GDK_VISIBILITY_NOTIFY)
    (no-expose GDK_NO_EXPOSE))
 
-(define-enum GdkEventMask;;; Henning: should be a flag
+(define-flags GdkEventMask
    (exposure-mask GDK_EXPOSURE_MASK)
    (pointer-motion-mask GDK_POINTER_MOTION_MASK)
    (pointer-motion-hint-mask GDK_POINTER_MOTION_HINT_MASK)

@@ -37,6 +37,7 @@ mgtk.c: header.c gtk.defs
 
 mgtk.so: $(COBJS)
 	$(DYNLD) -o $@ $(COBJS) $(LIBS)
+
 clean:
 	$(REMOVE) *~
 	$(REMOVE) *.u? 

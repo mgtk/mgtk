@@ -295,7 +295,13 @@ struct
       | unwrapArg (TypeExp.LONG(_, TypeExp.FLAG (fName,false)), name) = 
 	$$["(setFlags ", name, ")"]
       | unwrapArg (typExp, name) = $name
-    fun wrapResult (TypeExp.LONG(_, TypeExp.WIDGET _)) res = $"OBJ(" && res && $")"
+    fun wrapResult (TypeExp.LONG(_, TypeExp.WIDGET _)) res = 
+	$"OBJ(" && res && $")"
+      | wrapResult (TypeExp.LONG(_, TypeExp.FLAG (fName,false))) res =
+(* see comment on getSet below
+	$"getSet" && $fName && $"(" && res && $")"
+*)
+	$"getFlags(" && res && $")"
       | wrapResult typExp res = res
 
     fun mkMLFunVal short (name, retTyp, params) =
@@ -522,6 +528,8 @@ struct
 	NameUtil.separateWords #"_" (NameUtil.removePrefix fName)
       | flagName _ =
 	Util.shouldntHappen "flagName: Not a flag"
+    fun flagRealName (TypeExp.LONG(_, TypeExp.FLAG(fName,_))) = fName
+      | flagRealName _ = Util.shouldntHappen "flagReal Name: Not a flag"
     fun mlFlagTupleType constr = 
 	TypeExp.LONG([], TypeExp.TUPLE(map (fn _=> TypeExp.LONG([], TypeExp.PRIMTYPE "int")) constr))
     fun mkFlagsDecl (flag, constr) =
@@ -548,6 +556,7 @@ struct
 	end
     fun mkMLFlagsVal (flag, constr) =
 	let val fName = flagName flag
+	    val fName' = flagRealName flag
 	    val tupleType = mlFlagTupleType constr
 	    fun cName const = $(mlEnumName const)
 	in  $indent && $"type " && $fName && $" = int" && Nl
@@ -556,6 +565,12 @@ struct
 	       && $$[indent, indent, "= app1(symb\"mgtk_get_",fName,"\")"] && Nl
          && $$[indent,"val ("] && prsep ($",") cName constr && $")" && Nl
          && $$[indent,indent,"= get_", fName, "_ ()"] && Nl
+(* we could do this, by the entire gtk.defs file only contains a
+   single return value of type flag --- consequently, this seems
+   excessive
+	 && $$[indent,"val getSet", fName'," = ", "isSet ["] &&
+	         prsep ($",") cName constr && $"]" && Nl
+*)
          && Nl
 	end
 

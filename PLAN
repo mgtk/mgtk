@@ -18,7 +18,7 @@ v Fix GC bugs.
   v I think there is one in mgtk_callback_dispatch [Fixed: Ken, June
     6, 2000.  I don't think there are any GC bugs in header.c now]
   v Fix mgtkgen [Fixed: Henning, June 7, 2000]
-* Flags
+v Flags [Fixed: Henning, June 13, 2000]
 
 Milestone 2 (release version 1.0):
 ----------------------------------
