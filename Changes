@@ -14,4 +14,5 @@ Changes since mgtk-alpha-0.01
   + short version of functions with no arguments are now also in the
     signature.
   + bugs related to Garbage Collection and (minor) space leaks.
+  + more than one flag can now be given to functions expecting flags.
 ----------------------------------------------------------------------

@@ -17,9 +17,6 @@ commands
     Windows:
       set MGTKHOME=..
 
-    Under Windows you *may* need to copy the file $(MGTKHOME)/mgtk.so
-    to the examples directory and then unset MGTKHOME.
-
 (4) mosml -I ..
 
 (5) load "<file>";  (where <file> is the name of the file

@@ -19,29 +19,57 @@ Let $(MGTKHOME) be the directory in which you unpacked mGTK.
       Type make
 
 
+* On Windows machines (using the binary version of mGTK):
+
+  (1) Install the GTK+ dll's.
+
+      Copy the .dll to the Windows system directory
+
+        bin\gtk\glib-1.3.dll
+        bin\gtk\gmodule-1.3.dll
+        bin\gtk\gthread-1.3.dll
+        bin\gtk\gdk-1.3.dll
+        bin\gtk\gtk-1.3.dll
+        bin\gtk\pthread.dll
+        bin\gtk\gnu-intl.dll  
+
+      (perhaps the mosml\bin directory will do).
+
+  (2) Install updated MosML runtime.
+
+      Copy the patched runtime to the mosml\bin directory:
+
+        bin\camlrt.dll
+
+
 * On Windows machines (using Microsoft Visual C++):
 
   (0) Get the Windows port of GTK+ from http://www.gimp.org/win32/.
 
       Be sure to get the ``Developer Packages'' (get the glib, the
-      gtk+, and the extralibs packages). Copy the following files to
-      the Windows system directory:
+      gtk+, and the extralibs packages). 
 
-        src/glib/glib-1.3.dll
-        src/glib/gmodule-1.3.dll
-        src/glib/gthread-1.3.dll
-        src/gtk+/gdk/gdk-1.3.dll
-        src/gtk+/gtk/gtk-1.3.dll
+  (1) Install the GTK+ dll's.
 
-        pthreads-snap-1999-05-30/pthread.dll
-        intl/gnu-intl.dll  
+      Copy the following files to the Windows system directory:
+
+        src\glib\glib-1.3.dll
+        src\glib\gmodule-1.3.dll
+        src\glib\gthread-1.3.dll
+        src\gtk+\gdk\gdk-1.3.dll
+        src\gtk+\gtk\gtk-1.3.dll
+
+        pthreads-snap-1999-05-30\pthread.dll
+        intl\gnu-intl.dll  
+
+      (perhaps the mosml\bin directory will do).
 
       We have had problems with the April 16. snapshot. Get the version
       from Febuary 15 instead!
   
   (2) Patch the runtime part of MosML.
 
-      A number of functions in mosml/src/runtime/{callback.h,memory.h}
+      A number of functions in mosml\src\runtime\{callback.h,memory.h}
       has to be declared EXTERN. Change the files to the following
       declarations.
 
@@ -65,7 +93,7 @@ Let $(MGTKHOME) be the directory in which you unpacked mGTK.
 
   (3) Configure mGTK.
 
-      Configure everything by changing $(MGTKHOME)/Makedefs.w32 to
+      Configure everything by changing $(MGTKHOME)\Makedefs.w32 to
       match your setup.
 
   (4) Build mGTK.

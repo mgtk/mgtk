@@ -13,13 +13,16 @@ Copyright (C) 2000 by Ken Friis Larsen and Henning Niss.
 CURRENT VERSION
 ---------------
 The current version is 
+    red-hens (or mgtk-beta-0.02)
+
+Previous versions include
     green-horses-and-blue-ducks (or mgtk-alpha-0.01)
 
 
 ABOUT
 -----
 
-mGTK is an SML interface to the C-based graphical toolkit gtk+ (the
+mGTK is an SML interface to the C-based graphical toolkit Gtk+ (the
 Gimp Toolkit).  Gtk+ is available from the homepage:
 	http://www.gtk.org
 
@@ -34,23 +37,28 @@ REQUIREMENTS
 ------------
 
 mGTK should work on any platform supported by both Moscow ML and
-gtk+. We develop and test mGTK on Linux machines (running RedHat).
-mGTK is know to run successfully on the following machines
+Gtk+. We develop and test mGTK on Linux machines (running RedHat).
+mGTK is known to run successfully on the following machines
 
-+   Linux, X86, RedHat 6.1/6.2
+*   Linux, X86, RedHat 6.1/6.2
+*   Windows, X86
+
 
 If you have had any success running mGTK on some other platform,
 please send us an email with a description of the machine.
 
-The following versions of Moscow ML and gtk+ are required:
+The following versions of Moscow ML and Gtk+ are required:
 
 Moscow ML: Version 1.44 (or newer) compiled with dynlib support.  
        Moscow ML is available from:
 	      http://www.dina.kvl.dk/~sestoft/mosml.html
 
-Gtk+: mGTK will only work with the 1.2.x series.  Check your gtk+ 
+Gtk+: mGTK will only work with the 1.2.x series.  Check your Gtk+ 
       version with the command:
               gtk-config --version
+      Gtk+ is available from:
+              http://www.gtk.org/
+              http://www.gimp.org/win32 (Windows version)
 
 
 DOCUMENTATION
@@ -58,7 +66,7 @@ DOCUMENTATION
 
 At this time there is no documentation for mGTK :-(
 However, it should be possible to use the documentation for the C
-interface to gtk+ (available the gtk+ homepage; see above).
+interface to Gtk+ (available at the Gtk+ homepage; see above).
 
 Also, you can take a peek in the examples directory (remember to read
 the README file there).
