@@ -128,8 +128,8 @@ struct
 
         (* UNSAFE: no error checking in the set and get functions! *)
         type 'a setter = GtkArgs -> int -> 'a -> unit
-        val set_bool : bool setter = app3(symb "mgtk_set_retpos_bool")
-        val set_int  : int setter  = app3(symb "mgtk_set_retpos_int")
+        val setBool : bool setter = app3(symb "mgtk_set_retpos_bool")
+        val setInt  : int setter  = app3(symb "mgtk_set_retpos_int")
 
 
         type 'a getter = GtkArgs -> int -> 'a
@@ -143,7 +143,7 @@ struct
 	fun register f = localId(fn id => (add (id, f); id))
 	fun reg_unit f = register(fn _ => f())
 	fun reg_bool f = register(fn (_,args,pos) => 
-				  set_bool args pos (f()))
+				  setBool args pos (f()))
 
 	val signal_connect : gtkobj -> string -> int -> bool -> int
 	                   = app4(symb"mgtk_signal_connect")
