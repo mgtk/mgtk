@@ -456,6 +456,7 @@ sig
     val WINDOW_POPUP : window_type
 
     val new: window_type -> base t
+    val get_size: 'a t -> int * int
 end
 
 
@@ -483,6 +484,14 @@ struct
     val new_ = _import "gtk_window_new": int -> cptr;
     val new: window_type -> base t
         = fn wtype => makeWin(new_ wtype)
+
+    val get_size_: cptr * int ref * int ref -> unit
+        = _import "gtk_window_get_size": cptr * int ref * int ref -> unit;
+    val get_size = fn self => GObject.withPtr(self, fn self =>
+		      let val (x1,x2) = (ref 0, ref 0)
+		      in  get_size_ (self, x1, x2)
+                        ; (!x1, !x2)
+		      end)
 
 end
 

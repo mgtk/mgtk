@@ -22,6 +22,9 @@
 #endif
 
 
+#define GetRefVal(r) (Field(r, 0))
+#define SetRefVal(r, v) (modify(&Field(r,0), v))
+
 /* TODO: 
 
    . Don't use void* so extensively.  Use the cast functions provided by gtk.
@@ -300,6 +303,12 @@ static inline GClosure* mgtk_closure_new(gpointer callback_id) {
 }
 
 
+/* Comment (HN, 2003/02/19): I kinda think that the return value from
+   g_signal_connect_closure is not the signal id, but rather the tag
+   (refer to the section "More on Signal Handlers" in the Gtk+ 2.0
+   tutorial.
+*/
+
 /* ML type: cptr -> string -> clb -> bool -> int */
 EXTERNML value mgtk_signal_connect (value object, value name, value clb, value after){  /* ML */
   int res;
@@ -375,6 +384,12 @@ EXTERNML value mgtk_gtk_button_new_with_label(value label) { /* ML */
   return Val_GtkObj(gtk_button_new_with_label(String_val(label)));
 }
 
+/* ML type: gtkobj -> string -> unit */
+EXTERNML value mgtk_gtk_button_set_label(value button, value label) { /* ML */
+  gtk_button_set_label(GtkObj_val(button), String_val(label));
+  return Val_unit;
+}
+
 /* *** Window stuff *** */
 
 /* ML type: unit -> int * int  */
@@ -391,6 +406,16 @@ EXTERNML value mgtk_gtk_window_new(value typ) { /* ML */
   return Val_GtkObj(gtk_window_new(Int_val(typ)));
 }
 
+
+/* ML type: cptr -> int ref -> int ref -> unit */
+EXTERNML value mgtk_gtk_window_get_size(value self, value wdr, value htr) { /* ML */
+  int wd = Int_val(GetRefVal(wdr));
+  int ht = Int_val(GetRefVal(htr));
+  gtk_window_get_size(GtkObj_val(self), &wd, &ht);
+  SetRefVal(wdr, Val_int(wd));
+  SetRefVal(htr, Val_int(ht));
+  return Val_unit;
+}
 
 /* ML type: int -> cptr */
 EXTERNML value mgtk_gtk_entry_new(value unit) { /* ML */

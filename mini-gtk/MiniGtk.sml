@@ -360,6 +360,8 @@ sig
     val clicked_sig : (unit -> unit) -> 'a t Signal.signal
 
     val inherit : 'a -> GObject.constructor -> 'a t
+
+    val set_label: 'a t -> string -> unit
 end
 
 structure Button :> Button =
@@ -386,9 +388,16 @@ struct
     val new_with_label: string -> base t
         = fn label => makeBut(new_with_label_ label)
 
+    val set_label_: cptr -> string -> unit
+        = app2(symb"mgtk_gtk_button_set_label")
+    val set_label: 'a t -> string -> unit
+        = fn button => fn label => set_label_(repr button) label
+
     local open Signal infix --> in
     fun clicked_sig f = 
         signal "clicked" false (void --> return_void) f
+    fun move_cursor_sig f =
+	signal "move-cursor" false (unit --> (int --> (bool --> return_void)))
     end
 end
 
@@ -405,6 +414,8 @@ sig
     val WINDOW_POPUP : window_type
 
     val new: window_type -> base t
+
+    val get_size: 'a t -> int * int
 end
 
 
@@ -434,6 +445,13 @@ struct
     val new: window_type -> base t
         = fn wtype => makeWin(new_ wtype)
 
+    val get_size_: cptr -> int ref -> int ref -> unit
+        = app3(symb"mgtk_gtk_window_get_size")
+    val get_size = fn self =>
+		      let val (x1,x2) = (ref 0, ref 0)
+		      in  get_size_ (repr self) x1 x2
+                        ; (!x1, !x2)
+		      end
 end
 
 signature Editable =
