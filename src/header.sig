@@ -24,9 +24,12 @@ sig
 
     val --> : ('a, 'b) read * ('b, 'c) trans -> ('a -> 'b, 'c) trans 
 
-    val signalConnect : 
-        'a GtkObject -> string -> bool -> ('b -> 'c) return 
-                                       -> ('b -> 'c) -> int
+    type 'a signal
+    type signal_id
+
+    val signal  : string -> bool -> ('b -> 'c) return -> ('b -> 'c) ->
+                                                  'a GtkObject signal
+    val signalConnect : 'a GtkObject -> 'a GtkObject signal -> signal_id
 
     val bool_connect : 'a GtkObject -> string -> (unit -> bool) -> unit
     val unit_connect : 'a GtkObject -> string -> (unit -> unit) -> unit   

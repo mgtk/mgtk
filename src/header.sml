@@ -150,7 +150,7 @@ struct
 
     fun getter get (f, S(arg, max, next)) = 
         if next <= max  (* FIXME: it should be < but that gives problems with
-                                  return_unit.  Currently unsafe *)
+                                  return_unit.  Currently unsafe! *)
         then (f (get arg next), S(arg, max, next+1))
         else raise Subscript
 
@@ -175,21 +175,28 @@ struct
 
     fun (x --> y) arg = y (x arg)                        
 
-    fun signalConnect (OBJ wid) sign after conv f =
+    datatype 'a signal = Sig of string * bool * callback
+
+    fun signal sign after conv f = 
         let fun wrap (_, arg, max) = ignore(conv (f, S(arg, max, 0)))
-            val id = register wrap
-        in  signal_connect wid sign id after
+        in  Sig(sign, after, wrap)
         end
 
+    type signal_id = int
+
+    fun signalConnect (OBJ wid) (Sig(sign, after, wrap)) =
+        let val id = register wrap
+        in  signal_connect wid sign id after
+        end
 
     (* new formulations of the two old connect functions *)
     (* connect a callback with type unit -> unit *)
     fun unit_connect wid sign cb =
-        ignore(signalConnect wid sign false (unit --> return_unit) cb)
+        ignore(signalConnect wid (signal sign false (unit --> return_unit) cb))
 
     (* connect a callback with type unit -> bool *)
     fun bool_connect wid sign cb =
-        ignore(signalConnect wid sign false (unit --> return_bool) cb)
+        ignore(signalConnect wid (signal sign false (unit --> return_bool) cb))
 
     (* old connect functions 
     fun unit_connect (OBJ wid) sign cb =
