@@ -318,7 +318,7 @@ struct
 				Const("("^show ty^")"), Var "f"]
 		    fun toUnderscore #"-" = #"_"
 		      | toUnderscore ch = ch
-		in  Some(Local(StrOnly(Open ["Signal"]) ++ StrOnly(Infix ["-->"]),
+		in  Some(Local(StrOnly(Open ["Signal"]) ++ StrOnly(Infix(SOME Right, ["-->"])),
 			 Some(ValDecl(VarPat((String.map toUnderscore name)^"_sig"), 
 				      Some(toSmlType ty), 
 				      Fn("f", App(Var("signal"), args))))))

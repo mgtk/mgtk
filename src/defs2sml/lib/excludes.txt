@@ -208,6 +208,7 @@ gtk_list_store_set_column_types
 gtk_tree_store_newv
 gtk_tree_store_set_column_types
 #INTERFACES
+GtkEditable
 GtkCellEditable
 GtkTreeModel
 GtkTreeDragSource
@@ -507,3 +508,7 @@ _gtk_size_group_queue_resize
 _gtk_size_group_compute_requisition
 _gtk_size_group_get_child_requisition
 _gtk_container_clear_resize_widgets
+#SIGNALSWITHUNSUPPORTEDTYPES
+extend-selection
+scroll-vertical
+scroll-horizontal

@@ -23,6 +23,10 @@ EXTERNML value my_copy_string(const char *s) {
   return copy_string((char*)s);
 }
 
+/* From Ken's note on interfacing mosml to C */
+#define Char_val(c)	((char) Long_val(c))
+#define Val_char(c)	(Val_long((long) c))
+
 
 /* TODO: 
 
@@ -183,6 +187,8 @@ EXTERNML value name (value vargs, value pos) { /* ML */ \
 MGTK_MakeSetter(mgtk_set_bool, g_value_set_boolean, Bool_val)
 MGTK_MakeSetter(mgtk_set_long, g_value_set_long, Long_val)
 MGTK_MakeSetter(mgtk_set_int, g_value_set_int, Long_val)
+MGTK_MakeSetter(mgtk_set_char, g_value_set_char, Char_val)
+MGTK_MakeSetter(mgtk_set_double, g_value_set_double, Double_val)
 
 /*
 MGTK_MakeGetter(mgtk_get_pos_char, GTK_VALUE_CHAR, Val_long)
@@ -190,6 +196,8 @@ MGTK_MakeGetter(mgtk_get_pos_uchar, GTK_VALUE_UCHAR, Val_long)
 */
 MGTK_MakeGetter(mgtk_get_pos_bool, g_value_get_boolean, Val_bool)
 MGTK_MakeGetter(mgtk_get_pos_int, g_value_get_int, Val_long)
+MGTK_MakeGetter(mgtk_get_pos_char, g_value_get_char, Val_char)
+MGTK_MakeGetter(mgtk_get_pos_double, g_value_get_double, copy_double)
 /*
 MGTK_MakeGetter(mgtk_get_pos_uint, GTK_VALUE_UINT, Val_long)
 MGTK_MakeGetter(mgtk_get_pos_long, GTK_VALUE_LONG, Val_long)

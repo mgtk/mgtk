@@ -16,6 +16,8 @@ structure TinySML = struct
         VarPat of string
       | TupPat of pat list
 
+    datatype fixity = Right | Left
+
     datatype exp =
 	Unit 
       | Const of string
@@ -37,7 +39,7 @@ structure TinySML = struct
       | EmptyDecl
       | Comment of string option (* an empty comment prints as newline *)
       | Open of string list
-      | Infix of string list
+      | Infix of fixity option * string list
       | Local of decl incl * decl incl
 
     infix ==>
@@ -92,6 +94,10 @@ structure TinySML = struct
 	      | show_type_incl sep (SigOnly ty) = 
 		if isSigMode mode then sep ^ SMLType.toString ty else ""
 
+	    fun show_fixity (NONE) = "infix"
+	      | show_fixity (SOME Right) = "infixr"
+	      | show_fixity (SOME Left)  = "infixl"
+
 	    fun show_exp level exp =
 		case exp of
 		    Unit => "()"
@@ -137,7 +143,9 @@ structure TinySML = struct
 		  | Comment NONE => ""
 		  | Comment(SOME c) => "(*" ^ c ^ "*)"
 		  | Open strs => indent ^ Util.stringSep "open " "" " " (fn s=>s) strs
-		  | Infix strs => indent ^ Util.stringSep "infix " "" " " (fn s=>s) strs
+		  | Infix(fixity, strs) => 
+		        indent ^ Util.stringSep (show_fixity fixity ^ " ")
+						"" " " (fn s=>s) strs
 		  | Local(dec1, dec2) =>
 		       let val dec1 = show' dec1
 		       in  if printing dec1 

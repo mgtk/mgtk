@@ -62,7 +62,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
         ,("guint",     (fn _ => SMLType.IntTy,SMLType.IntTy,           (* FIXME *)
 		        ccall"Int_val", ccall"Val_int", NONE))
         ,("char",      (fn _ => SMLType.CharTy,SMLType.CharTy,
-		        ccall"Int_val", ccall"Val_int", NONE)) (* FIXME *)
+		        ccall"Char_val", ccall"Val_char", NONE))
         ,("float",     (fn _ => SMLType.RealTy,SMLType.RealTy,
 		        ccall"Double_val", ccall"copy_double", NONE))
         ,("double",    (fn _ => SMLType.RealTy,SMLType.RealTy,
