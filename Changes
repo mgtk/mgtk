@@ -1,6 +1,7 @@
 ----------------------------------------------------------------------
 Changes since mgtk-alpha-0.01
 
-* Added a bunch of functions from the Sugar gtk.defs file.
+* Added a bunch of widgets and functions from the Sugar gtk.defs file.
 
+* Fixed some bugs.
 ----------------------------------------------------------------------

@@ -479,27 +479,32 @@ struct
 
     fun mkBoxedDecl (name, funcs) =
 	let val name' = TypeInfo.mlBoxedTypeName name
-	    val (refFunc, unRefFunc) =
-		case funcs of
-		    [refFunc, unRefFunc] => (refFunc, unRefFunc)
-		  | _ => raise Fail("wrong number of ref/unref functions (" ^ name ^ ")")
 	    fun isCopy func =
 		let fun last4 s = 
 		        String.extract(s, Int.max(0,String.size s-4), NONE)
 		in  "copy" = last4 func
 		end
+	    val (objExp, refExp, unRefExp) =
+		case funcs of
+                    [] => ("obj", Empty, Empty)
+		  | [refFunc, unRefFunc] => 
+			(if isCopy refFunc then "copy" else "obj",
+			 $$[if isCopy refFunc then "void* copy = " else "",
+                            refFunc, "(obj);"],
+			 $$[unRefFunc, " (", name, "_val(val)); "])
+		  | _ => raise Fail("wrong number of ref/unref functions (" ^ name ^ ")")
 		   
 	in  $$["#define ", name, "_val(x) ((void*) Field(x, 1))"] && Nl && Nl
 
          && $$["static void ml_finalize_", name', " (value val) {"] && Nl
-         && $$["  ", unRefFunc, " (", name, "_val(val)); "] && Nl
+         &&  $"  " && unRefExp && Nl
          && $$["}"] && Nl && Nl
 
          && $$["value Val_", name, " (void* obj) {"] && Nl
          && $$["  value res;"] && Nl
-         && $$["  ", if isCopy refFunc then "void* copy = " else "", refFunc, "(obj);"] && Nl
+         &&  $"  " && refExp && Nl
          && $$["  res = alloc_final (2, ml_finalize_", name', ", 0, 1);"] && Nl
-         && $$["  ", name, "_val(res) = (value) ", if isCopy refFunc then "copy" else "obj", " ;"] && Nl
+         && $$["  ", name, "_val(res) = (value) ", objExp, " ;"] && Nl
 	 && $$["  return res;"] && Nl
 	 && $$["}"] && Nl && Nl
 	end
