@@ -1,3 +1,34 @@
+dragdrop.sml
+------------
+An example adopted from "Mono, A Developers Notebook"
+(04-gtk/08-dragdrop).  Shows how to implement drag & drop.
+
+Defects:
+  - The program does not compile due to missing Gdk.Pixbuf support,
+    and perhaps also missing GError -> exceptions stuff.
+    WORKAROUND: Use high-level Gtk.Image API instead.
+  - The program does not compile due to missing Gtk.TargetEntry
+    support: no way to create one (assumed nice default).
+  - The program does not compile due to missing Gtk.TargetList
+    support: no structure in Gtk, no list-array support(?) for new. 
+  - Missing function gtk_drag_dest_set.  Assumes that it will be in
+    Gtk.Widget (like drag_dest_unset). An alternative could be to make
+    a structure Gtk.Drag.
+  - Missing enum types GtkDestDefaults, GdkDragAction, GdkModifierType
+  - Missing function gtk_drag_source_set.  Assumes that it will be in
+    Gtk.Widget.
+  - Missing gtk_drag_set_icon_pixbuf. Assumes that it will be in
+    Gtk.Widget.
+  - Missing gtk_drag_set_icon_pixbuf. Assumes that it will be in
+    Gtk.Widget.
+  - Missing support for types GdkDragContext and GtkSelectionData.  I
+    think that Gtk.SelectionData is just a (too) general encoding of a
+    string.
+  - In the function dataGet the argument data, is really an out-param,
+    which is supposed to fill.  Currently this is done by fictious
+    function set.
+
+
 treeview.sml
 ------------
 An example adopted from "Mono, A Developers Notebook"
