@@ -1,0 +1,7 @@
+(define-function dummy_function
+  (c-name "gtk_dummy_function")
+  (return-type "gboolean")
+  (parameters
+    '("guint" "dummyarg")
+  )
+)

@@ -1,0 +1,44 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object CellRenderer
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkCellRenderer")
+  (gtype-id "GTK_TYPE_CELL_RENDERER")
+)
+
+(define-function gtk_cell_renderer_get_type
+  (c-name "gtk_cell_renderer_get_type")
+  (return-type "GType")
+)
+
+(define-method set_fixed_size
+  (of-object "GtkCellRenderer")
+  (c-name "gtk_cell_renderer_set_fixed_size")
+  (return-type "none")
+  (parameters
+    '("gint" "width")
+    '("gint" "height")
+  )
+)
+
+;;(define-method get_fixed_size
+;;  (of-object "GtkCellRenderer")
+;;  (c-name "gtk_cell_renderer_get_fixed_size")
+;;  (return-type "none")
+;;  (parameters
+;;    '("gint*" "width")
+;;    '("gint*" "height")
+;;  )
+;;)
+
+(define-function gtk_cell_renderer_text_new
+  (c-name "gtk_cell_renderer_text_new")
+  (is-constructor-of GtkCellRendererText)
+  (return-type "GtkCellRenderer*")
+)

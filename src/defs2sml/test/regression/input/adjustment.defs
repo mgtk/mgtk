@@ -1,0 +1,27 @@
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Adjustment
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkAdjustment")
+  (gtype-id "GTK_TYPE_ADJUSTMENT")
+)
+
+(define-function gtk_adjustment_new
+  (c-name "gtk_adjustment_new")
+  (is-constructor-of "GtkAdjustment")
+  (return-type "GtkObject*")
+  (parameters
+    '("gdouble" "value")
+    '("gdouble" "lower")
+    '("gdouble" "upper")
+    '("gdouble" "step_increment")
+    '("gdouble" "page_increment")
+    '("gdouble" "page_size")
+  )
+)

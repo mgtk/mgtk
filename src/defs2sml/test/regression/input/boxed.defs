@@ -1,0 +1,15 @@
+(define-boxed IconSource
+  (in-module "Gtk")
+  (c-name "GtkIconSource")
+  (gtype-id "GTK_TYPE_ICON_SOURCE")
+  (copy-func "gtk_icon_source_copy")
+  (release-func "gtk_icon_source_free")
+)
+
+(define-boxed TextIter
+  (in-module "Gtk")
+  (c-name "GtkTextIter")
+  (gtype-id "GTK_TYPE_TEXT_ITER")
+  (copy-func "gtk_text_iter_copy")
+  (release-func "gtk_text_iter_free")
+)

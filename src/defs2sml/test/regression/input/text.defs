@@ -1,0 +1,28 @@
+(define-boxed TextIter
+  (in-module "Gtk")
+  (c-name "GtkTextIter")
+  (gtype-id "GTK_TYPE_TEXT_ITER")
+  (copy-func "gtk_text_iter_copy")
+  (release-func "gtk_text_iter_free")
+)
+
+(define-object TextBuffer
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkTextBuffer")
+  (gtype-id "GTK_TYPE_TEXT_BUFFER")
+  (fields
+    '("GtkTextTagTable*" "tag_table")
+  )
+)
+
+(define-method insert
+  (of-object "GtkTextBuffer")
+  (c-name "gtk_text_buffer_insert")
+  (return-type "none")
+  (parameters
+    '("GtkTextIter*" "iter")
+    '("const-gchar*" "text")
+    '("gint" "len" (default "-1"))
+  )
+)

@@ -1,0 +1,121 @@
+(define-boxed IconSet
+  (in-module "Gtk")
+  (c-name "GtkIconSet")
+  (gtype-id "GTK_TYPE_ICON_SET")
+)
+
+(define-enum IconSize
+  (in-module "Gtk")
+  (c-name "GtkIconSize")
+  (gtype-id "GTK_TYPE_ICON_SIZE")
+  (values
+    '("invalid" "GTK_ICON_SIZE_INVALID")
+    '("menu" "GTK_ICON_SIZE_MENU")
+    '("small-toolbar" "GTK_ICON_SIZE_SMALL_TOOLBAR")
+    '("large-toolbar" "GTK_ICON_SIZE_LARGE_TOOLBAR")
+    '("button" "GTK_ICON_SIZE_BUTTON")
+    '("dnd" "GTK_ICON_SIZE_DND")
+    '("dialog" "GTK_ICON_SIZE_DIALOG")
+  )
+)
+
+(define-function icon_size_register
+  (c-name "gtk_icon_size_register")
+  (return-type "GtkIconSize")
+  (parameters
+    '("const-gchar*" "name")
+    '("gint" "width")
+    '("gint" "height")
+  )
+)
+
+(define-object Settings
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkSettings")
+  (gtype-id "GTK_TYPE_SETTINGS")
+)
+
+(define-object Style
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkStyle")
+  (fields
+    '("GdkColor*" "fg")
+    '("GdkColor*" "bg")
+    '("GdkColor*" "light")
+    '("GdkColor*" "dark")
+    '("GdkColor*" "mid")
+    '("GdkColor*" "text")
+    '("GdkColor*" "base")
+    '("GdkColor*" "text_aa")
+    '("GdkColor" "white")
+    '("GdkColor" "black")
+    '("PangoFontDescription*" "font_desc")
+    '("gint" "xthickness")
+    '("gint" "ythickness")
+    '("GdkGC**" "fg_gc")
+    '("GdkGC**" "bg_gc")
+    '("GdkGC**" "light_gc")
+    '("GdkGC**" "dark_gc")
+    '("GdkGC**" "mid_gc")
+    '("GdkGC**" "text_gc")
+    '("GdkGC**" "base_gc")
+    '("GdkGC**" "text_aa_gc")
+    '("GdkGC*" "white_gc")
+    '("GdkGC*" "black_gc")
+    '("GdkPixmap**" "bg_pixmap")
+  )
+  (gtype-id "GTK_TYPE_STYLE")
+)
+
+(define-object RcStyle
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkRcStyle")
+  (gtype-id "GTK_TYPE_RC_STYLE")
+)
+
+(define-object Object
+  (in-module "Gtk")
+  (parent "GObject")
+  (c-name "GtkObject")
+  (gtype-id "GTK_TYPE_OBJECT")
+)
+
+(define-object Widget
+  (in-module "Gtk")
+  (parent "GtkObject")
+  (c-name "GtkWidget")
+  (gtype-id "GTK_TYPE_WIDGET")
+  (fields
+    '("guint8" "state")
+    '("guint8" "saved_state")
+    '("gchar*" "name")
+    '("GtkStyle*" "style")
+    '("GdkRectangle" "allocation")
+    '("GdkWindow*" "window")
+    '("GtkWidget*" "parent")
+  )
+)
+
+(define-function rc_get_style_by_paths
+  (of-object "GtkRcStyle")
+  (c-name "gtk_rc_get_style_by_paths")
+  (return-type "GtkStyle*")
+  (parameters
+    '("GtkSettings*" "settings")
+    '("const-char*" "widget_path")
+    '("const-char*" "class_path")
+    '("GType" "type")
+  )
+)
+
+(define-method modify_style
+  (of-object "GtkWidget")
+  (c-name "gtk_widget_modify_style")
+  (return-type "none")
+  (parameters
+    '("GtkRcStyle*" "style")
+  )
+)
