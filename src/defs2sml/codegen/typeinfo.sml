@@ -251,6 +251,7 @@ functor TypeInfo(structure Prim : PRIMTYPES) :> TypeInfo = struct
 	       in  #wrapped info end
 	  | Type.WithDefault(ty,default) => isWrapped tinfo ty
 	  | Type.Ptr ty => isWrapped tinfo ty
+	  | Type.Const ty => isWrapped tinfo ty
 	  | Type.Output(pass,ty) => isWrapped tinfo ty
 	  | _ => false
 

@@ -114,6 +114,7 @@ structure Gtk  = struct
 	type 'a t = 'a treepath_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTreePath : 'a t -> base t
+	val compare : 'a t -> 'b t -> int
       end = struct
 	type cptr = GObject.cptr
 	type base = unit
@@ -123,6 +124,13 @@ structure Gtk  = struct
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreePath obj
 	  = inherit () (fn () => GObject.withPtr (obj, fn obj => obj))
+	val compare_ : cptr * cptr -> int
+	    = _import "gtk_tree_path_compare" : cptr * cptr -> int;
+	val compare : 'a t -> 'b t -> int
+	    = fn self => fn b =>
+		 GObject.withPtr
+		   (self, 
+		    fn self => GObject.withPtr (b, fn b => compare_ (self, b)))
     end
 end
 

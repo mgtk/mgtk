@@ -121,6 +121,7 @@ structure Gtk  = struct
 	type 'a t = 'a treepath_t GObject.t
 	val inherit : 'a -> GObject.constructor -> 'a t
 	val toTreePath : 'a t -> base t
+	val compare : 'a t -> 'b t -> int
       end = struct
 	open Dynlib
 	type cptr = GObject.cptr
@@ -132,6 +133,10 @@ structure Gtk  = struct
 	fun inherit w con = GObject.inherit () con
 	fun make ptr = inherit () (fn () => ptr)
 	fun toTreePath obj = inherit () (fn () => repr obj)
+	val compare_ : cptr -> cptr -> int
+	    = app2 (symb"mgtk_gtk_tree_path_compare")
+	val compare : 'a t -> 'b t -> int
+	    = fn self => fn b => compare_ (repr self) (repr b)
     end
 end
 
@@ -166,3 +171,8 @@ EXTERNML value mgtk_gtk_tree_view_set_model(value self, value model) { /* ML */
 
 
 /* *** TreePath *** */
+/* ML type: cptr -> cptr -> int */
+EXTERNML value mgtk_gtk_tree_path_compare(value self, value b) { /* ML */
+    return Val_int(gtk_tree_path_compare(GtkObj_val(self), GtkObj_val(b)));
+}
+

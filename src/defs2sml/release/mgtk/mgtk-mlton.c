@@ -728,13 +728,6 @@ EXTERNML GtkBorder* alloc_GtkBorder() {
 
 
 
-/* *** IconInfo *** */
-EXTERNML GtkIconInfo* alloc_GtkIconInfo() {
-  GtkIconInfo *res = (GtkIconInfo*) malloc(sizeof(GtkIconInfo*));
-    return gtk_icon_info_copy(res);
-}
-
-
 
 /* *** IconTheme *** */
 /* ML type: int ref * int ref -> unit */
@@ -791,11 +784,6 @@ EXTERNML GtkTextIter* alloc_GtkTextIter() {
 
 
 /* *** TreeRowReference *** */
-EXTERNML GtkTreeRowReference* alloc_GtkTreeRowReference() {
-  GtkTreeRowReference *res = (GtkTreeRowReference*) malloc(sizeof(GtkTreeRowReference*));
-    return gtk_tree_row_reference_copy(res);
-}
-
 
 
 /* *** CellEditable *** */

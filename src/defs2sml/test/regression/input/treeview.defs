@@ -58,3 +58,12 @@
   (c-name "gtk_tree_path_get_indices")
   (return-type "gint*" (array foo))
 )
+
+(define-method compare
+  (of-object "GtkTreePath")
+  (c-name "gtk_tree_path_compare")
+  (return-type "gint")
+  (parameters
+    '("const-GtkTreePath*" "b")
+  )
+)
