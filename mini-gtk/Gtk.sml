@@ -147,7 +147,7 @@ struct
 
     (* connect a callback with type unit -> bool *)
     fun bool_connect wid sign cb =
-        ignore(signalConnect wid (signal sign false (unit --> return_bool) cb))
+        ignore(signalConnect wid (signal sign true (unit --> return_bool) cb))
 
     end	
 
@@ -224,7 +224,7 @@ struct
     val connect_delete_event: 'a GtkWidget -> (unit -> bool) -> unit
         = fn wid => fn cb => 
                        ignore(signalConnect wid 
-                              (signal "delete_event" false 
+                              (signal "delete_event" true 
                                       (unit --> return_bool) cb))
     val connect_clicked: 'a GtkButton -> (unit -> unit) -> unit
         = fn wid => fn cb => unit_connect wid "clicked" cb
