@@ -60,7 +60,10 @@ functor GenCMosml(structure TypeInfo : TypeInfo)
 		    val parsty' = List.mapPartial f parsty
 		    val ret = Type.getRetType ty
 
-		    fun f ((par,ty),i) = VDecl(par,TValue,SOME(Call("Field", NONE, [Var "mgtk_params", Int i])))
+		    val isOut = TypeInfo.isOutput (fn _ => true) typeinfo
+		    fun f ((par,ty),i) = 
+			VDecl(if isOut ty then par^"_ref" else par,TValue,
+			      SOME(Call("Field",NONE,[Var"mgtk_params",Int i])))
 		    val extract = if List.length parsty > 5 
 				  then List.map f (ListPair.zip(parsty,List.tabulate(List.length parsty, fn i=>i)))
 				  else []
