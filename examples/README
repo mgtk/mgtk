@@ -11,13 +11,13 @@ commands
 
 (3) set an environment variable:
     Unix:
-      export MGTKHOME=..  (when using bash)
-      setenv MGTKHOME ..  (when using [t]csh)
+      export MGTKHOME=~/mgtk-beta  (when using bash)
+      setenv MGTKHOME ~/mgtk-beta  (when using [t]csh)
 
     Windows:
-      set MGTKHOME=..
+      set MGTKHOME=\mgtk-beta
 
-(4) mosml -I ..
+(4) mosml -I ~/mgtk-beta
 
 (5) load "<file>";  (where <file> is the name of the file
                      *without* the .uo extension)
@@ -42,6 +42,8 @@ counter.sml	 | A first attempt to move some of the event loop to SML,
 calendar.sml     | Shows how to use the calendar widget
 drawing.sml      | Shows how to use the drawing area widget, including
                  | how to manage graphics contexts, etc.
+pixmap.sml       | Shows how to use pixmaps (loading from files, and
+                   drawing on pixmaps); uses wheel.xpm
 comboexample.sml | Shows how to use combo boxes (from the gtk+ tutorial)
 treeexample.sml  | Shows how to use trees (from the gtk+ tutorial)
 treeexample2.sml | Like treeexample, but show how closures can be used to 
