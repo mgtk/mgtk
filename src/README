@@ -27,5 +27,5 @@ Let ${MGTKHOME} be the directory in which you unpacked mGtk.
 You can now try some of the examples in the ${MGTKHOME}/examples
 directory.
 
-----------------------------------------------------------------------
-                                          Henning Niss, April 12, 2000
+---------------------------------------------------------------------- 
+                        Ken Friis Larsen and Henning Niss, April, 2000
