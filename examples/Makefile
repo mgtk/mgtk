@@ -1,26 +1,18 @@
-include ../../Makefile.inc
+include ../src/Makefile.inc
 
-MOSMLINCLUDE=-I ..
+MOSMLINCLUDE=-I $(LIBDIR)
 
-OBJS=defsstat.uo defslist.uo defsfind.uo
-TOOLS=defsstat defslist defsfind
+OBJS= FunInput.uo valuta.uo helloworld2.uo helloworld.uo entrylabel.uo\
+      fileview.uo fileedit.uo fileedit2.uo counter.uo comboexample.uo\
+      treeexample.uo
 
-all: $(TOOLS)
+all: tests
 
-defsstat: defsstat.uo
-	$(MOSMLC) $(MOSMLINCLUDE) -o $@ $<
-
-defslist: defslist.uo
-	$(MOSMLC) $(MOSMLINCLUDE) -o $@ $<
-
-defsfind: defsfind.uo
-	$(MOSMLC) $(MOSMLINCLUDE) -o $@ $<
-
+tests: $(OBJS)
 
 clean:
 	$(REMOVE) *~
 	$(REMOVE) *.u? 
-	$(REMOVE) $(TOOLS)
 	$(REMOVE) Makefile.bak
 
 depend: 
@@ -29,5 +21,8 @@ depend:
 	$(CAMLRUNM) $(MOSMLTOOLS)/cutdeps < Makefile.bak > Makefile
 	$(CAMLRUNM) $(MOSMLTOOLS)/mosmldep >> Makefile
 
+
 ### EVERYTHING THAT GOES BEYOND THIS COMMENT WILL BE ERASED WITHOUT WARNING
 ### DO NOT DELETE THIS LINE
+FunInput.uo: FunInput.ui 
+counter.uo: FunInput.ui 

@@ -32,6 +32,10 @@ SHELL=/bin/sh
 
 # ---------- You shouldn't need to edit below this line ------------
 
+TOPDIR=..
+BINDIR=$(TOPDIR)/bin
+LIBDIR=$(TOPDIR)/src
+
 GENPROG=../bin/mgtkgen
 
 MOSMLTOOLS=${MOSMLHOME}/tools
