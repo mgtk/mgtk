@@ -3,7 +3,7 @@ struct
 
     val toLower = String.map Char.toLower
 
-    fun toName split current name = 
+    fun toName ret split current name = 
 	let val splits = split name
 (*
 	    fun return full [] = (rev full,[],[])
@@ -17,7 +17,7 @@ struct
 	      | loop ([], p') acc = (rev acc, p')
 	      | loop (_, []) acc = ([],rev acc) (* FIXME *)
 *)
-	    fun  return full path = (rev full, [], path)
+	    fun return full path = ret (rev full, path)
 	    fun loop (e::p, e'::p') full = 
 		if Name.toLower e = Name.toLower e' then loop (p,p') (e::full)
 		else return full (e'::p')
@@ -39,7 +39,19 @@ struct
 	let 
 	    val show_path = Util.stringSep "{" "}" "-" (fn s => s)
 		    
-		
+	    structure Set = Splayset
+	    fun compare (n1, n2) = 
+		let fun tos ns = Util.stringSep "" "" "" (fn s=>s) ns
+		in  String.compare(tos(Name.getFullPath n1 @ Name.getBase n1), 
+				   tos(Name.getFullPath n2 @ Name.getBase n2))
+		end
+	    val seenbefore = ref (Set.empty Name.compare)
+	    fun add name = seenbefore := Set.add(!seenbefore,name)
+	    fun lookup (full,base) =
+		if Set.member(!seenbefore, Name.fromPaths(full,[],base))
+		then (full,base,[])
+		else (full,[],base)
+	    fun id (full,base) = (full,[],base)
 	    fun splitfcn info = 
                 case info of
                     Method _ => Name.separateUnderscores
@@ -49,19 +61,21 @@ struct
 	    fun resMod current m =
 	        case m of
 		    Module{name,members,info} =>
-			let val (full,path,base) = toName Name.separateWords current name
+			let val (full,path,base) = toName id Name.separateWords current name
 			    val current' = Name.separateWords name
 			    val name' = Name.fromPaths(full,path,base)
 			    val _ = MsgUtil.debug("  module: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ Name.toString' name' ^"\n")
 			in  Module{name=name',
 				   members=List.map (resMem current') members,
 				   info=resType' current info}
+			before
+			    add name'
 			end
 	    and resMem current m =
 		case m of
 		    Sub m => Sub(resMod current m)
 	          | Member{name,info} => 
-			let val (full,path,base) = toName (splitfcn info) current name
+			let val (full,path,base) = toName id (splitfcn info) current name
 			    val name' = Name.fromPaths(full,path,base)
 			    val _ = MsgUtil.debug("  member: " ^ name ^ " (at " ^ show_path current ^ ") -> " ^ Name.toString' name')
 			in  Member{name=name',
@@ -69,7 +83,7 @@ struct
 			end
 	    and resMemInfo current (Enum enums) =
 		let fun res e = 
-			let val (f,p,b) = toName (Name.separateUnderscores) current e
+			let val (f,p,b) = toName id (Name.separateUnderscores) current e
 			in  Name.fromPaths(f,p,b) end
 		in  Enum(List.map res enums) end
 	      | resMemInfo current (Method ty) = Method(resType current ty)
@@ -78,7 +92,7 @@ struct
 	      | resMemInfo current (Boxed funcs) = Boxed funcs
 	    and resType current ty =
 		let fun demod (Type.Tname _, tyname) = 
-			let val (f,p,b) = toName Name.separateWords current tyname
+			let val (f,p,b) = toName lookup Name.separateWords current tyname
 			in  Name.fromPaths(f,p,b) end
 		      | demod (Type.Base _, tyname) = Name.fromPaths([],[],[tyname])
 		      | demod (_,_) = raise Fail("resType: shouldn't happen")

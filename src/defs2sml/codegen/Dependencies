@@ -4,6 +4,6 @@
 smltype: /ast/type /util/util /ast/name
 tinyc: /util/util
 tinysml: /ast/name smltype /util/
-typeinfo: /util/util /ast/ast /ast/name /ast/type smltype tinyc tinysml
+typeinfo: /util/ /ast/ast /ast/name /ast/type smltype tinyc tinysml
 smlgen: /ast/ast /ast/name /ast/type /util/ smltype tinysml typeinfo
 cgen: /ast/ast /ast/name /ast/type tinyc smltype typeinfo

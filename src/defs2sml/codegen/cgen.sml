@@ -96,14 +96,15 @@ struct
 	  | AST.Boxed(SOME{copy,release}) =>
 	        let val name = Name.asCBoxed name
 		in  [(Define(name^"_val(x)", "(((void*) Field(x, 1)))"),NONE),
+		     (Define(name^"_val_nocast(x)", "(Field(x, 1))"),NONE),
 		     (Fun(Proto(SOME"static","ml_finalize_"^name,[("val",TValue)],TVoid),
 			  Block(NONE,[],[Exp(Call(release,NONE,[Call(name^"_val",NONE,[Var"val"])]))])),
 		      NONE),
                      (Fun(Proto(NONE,"Val_"^name,[("obj",TStar TVoid)],TValue),
 			  Block(NONE,[VDecl("res",TValue,NONE)],
 			     Ass(Var"res", TValue, Call("alloc_final",NONE,[Int 2,Var("ml_finalize_"^name),Int 0, Int 1]))::
-			     Ass(Call(name^"_val",NONE,[Var"res"]),TValue,
-				 Call(copy,NONE,[Var"obj"]))::
+			     Ass(Call(name^"_val_nocast",NONE,[Var"res"]),TValue,
+				 Cast(TValue,Call(copy,NONE,[Var"obj"])))::
 			     [Return(Var"res")]
                           )),
 		      NONE)]
@@ -111,13 +112,14 @@ struct
 	  | AST.Boxed NONE =>
 	        let val name = Name.asCBoxed name
 		in  [(Define(name^"_val(x)", "(((void*) Field(x, 1)))"),NONE),
+		     (Define(name^"_val_nocast(x)", "(Field(x, 1))"),NONE),
 		     (Fun(Proto(SOME"static","ml_finalize_"^name,[("val",TValue)],TVoid),
 			 Block(NONE,[],[Comment"Empty"])),
 		      NONE),
                      (Fun(Proto(NONE,"Val_"^name,[("obj",TStar TVoid)],TValue),
 			  Block(NONE,[VDecl("res",TValue,NONE)],
 			     Ass(Var"res", TValue, Call("alloc_final",NONE,[Int 2,Var("ml_finalize_"^name),Int 0, Int 1]))::
-			     Ass(Call(name^"_val",NONE,[Var"res"]),TValue,Var"obj")::
+			     Ass(Call(name^"_val_nocast",NONE,[Var"res"]),TValue,Cast(TValue,Var"obj"))::
 			     [Return(Var"res")]
                           )),
 		      NONE)]

@@ -23,6 +23,7 @@ struct
 	     Var of var
 	   | Int of int
 	   | Float of real
+	   | Cast of ctype * expr
 (*
 	   | Null 
 	   | Op of operator * expr * expr
@@ -75,6 +76,7 @@ struct
 		    Var x => x
 		  | Int i => Int.toString i
 		  | Float f => Real.toString f
+		  | Cast(t,e) => "(" ^ showTy t ^ ") " ^ showExp e
 		  | VerbExp e => e
 		  | Call(f,cast,args) => 
 		       f ^ Util.stringSep "(" ")" ", " showExp args

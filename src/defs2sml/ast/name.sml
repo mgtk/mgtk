@@ -95,8 +95,8 @@ structure Name :> NAME = struct
 
     fun compare (n1, n2) = 
 	let fun tos ns = Util.stringSep "" "" "" (fn s=>s) ns
-	in  String.compare(tos (#fullpath n1 @ #base n1), 
-			   tos (#fullpath n2 @ #base n2))
+	in  String.compare(tos (#fullpath n1 @ #path n1 @ #base n1), 
+			   tos (#fullpath n2 @ #path n2 @ #base n2))
 	end
 
     fun fromString base = (* FIXME *)

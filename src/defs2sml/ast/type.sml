@@ -24,11 +24,12 @@ structure Type :> Type = struct
 	  | Tname n => Tname (f(ty, n))
     fun map f ty = mapi (fn (_,n) => f n) ty
 
+    val toUpper = String.map Char.toUpper
     fun show show_tname ty =
 	let fun shw ty =
 		case ty of
 		    Void => "VOID"
-		  | Base n => show_tname n
+		  | Base n => toUpper(show_tname n)
 		  | Tname n => show_tname n
 		  | Ptr ty => shw ty ^ " ref"
 		  | Const ty => shw ty ^ " const"

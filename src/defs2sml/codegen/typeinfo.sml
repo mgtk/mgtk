@@ -65,28 +65,13 @@ structure TypeInfo :> TypeInfo = struct
     fun build module =
 	let fun bmod (AST.Module{name,members,info=SOME(n,parent)},table) = 
 		let val table' = List.foldl bmem table members
-(*
-		    val md = Util.stringSep "" "" "" (fn s=>s) (Name.getBase name)
-(*
-			case Name.getBase name of 
-			    [md] => md
-			  | bs => raise Fail("build: " ^ Util.stringSep "" "" "." (fn s=>s) bs)
-*)
-*)
 		    val nb = Name.getBase name
-(*		    val name' = Name.fromPaths(Name.getFullPath name@[md],
-					       Name.getPath name,
-					       [Name.toLower md^"_t"])
-*)
 (*
-		    val tname = Name.fromPaths(Name.getFullPath name@[md],
-					       Name.getPath name,
-					       [Name.toLower md^"_t"])
-*)
 		    val name' = Name.fromPaths(Name.getFullPath name@nb,
 					       Name.getPath name,
 					       nb)
-		    val _  = TextIO.print("Binding " ^ Name.toString' name ^ "\n")
+*)
+		    val _  = MsgUtil.debug("Binding " ^ Name.toString' name)
 		    val info = {toc=ccall"GtkObj_val",fromc=ccall"Val_GtkObj",
 				ptype=SMLType.TyApp([],["cptr"]),
 				fromprim = make, toprim = repr,
@@ -99,7 +84,7 @@ structure TypeInfo :> TypeInfo = struct
 	      | bmem (AST.Member{name,info},table) =
 		case info of
 		    AST.Enum _ => 
-		    (TextIO.print("Binding " ^ Name.toString' name ^ "\n");
+		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
 			    {toc=ccall"Int_val", fromc=ccall"Val_int",
 			     fromprim=id, toprim=id,
@@ -107,7 +92,7 @@ structure TypeInfo :> TypeInfo = struct
 			     stype=fn _ => SMLType.TyApp([],[Name.asEnum name])})
                     )
 		  | AST.Boxed _ =>
-		    (TextIO.print("Binding " ^ Name.toString' name ^ "\n");
+		    (MsgUtil.debug("Binding " ^ Name.toString' name);
 		        add(table,name,
 			    {toc=ccall(Name.asCBoxed name^"_val"), 
 			     fromc=ccall("Val_"^Name.asCBoxed name),
@@ -147,10 +132,10 @@ structure TypeInfo :> TypeInfo = struct
 		     ; table
 		   end
 
-    fun prependPath path ty =
+    fun prependPath (path,base) ty =
 	case ty of
 	    SMLType.TyApp(alphas, tyname) =>
-	        SMLType.TyApp(alphas, path @ tyname)
+		SMLType.TyApp(alphas, path @ tyname)
 	  | _ => ty
 
     fun toSMLType tinfo fresh ty =
@@ -170,7 +155,8 @@ structure TypeInfo :> TypeInfo = struct
                )
 	  | Type.Tname n => 
 	       (let val info: info = lookup tinfo n
-		in  prependPath (Name.getPath n) (#stype info fresh)
+		in  prependPath (Name.getPath n, Name.getBase n) 
+				(#stype info fresh)
 		end
 		    handle NotFound => raise Unbound n
                )
@@ -239,6 +225,7 @@ structure TypeInfo :> TypeInfo = struct
 		end
 		    handle NotFound => raise Unbound n
 	       )
+	  | Type.Ptr ty => fromPrimValue tinfo ty (* FIXME: ? *)
 	  | _ => id
     fun toPrimValue tinfo ty =
 	case ty of
@@ -254,6 +241,7 @@ structure TypeInfo :> TypeInfo = struct
 		end
 		    handle NotFound => raise Unbound n
 	       )
+	  | Type.Ptr ty => toPrimValue tinfo ty (* FIXME: ? *)
 	  | _ => id
 
     fun toCValue tinfo ty =
